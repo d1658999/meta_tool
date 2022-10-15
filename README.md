@@ -1,9 +1,10 @@
 <h1 align="center">Hi 👋, I'm PriceWu</h1>
 <h3 align="center">Meta tool for non-signaling and signaling for fast measurements</h3>
 
-- 🔭 I’m currently working on Google Pixel team for RF **P23**
+- 🔭 I’m currently working on **P23**
 
-<h3 align="left">Connect with me:</h3>
+- 📫 How to reach me **PriceWu@google.com**
+
 <p align="left">
 </p>
 
