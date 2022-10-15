@@ -1,0 +1,8 @@
+# created by virtualenv automatically
+*.xlsx
+/outputfile
+/Python39
+/Python39_v26.01
+log.txt
+__pycache__/
+.idea/
