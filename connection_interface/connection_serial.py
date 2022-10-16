@@ -5,7 +5,12 @@ from utils.log_init import log_set
 
 logger = log_set()
 
+
 class ModemComport:
+    def __init__(self):
+        self.ser = None
+        self.begin_serial()
+
     @staticmethod
     def get_comport_wanted():
         comports = serial.tools.list_ports.comports()
@@ -34,11 +39,14 @@ class ModemComport:
         self.ser.port = self.get_comport_wanted()
         self.com_open()
 
+
 def test():
     logger.info('test')
 
+
 def main():
     test()
+
 
 if __name__ == '__main__':
     main()
