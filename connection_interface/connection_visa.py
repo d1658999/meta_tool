@@ -2,7 +2,6 @@ import pyvisa
 
 from utils.log_init import log_set
 
-
 logger = log_set()
 
 
@@ -14,14 +13,16 @@ class VisaComport:
     def begin_visa(self, equipment_name):
         if equipment_name in ['CMW100', 'Cmw100', 'cmw100']:
             try:
-                cmw100 = pyvisa.ResourceManager().open_resource('TCPIP0::127.0.0.1::INSTR')
-                cmw100.timeout = 5000
-                logger.info('Connect to CMW100')
-                logger.info('TCPIP0::127.0.0.1::INSTR')
-                return cmw100
+                self.inst = pyvisa.ResourceManager().open_resource('TCPIP0::127.0.0.1::INSTR')
+                self.inst.timeout = 5000
 
             except Exception as err:
+                logger.info(err)
                 logger.info('Please check if connecting to CMW100 or the comport is occupied')
+
+            else:
+                logger.info('Connect to CMW100')
+                logger.info('TCPIP0::127.0.0.1::INSTR')
 
         elif '8820' in equipment_name or '8821' in equipment_name:
             gpib_wanted = None
