@@ -5,7 +5,7 @@ from utils.log_init import log_set
 
 logger = log_set()
 
-class Comport:
+class ModemComport:
     @staticmethod
     def get_comport_wanted():
         comports = serial.tools.list_ports.comports()
