@@ -8,6 +8,7 @@ logger = log_set()
 
 class VisaComport:
     def __init__(self, equipment_name):
+        self.inst = None
         self.begin_visa(equipment_name)
 
     def begin_visa(self, equipment_name):
@@ -42,3 +43,9 @@ class VisaComport:
                 resources.append(resource)
                 logger.debug(resource)
         return resources
+
+    def write(self, command):
+        self.inst.write(command)
+
+    def query(self, command):
+        return self.inst.query(command)

@@ -8,6 +8,7 @@ logger = log_set()
 
 class ModemComport:
     def __init__(self):
+        pass
         self.ser = None
         self.begin_serial()
 
@@ -24,10 +25,11 @@ class ModemComport:
     def com_open(self):
         try:
             self.ser.open()
-            logger.info('open modem comport')
         except Exception as err:
             logger.info('check the comport is locked or drop comport')
             logger.debug(err)
+        else:
+            logger.info('open modem comport')
 
     def com_close(self):
         self.ser.close()
@@ -38,6 +40,12 @@ class ModemComport:
         self.ser.timeout = 0.2
         self.ser.port = self.get_comport_wanted()
         self.com_open()
+
+    def write(self, command):
+        self.ser.write(command)
+
+    def readlines(self):
+        return self.ser.readlines()
 
 
 def test():
