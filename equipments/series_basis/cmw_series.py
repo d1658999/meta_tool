@@ -60,6 +60,18 @@ class CMW:
         '''
         self.cmw_write(f'ROUTe:GPRF:MEAS:SCENario:SALone R1{port_tx} RX1')
 
+    def set_power_count(self, count=2):
+        '''
+        Specifies the statistic count of the measurement. The statistic count is equal to the
+        number of measurement intervals per single shot.
+        Parameters:
+        <StatisticCount> numeric
+        Number of measurement intervals
+        Range:  1  to  100E+3
+        *RST:  10
+        '''
+        self.cmw_write(f'CONFigure:GPRF:MEAS:POWer:SCOunt {count}')
+
     def preset_instrument(self):
         logger.info('----------Preset CMW----------')
         self.cmw_write('SYSTem:PRESet:ALL')

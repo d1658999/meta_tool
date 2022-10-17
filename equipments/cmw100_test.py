@@ -13,7 +13,7 @@ class CMW100(CMW):
         self.set_if_filter()
         self.set_bandpass_filter_bw(self.bw_fr1)
         self.set_rf_input_path(self.port_tx)
-        self.command_cmw100_write(f'CONF:GPRF:MEAS:POW:SCO 2')
+        self.set_power_count(2)
         self.command_cmw100_write(f'CONF:GPRF:MEAS:POW:REP SING')
         self.command_cmw100_write(f'CONF:GPRF:MEAS:POW:LIST OFF')
         self.command_cmw100_write(f"TRIGger:GPRF:MEAS:POWer:SOURce 'Free Run'")
