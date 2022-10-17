@@ -1,15 +1,9 @@
-import serial
 import time
 import datetime
-import serial.tools.list_ports
-import logging
-import pyvisa
-from logging.config import fileConfig
 import openpyxl
 from openpyxl.chart import LineChart, Reference, BarChart, Series
 import pathlib
 
-from connection_interface.connection_serial import ModemComport
 from utils.loss_handler import get_loss
 from utils.log_init import log_set
 from connection_interface.connection_serial import ModemComport

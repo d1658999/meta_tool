@@ -1,8 +1,14 @@
-from connection_interface.connection_serial import ModemComport
+from equipments.series_basis.cmw_series import CMW
 
-class Test:
+
+class CMW100(CMW):
     def __init__(self):
-        self.ser = ModemComport()
+        super().__init__('cmw100')
+        print('good')
 
-t = Test()
-t.ser.readlines()
+def main():
+    cmw100 = CMW100()
+
+
+if __name__ == '__main__':
+    main()

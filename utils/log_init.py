@@ -1,9 +1,9 @@
-import pathlib
+from pathlib import Path
 import logging
 from logging.config import fileConfig
 
 def log_set():
-    config_file = pathlib.Path('./utils/logging.ini')
+    config_file = Path('logging.ini')
     fileConfig(config_file)
     logger = logging.getLogger()
     return logger
