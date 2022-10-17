@@ -18,7 +18,7 @@ class CMW:
         logger.info(f'TCPIP::<<{tcpip_command}')
 
     def set_if_filter(self, filter='BAND'):
-        '''
+        """
         Selects the IF filter type.
         Parameters:
         <FilterType> BANDpass | GAUSs | WCDMa | CDMA | TDSCdma
@@ -27,11 +27,11 @@ class CMW:
         WCDMA: 3.84-MHz RRC filter for WCDMA TX tests
         CDMA: 1.2288-MHz channel filter for CDMA 2000 TX tests
         TDSCdma: 1.28-MHz RRC filter for TD-SCDMA TX tests
-        '''
+        """
         self.cmw_write(f'CONFigure:GPRF:MEAS:POWer:FILTer:TYPE {filter}')
 
     def set_bandpass_filter_bw(self, bw=10):
-        '''
+        """
         Selects the bandwidth for a bandpass filter.
         Parameters:
         <BandpassBW> numeric
@@ -45,11 +45,11 @@ class CMW:
         58, 60, 67, 80, 89, 112, 160 MHz
         The bold values require R&S CMW with TRX160
         *RST 300 kHz
-        '''
+        """
         self.cmw_write(f'CONFigure:GPRF:MEAS:POWer:FILTer:BANDpass:BWIDth {bw}MHz')
 
     def set_rf_input_path(self, port_tx=1):
-        '''
+        """
         Activates the standalone scenario and selects the RF input path for the measured RF
         signal.
         For possible connector and converter values, see Chapter 3.11.4, "Values for RF Path
@@ -57,11 +57,11 @@ class CMW:
         Parameters:
         <RXConnector> RF connector for the input path
         <RFConverter> RX module for the input path
-        '''
+        """
         self.cmw_write(f'ROUTe:GPRF:MEAS:SCENario:SALone R1{port_tx} RX1')
 
     def set_power_count(self, count=2):
-        '''
+        """
         Specifies the statistic count of the measurement. The statistic count is equal to the
         number of measurement intervals per single shot.
         Parameters:
@@ -69,8 +69,34 @@ class CMW:
         Number of measurement intervals
         Range:  1  to  100E+3
         *RST:  10
-        '''
+        """
         self.cmw_write(f'CONFigure:GPRF:MEAS:POWer:SCOunt {count}')
+
+    def set_power_repetition(self, repetition='SINGleshot'):
+        """
+        Specifies the repetition mode of the measurement. The repetition mode specifies
+        whether the measurement is stopped after a single shot or repeated continuously. Use
+        CONFigure:..:MEAS<i>:...:SCOunt to determine the number of measurement
+        intervals per single shot.
+        Parameters:
+        <Repetition> SINGleshot | CONTinuous
+        SINGleshot: single-shot measurement
+        CONTinuous: continuous measurement
+        *RST:  SING
+        """
+        self.cmw_write(f'CONFigure:GPRF:MEAS:POWer:REPetition {repetition}')
+
+    def set_power_list_mode(self, on_off='OFF'):
+        """
+        Enables or disables the list mode for the power measurement.
+        Parameters:
+        <EnableListMode> OFF | ON
+        OFF: list mode off
+        ON: list mode on
+        *RST:  OFF
+        """
+        self.cmw_write(f'CONFigure:GPRF:MEAS:POWer:LIST {on_off}')
+
 
     def preset_instrument(self):
         logger.info('----------Preset CMW----------')
