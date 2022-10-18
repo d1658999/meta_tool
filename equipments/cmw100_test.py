@@ -11,7 +11,7 @@ class CMW100(CMW):
     def preset_instrument(self):
         logger.info('----------Preset CMW----------')
         self.system_preset_all()
-        self.system_base_option_version('CMW_NRSub6G_Meas')
+        self.system_base_option_version_query('CMW_NRSub6G_Meas')
         self.set_fd_correction_deactivate_all()
         self.set_fd_correction_ctable_delete()
         self.cmw_query('*OPC?')
@@ -39,6 +39,18 @@ class CMW100(CMW):
         self.set_gprf_expect_power(self.tx_level)
         self.set_gprf_rf_setting_user_margin(10.00)
         self.set_gprf_rf_setting_external_attenuation(self.loss_tx)
+
+    def set_gprf_power_on(self):
+        self.set_gprf_power_on()
+        self.cmw_query('*OPC?')
+        f_state = self.get_gprf_power_state_query()
+        while f_state != 'RDY':
+            f_state = self.get_gprf_power_state_query()
+            self.cmw_query('*OPC?')
+        power_average = round(eval(self.command_cmw100_query('FETC:GPRF:MEAS:POWer:AVER?'))[1], 2)
+        logger.info(f'Get the GPRF power: {power_average}')
+        return power_average
+
 
 def main():
     cmw100 = CMW100()

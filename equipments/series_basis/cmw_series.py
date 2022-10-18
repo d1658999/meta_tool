@@ -28,7 +28,7 @@ class CMW:
         """
         self.cmw_write(f'SYSTem:PRESet:ALL')
 
-    def system_base_option_version(self, application='nonsense'):
+    def system_base_option_version_query(self, application='nonsense'):
         """
         Returns version information for installed software packages. The "Setup" dialog provides
         this information in section "SW/HW-Equipment > Installed Software".
@@ -53,10 +53,10 @@ class CMW:
         Returns "0"
         Usage: Query only
         """
-        self.cmw_query(f'SYSTem:BASE:OPTion:VERSion? {application}')
+        return self.cmw_query(f'SYSTem:BASE:OPTion:VERSion? {application}')
 
     def system_err_all_query(self):
-        self.cmw_query('SYST:ERR:ALL?')
+        return self.cmw_query('SYST:ERR:ALL?')
 
     def set_fd_correction_deactivate_all(self):
         """
@@ -267,23 +267,53 @@ class CMW:
         """
         self.cmw_write(f'CONFigure:GPRF:MEAS:RFSettings:EATTenuation {attenuation}')
 
+    def set_gprf_tx_freq(self, tx_freq):  # this is KHz
+        """
+        Selects the center frequency of the RF analyzer.
+        For the supported frequency range, see Chapter 3.11.5, "Frequency Ranges",
+        on page 395.
+        Parameters:
+        <AnalyzerFreq> numeric
+        Default unit: Hz
+        """
+        self.cmw_write(f'CONFigure:GPRF:MEAS:RFSettings:FREQuency {tx_freq}KHz')
 
+    def set_gprf_power_on(self):
+        """
+        INITiate:GPRF:MEAS:POWer
+        STOP:GPRF:MEAS:POWer
+        ABORt:GPRF:MEAS:POWer
+        Starts, stops, or aborts the measurement:
+        ● INITiate... starts or restarts the measurement. The measurement enters the
+        "RUN" state.
+        ● STOP... halts the measurement immediately. The measurement enters the "RDY"
+        state. Measurement results are kept. The resources remain allocated to the mea-
+        surement.
+        ● ABORt... halts the measurement immediately. The measurement enters the
+        "OFF" state. All measurement values are set to NAV. Allocated resources are
+        released.
+        Use FETCh...STATe? to query the current measurement state.
+        ==================================================================================
+        Use READ:GPRF:MEAS:POWer...? to initiate a measurement and to retrieve the
+        results. You can also start the measurement using INIT:GPRF:MEAS:POWer and
+        retrieve the results using FETCh:GPRF:MEAS:POWer...
+        """
+        self.cmw_write(f'INIT:GPRF:MEAS:POWer')
 
-
-
-    def set_gprf_tx_freq(self):
-        self.command_cmw100_write(f'CONF:GPRF:MEAS:RFS:FREQ {self.tx_freq_fr1}KHz')
-
-    def get_gprf_power(self):
-        self.command_cmw100_write('INIT:GPRF:MEAS:POW')
-        self.command_cmw100_query('*OPC?')
-        f_state = self.command_cmw100_query('FETC:GPRF:MEAS:POW:STAT?')
-        while f_state != 'RDY':
-            f_state = self.command_cmw100_query('FETC:GPRF:MEAS:POW:STAT?')
-            self.command_cmw100_query('*OPC?')
-        power_average = round(eval(self.command_cmw100_query('FETC:GPRF:MEAS:POWer:AVER?'))[1], 2)
-        logger.info(f'Get the GPRF power: {power_average}')
-        return power_average
+    def get_gprf_power_state_query(self):
+        """
+        Queries the main measurement state. Use FETCh:...:STATe:ALL? to query the
+        measurement state including the substates. Use INITiate..., STOP...,
+        ABORt... to change the measurement state.
+        Return values:
+        <MeasState> OFF | RUN | RDY
+        OFF: measurement off, no resources allocated, no results
+        RUN: measurement running, synchronization pending or adjus-
+        ted, resources active or queued
+        RDY: measurement finished
+        *RST:  OFF
+        """
+        return self.cmw_query('FETC:GPRF:MEAS:POW:STAT?')
 
     def sig_gen_gsm(self):
         logger.info('----------Sig Gen----------')
