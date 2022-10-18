@@ -8,6 +8,17 @@ class CMW100(CMW):
     def __init__(self, equipment='cmw100'):
         super().__init__(equipment)
 
+    def preset_instrument(self):
+        logger.info('----------Preset CMW----------')
+        self.system_preset_all()
+        self.system_base_option_version('CMW_NRSub6G_Meas')
+        self.set_fd_correction_deactivate_all()
+        self.set_fd_correction_ctable_delete()
+        self.cmw_query('*OPC?')
+        self.system_err_all_query()
+        self.cmw_write('*RST')
+        self.cmw_query('*OPC?')
+
     def set_gprf_measurement_fr1(self):
         logger.info('----------set GPRF Measurement----------')
         self.set_gprf_if_filter()

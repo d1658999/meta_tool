@@ -17,6 +17,60 @@ class CMW:
         self.cmw.write(tcpip_command)
         logger.info(f'TCPIP::<<{tcpip_command}')
 
+    def system_preset_all(self):
+        """
+        A PRESet sets the parameters of all sub-instruments and the base settings to default
+        values suitable for local/manual interaction. A RESet sets them to default values suitable
+        for remote operation.
+        Example: SYSTem:PRESet:ALL
+        Force the entire R&S CMW500 to a preset state optimized for
+        manual operation
+        """
+        self.cmw_write(f'SYSTem:PRESet:ALL')
+
+    def system_base_option_version(self, application='nonsense'):
+        """
+        Returns version information for installed software packages. The "Setup" dialog provides
+        this information in section "SW/HW-Equipment > Installed Software".
+        You can either query a list of all installed packages and their versions or you can query
+        the version of a single package specified via parameter <Application>:
+        ● <Application> specified: A string is returned, indicating the version of the <Application>. If the specified <Application> is unknown / not installed, "0" is returned.
+        ● <Application> omitted: A string is returned, containing a list of all installed software
+        packages and their version in the format "<PackageName1>,<Version1>;<PackageName2>,<Version2>;..."
+        Query parameters:
+        <Application> String selecting the software package for which the version shall
+        be queried
+        Return values:
+        <SoftwareVersion> String containing a single version or a list of applications and versions
+        Example: SYSTem:BASE:OPTion:VERSion?
+        Returns a list of all packages, for example
+        "CMW BASE,V3.0.10;CMW GPRF Gen,V3.0.10;CMW GPRF
+        Meas,V3.0.10"
+        Example: SYSTem:BASE:OPTion:VERSion? "CMW GPRF Gen"
+        Returns the version of the GPRF generator software, for example
+        "V3.0.10"
+        Example: SYSTem:BASE:OPTion:VERSion? "nonsense"
+        Returns "0"
+        Usage: Query only
+        """
+        self.cmw_query(f'SYSTem:BASE:OPTion:VERSion? {application}')
+
+    def system_err_all_query(self):
+        self.cmw_query('SYST:ERR:ALL?')
+
+    def set_fd_correction_deactivate_all(self):
+        """
+        it might be FreqCorrection commands group definition
+        from: https://rscmwbase.readthedocs.io/en/latest/Configure_FreqCorrection.html?highlight=fdcorrection
+        """
+        self.cmw_write('CONFigure:FDCorrection:DEACtivate:ALL')
+
+    def set_fd_correction_ctable_delete(self):
+        """
+        Deletes all correction tables for the addressed sub-instrument from the hard disk
+        """
+        self.cmw_write('CONFigure:BASE:FDCorrection:CTABle:DELete:ALL')
+
     def set_gprf_if_filter(self, filter='BAND'):
         """
         Selects the IF filter type.
@@ -213,16 +267,7 @@ class CMW:
         """
         self.cmw_write(f'CONFigure:GPRF:MEAS:RFSettings:EATTenuation {attenuation}')
 
-    def preset_instrument(self):
-        logger.info('----------Preset CMW----------')
-        self.cmw_write('SYSTem:PRESet:ALL')
-        self.cmw_query('SYSTem:BASE:OPTion:VERSion?  "CMW_NRSub6G_Meas"')
-        self.cmw_write('CONFigure:FDCorrection:DEACtivate:ALL')
-        self.cmw_write('CONFigure:BASE:FDCorrection:CTABle:DELete:ALL')
-        self.cmw_query('*OPC?')
-        self.cmw_query('SYST:ERR:ALL?')
-        self.cmw_write('*RST')
-        self.cmw_query('*OPC?')
+
 
 
 
