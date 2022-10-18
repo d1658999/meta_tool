@@ -17,7 +17,7 @@ class CMW:
         self.cmw.write(tcpip_command)
         logger.info(f'TCPIP::<<{tcpip_command}')
 
-    def set_if_filter(self, filter='BAND'):
+    def set_gprf_if_filter(self, filter='BAND'):
         """
         Selects the IF filter type.
         Parameters:
@@ -30,7 +30,7 @@ class CMW:
         """
         self.cmw_write(f'CONFigure:GPRF:MEAS:POWer:FILTer:TYPE {filter}')
 
-    def set_bandpass_filter_bw(self, bw=10):
+    def set_gprf_bandpass_filter_bw(self, bw=10):
         """
         Selects the bandwidth for a bandpass filter.
         Parameters:
@@ -48,7 +48,7 @@ class CMW:
         """
         self.cmw_write(f'CONFigure:GPRF:MEAS:POWer:FILTer:BANDpass:BWIDth {bw}MHz')
 
-    def set_rf_input_path(self, port_tx=1):
+    def set_gprf_rf_input_path(self, port_tx=1):
         """
         Activates the standalone scenario and selects the RF input path for the measured RF
         signal.
@@ -60,7 +60,7 @@ class CMW:
         """
         self.cmw_write(f'ROUTe:GPRF:MEAS:SCENario:SALone R1{port_tx} RX1')
 
-    def set_power_count(self, count=2):
+    def set_gprf_power_count(self, count=2):
         """
         Specifies the statistic count of the measurement. The statistic count is equal to the
         number of measurement intervals per single shot.
@@ -72,7 +72,7 @@ class CMW:
         """
         self.cmw_write(f'CONFigure:GPRF:MEAS:POWer:SCOunt {count}')
 
-    def set_power_repetition(self, repetition='SINGleshot'):
+    def set_gprf_power_repetition(self, repetition='SINGleshot'):
         """
         Specifies the repetition mode of the measurement. The repetition mode specifies
         whether the measurement is stopped after a single shot or repeated continuously. Use
@@ -86,7 +86,7 @@ class CMW:
         """
         self.cmw_write(f'CONFigure:GPRF:MEAS:POWer:REPetition {repetition}')
 
-    def set_power_list_mode(self, on_off='OFF'):
+    def set_gprf_power_list_mode(self, on_off='OFF'):
         """
         Enables or disables the list mode for the power measurement.
         Parameters:
@@ -97,6 +97,53 @@ class CMW:
         """
         self.cmw_write(f'CONFigure:GPRF:MEAS:POWer:LIST {on_off}')
 
+    def set_gprf_trigger_source(self, source='Free Run'):
+        """
+        Selects the source of the trigger events. Some values are always available. They are
+        listed below. Depending on the installed options, additional values are available. You
+        can query a list of all supported values via TRIGger:...:CATalog:SOURce?.
+        Parameters:
+        <Source> string
+        'IF Power': IF power trigger
+        'Free Run': free run (untriggered)
+        *RST:  'Free Run'
+        """
+        self.cmw_write(f'TRIGger:GPRF:MEAS:POWer:SOURce {source}')
+
+    def set_gprf_trigger_slope(self, slope='REDGe'):
+        """
+        Qualifies whether the trigger event is generated at the rising or at the falling edge of
+        the trigger pulse (valid for external and power trigger sources).
+        Parameters:
+        <Event> REDGe | FEDGe
+        REDGe: rising edge
+        FEDGe: falling edge
+        *RST:  REDG
+        """
+        # it also can use: <CONFigure:GPRF:MEAS:POWer:TRIGger:SLOPe>
+        self.cmw_write(f'TRIGger:GPRF:MEAS:POWer:SLOPe {slope}')
+
+    def set_gprf_trigger_step_length(self, length='576.9230769E-6'):
+        """
+        Sets the time between the beginning of two consecutive measurement lengths.
+        Parameters:
+        <StepLength> numeric
+        Range:  <MeasLength>  to  1 s
+        *RST:  576.9230769E-6 s
+        Default unit: s
+        """
+        self.cmw_write(f'CONFigure:GPRF:MEAS:POWer:SLENgth {length}')
+
+    def set_gprf_trigger_measure_length(self, length='576.9230769E-6'):
+        """
+        Sets the length of the evaluation interval used to measure a single set of current power
+        results.
+        The measurement length cannot be greater than the step length.
+        Parameters:
+        <MeasLength> numeric
+        Default unit: s
+        """
+        self.cmw_write(f'CONFigure:GPRF:MEAS:POWer:MLENgth {length}')
 
     def preset_instrument(self):
         logger.info('----------Preset CMW----------')
