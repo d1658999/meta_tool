@@ -145,6 +145,74 @@ class CMW:
         """
         self.cmw_write(f'CONFigure:GPRF:MEAS:POWer:MLENgth {length}')
 
+    def set_gprf_trigger_offset(self, offset=100E-6):
+        """
+        Defines a delay time for triggered measurements. The trigger offset delays the start of
+        the measurement relative to the trigger event.
+        Parameters:
+        <Offset> numeric
+        Range:  0 s  to  1 s
+        *RST:  100E-6 s
+        Default unit: s
+        """
+        self.cmw_write(f'TRIGger:GPRF:MEAS:POWer:OFFSet {offset}')
+
+    def set_gprf_trigger_mode(self, mode='SWE'):
+        """
+        Selects the measurement sequence that is triggered by each single trigger event. This
+        setting is not valid for free run measurements.
+        Parameters:
+        <Mode> ONCE | SWEep | ALL | PRESelect
+        ONCE: "Trigger Once"
+        SWEep: "Retrigger Sweep"
+        ALL: "Retrigger All"
+        PRESelect: "Retrigger Preselect"
+        *RST:  SWE
+        """
+        self.cmw_write(f'TRIGger:GPRF:MEAS:POWer:MODE {mode}')
+
+    def set_gprf_expect_power(self, exp_nom_pwr=0):
+        """
+        Sets the expected nominal power of the measured RF signal.
+        Parameters:
+        <ExpNomPwr> numeric
+        The range of the expected nominal power can be calculated as
+        follows:
+        Range (Expected Nominal Power) = Range (Input Power) +
+        External Attenuation - User Margin
+        The input power range is stated in the data sheet.
+        *RST:  0 dBm
+        Default unit: dBm
+        """
+        self.cmw_write(f'CONFigure:GPRF:MEAS:RFSettings:ENPower {exp_nom_pwr}')
+
+    def set_gprf_rf_setting_user_margin(self, margin=0):
+        """
+        Sets the margin that the measurement adds to the expected nominal power to deter-
+        mine the reference power. The reference power minus the external input attenuation
+        must be within the power range of the selected input connector. Refer to the data
+        sheet.
+        Parameters:
+        <UserMargin> numeric
+        Range:  0 dB to (55 dB + External Attenuation - Expected
+        Nominal Power)
+        *RST:  0 dB
+        Default unit: dB
+        """
+        self.cmw_write(f'CONFigure:GPRF:MEAS:RFSettings:UMARgin {margin}')
+
+    def set_gprf_rf_setting_external_attenuation(self, attenuation):
+        """
+        Defines an external attenuation (or gain, if the value is negative), to be applied to the
+        input connector.
+        Parameters:
+        <RFInputExtAtt> numeric
+        Range:  -50 dB  to  90 dB
+        *RST:  0 dB
+        Default unit: dB
+        """
+        self.cmw_write(f'CONFigure:GPRF:MEAS:RFSettings:EATTenuation {attenuation}')
+
     def preset_instrument(self):
         logger.info('----------Preset CMW----------')
         self.cmw_write('SYSTem:PRESet:ALL')

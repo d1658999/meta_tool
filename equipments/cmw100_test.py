@@ -15,7 +15,7 @@ class CMW100(CMW):
         self.set_gprf_rf_input_path(self.port_tx)
         self.set_gprf_power_count()
         self.set_gprf_power_repetition()
-        self.set_gprf_power_list_mode()
+        self.set_gprf_power_list_mode()  # default is off listmode
         self.set_gprf_trigger_source()
         self.set_gprf_trigger_slope()
         self.set_gprf_trigger_step_length(5.0e-3)
@@ -23,11 +23,11 @@ class CMW100(CMW):
         self.set_gprf_trigger_measure_length(5.0e-3)
         # self.command_cmw100_write(f'TRIGger:GPRF:MEAS:POWer:OFFSet 2.1E-3')
         # self.command_cmw100_write(f'TRIGger:GPRF:MEAS:POWer:OFFSet 5E-4')
-        self.command_cmw100_write(f'TRIGger:GPRF:MEAS:POWer:OFFSet 0')
-        self.command_cmw100_write(f'TRIG:GPRF:MEAS:POW:MODE ONCE')
-        self.command_cmw100_write(f'CONF:GPRF:MEAS:RFS:ENP {self.tx_level}')
-        self.command_cmw100_write(f'CONF:GPRF:MEAS:RFS:UMAR 10.000000')
-        self.command_cmw100_write(f'CONF:GPRF:MEAS:RFS:EATT {self.loss_tx}')
+        self.set_gprf_trigger_offset(0)
+        self.set_gprf_trigger_mode('ONCE')
+        self.set_gprf_expect_power(self.tx_level)
+        self.set_gprf_rf_setting_user_margin(10.00)
+        self.set_gprf_rf_setting_external_attenuation(self.loss_tx)
 
 def main():
     cmw100 = CMW100()
