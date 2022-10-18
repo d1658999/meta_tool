@@ -82,7 +82,7 @@ class CMW:
         CDMA: 1.2288-MHz channel filter for CDMA 2000 TX tests
         TDSCdma: 1.28-MHz RRC filter for TD-SCDMA TX tests
         """
-        self.cmw_write(f'CONFigure:GPRF:MEAS:POWer:FILTer:TYPE {filter}')
+        self.cmw_write(f'CONFigure:GPRF:MEASurement:POWer:FILTer:TYPE {filter}')
 
     def set_gprf_bandpass_filter_bw(self, bw=10):
         """
@@ -100,7 +100,7 @@ class CMW:
         The bold values require R&S CMW with TRX160
         *RST 300 kHz
         """
-        self.cmw_write(f'CONFigure:GPRF:MEAS:POWer:FILTer:BANDpass:BWIDth {bw}MHz')
+        self.cmw_write(f'CONFigure:GPRF:MEASurement:POWer:FILTer:BANDpass:BWIDth {bw}MHz')
 
     def set_gprf_rf_input_path(self, port_tx=1):
         """
@@ -112,7 +112,19 @@ class CMW:
         <RXConnector> RF connector for the input path
         <RFConverter> RX module for the input path
         """
-        self.cmw_write(f'ROUTe:GPRF:MEAS:SCENario:SALone R1{port_tx} RX1')
+        self.cmw_write(f'ROUTe:GPRF:MEASurement:SCENario:SALone R1{port_tx} RX1')
+
+    def set_gprf_rf_output_path(self, port_rx=18):
+        """
+        Activates the standalone scenario and selects the output path for the generated RF
+        signal.
+        For possible connector and converter values, see Chapter 2.5.1.2, "Values for Signal
+        Path Selection", on page 65.
+        Parameters:
+        <TXConnector> RF connector for the output path
+        <RFConverter> TX module for the output path
+        """
+        self.cmw_write(f'ROUTe:GPRF:GENerator:SCENario:SALone R1{port_rx} TX1')
 
     def set_gprf_power_count(self, count=2):
         """
@@ -124,7 +136,7 @@ class CMW:
         Range:  1  to  100E+3
         *RST:  10
         """
-        self.cmw_write(f'CONFigure:GPRF:MEAS:POWer:SCOunt {count}')
+        self.cmw_write(f'CONFigure:GPRF:MEASurement:POWer:SCOunt {count}')
 
     def set_gprf_power_repetition(self, repetition='SINGleshot'):
         """
@@ -138,7 +150,7 @@ class CMW:
         CONTinuous: continuous measurement
         *RST:  SING
         """
-        self.cmw_write(f'CONFigure:GPRF:MEAS:POWer:REPetition {repetition}')
+        self.cmw_write(f'CONFigure:GPRF:MEASurement:POWer:REPetition {repetition}')
 
     def set_gprf_power_list_mode(self, on_off='OFF'):
         """
@@ -149,7 +161,7 @@ class CMW:
         ON: list mode on
         *RST:  OFF
         """
-        self.cmw_write(f'CONFigure:GPRF:MEAS:POWer:LIST {on_off}')
+        self.cmw_write(f'CONFigure:GPRF:MEASurement:POWer:LIST {on_off}')
 
     def set_gprf_trigger_source(self, source='Free Run'):
         """
@@ -162,7 +174,7 @@ class CMW:
         'Free Run': free run (untriggered)
         *RST:  'Free Run'
         """
-        self.cmw_write(f'TRIGger:GPRF:MEAS:POWer:SOURce {source}')
+        self.cmw_write(f'TRIGger:GPRF:MEASurement:POWer:SOURce {source}')
 
     def set_gprf_trigger_slope(self, slope='REDGe'):
         """
@@ -174,8 +186,8 @@ class CMW:
         FEDGe: falling edge
         *RST:  REDG
         """
-        # it also can use: <CONFigure:GPRF:MEAS:POWer:TRIGger:SLOPe>
-        self.cmw_write(f'TRIGger:GPRF:MEAS:POWer:SLOPe {slope}')
+        # it also can use: <CONFigure:GPRF:MEASurement:POWer:TRIGger:SLOPe>
+        self.cmw_write(f'TRIGger:GPRF:MEASurement:POWer:SLOPe {slope}')
 
     def set_gprf_trigger_step_length(self, length='576.9230769E-6'):
         """
@@ -186,7 +198,7 @@ class CMW:
         *RST:  576.9230769E-6 s
         Default unit: s
         """
-        self.cmw_write(f'CONFigure:GPRF:MEAS:POWer:SLENgth {length}')
+        self.cmw_write(f'CONFigure:GPRF:MEASurement:POWer:SLENgth {length}')
 
     def set_gprf_trigger_measure_length(self, length='576.9230769E-6'):
         """
@@ -197,7 +209,7 @@ class CMW:
         <MeasLength> numeric
         Default unit: s
         """
-        self.cmw_write(f'CONFigure:GPRF:MEAS:POWer:MLENgth {length}')
+        self.cmw_write(f'CONFigure:GPRF:MEASurement:POWer:MLENgth {length}')
 
     def set_gprf_trigger_offset(self, offset=100E-6):
         """
@@ -209,7 +221,7 @@ class CMW:
         *RST:  100E-6 s
         Default unit: s
         """
-        self.cmw_write(f'TRIGger:GPRF:MEAS:POWer:OFFSet {offset}')
+        self.cmw_write(f'TRIGger:GPRF:MEASurement:POWer:OFFSet {offset}')
 
     def set_gprf_trigger_mode(self, mode='SWE'):
         """
@@ -223,7 +235,7 @@ class CMW:
         PRESelect: "Retrigger Preselect"
         *RST:  SWE
         """
-        self.cmw_write(f'TRIGger:GPRF:MEAS:POWer:MODE {mode}')
+        self.cmw_write(f'TRIGger:GPRF:MEASurement:POWer:MODE {mode}')
 
     def set_gprf_expect_power(self, exp_nom_pwr=0):
         """
@@ -238,7 +250,19 @@ class CMW:
         *RST:  0 dBm
         Default unit: dBm
         """
-        self.cmw_write(f'CONFigure:GPRF:MEAS:RFSettings:ENPower {exp_nom_pwr}')
+        self.cmw_write(f'CONFigure:GPRF:MEASurement:RFSettings:ENPower {exp_nom_pwr}')
+
+    def set_gprf_rx_level(self, rx_level=-70):
+        """
+        Sets the base RMS level of the RF generator.
+        Parameters:
+        <Level> numeric
+        Range:  Please notice the ranges quoted in the data sheet.
+        Increment:  0.01 dB
+        *RST:  -30 dBm
+        Default unit: dBm
+        """
+        self.cmw_write(f'SOURce:GPRF:GENerator1:RFSettings:LEVel {rx_level}')
 
     def set_gprf_rf_setting_user_margin(self, margin=0):
         """
@@ -253,9 +277,9 @@ class CMW:
         *RST:  0 dB
         Default unit: dB
         """
-        self.cmw_write(f'CONFigure:GPRF:MEAS:RFSettings:UMARgin {margin}')
+        self.cmw_write(f'CONFigure:GPRF:MEASurement:RFSettings:UMARgin {margin}')
 
-    def set_gprf_rf_setting_external_attenuation(self, attenuation):
+    def set_gprf_rf_setting_external_input_attenuation(self, attenuation):
         """
         Defines an external attenuation (or gain, if the value is negative), to be applied to the
         input connector.
@@ -265,7 +289,19 @@ class CMW:
         *RST:  0 dB
         Default unit: dB
         """
-        self.cmw_write(f'CONFigure:GPRF:MEAS:RFSettings:EATTenuation {attenuation}')
+        self.cmw_write(f'CONFigure:GPRF:MEASurement:RFSettings:EATTenuation {attenuation}')
+
+    def set_gprf_rf_setting_external_output_attenuation(self, attenuation):
+        """
+        Defines an external attenuation (or gain, if the value is negative), to be applied to the
+        output connector.
+        Parameters:
+        <ExtRFOutAtt> numeric
+        Range:  -50 dB  to  90 dB
+        *RST:  0 dB
+        Default unit: dB
+        """
+        self.cmw_write(f'SOURce:GPRF:GENerator:RFSettings:EATTenuation {attenuation}')
 
     def set_gprf_tx_freq(self, tx_freq):  # this is KHz
         """
@@ -276,9 +312,20 @@ class CMW:
         <AnalyzerFreq> numeric
         Default unit: Hz
         """
-        self.cmw_write(f'CONFigure:GPRF:MEAS:RFSettings:FREQuency {tx_freq}KHz')
+        self.cmw_write(f'CONFigure:GPRF:MEASurement:RFSettings:FREQuency {tx_freq}KHz')
 
-    def set_gprf_power_on(self):
+    def set_gprf_rx_freq(self, rx_freq):  # this is KHz
+        """
+        Sets the frequency of the unmodulated RF carrier.
+        For the supported frequency range, see Chapter 2.5.1.3, "Frequency Ranges",
+        on page 67.
+        Parameters:
+        <Frequency> numeric
+        Default unit: Hz
+        """
+        self.cmw_write(f'SOURce:GPRF:GENerator1:RFSettings:FREQuency {rx_freq}KHz')
+
+    def set_gprf_measure_start_on(self):
         """
         INITiate:GPRF:MEAS:POWer
         STOP:GPRF:MEAS:POWer
@@ -297,8 +344,77 @@ class CMW:
         Use READ:GPRF:MEAS:POWer...? to initiate a measurement and to retrieve the
         results. You can also start the measurement using INIT:GPRF:MEAS:POWer and
         retrieve the results using FETCh:GPRF:MEAS:POWer...
+        FETCh:GPRF:MEAS:POWer = INIT:GPRF:MEAS:POWer and then READ:GPRF:MEAS:POWer
         """
-        self.cmw_write(f'INIT:GPRF:MEAS:POWer')
+        self.cmw_write(f'INIT:GPRF:MEASurement:POWer')
+
+    def set_gprf_generator_base_band_mode(self, mode='ARB'):
+        """
+        Selects the baseband mode for the generator signal.
+        Parameters:
+        <BaseBandMode> CW | DTONe | ARB
+        CW: unmodulated CW signal
+        DTONe: dual-tone signal
+        ARB: ARB generator processing a waveform file
+        *RST:  CW
+        """
+        self.cmw_write(f'SOURce:GPRF:GENerator1:BBMode {mode}')
+
+    def set_gprf_generator_cmw_port_uasge_all(self):
+        """
+        Activates or deactivates the individual RF connectors of a connector bench.
+        For possible bench values, see Chapter 2.5.1.2, "Values for Signal Path Selection",
+        on page 65.
+        Parameters:
+        <Usage> OFF | ON
+        Comma-separated list of 4 or 8 values, one for each connector
+        of the bench
+        ON: activate the connector
+        OFF: deactivate the connector
+        Parameters for setting and query:
+        <TXConnBench> Selects a bench with 4 or 8 connectors
+        """
+        self.cmw_write(f'CONFigure:GPRF:GENerator:CMWS:USAGe:TX:ALL ON, ON, ON, ON, ON, ON, ON, ON')
+
+    def set_gprf_arb_file(self, file_path):
+        """
+        Selects a waveform file for the ARB baseband mode.
+        This command supports path aliases (e.g. @WAVEFORM). Use MMEMory:ALIases? to
+        query the available path aliases.
+        If the selected file does not exist or no file has been selected, a query returns "No
+        File Selected".
+        If the selected file does exist, a query returns:
+        ● Without <PathType>: The string used to select the file. If an alias has been used,
+        the alias is not substituted.
+        ● With <PathType>: The absolute path of the file. If an alias has been used, the alias
+        is substituted.
+        Parameters:
+        <ARBFile> string
+        Name of the waveform file to be used (.wv).
+        Query parameters:
+        <PathType> ABSPath
+        Optional parameter, specifying that a query returns the absolute
+        path.
+        """
+        self.cmw_write(f'SOURce:GPRF:GENerator1:ARB:FILE {file_path}')
+
+    def set_gprf_generator_state(self, state='ON'):
+        """
+        Turns the generator on or off.
+        Setting parameters:
+        <Control> ON | OFF
+        Switch the generator ON or OFF.
+        *RST:  OFF
+        Return values:
+        <GeneratorState> OFF | PENDing | ON | RDY
+        OFF: generator switched off
+        PEND: generator switched on but no signal available yet
+        ON: generator switched on, signal available
+        RDY: generator switched off, ARB file processing complete in
+        smart channel mode
+        *RST:  OFF
+        """
+        return self.cmw_query(f'SOUR:GPRF:GENerator1:STAT {state}')
 
     def get_gprf_power_state_query(self):
         """
@@ -313,7 +429,71 @@ class CMW:
         RDY: measurement finished
         *RST:  OFF
         """
-        return self.cmw_query('FETC:GPRF:MEAS:POW:STAT?')
+        return self.cmw_query('FETC:GPRF:MEASurement:POW:STAT?')
+
+    def get_gprf_power_average_query(self):
+        """
+        The following results can be retrieved:
+        ● "Power Current RMS" (...:POWer:CURRent?)
+        ● "Power Current Min." (...:MINimum:CURRent?)
+        ● "Power Current Max." (...:MAXimum:CURRent?)
+        ● "Power Average RMS" (...:AVERage?)
+        ● "Power Minimum" (...:PEAK:MINimum?)
+        ● "Power Maximum" (...:PEAK:MAXimum?)
+        ● "Standard Deviation" (...:SDEViation?)
+        The values described below are returned by FETCh and READ commands. CALCulate
+        commands return error codes instead, one value for each result listed below.
+        Return values:
+        <Reliability> decimal
+        See Reliability Indicator
+        <Power> float
+        Power value
+        Default unit: dBm (SDEViation: dB)
+        """
+        return self.cmw_query('FETC:GPRF:MEASurement:POWer:AVER?')
+
+    def get_gprf_arb_file_query(self):
+        """
+        Selects a waveform file for the ARB baseband mode.
+        This command supports path aliases (e.g. @WAVEFORM). Use MMEMory:ALIases? to
+        query the available path aliases.
+        If the selected file does not exist or no file has been selected, a query returns "No
+        File Selected".
+        If the selected file does exist, a query returns:
+        ● Without <PathType>: The string used to select the file. If an alias has been used,
+        the alias is not substituted.
+        ● With <PathType>: The absolute path of the file. If an alias has been used, the alias
+        is substituted.
+        Parameters:
+        <ARBFile> string
+        Name of the waveform file to be used (.wv).
+        Query parameters:
+        <PathType> ABSPath
+        Optional parameter, specifying that a query returns the absolute
+        path.
+        """
+        return self.cmw_query(f'SOURce:GPRF:GENerator1:ARB:FILE?')
+
+    def get_gprf_generator_state_query(self):
+        """
+        Turns the generator on or off.
+        Setting parameters:
+        <Control> ON | OFF
+        Switch the generator ON or OFF.
+        *RST:  OFF
+        Return values:
+        <GeneratorState> OFF | PENDing | ON | RDY
+        OFF: generator switched off
+        PEND: generator switched on but no signal available yet
+        ON: generator switched on, signal available
+        RDY: generator switched off, ARB file processing complete in
+        smart channel mode
+        *RST:  OFF
+        """
+        return self.cmw_query(f'SOUR:GPRF:GENerator1:STAT?')
+
+
+
 
     def sig_gen_gsm(self):
         logger.info('----------Sig Gen----------')
@@ -394,45 +574,7 @@ class CMW:
             self.command_cmw100_write('SOUR:GPRF:GEN1:STAT ON')
             self.command_cmw100_query('*OPC?')
 
-    def sig_gen_fr1(self):
-        """
-        scs: FDD is forced to 15KHz and TDD is to be 30KHz
-        """
-        logger.info('----------Sig Gen----------')
-        self.band_fr1 = int(self.band_fr1)
-        scs = 1 if self.band_fr1 in [34, 38, 39, 40, 41, 42, 48, 77, 78,
-                                     79] else 0  # for now FDD is forced to 15KHz and TDD is to be 30KHz
-        scs = 15 * (2 ** scs)
-        mcs_fr1_wv = 4
-        self.scs = scs
-        self.command_cmw100_query('SYSTem:BASE:OPTion:VERSion?  "CMW_NRSub6G_Meas"')
-        self.command_cmw100_write('ROUT:GPRF:GEN:SCEN:SAL R118, TX1')
-        self.command_cmw100_query('*OPC?')
-        self.command_cmw100_write('CONFigure:GPRF:GEN:CMWS:USAGe:TX:ALL R118, ON, ON, ON, ON, ON, ON, ON, ON')
-        self.command_cmw100_query('*OPC?')
-        self.command_cmw100_write('SOUR:GPRF:GEN1:LIST OFF')
-        self.command_cmw100_query('*OPC?')
-        self.command_cmw100_write(f'SOUR:GPRF:GEN1:RFS:EATT {self.loss_rx}')
-        self.command_cmw100_query('*OPC?')
-        self.command_cmw100_write('SOUR:GPRF:GEN1:BBM ARB')
-        self.command_cmw100_query('*OPC?')
-        self.command_cmw100_write('CONFigure:NRSub:MEAS:ULDL:PERiodicity MS10')
-        self.command_cmw100_query('*OPC?')
-        if self.band_fr1 in [34, 38, 39, 40, 41, 42, 48, 77, 78, 79]:
-            self.command_cmw100_write(
-                f"SOUR:GPRF:GEN1:ARB:FILE 'C:\CMW100_WV\SMU_NodeB_NR_Ant0_NR_{self.bw_fr1}MHz_SCS{scs}_TDD_Sens_MCS{mcs_fr1_wv}_rescale.wv'")
-        else:
-            self.command_cmw100_write(
-                f"SOUR:GPRF:GEN1:ARB:FILE 'C:\CMW100_WV\SMU_NodeB_NR_Ant0_LTE_NR_{self.bw_fr1}MHz_SCS{scs}_FDD_Sens_MCS_{mcs_fr1_wv}.wv'")
-        self.command_cmw100_query('*OPC?')
-        self.command_cmw100_query('SOUR:GPRF:GEN1:ARB:FILE?')
-        self.command_cmw100_write(f'SOUR:GPRF:GEN1:RFS:FREQ {self.rx_freq_fr1}KHz')
-        self.command_cmw100_write(f'SOUR:GPRF:GEN1:RFS:LEV {self.rx_level}')
-        gprf_gen = self.command_cmw100_query('SOUR:GPRF:GEN1:STAT?')
-        self.command_cmw100_query('*OPC?')
-        if gprf_gen == 'OFF':
-            self.command_cmw100_write('SOUR:GPRF:GEN1:STAT ON')
-            self.command_cmw100_query('*OPC?')
+
 
     def tx_monitor_lte(self):
         logger.info('---------Tx Monitor----------')
