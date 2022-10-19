@@ -3,6 +3,7 @@ from utils.log_init import log_set
 
 logger = log_set()
 
+
 class CMW:
     def __init__(self, equipment):
         self.cmw = VisaComport(equipment)
@@ -34,7 +35,8 @@ class CMW:
         this information in section "SW/HW-Equipment > Installed Software".
         You can either query a list of all installed packages and their versions or you can query
         the version of a single package specified via parameter <Application>:
-        ● <Application> specified: A string is returned, indicating the version of the <Application>. If the specified <Application> is unknown / not installed, "0" is returned.
+        ● <Application> specified: A string is returned, indicating the version of the <Application>.
+          If the specified <Application> is unknown / not installed, "0" is returned.
         ● <Application> omitted: A string is returned, containing a list of all installed software
         packages and their version in the format "<PackageName1>,<Version1>;<PackageName2>,<Version2>;..."
         Query parameters:
@@ -56,6 +58,9 @@ class CMW:
         return self.cmw_query(f'SYSTem:BASE:OPTion:VERSion? {application}')
 
     def system_err_all_query(self):
+        """
+        To show upw the system if there is error message
+        """
         return self.cmw_query('SYST:ERR:ALL?')
 
     def set_fd_correction_deactivate_all(self):
@@ -492,8 +497,15 @@ class CMW:
         """
         return self.cmw_query(f'SOUR:GPRF:GENerator1:STAT?')
 
-
-
+    def set_fr1_uldl_periodicity(self, periodicity='MS10'):
+        """
+        Configures the periodicity of the TDD UL-DL pattern.
+        Parameters:
+        <Periodicity> MS05 | MS1 | MS125 | MS2 | MS25 | MS3 | MS4 | MS5 | MS10
+        0.5 ms, 1 ms, 1.25 ms, 2 ms, 2.5 ms, 3 ms, 4 ms, 5 ms, 10 ms
+        *RST:  MS5
+        """
+        self.cmw_write(f'CONFigure:NRSub::MEASurement:ULDL:PERiodicity {periodicity}')
 
     def sig_gen_gsm(self):
         logger.info('----------Sig Gen----------')
@@ -536,37 +548,6 @@ class CMW:
         self.command_cmw100_query('*OPC?')
         self.command_cmw100_query('SOUR:GPRF:GEN1:ARB:FILE?')
         self.command_cmw100_write(f'SOUR:GPRF:GEN1:RFS:FREQ {self.rx_freq_wcdma}KHz')
-        self.command_cmw100_write(f'SOUR:GPRF:GEN1:RFS:LEV {self.rx_level}')
-        gprf_gen = self.command_cmw100_query('SOUR:GPRF:GEN1:STAT?')
-        self.command_cmw100_query('*OPC?')
-        if gprf_gen == 'OFF':
-            self.command_cmw100_write('SOUR:GPRF:GEN1:STAT ON')
-            self.command_cmw100_query('*OPC?')
-
-    def sig_gen_lte(self):
-        logger.info('----------Sig Gen----------')
-        self.command_cmw100_query('SYSTem:BASE:OPTion:VERSion?  "CMW_NRSub6G_Meas"')
-        self.command_cmw100_write('ROUT:GPRF:GEN:SCEN:SAL R118, TX1')
-        self.command_cmw100_query('*OPC?')
-        self.command_cmw100_write('CONFigure:GPRF:GEN:CMWS:USAGe:TX:ALL R118, ON, ON, ON, ON, ON, ON, ON, ON')
-        self.command_cmw100_query('*OPC?')
-        self.command_cmw100_write('SOUR:GPRF:GEN1:LIST OFF')
-        self.command_cmw100_query('*OPC?')
-        self.command_cmw100_write(f'SOUR:GPRF:GEN1:RFS:EATT {self.loss_rx}')
-        self.command_cmw100_query('*OPC?')
-        self.command_cmw100_write('SOUR:GPRF:GEN1:BBM ARB')
-        self.command_cmw100_query('*OPC?')
-        self.band_lte = int(self.band_lte)
-        if self.band_lte in [34, 38, 39, 40, 41, 42, 48]:
-            self.command_cmw100_write(
-                f"SOUR:GPRF:GEN1:ARB:FILE 'C:\CMW100_WV\SMU_Channel_CC0_RxAnt0_RF_Verification_10M_SIMO_01.wv'")
-        else:
-            # self.command_cmw100_write(f"SOUR:GPRF:GEN1:ARB:FILE 'C:\CMW100_WV\SMU_NodeB_Ant0_FRC_10MHz.wv'")
-            bw_lte = '1p4' if self.bw_lte == 1.4 else '03' if self.bw_lte == 3 else self.bw_lte
-            self.command_cmw100_write(f"SOUR:GPRF:GEN1:ARB:FILE 'C:\CMW100_WV\SMU_NodeB_Ant0_FRC_{bw_lte}MHz.wv'")
-        self.command_cmw100_query('*OPC?')
-        self.command_cmw100_query('SOUR:GPRF:GEN1:ARB:FILE?')
-        self.command_cmw100_write(f'SOUR:GPRF:GEN1:RFS:FREQ {self.rx_freq_lte}KHz')
         self.command_cmw100_write(f'SOUR:GPRF:GEN1:RFS:LEV {self.rx_level}')
         gprf_gen = self.command_cmw100_query('SOUR:GPRF:GEN1:STAT?')
         self.command_cmw100_query('*OPC?')

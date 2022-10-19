@@ -21,6 +21,7 @@ class CMW100(CMW):
         self.loss_rx = None
         self.tx_freq_fr1 = None
         self.rx_freq_fr1 = None
+        self.scs = None
 
     def preset_instrument(self):
         logger.info('----------Preset CMW----------')
@@ -83,6 +84,14 @@ class CMW100(CMW):
 
         self.set_gprf_arb_file(file_path)
 
+    def set_waveform_lte(self, bw):
+        if self.band_fr1 in [34, 38, 39, 40, 41, 42, 48]:
+            file_path = f'C:\CMW100_WV\SMU_Channel_CC0_RxAnt0_RF_Verification_10M_SIMO_01.wv'
+        else:
+            file_path = f'C:\CMW100_WV\SMU_NodeB_Ant0_FRC_{bw}MHz.wv'
+
+        self.set_gprf_arb_file(file_path)
+
     def sig_gen_fr1(self):
         """
         scs: FDD is forced to 15KHz and TDD is to be 30KHz
@@ -104,7 +113,7 @@ class CMW100(CMW):
         self.cmw_query('*OPC?')
         self.set_gprf_generator_base_band_mode('ARB')
         self.cmw_query('*OPC?')
-        self.command_cmw100_write('CONFigure:NRSub:MEAS:ULDL:PERiodicity MS10')
+        self.set_fr1_uldl_periodicity()
         self.cmw_query('*OPC?')
         self.set_waveform_fr1(self.bw_fr1, scs, mcs=4)
         self.cmw_query('*OPC?')
@@ -116,6 +125,32 @@ class CMW100(CMW):
         if gprf_gen == 'OFF':
             self.set_gprf_generator_state()
             self.cmw_query('*OPC?')
+
+    def sig_gen_lte(self):
+        logger.info('----------Sig Gen----------')
+        self.system_base_option_version_query('CMW_NRSub6G_Meas')
+        self.set_gprf_rf_output_path(18)
+        self.cmw_query('*OPC?')
+        self.set_gprf_generator_cmw_port_uasge_all()
+        self.cmw_query('*OPC?')
+        self.set_gprf_power_list_mode()
+        self.cmw_query('*OPC?')
+        self.set_gprf_rf_setting_external_output_attenuation(self.loss_rx)
+        self.cmw_query('*OPC?')
+        self.set_gprf_generator_base_band_mode('ARB')
+        self.cmw_query('*OPC?')
+        self.band_lte = int(self.band_lte)
+        self.set_waveform_lte(self.bw_lte)
+        self.cmw_query('*OPC?')
+        self.get_gprf_arb_file_query()
+        self.set_gprf_rx_freq(self.rx_freq_fr1)
+        self.set_gprf_rx_level(self.rx_level)
+        gprf_gen = self.get_gprf_generator_state_query()
+        self.cmw_query('*OPC?')
+        if gprf_gen == 'OFF':
+            self.set_gprf_generator_state()
+            self.cmw_query('*OPC?')
+
 
 def main():
     cmw100 = CMW100()
