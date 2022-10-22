@@ -497,7 +497,7 @@ class CMW:
         """
         return self.cmw_query(f'SOUR:GPRF:GENerator1:STAT?')
 
-    def set_fr1_uldl_periodicity(self, periodicity='MS10'):
+    def set_uldl_periodicity_fr1(self, periodicity='MS10'):
         """
         Configures the periodicity of the TDD UL-DL pattern.
         Parameters:
@@ -507,55 +507,398 @@ class CMW:
         """
         self.cmw_write(f'CONFigure:NRSub::MEASurement:ULDL:PERiodicity {periodicity}')
 
-    def sig_gen_gsm(self):
-        logger.info('----------Sig Gen----------')
-        self.command_cmw100_query('SYSTem:BASE:OPTion:VERSion?  "CMW_NRSub6G_Meas"')
-        self.command_cmw100_write('ROUT:GPRF:GEN:SCEN:SAL R118, TX1')
-        self.command_cmw100_query('*OPC?')
-        self.command_cmw100_write('CONFigure:GPRF:GEN:CMWS:USAGe:TX:ALL R118, ON, ON, ON, ON, ON, ON, ON, ON')
-        self.command_cmw100_query('*OPC?')
-        self.command_cmw100_write('SOUR:GPRF:GEN1:LIST OFF')
-        self.command_cmw100_query('*OPC?')
-        self.command_cmw100_write(f'SOUR:GPRF:GEN1:RFS:EATT {self.loss_rx}')
-        self.command_cmw100_query('*OPC?')
-        self.command_cmw100_write(f'SOUR:GPRF:GEN1:BBM ARB')
-        waveform_2g = '2G_FINAL.wv'
-        self.command_cmw100_write(f"SOUR:GPRF:GEN1:ARB:FILE 'C:\CMW100_WV\{waveform_2g}'")
-        self.command_cmw100_query('*OPC?')
-        self.command_cmw100_query('SOUR:GPRF:GEN1:ARB:FILE?')
-        self.command_cmw100_write(f'SOUR:GPRF:GEN1:RFS:FREQ {self.rx_freq_gsm}KHz')
-        self.command_cmw100_write(f'SOUR:GPRF:GEN1:RFS:LEV {self.rx_level}')
-        gprf_gen = self.command_cmw100_query('SOUR:GPRF:GEN1:STAT?')
-        self.command_cmw100_query('*OPC?')
-        if gprf_gen == 'OFF':
-            self.command_cmw100_write('SOUR:GPRF:GEN1:STAT ON')
-            self.command_cmw100_query('*OPC?')
+    def set_duplexer_mode_fr1(self, mode='FDD'):
+        """
+        Selects the duplex mode of the signal: FDD or TDD.
+        Parameters:
+        <Mode> FDD | TDD
+        *RST:  FDD
+        """
+        self.cmw_write(f'CONFigure:NRSub:MEASurement:MEValuation:DMODe {mode}')
 
-    def sig_gen_wcdma(self):
-        logger.info('----------Sig Gen----------')
-        self.command_cmw100_query('SYSTem:BASE:OPTion:VERSion?  "CMW_NRSub6G_Meas"')
-        self.command_cmw100_write('ROUT:GPRF:GEN:SCEN:SAL R118, TX1')
-        self.command_cmw100_query('*OPC?')
-        self.command_cmw100_write('CONFigure:GPRF:GEN:CMWS:USAGe:TX:ALL R118, ON, ON, ON, ON, ON, ON, ON, ON')
-        self.command_cmw100_query('*OPC?')
-        self.command_cmw100_write('SOUR:GPRF:GEN1:LIST OFF')
-        self.command_cmw100_query('*OPC?')
-        self.command_cmw100_write(f'SOUR:GPRF:GEN1:RFS:EATT {self.loss_rx}')
-        self.command_cmw100_query('*OPC?')
-        self.command_cmw100_write(f'SOUR:GPRF:GEN1:BBM ARB')
-        waveform_3g = '3G_CAL_FINAL.wv'
-        self.command_cmw100_write(f"SOUR:GPRF:GEN1:ARB:FILE 'C:\CMW100_WV\{waveform_3g}'")
-        self.command_cmw100_query('*OPC?')
-        self.command_cmw100_query('SOUR:GPRF:GEN1:ARB:FILE?')
-        self.command_cmw100_write(f'SOUR:GPRF:GEN1:RFS:FREQ {self.rx_freq_wcdma}KHz')
-        self.command_cmw100_write(f'SOUR:GPRF:GEN1:RFS:LEV {self.rx_level}')
-        gprf_gen = self.command_cmw100_query('SOUR:GPRF:GEN1:STAT?')
-        self.command_cmw100_query('*OPC?')
-        if gprf_gen == 'OFF':
-            self.command_cmw100_write('SOUR:GPRF:GEN1:STAT ON')
-            self.command_cmw100_query('*OPC?')
+    def set_band_fr1(self, band):
+        """
+        Selects the operating band (OB). The allowed input range depends on the duplex
+        mode (FDD or TDD).
+        Parameters:
+        <Band> FDD: OB1 | OB2 | OB3 | OB5 | OB7 | OB8 | OB12 | OB14 |
+        OB18 | OB20 | OB25 | OB26 | OB28 | OB30 | OB65 | OB66 |
+        OB70 | OB71 | OB74 | OB80 | ... | OB84 | OB86 | OB89 | OB91
+        | ... | OB95
+        TDD: OB34 | OB38 | ... | OB41 | OB48 | OB50 | OB51 | OB53 |
+        OB77 | ... | OB84 | OB86 | OB89 | OB90 | OB95
+        *RST:  OB1
+        """
+        self.cmw_write(f'CONFigure:NRSub:MEASurement:BAND OB{band}')
 
+    def set_band_lte(self, band):
+        """
+        Selects the operating band (OB).
+        The allowed input range has dependencies:
+        ● FDD UL: OB1 | ... | OB28 | OB30 | OB31 | OB65 | OB66 | OB68 | OB70 | ... | OB74
+        | OB85
+        ● TDD UL: OB33 | ... | OB45 | OB48 | OB50 | ... | OB53 | OB250
+        ● Sidelink: OB47
+        For the combined signal path scenario, use:
+        ● CONFigure:LTE:SIGN<i>[:PCC]:BAND
+        ● CONFigure:LTE:SIGN<i>:SCC<c>:BAND
+        Parameters:
+        <Band> OB1 to OB250, see list above
+        *RST:  OB1 (OB33 for TDD UL, OB47 for sidelink)
+        """
+        self.cmw_write(f'CONFigure:LTE:MEASurement:BAND OB{band}')
 
+    def set_band_wcdma(self, band):
+        """
+        Selects the Operating Band (OB) for ver3.0.30.
+        Parameters:
+        <Band> OB1 | ... | OB14 | OB19 | ... | OB21 | OBS1 | ... | OBS3 | OBL1
+        OB1, ..., OB14: Operating Band I to XIV
+        OB19, ..., OB21: Operating Band XIX to XXI
+        OBS1: Operating Band S
+        OBS2: Operating Band S 170 MHz
+        OBS3: Operating Band S 190 MHz
+        OBL1: Operating Band L
+        *RST:  OB1
+        CONFigure:WCDMa:MEASurement<i>:CARRier<c>:BAND for ver3.7.22
+        """
+        self.cmw_write(f'CONFigure:WCDMa:MEASurement:BAND OB{band}')
+
+    def set_band_gsm(self, band):
+        """
+        Selects the GSM frequency band.
+        For the combined signal path scenario, use:
+        ● CONFigure:GSM:SIGN<i>:BAND:BCCH
+        ● SENSe:GSM:SIGN<i>:BAND:TCH?
+        Parameters:
+        <Band> G04 | G085 | G09 | G18 | G19 | GG08
+        G04: GSM400
+        G085: GSM850
+        G09: GSM900
+        G18: GSM1800
+        G19: GSM1900
+        """
+        band_tx_meas_dict_gsm = {
+            900: 'G09',
+            1800: 'G18',
+            1900: 'G19',
+            850: 'G085',
+        }
+        self.cmw_write(f'CONFigure:GSM:MEASurement:BAND {band_tx_meas_dict_gsm[band]}')
+
+    def set_statistic_count_fr1(self, count=5):
+        """
+        DBT
+        """
+        self.cmw_write(f'CONFigure:NRSub:MEASurement:MEValuation:SCOunt:MODulation {count}')
+
+    def set_statistic_count_lte(self, count=5):
+        """
+        DBT
+        """
+        self.cmw_write(f'CONFigure:LTE:MEASurement:MEValuation:SCOunt:MODulation {count}')
+
+    def set_statistic_count_wcdma(self, count=5):
+        """
+        Specifies the statistic count of the measurement. The statistic count is equal to the
+        number of measurement intervals per single shot.
+        Parameters:
+        <StatisticCount> Number of measurement intervals
+        Range:  1  to  1000
+        *RST:  10
+        """
+        self.cmw_write(f'CONFigure:WCDMa:MEASurement:MEValuation:SCOunt:MODulation {count}')
+
+    def set_statistic_count_gsm(self, count=5):
+        """
+        DBT
+        """
+        self.cmw_write(f'CONFigure:GSM:MEASurement:MEValuation:SCOunt:MODulation {count}')
+
+    def set_tx_freq_fr1(self, tx_freq):  # this is KHz
+        """
+        Selects the center frequency of the measured carrier.
+        Using the unit CH, the frequency can be set via the channel number. The allowed
+        channel number range depends on the operating band, see Chapter 3.3.3, "Frequency
+        Bands", on page 19.
+        For the supported frequency range, see Chapter 6.1.5, "Frequency Ranges",
+        on page 100.
+        Parameters:
+        <AnalyzerFreq> numeric
+        Default unit: Hz
+        """
+        self.cmw_write(f'CONFigure:NRSub:MEASurement:RFSettings:FREQuency {tx_freq}KHz')
+
+    def set_tx_freq_lte(self, tx_freq):  # this is KHz
+        """
+        Selects the center frequency of component carrier CC<no>. Without carrier aggrega-
+        tion, you can omit <no>.
+        Using the unit CH, the frequency can be set via the channel number. The allowed
+        channel number range depends on the operating band, see Chapter 5.2.11.4, "Fre-
+        quency Bands", on page 928.
+        For the combined signal path scenario, use:
+        ● CONFigure:LTE:SIGN<i>:RFSettings[:PCC]:CHANnel:UL
+        ● CONFigure:LTE:SIGN<i>:RFSettings:SCC<c>:CHANnel:UL
+        For the supported frequency range, see Chapter 5.5.1.5, "Frequency Ranges",
+        on page 1021.
+        Suffix:
+        <no>   1..4
+        Parameters:
+        <AnalyzerFreq> *RST:  Depends on <no>
+        Default unit: Hz
+        CONFigure:LTE:MEAS<i>:RFSettings:CC<no>:FREQuency <AnalyzerFreq> for after 3.7.30
+        """
+        self.cmw_write(f'CONFigure:LTE:MEASurement:RFSettings:FREQuency {tx_freq}KHz')
+
+    def set_tx_freq_wcdma(self, tx_freq):  # this is KHz
+        """
+        DBT
+        """
+        self.cmw_write(f'CONFigure:WCDMa:MEASurement:RFSettings:FREQuency {tx_freq}KHz')
+
+    def set_tx_freq_gsm(self, tx_freq):  # this is KHz
+        """
+        DBT
+        """
+        self.cmw_write(f'CONFigure:GSM:MEASurement:RFSettings:FREQuency {tx_freq}KHz')
+
+    def set_plc_fr1(self, id=0):
+        """
+        Specifies the physical cell ID of carrier <no>.
+        Suffix:
+        <no>    1
+        Parameters:
+        <PhysicalCellID> numeric
+        Range:  0  to  1007
+        *RST:  0
+        origainl name: CONFigure:NRSub:MEAS<i>[:CC<no>]:PLCid
+        """
+        self.cmw_write(f'CONFigure:NRSub:MEASurement:PLCid {id}')
+
+    def set_meas_on_exception_fr1(self, meas_on_exception='ON'):
+        """
+        Specifies whether measurement results identified as faulty or inaccurate are rejected.
+        Parameters:
+        <MeasOnException> OFF | ON
+        OFF: Faulty results are rejected.
+        ON: Results are never rejected.
+        *RST:  OFF
+        """
+        self.cmw_write(f'CONFigure:NRSub:MEASurement:MEValuation:MOEXception {meas_on_exception}')
+
+    def set_scs_bw_fr1(self, scs, bw):
+        """
+        this command from LSI cannot find in the doc of R&S
+        it just can reference:
+        ● CONFigure:NRSub:MEAS<i>:CCALl:TXBWidth:SCSPacing <UsedSCS>
+        Selects the subcarrier spacing for the measurement, for all carriers.
+        Parameters:
+        <UsedSCS> S15K | S30K | S60K
+        *RST:  S30K
+        ● CONFigure:NRSub:MEAS<i>[:CC<no>]:CBANdwidth <ChannelBW>
+        Specifies the channel bandwidth of carrier <no>.
+        Suffix:
+        <no>  1
+        Parameters:
+        <ChannelBW> B005 | B010 | B015 | B020 | B025 | B030 | B040 | B050 | B060 |
+        B080 | B090 | B100
+        Channel bandwidth 5 MHz to 100 MHz (Bxxx = xxx MHz).
+        *RST:  B020
+        """
+        bw = f'00{bw}' if bw < 10 else f'0{bw}' if 10 <= bw < 100 else bw
+        self.cmw_write(f'CONF:NRS:MEAS:MEV:BWC S{scs}K, B{bw}')
+
+    def set_spectrum_limit_fr1(self, area, bw, start_freq, stop_freq, level, rbw):
+        """
+        ● CONFigure:NRSub:MEAS<i>:MEValuation:LIMit:SEMask:AREA<area>:CBANdwidth<bw>
+          + <Enable>, <FrequencyStart>, <FrequencyEnd>, <Level>, <RBW>
+        Defines general requirements for the emission mask area number <area> (for NR SA).
+        The activation state, the area borders, an upper limit and the resolution bandwidth
+        must be specified.
+        The emission mask applies to the channel bandwidth <bw>.
+        Suffix:
+        <bw>
+        5, 10, 15, 20, 25, 30, 40, 50, 60, 80, 90, 100 Channel bandwidth in MHz
+        <area> 1..12
+        Number of the emission mask area
+        Parameters:
+        <Enable> OFF | ON
+        OFF: disables the check of these requirements
+        ON: enables the check of these requirements
+        *RST:  ON (<area> = 1 to 4) / OFF (<area> = 5 to 12)
+        <FrequencyStart> numeric
+        Start frequency of the area, relative to the edges of the channel
+        bandwidth
+        Range:  0 MHz  to  105 MHz (less, depending on <bw>)
+        *RST:  depends on <bw> and <area>
+        Default unit: Hz
+        <FrequencyEnd> numeric
+        Stop frequency of the area, relative to the edges of the channel
+        bandwidth
+        Range:  0 MHz  to  105 MHz (less, depending on <bw>)
+        *RST:  depends on <bw> and <area>
+        Default unit: Hz
+        <Level> numeric
+        Upper limit for the area
+        Range:  -256 dBm  to  256 dBm
+        *RST:  depends on <bw> and <area>
+        Default unit: dBm
+        <RBW> K030 | PC1 | M1
+        Resolution bandwidth to be used for the area
+        Only a subset of the values is allowed, depending on <bw>.
+        K030: 30 kHz
+        PC1: 1 % of channel bandwidth
+        M1: 1 MHz
+        *RST:  K030 (<area> = 1) / M1 (<area> = 2 to 12)
+        """
+        self.cmw_write(f'CONFigure:NRSub:MEASurement:MEValuation:LIMit:SEMask:AREA{area}:CBANdwidth{bw} '
+                       f'ON, {start_freq}MHz, {stop_freq}MHz, {level}, {rbw}'
+                       )
+
+    def set_pusch_fr1(self, mcs, rb_size, rb_start):
+        """
+        Specifies settings related to the PUSCH.
+        Parameters:
+        <ModScheme> AUTO | BPSK | BPWS | QPSK | Q16 | Q64 | Q256
+
+        Modulation scheme
+        AUTO: Auto-detection
+        BPSK, BPWS: π/2-BPSK, π/2-BPSK with shaping
+        QPSK, Q16, Q64, Q256: QPSK, 16-QAM, 64-QAM, 256-QAM
+        *RST: QPSK
+
+        <MappingType> A | B
+        *RST: A
+        <NRBAuto> OFF | ON
+
+        Automatic detection of <NoRB> and <StartRB>
+        *RST: ON
+        <NoRB> numeric
+
+        Number of allocated RBs in the measured slot.
+
+        The allowed values depend on the SC spacing and on the chan-
+        nel bandwidth, see "Resource block allocation" on page 25.
+
+        *RST: 51
+        <StartRB> numeric
+
+        Index of the first allocated RB in the measured slot.
+        Range: 0 to max(<NoRB>) - <NoRB>
+        *RST: 0
+        <NoSymbols> numeric
+
+        Number of allocated OFDM symbols in the measured slot.
+        The allowed values depend on the mapping type, see "Symbol
+        allocation" on page 25.
+        *RST: 14
+        <StartSymbol> numeric
+
+        Index of the first allocated symbol in the measured slot.
+        The input range depends on the mapping type and the number
+        of symbols, see "Symbol allocation" on page 25.
+        *RST: 0
+        <ConfigType> T1 | T2
+
+        DM-RS setting "dmrs-Type".
+        *RST: T1
+        <MaxLength> SINGle
+
+        DM-RS setting "maxLength".
+        *RST: SING
+        <AddPosition> numeric
+
+        DM-RS setting "dmrs-AdditionalPosition".
+        Range: 0 to 2
+        *RST: 2
+        <lZero> numeric
+        DM-RS setting l0
+        .
+
+        Range: Mapping type A: 2 to 3, type B: 0
+        *RST: 2
+        """
+        _256Q_flag = 2 if mcs == 'Q256' else 0
+        self.cmw_write(f'CONFigure:NRSub:MEASurement:MEValuation:PUSChconfig '
+                       f'{mcs}, A, OFF, {rb_size}, {rb_start}, 14, 0, T1, SING, {_256Q_flag}, 2')
+
+    def set_precoding_fr1(self, on_off='OFF'):
+        """
+        Specifies whether the signal uses a transform precoding function performing DFT-
+        spreading.
+
+        Parameters:
+        <OnOff> OFF | ON
+        *RST: OFF
+        DFTS: ON, CP: OFF
+        """
+        on_off = 'ON' if self.type_fr1 == 'DFTS' else 'OFF'  # DFTS: ON, CP: OFF
+        self.cmw_write(f'CONFigure:NRSub:MEASurement:MEValuation:DFTPrecoding {on_off}')
+
+    def set_phase_compensation(self, phase_comp='OFF', user_freq=6E0):
+        """
+        Specifies the phase compensation applied by the UE during the modulation and
+        upconversion.
+        Parameters:
+        <PhaseComp> OFF | CAF | UDEF
+        OFF: no phase compensation
+        CAF: phase compensation for carrier frequency
+        UDEF: phase compensation for frequency <UserDefFreq>
+        *RST:  OFF
+        <UserDefFreq> numeric
+        Frequency for <PhaseComp> = UDEF
+        Range:  0 Hz  to  10E+9 Hz
+        *RST:  1.95E+9 Hz
+        Default unit: Hz
+        """
+        self.cmw_write(f'CONFigure:NRSub:MEASurement:MEValuation:PCOMp {phase_comp}, {user_freq}')
+
+    def set_repetition_fr1(self, rep='SING'):
+        """
+        Specifies the repetition mode of the measurement. The repetition mode specifies
+        whether the measurement is stopped after a single shot or repeated continuously. Use
+        CONFigure:..:MEAS<i>:...:SCOunt to determine the number of measurement
+        intervals per single shot.
+        Parameters:
+        <Repetition> SINGleshot | CONTinuous
+        SINGleshot: Single-shot measurement
+        CONTinuous: Continuous measurement
+        *RST:  SING
+        """
+        self.cmw_write(f'CONFigure:NRSub:MEASurement:MEValuation:REPetition {rep}')
+
+    def set_channel_type_fr1(self, ctype='PUSC'):
+        """
+        for now only support PSUCH
+        <channel_type> PUSCh or PUCCh
+        """
+        self.cmw_write(f'CONFigure:NRSub:MEASurement:MEValuation:CTYPe')
+
+    def set_uldl_pattern_fr1(self, scs):
+        """
+        CONFigure:NRSub:MEAS<i>:ULDL:PATTern <SCSpacing>, <DLSlots>,
+        <DLSymbols>, <ULSlots>, <ULSymbols>
+        CONFigure:NRSub:MEAS<i>:ULDL:PATTern? <SCSpacing>
+        Configures the TDD UL-DL pattern for the <SCSpacing>.
+        The ranges have dependencies, see "TDD UL-DL configuration" on page 16.
+        Parameters:
+        <DLSlots> numeric
+        Specifies "nrofDownlinkSlots".
+        Range:  0  to  38
+        <DLSymbols> numeric
+        Specifies "nrofDownlinkSymbols".
+        Range:  0  to  14
+        <ULSlots> numeric
+        Specifies "nrofUplinkSlots".
+        Range:  1  to  40
+        <ULSymbols> numeric
+        Specifies "nrofUplinkSymbols".
+        Range:  0  to  14
+        Parameters for setting and query:
+        <SCSpacing> S15K | S30K | S60K
+        Subcarrier spacing for which the other settings apply.
+        """
+        self.cmw_write(f'CONFigure:NRSub:MEASurement:ULDL:PATTern S{scs}K, 3,0,1,14 ')
 
     def tx_monitor_lte(self):
         logger.info('---------Tx Monitor----------')
@@ -851,105 +1194,5 @@ class CMW:
         logger.debug(aclr_results + mod_results)
         return aclr_results + mod_results  # U_-2, U_-1, E_-1, Pwr, E_+1, U_+1, U_+2, EVM, Freq_Err, IQ_OFFSET
 
-    def tx_measure_fr1(self):
-        scs = 1 if self.band_fr1 in [34, 38, 39, 40, 41, 42, 48, 75, 76, 77, 78,
-                                     79] else 0  # for now FDD is forced to 15KHz and TDD is to be 30KHz
-        scs = 15 * (2 ** scs)  # for now TDD only use 30KHz, FDD only use 15KHz
-        logger.info('---------Tx Measure----------')
-        mode = "TDD" if self.band_fr1 in [34, 38, 39, 40, 41, 42, 48, 75, 76, 77, 78, 79] else "FDD"
-        self.command_cmw100_query(f'SYSTem:BASE:OPTion:VERSion?  "CMW_NRSub6G_Meas"')
-        self.command_cmw100_write(f'CONF:NRS:MEAS:MEV:DMODe {mode}')
-        self.command_cmw100_write(f'CONF:NRS:MEAS:BAND OB{self.band_fr1}')
-        self.command_cmw100_write(f'CONF:NRS:MEAS:RFS:FREQ {self.tx_freq_fr1}KHz')
-        self.command_cmw100_query(f'*OPC?')
-        self.command_cmw100_write(f'CONF:NRS:MEAS:MEV:PLC 0')
-        self.command_cmw100_write(f'CONF:NRS:MEAS:MEV:MOEX ON')
-        bw = f'00{self.bw_fr1}' if self.bw_fr1 < 10 else f'0{self.bw_fr1}' if 10 <= self.bw_fr1 < 100 else self.bw_fr1
-        self.command_cmw100_write(f'CONF:NRS:MEAS:MEV:BWC S{scs}K, B{bw}')
-        self.command_cmw100_write(
-            f'CONF:NRS:MEAS:MEV:LIM:SEM:AREA1:CBAN{self.bw_fr1} ON,0.015MHz,0.0985MHz,{round(-13.5 - 10 * math.log10(self.bw_fr1 / 5), 1)},K030')
-        self.command_cmw100_write(
-            f'CONF:NRS:MEAS:MEV:LIM:SEM:AREA2:CBAN{self.bw_fr1} ON,1.5MHz,4.5MHz,-8.5,M1')
-        self.command_cmw100_write(
-            f'CONF:NRS:MEAS:MEV:LIM:SEM:AREA3:CBAN{self.bw_fr1} ON,5.5MHz,{round(-0.5 + self.bw_fr1, 1)}MHz,-11.5,M1')
-        self.command_cmw100_write(
-            f'CONF:NRS:MEAS:MEV:LIM:SEM:AREA4:CBAN{self.bw_fr1} ON,{round(0.5 + self.bw_fr1, 1)}MHz,{round(4.5 + self.bw_fr1, 1)}MHz,-23.5,M1')
-        _256Q_flag = 2 if self.mcs_fr1 == 'Q256' else 0
-        self.command_cmw100_write(
-            f'CONFigure:NRSub:MEASurement:MEValuation:PUSChconfig {self.mcs_fr1},A,OFF,{self.rb_size_fr1},{self.rb_start_fr1},14,0,T1,SING,{_256Q_flag},2')
-        type_ = 'ON' if self.type_fr1 == 'DFTS' else 'OFF'  # DFTS: ON, CP: OFF
-        self.command_cmw100_write(f'CONFigure:NRSub:MEASurement:MEValuation:DFTPrecoding {type_}')
-        self.command_cmw100_write(f'CONFigure:NRSub:MEASurement:MEValuation:PCOMp OFF, 6000E+6')
-        self.command_cmw100_query(f'*OPC?')
-        self.command_cmw100_write(f'CONFigure:NRSub:MEASurement:MEValuation:REPetition SING')
-        self.command_cmw100_write(f'CONFigure:NRSub:MEASurement:MEValuation:PLCid 0')
-        self.command_cmw100_write(f'CONFigure:NRSub:MEASurement:MEValuation:CTYPe PUSC')
-        self.command_cmw100_write(f'CONF:NRS:MEAS:ULDL:PER MS25')
-        self.command_cmw100_write(f'CONF:NRS:MEAS:ULDL:PATT S{scs}K, 3,0,1,14 ')
-        self.command_cmw100_write(f'CONF:NRS:MEAS:RFS:UMAR 10.000000')
-        self.command_cmw100_write(f'CONF:NRS:MEAS:RFS:ENP {self.tx_level + 5}.00')
-        self.command_cmw100_write(f'ROUT:NRS:MEAS:SCEN:SAL R1{self.port_tx}, RX1')
-        self.command_cmw100_write(f'CONF:NRS:MEAS:RFS:UMAR 10.000000')
-        self.command_cmw100_write(f'CONF:NRS:MEAS:MEV:SCO:MOD 5')
-        self.command_cmw100_write(f'CONF:NRS:MEAS:MEV:SCO:SPEC:ACLR 5')
-        self.command_cmw100_write(f'CONF:NRS:MEAS:MEV:SCO:SPEC:SEM 5')
-        self.command_cmw100_write(f"TRIG:NRS:MEAS:MEV:SOUR 'GPRF GEN1: Restart Marker'")
-        self.command_cmw100_write(f'TRIG:NRS:MEAS:MEV:THR -20.0')
-        self.command_cmw100_write(f'CONF:NRS:MEAS:MEV:REP SING')
-        self.command_cmw100_write(f'CONF:NRS:MEAS:MEV:RES:ALL ON, ON, ON, ON, ON, ON, ON, ON, ON, ON')
-        self.command_cmw100_write(f'CONF:NRS:MEAS:MEV:NSUB 10')
-        self.command_cmw100_write(f'CONFigure:NRSub:MEASurement:MEValuation:MSLot ALL')
-        self.command_cmw100_write(f'CONF:NRS:MEAS:SCEN:ACT SAL')
-        self.command_cmw100_write(f'CONF:NRS:MEAS:RFS:EATT {self.loss_tx}')
-        self.command_cmw100_query(f'*OPC?')
-        self.command_cmw100_write(f'ROUT:GPRF:MEAS:SCEN:SAL R1{self.port_tx}, RX1')
-        self.command_cmw100_query(f'*OPC?')
-        self.command_cmw100_write(f'ROUT:NRS:MEAS:SCEN:SAL R1{self.port_tx}, RX1')
-        self.command_cmw100_query(f'*OPC?')
-        self.command_cmw100_write(f'INIT:NRS:MEAS:MEV')
-        self.command_cmw100_query(f'*OPC?')
-        f_state = self.command_cmw100_query(f'FETC:NRS:MEAS:MEV:STAT?')
-        while f_state != 'RDY':
-            f_state = self.command_cmw100_query(f'FETC:NRS:MEAS:MEV:STAT?')
-            self.command_cmw100_query('*OPC?')
-        mod_results = self.command_cmw100_query(
-            'FETC:NRS:MEAS:MEV:MOD:AVER?')  # P3 is EVM, P15 is Ferr, P14 is IQ Offset
-        mod_results = mod_results.split(',')
-        mod_results = [mod_results[3], mod_results[15], mod_results[14]]
-        mod_results = [eval(m) for m in mod_results]
-        logger.info(f'EVM: {mod_results[0]:.2f}, FREQ_ERR: {mod_results[1]:.2f}, IQ_OFFSET: {mod_results[2]:.2f}')
-        aclr_results = self.command_cmw100_query('FETC:NRS:MEAS:MEV:ACLR:AVER?')
-        aclr_results = aclr_results.split(',')[1:]
-        aclr_results = [eval(aclr) * -1 if eval(aclr) > 30 else eval(aclr) for aclr in
-                        aclr_results]  # UTRA2(-), UTRA1(-), NR(-), TxP, NR(+), UTRA1(+), UTRA2(+)
-        logger.info(
-            f'Power: {aclr_results[3]:.2f}, E-UTRA: [{aclr_results[2]:.2f}, {aclr_results[4]:.2f}], UTRA_1: [{aclr_results[1]:.2f}, {aclr_results[5]:.2f}], UTRA_2: [{aclr_results[0]:.2f}, {aclr_results[6]:.2f}]')
-        iem_results = self.command_cmw100_query('FETC:NRS:MEAS:MEV:IEM:MARG:AVER?')
-        iem_results = iem_results.split(',')
-        iem = f'{eval(iem_results[2]):.2f}' if iem_results[2] != 'INV' else 'INV'
-        logger.info(f'InBandEmissions Margin: {iem}dB')
-        # logger.info(f'IEM_MARG results: {iem_results}')
-        esfl_results = self.command_cmw100_query(f'FETC:NRS:MEAS:MEV:ESFL:EXTR?')
-        esfl_results = esfl_results.split(',')
-        ripple1 = round(eval(esfl_results[2]), 2) if esfl_results[2] != 'NCAP' else esfl_results[2]
-        ripple2 = round(eval(esfl_results[3]), 2) if esfl_results[3] != 'NCAP' else esfl_results[3]
-        logger.info(f'Equalize Spectrum Flatness: Ripple1:{ripple1} dBpp, Ripple2:{ripple2} dBpp')
-        time.sleep(0.2)
-        # logger.info(f'ESFL results: {esfl_results}')
-        sem_results = self.command_cmw100_query(f'FETC:NRS:MEAS:MEV:SEM:MARG:ALL?')
-        logger.info(f'SEM_MARG results: {sem_results}')
-        sem_avg_results = self.command_cmw100_query(f'FETC:NRS:MEAS:MEV:SEM:AVERage?')
-        sem_avg_results = sem_avg_results.split(',')
-        logger.info(
-            f'OBW: {eval(sem_avg_results[2]) / 1000000:.3f} MHz, Total TX Power: {eval(sem_avg_results[3]):.2f} dBm')
-        # logger.info(f'SEM_AVER results: {sem_avg_results}')
-        self.command_cmw100_write(f'STOP:NRS:MEAS:MEV')
-        self.command_cmw100_query('*OPC?')
 
-        logger.debug(aclr_results + mod_results)
-        return aclr_results + mod_results  # U_-2, U_-1, E_-1, Pwr, E_+1, U_+1, U_+2, EVM, Freq_Err, IQ_OFFSET
 
-    def set_rx_level(self):
-        logger.info(f'==========Search: {self.rx_level} dBm==========')
-        self.command_cmw100_write(f'SOUR:GPRF:GEN1:RFS:LEV {self.rx_level}')
-        # self.command_cmw100_query('*OPC?')

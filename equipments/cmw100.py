@@ -6400,7 +6400,7 @@ def main():
     # cmw100.loss_tx = 1
     # cmw100.set_gprf_measurement()
     # cmw100.set_gprf_tx_freq()
-    # cmw100.get_gprf_power()
+    # cmw100.set_gprf_measure_start_on()
     # cmw100.sensitivity_pipline_endc()
     # cmw100.preset_instrument()
     # cmw100.tx_monitor_lte()
