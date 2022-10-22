@@ -76,7 +76,7 @@ class CMW:
         """
         self.cmw_write('CONFigure:BASE:FDCorrection:CTABle:DELete:ALL')
 
-    def set_gprf_if_filter(self, filter='BAND'):
+    def set_gprf_if_filter(self, flt='BAND'):
         """
         Selects the IF filter type.
         Parameters:
@@ -87,7 +87,7 @@ class CMW:
         CDMA: 1.2288-MHz channel filter for CDMA 2000 TX tests
         TDSCdma: 1.28-MHz RRC filter for TD-SCDMA TX tests
         """
-        self.cmw_write(f'CONFigure:GPRF:MEASurement:POWer:FILTer:TYPE {filter}')
+        self.cmw_write(f'CONFigure:GPRF:MEASurement:POWer:FILTer:TYPE {flt}')
 
     def set_gprf_bandpass_filter_bw(self, bw=10):
         """
