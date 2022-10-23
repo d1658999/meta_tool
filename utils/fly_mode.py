@@ -3,7 +3,7 @@ import time
 from utils.log_init import log_set
 from connection_interface.connection_serial import ModemComport
 
-logger = log_set()
+logger = log_set('FlyMode')
 
 
 class FlyMode:

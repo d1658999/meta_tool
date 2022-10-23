@@ -3,7 +3,7 @@ import serial.tools.list_ports
 
 from utils.log_init import log_set
 
-logger = log_set()
+logger = log_set('Serial')
 
 
 class ModemComport:

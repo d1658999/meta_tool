@@ -15,7 +15,7 @@ from utils.log_init import log_set
 # from power_supply import Psu
 # from temp_chamber import TempChamber
 
-logger = log_set()
+logger = log_set('GUI')
 
 PROJECT_PATH = pathlib.Path(__file__).parent
 PROJECT_UI =  PROJECT_PATH / pathlib.Path('gui') /"main_v2_6.ui"

@@ -2,7 +2,7 @@ import pyvisa
 
 from utils.log_init import log_set
 
-logger = log_set()
+logger = log_set('Visa')
 
 
 class VisaComport:
