@@ -899,6 +899,17 @@ class CMW:
         """
         self.cmw_write(f'CONFigure:NRSub:MEASurement:MEValuation:MOEXception {meas_on_exception}')
 
+    def set_meas_on_exception_lte(self, meas_on_exception='ON'):
+        """
+        Specifies whether measurement results identified as faulty or inaccurate are rejected.
+        Parameters:
+        <MeasOnException> OFF | ON
+        OFF: Faulty results are rejected.
+        ON: Results are never rejected.
+        *RST:  OFF
+        """
+        self.cmw_write(f'CONFigure:LTE:MEASurement:MEValuation:MOEXception {meas_on_exception}')
+
     def set_scs_bw_fr1(self, scs, bw):
         """
         this command from LSI cannot find in the doc of R&S
@@ -946,10 +957,10 @@ class CMW:
         bw10 = f'0{bw * 10}' if bw < 10 else f'{bw * 10}'
         self.cmw_write(f'CONFigurat:LTE:MEASurement:MEValuation:CBANdwidth B{bw10}')
 
-    def set_spectrum_limit_fr1(self, area, bw, start_freq, stop_freq, level, rbw):
+    def set_spectrum_limit_fr1(self, area, bw10, start_freq, stop_freq, level, rbw):
         """
         ● CONFigure:NRSub:MEAS<i>:MEValuation:LIMit:SEMask:AREA<area>:CBANdwidth<bw>
-          + <Enable>, <FrequencyStart>, <FrequencyEnd>, <Level>, <RBW>
+           <Enable>, <FrequencyStart>, <FrequencyEnd>, <Level>, <RBW>
         Defines general requirements for the emission mask area number <area> (for NR SA).
         The activation state, the area borders, an upper limit and the resolution bandwidth
         must be specified.
@@ -989,9 +1000,51 @@ class CMW:
         M1: 1 MHz
         *RST:  K030 (<area> = 1) / M1 (<area> = 2 to 12)
         """
-        self.cmw_write(f'CONFigure:NRSub:MEASurement:MEValuation:LIMit:SEMask:AREA{area}:CBANdwidth{bw} '
-                       f'ON, {start_freq}MHz, {stop_freq}MHz, {level}, {rbw}'
-                       )
+        self.cmw_write(f'CONFigure:NRSub:MEASurement:MEValuation:LIMit:SEMask:AREA{area}:CBANdwidth{bw10} '
+                       f'ON, {start_freq}MHz, {stop_freq}MHz, {level}, {rbw}')
+
+    def set_spectrum_limit_lte(self, no, bw10, enable, start_freq, stop_freq, level, rbw):
+        """
+        CONFigure:LTE:MEAS<i>:MEValuation:LIMit:SEMask:LIMit<no>:
+        CBANdwidth<Band> <Enable>, <FrequencyStart>, <FrequencyEnd>, <Level>,
+        <RBW>
+        Defines general requirements for the emission mask area <no>. The activation state,
+        the area borders, an upper limit and the resolution bandwidth must be specified.
+        The emission mask applies to the channel bandwidth <Band>.
+        Suffix:
+        <Band>
+        .
+        14, 30, 50, 100, 150, 200
+        <no> 1..12
+        Number of the emission mask area
+        Parameters:
+        <Enable> OFF | ON
+        OFF: disables the check of these requirements
+        ON: enables the check of these requirements
+        *RST:  depends on channel bandwidth and area number
+        <FrequencyStart> Start frequency of the area, relative to the edges of the channel
+        bandwidth
+        Range:  see table below
+        *RST:  depends on channel bandwidth and area number
+        Default unit: Hz
+        <FrequencyEnd> Stop frequency of the area, relative to the edges of the channel
+        bandwidth
+        Range:  see table below
+        *RST:  depends on channel bandwidth and area number
+        Default unit: Hz
+        <Level> Upper limit for the area
+        Range:  -256 dBm  to  256 dBm
+        *RST:  depends on channel bandwidth and area number
+        Default unit: dBm
+        <RBW> K030 | K100 | M1
+        Resolution bandwidth to be used for the area
+        K030: 30 kHz
+        K100: 100 kHz
+        M1: 1 MHz
+        *RST:  K030 (<no> = 1) / M1 (<no> = 2 to 12)
+        """
+        self.cmw_write(f'CONFigure:LTE:MEASuremnet:MEValuation:LIMit:SEMask:LIMit{no}:CBANdwidth{bw10} '
+                       f'{enable}, {start_freq}MHz, {stop_freq}MHz, {level}, {rbw}')
 
     def set_pusch_fr1(self, mcs, rb_size, rb_start):
         """
@@ -1093,6 +1146,17 @@ class CMW:
         *RST:  0
         """
         self.cmw_write(f'CONFigure:LTE:MEASurement:MEValuation:RBALlocation:ORB {rb_start}')
+
+    def set_rb_auto_detect_lte(self, on_off='ON'):
+        """
+        Enables or disables the automatic detection of the RB configuration.
+        Parameters:
+        <Auto> OFF | ON
+        OFF: manual definition
+        ON: automatic detection
+        *RST:  ON
+        """
+        self.cmw_write(f'CONFigure:LTE:MEAS<i>:MEValuation:RBALlocation:AUTO {on_off}')
 
     def set_precoding_fr1(self, _type_fr1):
         """
@@ -1616,6 +1680,15 @@ class CMW:
         """
         return self.cmw_query(f'FETCh:NRSub:MEASurement:MEValuation:SEMask:MARGin:ALL?')
 
+    def set_delta_sequence_shift(self, delta=0):
+        """
+        Specifies the delta sequence shift value (Δ ss ) used to calculate the sequence shift pat-
+        tern for PUSCH.
+        Parameters:
+        <DeltaSeqShPUSCH>Range:  0  to  29
+        *RST:  0
+        """
+        self.cmw_write(f'CONFigure:LTE:MEASurement:MEValuation:DSSPusch {delta}')
 
 
 
