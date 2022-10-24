@@ -343,6 +343,21 @@ class CMW:
         """
         self.cmw_write(f'CONFigure:NRSub:MEASurement:RFSettings:UMARgin {margin}')
 
+    def set_rf_setting_user_margin_lte(self, margin=10.00):
+        """
+        Sets the margin that the measurement adds to the expected nominal power to deter-
+        mine the reference power. The reference power minus the external input attenuation
+        must be within the power range of the selected input connector. Refer to the data
+        sheet.
+        Parameters:
+        <UserMargin> numeric
+        Range:  0 dB to (55 dB + external attenuation - expected
+        nominal power)
+        *RST:  0 dB
+        Default unit: dB
+        """
+        self.cmw_write(f'CONFigure:LTE:MEASurement:RFSettings:UMARgin {margin}')
+
     def set_rf_setting_external_tx_port_attenuation_gprf(self, attenuation):
         """
         Defines an external attenuation (or gain, if the value is negative), to be applied to the
