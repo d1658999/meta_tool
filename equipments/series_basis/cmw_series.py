@@ -871,6 +871,23 @@ class CMW:
         """
         self.cmw_write(f'CONFigure:NRSub:MEASurement:PLCid {plc_id}')
 
+    def set_plc_lte(self, plc_id=0):
+        """
+        Specifies the physical layer cell ID of component carrier CC<no>. Without carrier
+        aggregation, you can omit <no>.
+        For the combined signal path scenario, use:
+        ● CONFigure:LTE:SIGN<i>:CELL[:PCC]:PCID
+        ● CONFigure:LTE:SIGN<i>:CELL:SCC<c>:PCID
+        Suffix:
+        <no>
+        .
+        1..4
+        Parameters:
+        <PhsLayerCellID> Range:  0  to  503
+        *RST:  0
+        """
+        self.cmw_write(f'CONFigure:LTE:MEASurement:MEValuation::PLCid {plc_id}')
+
     def set_meas_on_exception_fr1(self, meas_on_exception='ON'):
         """
         Specifies whether measurement results identified as faulty or inaccurate are rejected.
@@ -1052,6 +1069,30 @@ class CMW:
         *RST:  QPSK
         """
         self.cmw_write(f'CONFigure:LTE:MEASurement:MEValuation:MODulation:MSCHeme {mcs}')
+
+    def set_rb_size_lte(self, rb_size=100):
+        """
+        Specifies the number of allocated RBs in the measured slot. For manual RB allocation
+        definition, for uplink signals without multi-cluster allocation.
+        Parameters:
+        <NoRB> For the allowed input range, see Chapter 5.2.11.2, "Uplink
+        Resource Block Allocation", on page 925.
+        *RST:  100
+        """
+        self.cmw_write(f'CONFigure:LTE:MEASurement:MEValuation:RBALlocation:NRB {rb_size}')
+
+    def set_rb_start_lte(self, rb_start=0):
+        """
+        Specifies the offset of the first allocated resource block for manual RB allocation defini-
+        tion, for uplink signals without multi-cluster allocation.
+        Parameters:
+        <OffsetRB> For the maximum number of RBs depending on the channel BW,
+        see Chapter 5.2.11.2, "Uplink Resource Block Allocation",
+        on page 925.
+        Range:  0 to maximum number of RBs minus 1
+        *RST:  0
+        """
+        self.cmw_write(f'CONFigure:LTE:MEASurement:MEValuation:RBALlocation:ORB {rb_start}')
 
     def set_precoding_fr1(self, _type_fr1):
         """
@@ -1292,6 +1333,17 @@ class CMW:
         As to CMW100, it only can select SAL.If selecting CSP, it will shutdown
         """
         self.cmw_write(f'CONFigure:NRSub:MEASurement:SCENario:ACT {scenario}')
+
+    def set_type_cyclic_prefix_lte(self, cyclic_prefix='NORM'):
+        """
+        Selects the type of cyclic prefix of the LTE signal.
+        For the combined signal path scenario, use CONFigure:LTE:SIGN<i>:CELL:
+        CPRefix.
+        Parameters:
+        <CyclicPrefix> NORMal | EXTended
+        *RST:  NORM
+        """
+        self.cmw_write(f'CONFigure:LTE:MEASurement:MEValuation:CPRefix {cyclic_prefix}')
 
     def get_modulation_average_query_fr1(self):
         """
@@ -1563,6 +1615,8 @@ class CMW:
         Default unit: dB
         """
         return self.cmw_query(f'FETCh:NRSub:MEASurement:MEValuation:SEMask:MARGin:ALL?')
+
+
 
 
 

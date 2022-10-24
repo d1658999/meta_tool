@@ -36,6 +36,8 @@ class CMW100(CMW):
         self.mcs_lte = None
         self.rb_size_fr1 = None
         self.rb_start_fr1 = None
+        self.rb_size_lte = None
+        self.rb_start_lte = None
 
     def preset_instrument(self):
         logger.info('----------Preset CMW----------')
@@ -341,10 +343,10 @@ class CMW100(CMW):
         self.cmw_query('*OPC?')
         self.set_bw_lte(self.bw_lte)
         self.set_mcs_lte(self.mcs_lte)
-        self.command_cmw100_write(f'CONF:LTE:MEAS:MEV:RBAL:NRB {self.rb_size_lte}')
-        self.command_cmw100_write(f'CONF:LTE:MEAS:MEV:RBAL:ORB {self.rb_start_lte}')
-        self.command_cmw100_write(f'CONF:LTE:MEAS:MEV:CPR NORM')
-        self.command_cmw100_write(f'CONF:LTE:MEAS:MEV:PLC 0')
+        self.set_rb_size_lte(self.rb_size_lte)
+        self.set_rb_start_lte(self.rb_start_lte)
+        self.set_type_cyclic_prefix_lte('NORM')
+        self.set_plc_lte(0)
         self.command_cmw100_write(f'CONF:LTE:MEAS:MEV:DSSP 0')
         self.command_cmw100_write(f'CONF:LTE:MEAS:MEV:RBAL:AUTO OFF')
         self.command_cmw100_write(f'CONF:LTE:MEAS:MEV:MOEX ON')
