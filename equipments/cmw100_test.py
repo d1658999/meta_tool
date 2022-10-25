@@ -66,7 +66,7 @@ class CMW100(CMW):
         self.set_bandpass_filter_bw_gprf(bw)
         self.set_rf_tx_port_gprf(port_tx)
         self.set_power_count_gprf()
-        self.set_power_repetition_gprf()
+        self.set_repetition_gprf()
         self.set_power_list_mode_gprf()  # default is off listmode
         self.set_trigger_source_gprf()
         self.set_trigger_slope_gprf()
@@ -104,8 +104,35 @@ class CMW100(CMW):
         logger.info(f'EVM: {mod_results[0]:.2f}, FREQ_ERR: {mod_results[1]:.2f}, IQ_OFFSET: {mod_results[2]:.2f}')
         return mod_results
 
+    def get_modulation_avgerage_lte(self):
+        f_state = self.get_power_state_query_fr1()
+        while f_state != 'RDY':
+            f_state = self.get_power_state_query_fr1()
+            self.cmw_query('*OPC?')
+        mod_results = self.get_modulation_average_query_lte()  # P[3] is EVM, P[15] is Ferr, P[14] is IQ Offset
+        mod_results = mod_results.split(',')
+        mod_results = [mod_results[3], mod_results[15], mod_results[14]]
+        mod_results = [eval(m) for m in mod_results]
+        logger.info(f'EVM: {mod_results[0]:.2f}, FREQ_ERR: {mod_results[1]:.2f}, IQ_OFFSET: {mod_results[2]:.2f}')
+        return mod_results
+
     def get_aclr_average_fr1(self):
         aclr_results = self.get_aclr_average_query_fr1()
+        aclr_results = aclr_results.split(',')[1:]
+        aclr_results = [eval(aclr) * -1 if eval(aclr) > 30 else eval(aclr) for aclr in
+                        aclr_results]  # UTRA2(-), UTRA1(-), NR(-), TxP, NR(+), UTRA1(+), UTRA2(+)
+        logger.info(f'Power: {aclr_results[3]:.2f}, '
+                    f'E-UTRA: [{aclr_results[2]:.2f}, {aclr_results[4]:.2f}], '
+                    f'UTRA_1: [{aclr_results[1]:.2f}, {aclr_results[5]:.2f}], '
+                    f'UTRA_2: [{aclr_results[0]:.2f}, {aclr_results[6]:.2f}]')
+        return aclr_results
+
+    def get_aclr_average_lte(self):
+        f_state = self.get_power_state_query_lte()
+        while f_state != 'RDY':
+            f_state = self.get_power_state_query_lte()
+            self.cmw_query('*OPC?')
+        aclr_results = self.get_aclr_average_query_lte()
         aclr_results = aclr_results.split(',')[1:]
         aclr_results = [eval(aclr) * -1 if eval(aclr) > 30 else eval(aclr) for aclr in
                         aclr_results]  # UTRA2(-), UTRA1(-), NR(-), TxP, NR(+), UTRA1(+), UTRA2(+)
@@ -123,8 +150,25 @@ class CMW100(CMW):
         # logger.info(f'IEM_MARG results: {iem_results}')
         return iem_results
 
+    def get_in_band_emissions_lte(self):
+        iem_results = self.get_in_band_emission_query_lte()
+        iem_results = iem_results.split(',')
+        iem = f'{eval(iem_results[2]):.2f}' if iem_results[2] != 'INV' else 'INV'
+        logger.info(f'InBandEmissions Margin: {iem}dB')
+        # logger.info(f'IEM_MARG results: {iem_results}')
+        return iem_results
+
     def get_flatness_extreme_fr1(self):
         esfl_results = self.get_flatness_extreme_query_fr1()
+        esfl_results = esfl_results.split(',')
+        ripple1 = round(eval(esfl_results[2]), 2) if esfl_results[2] != 'NCAP' else esfl_results[2]
+        ripple2 = round(eval(esfl_results[3]), 2) if esfl_results[3] != 'NCAP' else esfl_results[3]
+        logger.info(f'Equalize Spectrum Flatness: Ripple1:{ripple1} dBpp, Ripple2:{ripple2} dBpp')
+        # logger.info(f'ESFL results: {esfl_results}')
+        return ripple1, ripple2
+
+    def get_flatness_extreme_lte(self):
+        esfl_results = self.get_flatness_extreme_query_lte()
         esfl_results = esfl_results.split(',')
         ripple1 = round(eval(esfl_results[2]), 2) if esfl_results[2] != 'NCAP' else esfl_results[2]
         ripple2 = round(eval(esfl_results[3]), 2) if esfl_results[3] != 'NCAP' else esfl_results[3]
@@ -136,6 +180,16 @@ class CMW100(CMW):
         sem_results = self.get_sem_margin_all_query_fr1()
         logger.info(f'SEM_MARG results: {sem_results}')
         sem_avg_results = self.get_sem_average_query_fr1()
+        sem_avg_results = sem_avg_results.split(',')
+        logger.info(f'OBW: {eval(sem_avg_results[2]) / 1000000:.3f} MHz, '
+                    f'Total TX Power: {eval(sem_avg_results[3]):.2f} dBm')
+        # logger.info(f'SEM_AVER results: {sem_avg_results}')
+        return sem_results, sem_avg_results
+
+    def get_sem_average_and_margin_lte(self):
+        sem_results = self.get_sem_margin_all_query_lte()
+        logger.info(f'SEM_MARG results: {sem_results}')
+        sem_avg_results = self.get_sem_average_query_lte()
         sem_avg_results = sem_avg_results.split(',')
         logger.info(f'OBW: {eval(sem_avg_results[2]) / 1000000:.3f} MHz, '
                     f'Total TX Power: {eval(sem_avg_results[3]):.2f} dBm')
@@ -361,7 +415,7 @@ class CMW100(CMW):
         self.set_pusch_fr1(self.mcs_fr1, self.rb_size_fr1, self.rb_start_fr1)
         self.set_phase_compensation_fr1()
         self.cmw_query('*OPC?')
-        self.set_repetition_fr1()
+        self.set_repetition_fr1('SING')
         self.set_plc_fr1()
         self.set_channel_type_fr1()
         self.set_uldl_periodicity_fr1('M25')
@@ -375,10 +429,10 @@ class CMW100(CMW):
         self.set_sem_count_fr1(5)
         self.set_trigger_source_fr1('GPRF GEN1: Restart Marker')
         self.set_trigger_threshold_fr1(-20)
-        self.set_repetition_fr1()
+        self.set_repetition_fr1('SING')
         self.set_measurements_enable_all_fr1()
         self.set_subframe_fr1(10)
-        self.set_measured_slot('ALL')
+        self.set_measured_slot_fr1('ALL')
         self.set_scenario_activate_fr1('SAL')
         self.set_rf_setting_external_tx_port_attenuation_fr1(self.loss_tx)
         self.cmw_query(f'*OPC?')
@@ -412,78 +466,49 @@ class CMW100(CMW):
         self.set_rb_start_lte(self.rb_start_lte)
         self.set_type_cyclic_prefix_lte('NORM')
         self.set_plc_lte(0)
-        self.set_delta_sequence_shift(0)
+        self.set_delta_sequence_shift_lte(0)
         self.set_rb_auto_detect_lte('OFF')
         self.set_meas_on_exception_lte('ON')
         self.set_sem_limit_lte(self.bw_lte)
         self.cmw_query('SYST:ERR:ALL?')
-        self.command_cmw100_write(f'CONFigure:LTE:MEAS:MEValuation:MSLot ALL')
+        self.set_measured_slot_lte('ALL')
         self.set_rf_setting_user_margin_lte(10.00)
-        self.command_cmw100_write(f'CONF:LTE:MEAS:RFS:ENP {self.tx_level + 5}.00')
-        self.command_cmw100_write(f'ROUT:LTE:MEAS:SCEN:SAL R11, RX1')
+        self.set_expect_power_lte(self.tx_level + 5)
+        self.set_rf_tx_port_lte(1)
         self.cmw_query('*OPC?')
         self.set_rf_setting_user_margin_lte(10.00)
-        self.command_cmw100_write(f'CONF:LTE:MEAS:MEV:RBAL:AUTO ON')
-        self.command_cmw100_write(f'CONF:LTE:MEAS:MEV:SCO:MOD 5')
+        self.set_rb_auto_detect_lte('ON')
+        self.set_statistic_count_lte(5)
         self.cmw_query('*OPC?')
-        self.command_cmw100_write(f'CONF:LTE:MEAS:MEV:SCO:SPEC:ACLR 5')
+        self.set_aclr_count_lte(5)
         self.cmw_query('*OPC?')
-        self.command_cmw100_write(f'CONF:LTE:MEAS:MEV:SCO:SPEC:SEM 5')
+        self.set_sem_count_lte(5)
         self.cmw_query('*OPC?')
-        self.command_cmw100_write(f"TRIG:LTE:MEAS:MEV:SOUR 'GPRF Gen1: Restart Marker'")
-        self.command_cmw100_write(f'TRIG:LTE:MEAS:MEV:THR -20.0')
-        self.command_cmw100_write(f'CONF:LTE:MEAS:MEV:REP SING')
-        self.command_cmw100_write(f'CONF:LTE:MEAS:MEV:RES:ALL ON, ON, ON, ON, ON, ON, ON, ON, ON, ON')
+        self.set_trigger_source_lte('GPRF Gen1: Restart Marker')
+        self.set_trigger_threshold_lte(-20.0)
+        self.set_repetition_lte('SING')
+        self.set_measurements_enable_all_lte()
         self.cmw_query('*OPC?')
-        self.command_cmw100_write(f'CONF:LTE:MEAS:MEV:MSUB 2, 10, 0')
-        self.command_cmw100_write(f'CONF:LTE:MEAS:SCEN:ACT SAL')
-        self.command_cmw100_query('SYST:ERR:ALL?')
-        self.command_cmw100_write(f'ROUT:GPRF:MEAS:SCEN:SAL R1{self.port_tx}, RX1')
+        self.set_measured_subframe()
+        self.set_scenario_activate_lte('SAL')
+        self.cmw_query('SYST:ERR:ALL?')
+        self.set_rf_tx_port_gprf(self.port_tx)
         self.cmw_query('*OPC?')
-        self.command_cmw100_write(f'ROUT:LTE:MEAS:SCEN:SAL R1{self.port_tx}, RX1')
+        self.set_rf_tx_port_lte(self.port_tx)
         self.cmw_query('*OPC?')
-        self.command_cmw100_write(f'CONF:LTE:MEAS:RFS:EATT {self.loss_tx}')
+        self.set_rf_setting_external_tx_port_attenuation_lte(self.loss_tx)
         self.cmw_query('*OPC?')
         time.sleep(0.2)
-        mod_results = self.command_cmw100_query(
-            'READ:LTE:MEAS:MEV:MOD:AVER?')  # P3 is EVM, P15 is Ferr, P14 is IQ Offset
-        mod_results = mod_results.split(',')
-        mod_results = [mod_results[3], mod_results[15], mod_results[14]]
-        mod_results = [eval(m) for m in mod_results]
-        logger.info(f'EVM: {mod_results[0]:.2f}, FREQ_ERR: {mod_results[1]:.2f}, IQ_OFFSET: {mod_results[2]:.2f}')
-        self.command_cmw100_write(f'INIT:LTE:MEAS:MEV')
-        self.command_cmw100_query('*OPC?')
-        f_state = self.command_cmw100_query('FETC:LTE:MEAS:MEV:STAT?')
-        while f_state != 'RDY':
-            f_state = self.command_cmw100_query('FETC:LTE:MEAS:MEV:STAT?')
-            self.command_cmw100_query('*OPC?')
-        aclr_results = self.command_cmw100_query('FETC:LTE:MEAS:MEV:ACLR:AVER?')
-        aclr_results = aclr_results.split(',')[1:]
-        aclr_results = [eval(aclr) * -1 if eval(aclr) > 30 else eval(aclr) for aclr in
-                        aclr_results]  # U_-2, U_-1, E_-1, Pwr, E_+1, U_+1, U_+2
-        logger.info(
-            f'Power: {aclr_results[3]:.2f}, E-UTRA: [{aclr_results[2]:.2f}, {aclr_results[4]:.2f}], UTRA_1: [{aclr_results[1]:.2f}, {aclr_results[5]:.2f}], UTRA_2: [{aclr_results[0]:.2f}, {aclr_results[6]:.2f}]')
-        iem_results = self.command_cmw100_query('FETC:LTE:MEAS:MEV:IEM:MARG?')
-        iem_results = iem_results.split(',')
-        logger.info(f'InBandEmissions Margin: {eval(iem_results[2]):.2f}dB')
-        # logger.info(f'IEM_MARG results: {iem_results}')
-        esfl_results = self.command_cmw100_query(f'FETC:LTE:MEAS:MEV:ESFL:EXTR?')
-        esfl_results = esfl_results.split(',')
-        ripple1 = round(eval(esfl_results[2]), 2) if esfl_results[2] != 'NCAP' else esfl_results[2]
-        ripple2 = round(eval(esfl_results[3]), 2) if esfl_results[3] != 'NCAP' else esfl_results[3]
-        logger.info(f'Equalize Spectrum Flatness: Ripple1:{ripple1} dBpp, Ripple2:{ripple2} dBpp')
+        mod_results = self.get_modulation_avgerage_lte()
+        self.set_measure_start_on_lte()
+        self.cmw_query('*OPC?')
+        aclr_results = self.get_aclr_average_lte()
+        self.get_in_band_emissions_lte()
+        self.get_flatness_extreme_lte()
         time.sleep(0.2)
-        # logger.info(f'ESFL results: {esfl_results}')
-        sem_results = self.command_cmw100_query(f'FETC:LTE:MEAS:MEV:SEM:MARG?')
-        logger.info(f'SEM_MARG results: {sem_results}')
-        sem_avg_results = self.command_cmw100_query(f'FETC:LTE:MEAS:MEV:SEM:AVER?')
-        sem_avg_results = sem_avg_results.split(',')
-        logger.info(
-            f'OBW: {eval(sem_avg_results[2]) / 1000000:.3f} MHz, Total TX Power: {eval(sem_avg_results[3]):.2f} dBm')
-        # logger.info(f'SEM_AVER results: {sem_avg_results}')
-        self.command_cmw100_write(f'STOP:LTE:MEAS:MEV')
-        self.command_cmw100_query('*OPC?')
-
+        self.get_sem_average_and_margin_lte()
+        self.set_measure_stop_lte()
+        self.cmw_query('*OPC?')
         logger.debug(aclr_results + mod_results)
         return aclr_results + mod_results  # U_-2, U_-1, E_-1, Pwr, E_+1, U_+1, U_+2, EVM, Freq_Err, IQ_OFFSET
 

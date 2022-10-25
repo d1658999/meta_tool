@@ -131,6 +131,18 @@ class CMW:
         """
         self.cmw_write(f'ROUTe:NRSub:MEASurement:SCENario:SALone R1{port_tx} RX1')
 
+    def set_rf_tx_port_lte(self, port_tx=1):
+        """
+        Activates the standalone scenario and selects the RF input path for the measured RF
+        signal.
+        For possible connector and converter values, see Chapter 5.5.1.4, "Values for RF Path
+        Selection", on page 1019.
+        Parameters:
+        <RXConnector> RF connector for the input path
+        <RFConverter> RX module for the input path
+        """
+        self.cmw_write(f'ROUTe:LTE:MEASurement:SCENario:SALone R1{port_tx} RX1')
+
     def set_rf_rx_port_gprf(self, port_rx=18):
         """
         Activates the standalone scenario and selects the output path for the generated RF
@@ -142,6 +154,30 @@ class CMW:
         <RFConverter> TX module for the output path
         """
         self.cmw_write(f'ROUTe:GPRF:GENerator:SCENario:SALone R1{port_rx} TX1')
+
+    def set_rf_rx_port_fr1(self, port_rx=18):
+        """
+        Activates the standalone scenario and selects the output path for the generated RF
+        signal.
+        For possible connector and converter values, see Chapter 2.5.1.2, "Values for Signal
+        Path Selection", on page 65.
+        Parameters:
+        <TXConnector> RF connector for the output path
+        <RFConverter> TX module for the output path
+        """
+        self.cmw_write(f'ROUTe:NRsub:GENerator:SCENario:SALone R1{port_rx} TX1')
+
+    def set_rf_rx_port_lte(self, port_rx=18):
+        """
+        Activates the standalone scenario and selects the output path for the generated RF
+        signal.
+        For possible connector and converter values, see Chapter 2.5.1.2, "Values for Signal
+        Path Selection", on page 65.
+        Parameters:
+        <TXConnector> RF connector for the output path
+        <RFConverter> TX module for the output path
+        """
+        self.cmw_write(f'ROUTe:LTE:GENerator:SCENario:SALone R1{port_rx} TX1')
 
     def set_power_count_gprf(self, count=2):
         """
@@ -155,7 +191,7 @@ class CMW:
         """
         self.cmw_write(f'CONFigure:GPRF:MEASurement:POWer:SCOunt {count}')
 
-    def set_power_repetition_gprf(self, repetition='SINGleshot'):
+    def set_repetition_gprf(self, repetition='SINGleshot'):
         """
         Specifies the repetition mode of the measurement. The repetition mode specifies
         whether the measurement is stopped after a single shot or repeated continuously. Use
@@ -168,6 +204,34 @@ class CMW:
         *RST:  SING
         """
         self.cmw_write(f'CONFigure:GPRF:MEASurement:POWer:REPetition {repetition}')
+
+    def set_repetition_fr1(self, rep='SING'):
+        """
+        Specifies the repetition mode of the measurement. The repetition mode specifies
+        whether the measurement is stopped after a single shot or repeated continuously. Use
+        CONFigure:..:MEAS<i>:...:SCOunt to determine the number of measurement
+        intervals per single shot.
+        Parameters:
+        <Repetition> SINGleshot | CONTinuous
+        SINGleshot: Single-shot measurement
+        CONTinuous: Continuous measurement
+        *RST:  SING
+        """
+        self.cmw_write(f'CONFigure:NRSub:MEASurement:MEValuation:REPetition {rep}')
+
+    def set_repetition_lte(self, rep='SING'):
+        """
+        Specifies the repetition mode of the measurement. The repetition mode specifies
+        whether the measurement is stopped after a single shot or repeated continuously. Use
+        CONFigure:..:MEAS<i>:...:SCOunt to determine the number of measurement
+        intervals per single shot.
+        Parameters:
+        <Repetition> SINGleshot | CONTinuous
+        SINGleshot: Single-shot measurement
+        CONTinuous: Continuous measurement
+        *RST:  SING
+        """
+        self.cmw_write(f'CONFigure:LTE:MEASurement:MEValuation:REPetition {rep}')
 
     def set_power_list_mode_gprf(self, on_off='OFF'):
         """
@@ -209,6 +273,23 @@ class CMW:
         *RST:  'IF Power'
         """
         self.cmw_write(f'TRIGger:NRSub:MEASurement:MEValuation:SOURce {source}')
+
+    def set_trigger_source_lte(self, source='Free Run'):
+        """
+        Selects the source of the trigger events. Some values are always available. They are
+        listed below. Depending on the installed options, additional values are available. You
+        can query a list of all supported values via TRIGger:...:CATalog:SOURce?.
+        Parameters:
+        <Source> string
+        'Free Run (Fast Sync)'
+        Free run with synchronization
+        'Free Run (No Sync)'
+        Free run without synchronization
+        'IF Power'
+        Power trigger (received RF power)
+        *RST:  'IF Power'
+        """
+        self.cmw_write(f'TRIGger:LTE:MEASurement:MEValuation:SOURce {source}')
 
     def set_trigger_slope_gprf(self, slope='REDGe'):
         """
@@ -271,7 +352,7 @@ class CMW:
         """
         self.cmw_write(f'TRIGger:GPRF:MEASurement:POWer:MODE {mode}')
 
-    def set_expect_power_gprf(self, exp_nom_pwr=0):
+    def set_expect_power_gprf(self, exp_nom_pwr=0.00):
         """
         Sets the expected nominal power of the measured RF signal.
         Parameters:
@@ -286,7 +367,7 @@ class CMW:
         """
         self.cmw_write(f'CONFigure:GPRF:MEASurement:RFSettings:ENPower {exp_nom_pwr}')
 
-    def set_expect_power_fr1(self, exp_nom_pwr):
+    def set_expect_power_fr1(self, exp_nom_pwr=0.00):
         """
         Sets the expected nominal power of the measured RF signal.
         Parameters:
@@ -300,6 +381,25 @@ class CMW:
         Default unit: dBm
         """
         self.cmw_write(f'CONFigure:NRSub:MEASurement:RFSettings:ENPower {exp_nom_pwr}')
+
+    def set_expect_power_lte(self, exp_nom_pwr=0.00):
+        """
+        Sets the expected nominal power of the measured RF signal.
+        For the combined signal path scenario, use:
+        ● CONFigure:LTE:SIGN<i>:RFSettings[:PCC]:ENPMode
+        ● CONFigure:LTE:SIGN<i>:RFSettings[:PCC]:ENPower
+        ● CONFigure:LTE:SIGN<i>:RFSettings:SCC<c>:ENPMode
+        ● CONFigure:LTE:SIGN<i>:RFSettings:SCC<c>:ENPower
+        Parameters:
+        <ExpNomPow> The range of the expected nominal power can be calculated as
+        follows:
+        Range (Expected Nominal Power) = Range (Input Power) +
+        External Attenuation - User Margin
+        The input power range is stated in the data sheet.
+        *RST:  0 dBm
+        Default unit: dBm
+        """
+        self.cmw_write(f'CONFigure:LTE:MEASurement:RFSettings:ENPower {exp_nom_pwr}')
 
     def set_rx_level_gprf(self, rx_level=-70.0):
         """
@@ -384,7 +484,15 @@ class CMW:
 
     def set_rf_setting_external_tx_port_attenuation_lte(self, attenuation):
         """
-        DBT
+        Defines an external attenuation (or gain, if the value is negative), to be applied to the
+        RF input connector.
+        For the combined signal path scenario, use:
+        ● CONFigure:LTE:SIGN<i>:RFSettings[:PCC]:EATTenuation:INPut
+        ● CONFigure:LTE:SIGN<i>:RFSettings:SCC<c>:EATTenuation:INPut
+        Parameters:
+        <RFinputExtAtt> Range:  -50 dB  to  90 dB
+        *RST:  0 dB
+        Default unit: dB
         """
         self.cmw_write(f'CONFigure:LTE:MEASurement:RFSettings:EATTenuation {attenuation}')
 
@@ -485,7 +593,27 @@ class CMW:
 
     def set_measure_start_on_lte(self):
         """
-        DBT
+        Starts, stops, or aborts the measurement:
+        ● INITiate... starts or restarts the measurement. The measurement enters the
+        "RUN" state.
+        ● STOP... halts the measurement immediately. The measurement enters the "RDY"
+        state. Measurement results are kept. The resources remain allocated to the mea-
+        surement.
+        ● ABORt... halts the measurement immediately. The measurement enters the
+        "OFF" state. All measurement values are set to NAV. Allocated resources are
+        released.
+        Use FETCh...STATe? to query the current measurement state.
+        ==================================================================================
+        The NR multi-evaluation measurement is programmed as follows:
+        ● The measurement is controlled by SCPI commands with the following syn-
+        tax: ...NRSub:MEAS:MEValuation...
+        ● Use general commands of the type ...:NRSub:MEAS... (no :MEValuation
+        mnemonic) to define the signal routing and to perform RF and analyzer settings.
+        ● After a *RST, the measurement is switched off. Use
+        READ:NRSub:MEAS:MEValuation...? to initiate a measurement and to retrieve
+        the results. You can also start the measurement using
+        INIT:NRSub:MEAS:MEValuation and retrieve the results using
+        FETCh:NRSub:MEAS:MEValuation...?.
         """
         self.cmw_write(f'INIT:LTE:MEASurement:MEValuation')
 
@@ -518,7 +646,16 @@ class CMW:
 
     def set_measure_stop_lte(self):
         """
-        DBT
+        Starts, stops, or aborts the measurement:
+        ● INITiate... starts or restarts the measurement. The measurement enters the
+        "RUN" state.
+        ● STOP... halts the measurement immediately. The measurement enters the "RDY"
+        state. Measurement results are kept. The resources remain allocated to the mea-
+        surement.
+        ● ABORt... halts the measurement immediately. The measurement enters the
+        "OFF" state. All measurement values are set to NAV. Allocated resources are
+        released.
+        Use FETCh...STATe? to query the current measurement state.
         """
         self.cmw_write(f'STOP:LTE:MEASurement:MEValuation')
 
@@ -632,6 +769,22 @@ class CMW:
         Usage:  Query only
         """
         return self.cmw_query('FETCh:NRSub:MEASurement:MEValuation:STATe?')
+
+    def get_power_state_query_lte(self):
+        """
+        Queries the main measurement state. Use FETCh:...:STATe:ALL? to query the
+        measurement state including the substates. Use INITiate..., STOP...,
+        ABORt... to change the measurement state.
+        Return values:
+        <MeasStatus> OFF | RUN | RDY
+        OFF: measurement off, no resources allocated, no results
+        RUN: measurement running, synchronization pending or adjus-
+        ted, resources active or queued
+        RDY: measurement terminated, valid results can be available
+        *RST:  OFF
+        Usage:  Query only
+        """
+        return self.cmw_query('FETCh:LTE:MEASurement:MEValuation:STATe?')
 
     def get_power_average_query_gprf(self):
         """
@@ -805,7 +958,12 @@ class CMW:
 
     def set_statistic_count_lte(self, count=5):
         """
-        DBT
+        Specifies the statistic count of the measurement. The statistic count is equal to the
+        number of measurement intervals per single shot.
+        Parameters:
+        <StatisticCount> Number of measurement intervals (slots)
+        Range:  1 slot  to  1000 slots
+        *RST:  20 slots
         """
         self.cmw_write(f'CONFigure:LTE:MEASurement:MEValuation:SCOunt:MODulation {count}')
 
@@ -1171,7 +1329,7 @@ class CMW:
         ON: automatic detection
         *RST:  ON
         """
-        self.cmw_write(f'CONFigure:LTE:MEAS<i>:MEValuation:RBALlocation:AUTO {on_off}')
+        self.cmw_write(f'CONFigure:LTE:MEASurement:MEValuation:RBALlocation:AUTO {on_off}')
 
     def set_precoding_fr1(self, _type_fr1):
         """
@@ -1203,20 +1361,6 @@ class CMW:
         Default unit: Hz
         """
         self.cmw_write(f'CONFigure:NRSub:MEASurement:MEValuation:PCOMp {phase_comp}, {user_freq}')
-
-    def set_repetition_fr1(self, rep='SING'):
-        """
-        Specifies the repetition mode of the measurement. The repetition mode specifies
-        whether the measurement is stopped after a single shot or repeated continuously. Use
-        CONFigure:..:MEAS<i>:...:SCOunt to determine the number of measurement
-        intervals per single shot.
-        Parameters:
-        <Repetition> SINGleshot | CONTinuous
-        SINGleshot: Single-shot measurement
-        CONTinuous: Continuous measurement
-        *RST:  SING
-        """
-        self.cmw_write(f'CONFigure:NRSub:MEASurement:MEValuation:REPetition {rep}')
 
     def set_channel_type_fr1(self, ctype='PUSC'):
         """
@@ -1267,7 +1411,14 @@ class CMW:
 
     def set_aclr_count_lte(self, count=5):
         """
-        DBT
+        Specifies the statistic count of the measurement. The statistic count is equal to the
+        number of measurement intervals per single shot.
+        Separate statistic counts for ACLR and spectrum emission mask measurements are
+        supported.
+        Parameters:
+        <StatisticCount> Number of measurement intervals (slots)
+        Range:  1 slot  to  1000 slots
+        *RST:  20 slots
         """
         self.cmw_write(f'CONFigure:LTE:MEASurement:MEValuation:SCOunt:SPECtrum:ACLR {count}')
 
@@ -1299,7 +1450,14 @@ class CMW:
 
     def set_sem_count_lte(self, count=5):
         """
-        DBT
+        Specifies the statistic count of the measurement. The statistic count is equal to the
+        number of measurement intervals per single shot.
+        Separate statistic counts for ACLR and spectrum emission mask measurements are
+        supported.
+        Parameters:
+        <StatisticCount> Number of measurement intervals (slots)
+        Range:  1 slot  to  1000 slots
+        *RST:  20 slots
         """
         self.cmw_write(f'CONFigure:LTE:MEASurement:MEValuation:SCOunt:SPECtrum:SEMask {count}')
 
@@ -1320,6 +1478,18 @@ class CMW:
         external attenuation)
         """
         self.cmw_write(f'TRIGger:NRSub:MEASurement:MEValuation:THReshold {threshold}')
+
+    def set_trigger_threshold_lte(self, threshold=-20.0):
+        """
+        Defines the trigger threshold for power trigger sources.
+        Parameters:
+        <TrigThreshold> numeric
+        Range:  -50 dB  to  0 dB
+        *RST:  -20 dB
+        Default unit: dB (full scale, i.e. relative to reference level minus
+        external attenuation)
+        """
+        self.cmw_write(f'TRIGger:LTE:MEASurement:MEValuation:THReshold {threshold}')
 
     def set_measurements_enable_all_fr1(self):
         """
@@ -1366,6 +1536,51 @@ class CMW:
         items_en = 'ON, ON, ON, ON, ON, ON, ON, ON, ON, ON'
         self.cmw_write(f'CONFigure:NRSub:MEASurement:MEValuation:RESult:ALL {items_en}')
 
+    def set_measurements_enable_all_lte(self):
+        """
+        CONFigure:NRSub:MEAS<i>:MEValuation:RESult[:ALL] <EVM>, <MagnitudeError>, <PhaseError>, <InbandEmissions>,
+        <EVMversusC>, <IQ>, <EquSpecFlatness>, <TXMeasurement>, <SpecEmMask>, <ACLR>[, <PowerMonitor>, <PowerDynamics>]
+        Enables or disables the evaluation of results in the multi-evaluation measurement. This
+        command combines most other
+        CONFigure:NRSub:MEAS<i>:MEValuation:RESult... commands.
+        Parameters:
+        <EVM> OFF | ON
+        Error vector magnitude
+        OFF: Do not evaluate results
+        ON: Evaluate results
+        *RST:  ON
+        <MagnitudeError> OFF | ON
+        *RST:  OFF
+        <PhaseError> OFF | ON
+        *RST:  OFF
+        <InbandEmissions> OFF | ON
+        *RST:  ON
+        <EVMversusC> OFF | ON
+        EVM vs. subcarrier
+        *RST:  OFF
+        <IQ> OFF | ON
+        I/Q constellation diagram
+        *RST:  OFF
+        <EquSpecFlatness> OFF | ON
+        Equalizer spectrum flatness
+        *RST:  ON
+        <TXMeasurement> OFF | ON
+        TX measurement statistical overview
+        *RST:  ON
+        <SpecEmMask> OFF | ON
+        Spectrum emission mask
+        *RST:  ON
+        <ACLR> OFF | ON
+        Adjacent channel leakage power ratio
+        *RST:  ON
+        <PowerMonitor> OFF | ON
+        *RST:  OFF
+        <PowerDynamics> OFF | ON
+        *RST:  OFF
+        """
+        items_en = 'ON, ON, ON, ON, ON, ON, ON, ON, ON, ON'
+        self.cmw_write(f'CONFigure:LTE:MEASurement:MEValuation:RESult:ALL {items_en}')
+
     def set_subframe_fr1(self, subframe=10):
         """
         Configures how many subframes of each radio frame are measured.
@@ -1376,7 +1591,7 @@ class CMW:
         """
         self.cmw_write(f'CONFigure:NRSub:MEASurement:MEValuation:NSUBframes {subframe}')
 
-    def set_measured_slot(self, measured_slot='ALL'):
+    def set_measured_slot_fr1(self, measured_slot='ALL'):
         """
         CONFigure:NRSub:MEAS<i>:MEValuation:MSLot <MeasureSlot>[, <MeasSlotNo>]
         Selects which slots of the measured subframe range are evaluated.
@@ -1400,6 +1615,20 @@ class CMW:
         """
         self.cmw_write(f'CONFigure:NRSub:MEASurement:MEValuation:MSLot {measured_slot}')
 
+    def set_measured_slot_lte(self, measured_slot='ALL'):
+        """
+        CONFigure:LTE:MEAS<i>:MEValuation:MSLot <MeasureSlot>
+        Selects which slots of the "Measure Subframe" are measured.
+        Parameters:
+        <MeasureSlot> MS0 | MS1 | ALL
+        MS0: slot number 0 only
+        MS1: slot number 1 only
+        ALL: both slots
+        *RST:  ALL
+
+        """
+        self.cmw_write(f'CONFigure:LTE:MEASurement:MEValuation:MSLot {measured_slot}')
+
     def set_scenario_activate_fr1(self, scenario='SAL'):
         """
         CONF:NRS:MEAS:SCEN:ACT <senario>
@@ -1412,6 +1641,19 @@ class CMW:
         As to CMW100, it only can select SAL.If selecting CSP, it will shutdown
         """
         self.cmw_write(f'CONFigure:NRSub:MEASurement:SCENario:ACT {scenario}')
+
+    def set_scenario_activate_lte(self, scenario='SAL'):
+        """
+        CONF:NRS:MEAS:SCEN:ACT <senario>
+        This cannot find from the manual of R&S
+        guess:
+        <senario>  SAL | CSP
+        SAL: StandAlone
+        CSP: CombindSignalPath
+
+        As to CMW100, it only can select SAL.If selecting CSP, it will shutdown
+        """
+        self.cmw_write(f'CONFigure:LTE:MEASurement:SCENario:ACT {scenario}')
 
     def set_type_cyclic_prefix_lte(self, cyclic_prefix='NORM'):
         """
@@ -1518,6 +1760,100 @@ class CMW:
         """
         return self.cmw_query(f'FETCh:NRSub:MEASurement:MEValuation:MODulation:AVERage?')
 
+    def get_modulation_average_query_lte(self):
+        """
+        Return the current, average and standard deviation single value results.
+        The values described below are returned by FETCh and READ commands. CALCulate
+        commands return limit check results instead, one value for each result listed below.
+        Return values:
+        <1_Reliability> decimal
+        Reliability Indicator
+        <2_OutOfTol> decimal
+        Out of tolerance result, i.e. percentage of measurement inter-
+        vals of the statistic count for modulation measurements exceed-
+        ing the specified modulation limits.
+        Default unit: %
+        <3_EVM_RMSlow> float
+        EVM RMS value, low EVM window position
+        Default unit: %
+        <4_EVM_RMShigh> float
+        EVM RMS value, high EVM window position
+        Default unit: %
+        <5_EVMpeakLow> float
+        EVM peak value, low EVM window position
+        Default unit: %
+        <6_EVMpeakHigh> float
+        EVM peak value, high EVM window position
+        Default unit: %
+        <7_MErr_RMSlow> float
+        Magnitude error RMS value, low EVM window position
+        Default unit: %
+        <8_MErr_RMShigh> float
+        Magnitude error RMS value, high EVM window position
+        Default unit: %
+        <9_MErrPeakLow> float
+        Magnitude error peak value, low EVM window position
+        Default unit: %
+        <10_MErrPeakHigh> float
+        Magnitude error peak value, high EVM window position
+        Default unit: %
+        <11_PErr_RMSlow> float
+        Phase error RMS value, low EVM window position
+        Default unit: deg
+        <12_PErr_RMSh> float
+        Phase error RMS value, high EVM window position
+        Default unit: deg
+        <13_PErrPeakLow> float
+        Phase error peak value, low EVM window position
+        Default unit: deg
+        <14_PErrPeakHigh> float
+        Phase error peak value, high EVM window position
+        Default unit: deg
+        <15_IQoffset> float
+        I/Q origin offset
+        Default unit: dBc
+        <16_FreqError> float
+        Carrier frequency error
+        Default unit: Hz
+        <17_TimingError> float
+        Transmit time error
+        Default unit: Ts (basic time unit)
+        <18_TXpower> float
+        User equipment power
+        Default unit: dBm
+        <19_PeakPower> float
+        User equipment peak power
+        Default unit: dBm
+        <20_RBpower> float
+        RB power
+        Default unit: dBm
+        <21_EVM_DMRSl> float
+        EVM DMRS value, low EVM window position
+        Default unit: %
+        <22_EVM_DMRSh> float
+        EVM DMRS value, high EVM window position
+        Default unit: %
+        <23_MErr_DMRSl> float
+        Magnitude error DMRS value, low EVM window position
+        Default unit: %
+        <24_MErr_DMRSh> float
+        Magnitude error DMRS value, high EVM window position
+        Default unit: %
+        <25_PErr_DMRS> float
+        Phase error DMRS value, low EVM window position
+        Default unit: deg
+        <26_PErr_DMRSh> float
+        Phase error DMRS value, high EVM window position
+        Default unit: deg
+        <27_GainImbal> Gain imbalance
+        Default unit: dB
+        <28_QuadError> Quadrature error
+        Default unit: deg
+        <29_EVM_SRS> Error vector magnitude result for SRS signals
+        Default unit: %
+        """
+        return self.cmw_query(f'READ:LTE:MEASurement:MEValuation:MODulation:AVERage?')
+
     def get_aclr_average_query_fr1(self):
         """
         Returns the relative ACLR values for NR standalone, as displayed in the table below
@@ -1552,6 +1888,40 @@ class CMW:
         """
         return self.cmw_query(f'FETCh:NRSub:MEASurement:MEValuation:ACLR:AVERage?')
 
+    def get_aclr_average_query_lte(self):
+        """
+        Returns the relative ACLR values for NR standalone, as displayed in the table below
+        the ACLR diagram. The current and average values can be retrieved.
+        See also Chapter 4.2.8, "View Spectrum ACLR", on page 39.
+        The values described below are returned by FETCh and READ commands. CALCulate
+        commands return limit check results instead, one value for each result listed below.
+        Return values:
+        <Reliability> decimal
+        Reliability Indicator
+        <UTRA2neg> float
+        ACLR for the second UTRA channel with lower frequency
+        Default unit: dB
+        <UTRA1neg> float
+        ACLR for the first UTRA channel with lower frequency
+        Default unit: dB
+        <NRneg> float
+        ACLR for the first NR channel with lower frequency
+        Default unit: dB
+        <Carrier> float
+        Power in the allocated NR channel
+        Default unit: dBm
+        <NRpos> float
+        ACLR for the first NR channel with higher frequency
+        Default unit: dB
+        <UTRA1pos> float
+        ACLR for the first UTRA channel with higher frequency
+        Default unit: dB
+        <UTRA2pos> float
+        ACLR for the second UTRA channel with higher frequency
+        Default unit: dB
+        """
+        return self.cmw_query(f'FETCh:LTE:MEASurement:MEValuation:ACLR:AVERage?')
+
     def get_in_band_emission_query_fr1(self):
         """
         Return the limit line margin results. The CURRent margin indicates the minimum (verti-
@@ -1581,6 +1951,37 @@ class CMW:
         Default unit: dB
         """
         return self.cmw_query(f'FETCh:NRSub:MEASurement:MEValuation:IEMission:MARGin:AVERage?')
+
+    def get_in_band_emission_query_lte(self):
+        """
+        Return the limit line margin results. The CURRent margin indicates the minimum (verti-
+        cal) distance between the inband emissions limit line and the current trace. A negative
+        result indicates that the limit is exceeded.
+        The AVERage, EXTReme and SDEViation values are calculated from the current mar-
+        gins. The margin results cannot be displayed at the GUI.
+        Return values:
+        <Reliability> decimal
+        Reliability Indicator
+        <OutOfTolerance> decimal
+        Out of tolerance result, i.e. percentage of measurement inter-
+        vals of the statistic count for modulation measurements exceed-
+        ing the specified modulation limits.
+        Default unit: %
+        <Margin> float
+        Margin over all non-allocated RBs (scope of general limit com-
+        ponent)
+        Default unit: dB
+        <IQImage> float
+        Margin at image frequencies of allocated RBs (scope of IQ
+        image limit component)
+        Default unit: dB
+        <CarrLeakage> float
+        Margin at the carrier frequency (scope of IQ offset limit compo-
+        nent)
+        Default unit: dB
+        """
+        return self.cmw_query(f'FETCh:LTE:MEASurement:MEValuation:IEMission:MARGin:AVERage?')
+
 
     def get_flatness_extreme_query_fr1(self):
         """
@@ -1622,6 +2023,46 @@ class CMW:
         """
         return self.cmw_query(f'FETCh:NRSub:MEASurement:MEValuation:ESFLatness:EXTReme?')
 
+    def get_flatness_extreme_query_lte(self):
+        """
+        Return current, average, extreme and standard deviation single value results of the
+        equalizer spectrum flatness measurement. See also Chapter 4.7.6, "Equalizer Spec-
+        trum Flatness Limits", on page 72.
+        Return values:
+        <1_Reliability> decimal
+        Reliability Indicator
+        <2_OutOfTol> decimal
+        Out of tolerance result, i.e. percentage of measurement inter-
+        vals of the statistic count for modulation measurements exceed-
+        ing the specified modulation limits.
+        Default unit: %
+        <3_Ripple1> float
+        Max (range 1) - min (range 1)
+        Default unit: dB
+        <4_Ripple2> float
+        Max (range 2) - min (range 2)
+        Default unit: dB
+        <5_MaxR1MinR2> float
+        Max (range 1) - min (range 2)
+        Default unit: dB
+        <6_MaxR2MinR1> float
+        Max (range 2) - min (range 1)
+        Default unit: dB
+        <7_MinR1> float
+        Min (range 1)
+        Default unit: dB
+        <8_MaxR1> float
+        Max (range 1)
+        Default unit: dB
+        <9_MinR2> float
+        Min (range 2)
+        Default unit: dB
+        <10_MaxR2> float
+        Max (range 2)
+        Default unit: dB
+        """
+        return self.cmw_query(f'FETCh:LTE:MEASurement:MEValuation:ESFLatness:EXTReme?')
+
     def get_sem_average_query_fr1(self):
         """
         Return the current, average and standard deviation single value results of the spec-
@@ -1644,6 +2085,29 @@ class CMW:
         Default unit: dBm
         """
         return self.cmw_query(f'FETCh:NRSub:MEASurement:MEValuation:SEMask:AVERage?')
+
+    def get_sem_average_query_lte(self):
+        """
+        Return the current, average and standard deviation single value results of the spec-
+        trum emission measurement.
+        The values described below are returned by FETCh and READ commands. CALCulate
+        commands return limit check results instead, one value for each result listed below.
+        Return values:
+        <Reliability> decimal
+        Reliability Indicator
+        <OutOfTolerance> decimal
+        Out of tolerance result, i.e. percentage of measurement inter-
+        vals of the statistic count for spectrum emission measurements
+        exceeding the specified spectrum emission mask limits.
+        Default unit: %
+        <OBW> float
+        Occupied bandwidth
+        Default unit: Hz
+        <TXpower> float
+        Total TX power in the slot
+        Default unit: dBm
+        """
+        return self.cmw_query(f'FETCh:LTE:MEASurement:MEValuation:SEMask:AVERage?')
 
     def get_sem_margin_all_query_fr1(self):
         """
@@ -1695,7 +2159,58 @@ class CMW:
         """
         return self.cmw_query(f'FETCh:NRSub:MEASurement:MEValuation:SEMask:MARGin:ALL?')
 
-    def set_delta_sequence_shift(self, delta=0):
+    def get_sem_margin_all_query_lte(self):
+        """
+        FETCh:LTE:MEASurement:MEValuation:SEMask:MARGin:ALL?
+        Returns spectrum emission mask margin results. A negative margin indicates that the
+        trace is located above the limit line, i.e. the limit is exceeded.
+        Results are provided for the current, average and maximum traces. For each trace, 24
+        values related to the negative (Neg) and positive (Pos) offset frequencies of emission
+        mask areas 1 to 12 are provided. For inactive areas, NCAP is returned.
+        Return values:
+        <1_Reliability> decimal
+        Reliability Indicator
+        <2_OutOfTol> decimal
+        Out of tolerance result, i.e. percentage of measurement inter-
+        vals of the statistic count for spectrum emission measurements
+        exceeding the specified spectrum emission mask limits.
+        Default unit: %
+        <3_CurrNeg1> ...
+        <14_CurrNeg12>
+        float
+        Margin results for current trace, negative offsets
+        Default unit: dB
+        <15_CurrPos1> ...
+        <26_CurrPos12>
+        float
+        Margin results for current trace, positive offsets
+        Default unit: dB
+        <27_AvgNeg1> ...
+        <38_AvgNeg12>
+        float
+        Margin results for average trace, negative offsets
+        Default unit: dB
+        <39_AvgPos1> ...
+        <50_AvgPos12>
+        float
+        Margin results for average trace, positive offsets
+        Default unit: dB
+        <51_MinNeg1> ...
+        <62_MinNeg12>
+        float
+        Margin results for maximum trace (resulting in minimum mar-
+        gins), negative offsets
+        Default unit: dB
+        <63_MinPos1> ...
+        <74_MinPos12>
+        float
+        Margin results for maximum trace (resulting in minimum mar-
+        gins), positive offsets
+        Default unit: dB
+        """
+        return self.cmw_query(f'FETCh:LTE:MEASurement:MEValuation:SEMask:MARGin?')
+
+    def set_delta_sequence_shift_lte(self, delta=0):
         """
         Specifies the delta sequence shift value (Δ ss ) used to calculate the sequence shift pat-
         tern for PUSCH.
@@ -1704,6 +2219,25 @@ class CMW:
         *RST:  0
         """
         self.cmw_write(f'CONFigure:LTE:MEASurement:MEValuation:DSSPusch {delta}')
+
+    def set_measured_subframe(self, offset=2, length=10, subframe=0):
+        """
+        CONFigure:LTE:MEAS<i>:MEValuation:MSUBframes <SubframeOffset>, <SubframeCount>, <MeasSubframe>
+        Configures the scope of the measurement, i.e. which subframes are measured.
+        Parameters:
+        <SubframeOffset> Start of the measured subframe range relative to the trigger
+        event
+        Range:  0  to  9
+        *RST:  0
+        <SubframeCount> Length of the measured subframe range
+        Range:  1  to  320
+        *RST:  1
+        <MeasSubframe> Subframe containing the measured slots for modulation and
+        spectrum results
+        Range:  0  to  <SubframeCount>-1
+        *RST:  0
+        """
+        self.cmw_write(f'CONFigure:LTE:MEASurement:MEValuation:MSUBframes {offset}, {length}, {subframe}')
 
 
 
