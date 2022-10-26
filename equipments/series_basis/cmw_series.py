@@ -543,7 +543,6 @@ class CMW:
         """
         self.cmw_write(f'CONFigure:WCDMa:MEASurement:RFSettings:UMARgin {margin}')
 
-
     def set_rf_setting_external_tx_port_attenuation_gprf(self, attenuation):
         """
         Defines an external attenuation (or gain, if the value is negative), to be applied to the
@@ -2385,7 +2384,6 @@ class CMW:
         """
         return self.cmw_query(f'FETCh:LTE:MEASurement:MEValuation:IEMission:MARGin:AVERage?')
 
-
     def get_flatness_extreme_query_fr1(self):
         """
         Return current, average, extreme and standard deviation single value results of the
@@ -2711,7 +2709,6 @@ class CMW:
         *RST:  WCDM
         """
         self.cmw_write(f'CONFigure:WCDMa:MEASurement:UESignal:ULConfig {ul_config}')
-
 
 
 
