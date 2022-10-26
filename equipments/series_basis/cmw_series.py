@@ -143,6 +143,18 @@ class CMW:
         """
         self.cmw_write(f'ROUTe:LTE:MEASurement:SCENario:SALone R1{port_tx} RX1')
 
+    def set_rf_tx_port_wcdma(self, port_tx=1):
+        """
+        Activates the standalone scenario and selects the RF input path for the measured RF
+        signal.
+        For possible connector and converter values, see Chapter 5.5.1.4, "Values for RF Path
+        Selection", on page 1019.
+        Parameters:
+        <RXConnector> RF connector for the input path
+        <RFConverter> RX module for the input path
+        """
+        self.cmw_write(f'ROUTe:WCDMa:MEASurement:SCENario:SALone R1{port_tx} RX1')
+
     def set_rf_rx_port_gprf(self, port_rx=18):
         """
         Activates the standalone scenario and selects the output path for the generated RF
@@ -178,6 +190,18 @@ class CMW:
         <RFConverter> TX module for the output path
         """
         self.cmw_write(f'ROUTe:LTE:GENerator:SCENario:SALone R1{port_rx} TX1')
+
+    def set_rf_rx_port_wcdma(self, port_rx=18):
+        """
+        Activates the standalone scenario and selects the output path for the generated RF
+        signal.
+        For possible connector and converter values, see Chapter 2.5.1.2, "Values for Signal
+        Path Selection", on page 65.
+        Parameters:
+        <TXConnector> RF connector for the output path
+        <RFConverter> TX module for the output path
+        """
+        self.cmw_write(f'ROUTe:WCDMa:GENerator:SCENario:SALone R1{port_rx} TX1')
 
     def set_power_count_gprf(self, count=2):
         """
@@ -232,6 +256,20 @@ class CMW:
         *RST:  SING
         """
         self.cmw_write(f'CONFigure:LTE:MEASurement:MEValuation:REPetition {rep}')
+
+    def set_repetition_wcdma(self, rep='SING'):
+        """
+        Specifies the repetition mode of the measurement. The repetition mode specifies
+        whether the measurement is stopped after a single shot or repeated continuously. Use
+        CONFigure:..:MEAS<i>:...:SCOunt to determine the number of measurement
+        intervals per single shot.
+        Parameters:
+        <Repetition> SINGleshot | CONTinuous
+        SINGleshot: Single-shot measurement
+        CONTinuous: Continuous measurement
+        *RST:  SING
+        """
+        self.cmw_write(f'CONFigure:WCDMa:MEASurement:MEValuation:REPetition {rep}')
 
     def set_power_list_mode_gprf(self, on_off='OFF'):
         """
@@ -290,6 +328,21 @@ class CMW:
         *RST:  'IF Power'
         """
         self.cmw_write(f'TRIGger:LTE:MEASurement:MEValuation:SOURce {source}')
+
+    def set_trigger_source_wcdma(self, source='Free Run'):
+        """
+        Selects the source of the trigger events. Some values are always available in this firm-
+        ware application. They are listed below. Depending on the installed options, additional
+        values are available. A complete list of all supported values can be displayed using
+        TRIGger:...:CATalog:SOURce?.
+        Parameters:
+        <Source> 'Free Run (Standard)': Free run (standard synchronization)
+        'Free Run (Fast Sync)': Free run (fast synchronization)
+        'IF Power': Power trigger (normal synchronization)
+        'IF Power (Sync)': Power trigger (extended synchronization)
+        *RST:  'Free Run (Standard)'
+        """
+        self.cmw_write(f'TRIGger:WCDMa:MEASurement:MEValuation:SOURce {source}')
 
     def set_trigger_slope_gprf(self, slope='REDGe'):
         """
@@ -401,6 +454,23 @@ class CMW:
         """
         self.cmw_write(f'CONFigure:LTE:MEASurement:RFSettings:ENPower {exp_nom_pwr}')
 
+    def set_expect_power_wcdma(self, exp_nom_pwr=0.00):
+        """
+        Sets the expected nominal power of the measured RF signal.
+        For the combined signal path scenario, use:
+        ● CONFigure:WCDMa:SIGN<i>:RFSettings:ENPMode
+        ● CONFigure:WCDMa:SIGN<i>:RFSettings:ENPower
+        Parameters:
+        <ExpNomPower> The range of the expected nominal power can be calculated as
+        follows:
+        Range (Expected Nominal Power) = Range (Input Power) +
+        External Attenuation - User Margin
+        The input power range is stated in the data sheet.
+        *RST:  0 dBm
+        Default unit: dBm
+        """
+        self.cmw_write(f'CONFigure:LTE:MEASurement:RFSettings:ENPower {exp_nom_pwr}')
+
     def set_rx_level_gprf(self, rx_level=-70.0):
         """
         Sets the base RMS level of the RF generator.
@@ -458,6 +528,22 @@ class CMW:
         """
         self.cmw_write(f'CONFigure:LTE:MEASurement:RFSettings:UMARgin {margin}')
 
+    def set_rf_setting_user_margin_wcdma(self, margin=10.00):
+        """
+        Sets the margin that the measurement adds to the expected nominal power to deter-
+        mine the reference power. The reference power minus the external input attenuation
+        must be within the power range of the selected input connector. Refer to the data
+        sheet.
+        Parameters:
+        <UserMargin> numeric
+        Range:  0 dB to (55 dB + external attenuation - expected
+        nominal power)
+        *RST:  0 dB
+        Default unit: dB
+        """
+        self.cmw_write(f'CONFigure:WCDMa:MEASurement:RFSettings:UMARgin {margin}')
+
+
     def set_rf_setting_external_tx_port_attenuation_gprf(self, attenuation):
         """
         Defines an external attenuation (or gain, if the value is negative), to be applied to the
@@ -498,7 +584,14 @@ class CMW:
 
     def set_rf_setting_external_tx_port_attenuation_wcdma(self, attenuation):
         """
-        DBT
+        Defines an external attenuation (or gain, if the value is negative), to be applied to the
+        RF input connector.
+        For the combined signal path scenario, use CONFigure:WCDMa:SIGN<i>:
+        RFSettings:CARRier<c>:EATTenuation:INPut.
+        Parameters:
+        <RFInputExtAtt> Range:  -50 dB  to  90 dB
+        *RST:  0 dB
+        Default unit: dB
         """
         self.cmw_write(f'CONFigure:WCDMa:MEASurement:RFSettings:EATTenuation {attenuation}')
 
@@ -604,22 +697,35 @@ class CMW:
         released.
         Use FETCh...STATe? to query the current measurement state.
         ==================================================================================
-        The NR multi-evaluation measurement is programmed as follows:
+        The LTE multi-evaluation measurement is programmed as follows:
         ● The measurement is controlled by SCPI commands with the following syn-
-        tax: ...NRSub:MEAS:MEValuation...
+        tax: ...LTE:MEAS:MEValuation...
         ● Use general commands of the type ...:NRSub:MEAS... (no :MEValuation
         mnemonic) to define the signal routing and to perform RF and analyzer settings.
         ● After a *RST, the measurement is switched off. Use
-        READ:NRSub:MEAS:MEValuation...? to initiate a measurement and to retrieve
+        READ:LTE:MEAS:MEValuation...? to initiate a measurement and to retrieve
         the results. You can also start the measurement using
-        INIT:NRSub:MEAS:MEValuation and retrieve the results using
-        FETCh:NRSub:MEAS:MEValuation...?.
+        INIT:LTE:MEAS:MEValuation and retrieve the results using
+        FETCh:LTE:MEAS:MEValuation...?.
         """
         self.cmw_write(f'INIT:LTE:MEASurement:MEValuation')
 
     def set_measure_start_on_wcdma(self):
         """
-        DBT
+        INITiate:WCDMa:MEAS<i>:MEValuation
+        STOP:WCDMa:MEAS<i>:MEValuation
+        ABORt:WCDMa:MEAS<i>:MEValuation
+        ===================================================================================
+        Starts, stops, or aborts the measurement:
+        ● INITiate... starts or restarts the measurement. The measurement enters the
+        "RUN" state.
+        ● STOP... halts the measurement immediately. The measurement enters the "RDY"
+        state. Measurement results are kept. The resources remain allocated to the mea-
+        surement.
+        ● ABORt... halts the measurement immediately. The measurement enters the
+        "OFF" state. All measurement values are set to NAV. Allocated resources are
+        released.
+        Use FETCh...STATe? to query the current measurement state.
         """
         self.cmw_write(f'INIT:WCDMa:MEASurement:MEValuation')
 
@@ -661,7 +767,16 @@ class CMW:
 
     def set_measure_stop_wcdma(self):
         """
-        DBT
+        Starts, stops, or aborts the measurement:
+        ● INITiate... starts or restarts the measurement. The measurement enters the
+        "RUN" state.
+        ● STOP... halts the measurement immediately. The measurement enters the "RDY"
+        state. Measurement results are kept. The resources remain allocated to the mea-
+        surement.
+        ● ABORt... halts the measurement immediately. The measurement enters the
+        "OFF" state. All measurement values are set to NAV. Allocated resources are
+        released.
+        Use FETCh...STATe? to query the current measurement state.
         """
         self.cmw_write(f'STOP:WCDMa:MEASurement:MEValuation')
 
@@ -786,6 +901,22 @@ class CMW:
         """
         return self.cmw_query('FETCh:LTE:MEASurement:MEValuation:STATe?')
 
+    def get_power_state_query_wcdma(self):
+        """
+        Queries the main measurement state. Use FETCh:...:STATe:ALL? to query the
+        measurement state including the substates. Use INITiate..., STOP...,
+        ABORt... to change the measurement state.
+        Return values:
+        <MeasStatus> OFF | RUN | RDY
+        OFF: measurement off, no resources allocated, no results
+        RUN: measurement running, synchronization pending or adjus-
+        ted, resources active or queued
+        RDY: measurement terminated, valid results can be available
+        *RST:  OFF
+        Usage:  Query only
+        """
+        return self.cmw_query('FETCh:WCDMa:MEASurement:MEValuation:STATe?')
+
     def get_power_average_query_gprf(self):
         """
         The following results can be retrieved:
@@ -909,17 +1040,28 @@ class CMW:
 
     def set_band_wcdma(self, band):
         """
-        Selects the Operating Band (OB) for ver3.0.30.
+        CONFigure:WCDMa:MEAS<i>:CARRier<c>:BAND <Band>
+        Selects the operating band (OB).
+        For the combined signal path scenario, use:
+        ● CONFigure:WCDMa:SIGN<i>:CARRier<c>:BAND
+        ● CONFigure:WCDMa:SIGN<i>:RFSettings:DBDC
+        Suffix:
+        <c>
+        .
+        1..2
+        Selects the affected carrier - only relevant for dual band dual
+        carrier measurement
         Parameters:
-        <Band> OB1 | ... | OB14 | OB19 | ... | OB21 | OBS1 | ... | OBS3 | OBL1
-        OB1, ..., OB14: Operating Band I to XIV
-        OB19, ..., OB21: Operating Band XIX to XXI
-        OBS1: Operating Band S
-        OBS2: Operating Band S 170 MHz
-        OBS3: Operating Band S 190 MHz
-        OBL1: Operating Band L
-        *RST:  OB1
-        CONFigure:WCDMa:MEASurement<i>:CARRier<c>:BAND for ver3.7.22
+        <Band> OB1 | ... | OB14 | OB19 | ... | OB22 | OB25 | OB26 | OBS1 | ... |
+        OBS3 | OBL1
+        OB1, ..., OB14: operating band I to XIV
+        OB19, ..., OB22: operating band XIX to XXII
+        OB25, OB26: operating band XXV and XXVI
+        OBS1: operating band S
+        OBS2: operating band S 170 MHz
+        OBS3: operating band S 190 MHz
+        OBL1: operating band L
+        Default unit: OB1
         """
         self.cmw_write(f'CONFigure:WCDMa:MEASurement:BAND OB{band}')
 
@@ -945,7 +1087,7 @@ class CMW:
         }
         self.cmw_write(f'CONFigure:GSM:MEASurement:BAND {band_tx_meas_dict_gsm[band]}')
 
-    def set_statistic_count_fr1(self, count=5):
+    def set_modulation_count_fr1(self, count=5):
         """
         Specifies the statistic count of the measurement. The statistic count is equal to the
         number of measurement intervals per single shot.
@@ -956,7 +1098,7 @@ class CMW:
         """
         self.cmw_write(f'CONFigure:NRSub:MEASurement:MEValuation:SCOunt:MODulation {count}')
 
-    def set_statistic_count_lte(self, count=5):
+    def set_modulation_count_lte(self, count=5):
         """
         Specifies the statistic count of the measurement. The statistic count is equal to the
         number of measurement intervals per single shot.
@@ -967,7 +1109,7 @@ class CMW:
         """
         self.cmw_write(f'CONFigure:LTE:MEASurement:MEValuation:SCOunt:MODulation {count}')
 
-    def set_statistic_count_wcdma(self, count=5):
+    def set_modulation_count_wcdma(self, count=5):
         """
         Specifies the statistic count of the measurement. The statistic count is equal to the
         number of measurement intervals per single shot.
@@ -978,7 +1120,7 @@ class CMW:
         """
         self.cmw_write(f'CONFigure:WCDMa:MEASurement:MEValuation:SCOunt:MODulation {count}')
 
-    def set_statistic_count_gsm(self, count=5):
+    def set_modulation_count_gsm(self, count=5):
         """
         DBT
         """
@@ -1019,11 +1161,31 @@ class CMW:
         """
         self.cmw_write(f'CONFigure:LTE:MEASurement:RFSettings:FREQuency {tx_freq}KHz')
 
-    def set_tx_freq_wcdma(self, tx_freq):  # this is KHz
+    def set_tx_freq_wcdma(self, tx_chan):  # this is CH
         """
-        DBT
+        CONFigure:WCDMa:MEAS<i>:RFSettings:CARRier<c>:FREQuency <Frequency>
+        Selects the center frequency of the RF analyzer.
+        For the combined signal path scenario, use:
+        ● CONFigure:WCDMa:SIGN<i>:RFSettings:CARRier<c>:FREQuency:UL
+        ● CONFigure:WCDMa:SIGN<i>:RFSettings:CARRier<c>:FOFFset:UL
+        ● CONFigure:WCDMa:SIGN<i>:RFSettings:CARRier<c>:CHANnel:UL
+        The supported frequency range depends on the instrument model and the available
+        options. The supported range can be smaller than stated here. Refer to the preface of
+        your model-specific base unit manual.
+        Suffix:
+        <c>
+        .
+        1..2
+        Uplink carrier
+        Parameters:
+        <Frequency> Range:  70E+6 Hz  to  6E+9 Hz
+        *RST:  1.9226E+9 Hz
+        Default unit: Hz
+        Using the unit CH the frequency can be set via the channel num-
+        ber. The allowed channel number range depends on the operat-
+        ing band, see Chapter 3.2.4.3, "Operating Bands", on page 714.
         """
-        self.cmw_write(f'CONFigure:WCDMa:MEASurement:RFSettings:FREQuency {tx_freq}KHz')
+        self.cmw_write(f'CONFigure:WCDMa:MEASurement:RFSettings:FREQuency {tx_chan}CH')
 
     def set_tx_freq_gsm(self, tx_freq):  # this is KHz
         """
@@ -1424,9 +1586,14 @@ class CMW:
 
     def set_aclr_count_wcdma(self, count=5):
         """
-        DBT
+        Specifies the statistic count of the measurement. The statistic count is equal to the
+        number of measurement intervals per single shot.
+        Parameters:
+        <StatisticCount> Number of measurement intervals
+        Range:  1  to  1000
+        *RST:  10
         """
-        self.cmw_write(f'CONFigure:WCDMa:MEASurement:MEValuation:SCOunt:SPECtrum:ACLR {count}')
+        self.cmw_write(f'CONFigure:WCDMa:MEASurement:MEValuation:SCOunt:SPECtrum {count}')
 
     def set_orfs_count_wcdma(self, count=5):
         """
@@ -1490,6 +1657,18 @@ class CMW:
         external attenuation)
         """
         self.cmw_write(f'TRIGger:LTE:MEASurement:MEValuation:THReshold {threshold}')
+
+    def set_trigger_threshold_wcdma(self, threshold=-20.0):
+        """
+        Defines the trigger threshold for power trigger sources.
+        Parameters:
+        <TrigThreshold> numeric
+        Range:  -50 dB  to  0 dB
+        *RST:  -20 dB
+        Default unit: dB (full scale, i.e. relative to reference level minus
+        external attenuation)
+        """
+        self.cmw_write(f'TRIGger:WCDMa:MEASurement:MEValuation:THReshold {threshold}')
 
     def set_measurements_enable_all_fr1(self):
         """
@@ -1580,6 +1759,79 @@ class CMW:
         """
         items_en = 'ON, ON, ON, ON, ON, ON, ON, ON, ON, ON'
         self.cmw_write(f'CONFigure:LTE:MEASurement:MEValuation:RESult:ALL {items_en}')
+
+    def set_measurements_enable_all_wcdma(self):
+        """
+        CONFigure:WCDMa:MEAS<i>:MEValuation:RESult[:ALL] <EnableEVM>,
+        <EnableMagError>, <EnablePhaseErr>, <EnableACLR>, <EnableEMask>,
+        <EnableCDmonitor>, <EnableCDP>, <EnableCDE>, <EnableEVMchip>,
+        <EnableMErrChip>, <EnablePhErrChip>, <EnableUEpower>,
+        <EnableFreqError>, <EnablePhaseDisc>, <EnablePowSteps>, <EnableBER>[,
+        <EnableIQ>, <EnableRCDE>]
+        CONFigure:NRSub:MEAS<i>:MEValuation:RESult[:ALL] <EVM>, <MagnitudeError>, <PhaseError>, <InbandEmissions>,
+        Enables or disables the evaluation of results and shows or hides the views in the multi-
+        evaluation measurement. This command combines all other
+        CONFigure:WCDMa:MEAS<i>:MEValuation:RESult... commands.
+        Parameters:
+        <EnableEVM> OFF | ON
+        Error vector magnitude
+        OFF: Do not evaluate results, hide the view
+        ON: Evaluate results and show the view
+        *RST:  ON
+        <EnableMagError> OFF | ON
+        Magnitude error
+        *RST:  OFF
+        <EnablePhaseErr> OFF | ON
+        Phase error
+        *RST:  OFF
+        <EnableACLR> OFF | ON
+        Adjacent channel leakage power ratio
+        *RST:  ON
+        <EnableEMask> OFF | ON
+        Spectrum emission mask
+        *RST:  ON
+        <EnableCDmonitor> OFF | ON
+        Code domain monitor
+        *RST:  ON
+        <EnableCDP> OFF | ON
+        Code domain power
+        *RST:  ON
+        <EnableCDE> OFF | ON
+        Code domain error
+        *RST:  OFF
+        <EnableEVMchip> OFF | ON
+        EVM vs. chip
+        *RST:  ON
+        <EnableMErrChip> OFF | ON
+        Magnitude error vs. chip
+        *RST:  OFF
+        <EnablePhErrChip> OFF | ON
+        Phase error vs. chip
+        *RST:  OFF
+        <EnableUEpower> OFF | ON
+        UE power
+        *RST:  ON
+        <EnableFreqError> OFF | ON
+        Frequency error
+        *RST:  ON
+        <EnablePhaseDisc> OFF | ON
+        Phase discontinuity
+        *RST:  OFF
+        <EnablePowSteps> OFF | ON
+        Power steps
+        *RST:  ON
+        <EnableBER> OFF | ON
+        Bit error rate
+        *RST:  OFF
+        <EnableIQ> OFF | ON
+        I/Q constellation diagram
+        *RST:  OFF
+        <EnableRCDE> OFF | ON
+        Relative CDE
+        *RST:  OFF
+        """
+        items_en = 'ON, ON, ON, ON, ON, ON, ON, ON, ON, ON'
+        self.cmw_write(f'CONFigure:WCDMa:MEASurement:MEValuation:RESult:ALL {items_en}')
 
     def set_subframe_fr1(self, subframe=10):
         """
@@ -1854,6 +2106,72 @@ class CMW:
         """
         return self.cmw_query(f'READ:LTE:MEASurement:MEValuation:MODulation:AVERage?')
 
+    def get_modulation_average_query_wcdma(self):
+        """
+        Return the current, average, maximum and standard deviation single value results.
+        The return values described below are returned by FETCh and READ commands.
+        CALCulate commands return limit check results instead, one value for each of the
+        first 14 results listed below. The TX time alignment is only returned by FETCh and
+        READ commands.
+        The ranges indicated below apply to all results except standard deviation results. The
+        minimum for standard deviation results equals 0. The maximum equals the width of the
+        indicated range divided by two. Exceptions are explicitly stated.
+        The number to the left of each result parameter is provided for easy identification of the
+        parameter position within the result array.
+        Suffix:
+        <c>
+        .
+        1..2
+        Selects the carrier to be queried - only relevant for dual carrier
+        HSUPA
+        Return values:
+        <1_Reliability> Reliability Indicator
+        <2_EVMrms>
+        <3_EVMpeak>
+        Error vector magnitude RMS and peak value
+        Range:  0 %  to  100 %
+        Default unit: %
+        <4_MagErrorRMS> Magnitude error RMS value
+        Range:  0 %  to  100 %
+        Default unit: %
+        <5_MagErrorPeak> Magnitude error peak value
+        Range:  -100 % to 100 % (AVERage: 0% to 100 %, SDEVia-
+        tion: 0 % to 50 %)
+        Default unit: %
+        <6_PhErrorRMS> Phase error RMS value
+        Range:  0 deg  to  180 deg
+        Default unit: deg
+        <7_PhErrorPeak> Phase error peak value
+        Range:  -180 deg to 180 deg (AVERage: 0 deg to 180 deg,
+        SDEViation: 0 deg to 90 deg)
+        Default unit: deg
+        <8_IQoffset> I/Q origin offset
+        Range:  -100 dB  to  0 dB
+        Default unit: dB
+        <9_IQimbalance> I/Q imbalance
+        Range:  -100 dB  to  0 dB
+        Default unit: dB
+        <10_CarrFreqErr> Carrier frequency error
+        Range:  -60000 Hz  to  60000 Hz
+        Default unit: Hz
+        <11_TransTimeErr> Transmit time error
+        Range:  -250 chips  to  250 chips
+        Default unit: chip
+        <12_UEpower> User equipment power
+        Range:  -100 dBm  to  55 dBm
+        Default unit: dBm
+        <13_PowerSteps> User equipment power step
+        Range:  -50 dB  to  50 dB
+        Default unit: dB
+        <14_PhaseDisc> Phase discontinuity
+        Range:  -180 deg  to  180 deg
+        Default unit: deg
+        <15_TxTimeAlign> Time difference between the two UL carriers
+        Range:  -150 chips  to  100 chips
+        Default unit: chip
+        """
+        return self.cmw_query(f'READ:WCDMa:MEASurement:MEValuation:MODulation:AVERage?')
+
     def get_aclr_average_query_fr1(self):
         """
         Returns the relative ACLR values for NR standalone, as displayed in the table below
@@ -1921,6 +2239,91 @@ class CMW:
         Default unit: dB
         """
         return self.cmw_query(f'FETCh:LTE:MEASurement:MEValuation:ACLR:AVERage?')
+
+    def get_aclr_average_query_wcdma(self):
+        """
+        Returns the ACLR power and spectrum emission single value results of the multi-eval-
+        uation measurement. The current, average and maximum values can be retrieved.
+        See also Chapter 3.2.6.8, "Detailed Views: ACLR", on page 735 and Chapter 3.2.6.9,
+        "Detailed Views: Spectrum Emission Mask", on page 737
+        The return values described below are returned by FETCh and READ commands.
+        CALCulate commands return limit check results instead, one value for each of the
+        results 1 to 18, 29 and 30 listed below. The frequency positions are only returned by
+        FETCh and READ commands.
+        The number to the left of each result parameter is provided for easy identification of the
+        parameter position within the result array.
+        Query parameters:
+        <ACLRMode> ABSolute | RELative
+        ABSolute: ACLR power displayed in dBm as absolute value
+        RELative: ACLR power displayed in dB relative to carrier power
+        Query parameter is only relevant for FETCh and READ com-
+        mands. CALCulate commands return a limit check independent
+        from the used <ACLRMode>.
+        Return values:
+        <1_Reliability> Reliability Indicator
+        <2_CarrierPower> Power at the nominal carrier UL frequency
+        Range:  -100 dBm  to  55 dBm
+        Default unit: dBm
+        <3_ACLRminus2>
+        <4_ACLRminus1>
+        <5_ACLRplus1>
+        <6_ACLRplus2>
+        Power of the adjacent channels (±1 st  adjacent channels at ±5
+        MHz from the UL frequency, ±2 nd  adjacent channels at ±10 MHz
+        from the UL frequency)
+        Range:  -100 dBm  to  55 dBm
+        Default unit: dBm
+        <7_OBW> Occupied bandwidth
+        Range:  0 MHz  to  10 MHz
+        Default unit: Hz
+        <8_MarginABIJ>
+        <9_MarginBCJK>
+        <10_MarginCDKL>
+        <11_MarginEFMN>
+        <12_MarginFENM>
+        <13_MarginDCLK>
+        <14_MarginCBKJ>
+        <15_MarginBAJI>
+        Margin between 1 MHz trace and limit line in the eight emission
+        mask areas. A positive result indicates that the trace is located
+        above the limit line, i.e. the limit is exceeded.
+        Range:  -100 dB  to  90 dB
+        Default unit: dB
+        <16_UEpower> User equipment power
+        Range:  -100 dBm  to  55 dBm
+        Default unit: dBm
+        <17_MarginHAD>
+        <18_MarginHDA>
+        Margin between 1 MHz trace and limit line H. A positive result
+        indicates that the trace is located above the limit line, i.e. the
+        limit is exceeded.
+        Range:  -130 dB  to  130 dB
+        Default unit: dB
+        <19_FreqABIJ>
+        <20_FreqBCJK>
+        <21_FreqCDKL>
+        <22_FreqEFMN>
+        <23_FreqFENM>
+        <24_FreqDCLK>
+        <25_FreqCBKJ>
+        <26_FreqBAJI>
+        <27_FreqHAD>
+        <28_FreqHDA>
+        Frequency offsets between the margin points and the center fre-
+        quency in the 10 emission mask areas.
+        These values are only returned for FETCh and READ commands.
+        They are skipped in CALCulate commands.
+        Range:  -12500 kHz to 12500 kHz (for DC HSUPA: -19500
+        kHz to 19500 kHz)
+        Default unit: Hz
+        <29_CarrierPowerL>
+        <30_CarrierPowerR>
+        Power at the nominal carrier frequency; left/right carrier of the
+        dual carrier HSPA connection
+        Range:  -90 dBm  to  0 dBm
+        Default unit: dBm
+        """
+        return self.cmw_query(f'FETCh:WCDMa:MEASurement:MEValuation:SPECtrum:AVERage?')
 
     def get_in_band_emission_query_fr1(self):
         """
@@ -2238,6 +2641,77 @@ class CMW:
         *RST:  0
         """
         self.cmw_write(f'CONFigure:LTE:MEASurement:MEValuation:MSUBframes {offset}, {length}, {subframe}')
+
+    def set_ul_dpdch_wcdma(self, dpdch_on='ON'):
+        """
+        Defines whether the UL DPCH contains a DPDCH.
+        For the combined signal path scenario, use CONFigure:WCDMa:SIGN<i>:DL:
+        LEVel:DPCH.
+        Parameters:
+        <DPDCH> OFF | ON
+        OFF: DPCCH only
+        ON: DPCCH plus DPDCH
+        *RST:  ON
+        """
+        self.cmw_write(f'CONFigure:WCDMa:MEASurement:UESignal:DPDCh {dpdch_on}')
+
+    def set_ul_dpcch_slot_format_wcdma(self, slot_format=0):
+        """
+        Selects the slot format for the UL DPCCH.
+        Parameters:
+        <SlotFormat> Range:  0  to  5
+        *RST:  0
+        """
+        self.cmw_write(f'CONFigure:WCDMa:MEASurement:UESignal:SFORmat  {slot_format}')
+
+    def set_scrambling_code_wcdma(self, code=0):
+        """
+        CONFigure:WCDMa:MEAS<i>:UESignal:CARRier<c>:SCODe <Code>
+        Selects the number of the long code that is used to scramble the received uplink
+        WCDMA signal.
+        For the combined signal path scenario, use CONFigure:WCDMa:SIGN<i>:UL:
+        CARRier<c>:SCODe.
+        Suffix:
+        <c>
+        .
+        1..2
+        Selects the carrier to be queried - only relevant for dual carrier
+        HSUPA
+        Parameters:
+        <Code> Range:  #H0  to  #HFFFFFF
+        *RST:  #H0
+        """
+        self.cmw_write(f'CONFigure:WCDMa:MEASurement:UESignal:SCODe {code}')
+
+    def set_ul_signal_config_wcdma(self, ul_config='WCDM'):
+        """
+        Selects the uplink signal configuration.
+        Parameters:
+        <ULConfiguration> QPSK | WCDMa | HSDPa | HSUPa | HSPA | HSPLus | DCHS |
+        HDUPlus | DDUPlus | DHDU | 3CHS | 3DUPlus | 3HDU | 4CHS |
+        4DUPlus | 4HDU
+        QPSK: QPSK signal
+        WCDMa: WCDMA R99 signal
+        HSDPa: signal with HSDPA-related channels
+        HSUPa: signal with HSUPA channels
+        HSPA: HSDPA related and HSUPA channels
+        HSPLus: HSDPA+ related channels
+        HDUPlus: HSDPA+ related and HSUPA channels
+        DHDU: dual carrier HSDPA+ and dual carrier HSUPA active
+        The following values cannot be set, but can be returned while
+        the combined signal path scenario is active:
+        DCHS: dual carrier HSDPA+ active
+        DDUPlus: dual carrier HSDPA+ and HSUPA active
+        3CHS: three carrier HSDPA+ active
+        3DUPlus: three carrier HSDPA+ and HSUPA active
+        3HDU: three carrier HSDPA+ and dual carrier HSUPA active
+        4CHS: four carrier HSDPA+ active
+        4DUPlus: four carrier HSDPA+ and HSUPA active
+        4HDU: four carrier HSDPA+ and dual carrier HSUPA active
+        *RST:  WCDM
+        """
+        self.cmw_write(f'CONFigure:WCDMa:MEASurement:UESignal:ULConfig {ul_config}')
+
 
 
 

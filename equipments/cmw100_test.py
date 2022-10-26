@@ -24,7 +24,7 @@ class CMW100(CMW):
         self.loss_rx = None
         self.tx_freq_fr1 = None
         self.tx_freq_lte = None
-        self.tx_freq_wcdma = None
+        self.tx_chan_wcdma = None
         self.tx_freq_gsm = None
         self.rx_freq_fr1 = None
         self.rx_freq_lte = None
@@ -105,13 +105,17 @@ class CMW100(CMW):
         return mod_results
 
     def get_modulation_avgerage_lte(self):
-        f_state = self.get_power_state_query_fr1()
-        while f_state != 'RDY':
-            f_state = self.get_power_state_query_fr1()
-            self.cmw_query('*OPC?')
         mod_results = self.get_modulation_average_query_lte()  # P[3] is EVM, P[15] is Ferr, P[14] is IQ Offset
         mod_results = mod_results.split(',')
         mod_results = [mod_results[3], mod_results[15], mod_results[14]]
+        mod_results = [eval(m) for m in mod_results]
+        logger.info(f'EVM: {mod_results[0]:.2f}, FREQ_ERR: {mod_results[1]:.2f}, IQ_OFFSET: {mod_results[2]:.2f}')
+        return mod_results
+
+    def get_modulation_avgerage_wcdma(self):
+        mod_results = self.get_modulation_average_query_wcdma()  # P[1] is EVM, P[9] is Ferr, P[7] is IQ Offset
+        mod_results = mod_results.split(',')
+        mod_results = [mod_results[1], mod_results[9], mod_results[7]]
         mod_results = [eval(m) for m in mod_results]
         logger.info(f'EVM: {mod_results[0]:.2f}, FREQ_ERR: {mod_results[1]:.2f}, IQ_OFFSET: {mod_results[2]:.2f}')
         return mod_results
@@ -141,6 +145,25 @@ class CMW100(CMW):
                     f'UTRA_1: [{aclr_results[1]:.2f}, {aclr_results[5]:.2f}], '
                     f'UTRA_2: [{aclr_results[0]:.2f}, {aclr_results[6]:.2f}]')
         return aclr_results
+
+    def get_aclr_average_wcdma(self):
+        f_state = self.get_power_state_query_wcdma()
+        while f_state != 'RDY':
+            f_state = self.get_power_state_query_wcdma()
+            self.cmw_query('*OPC?')
+        spectrum_results = self.get_aclr_average_query_wcdma()  # P1: Power, P2: ACLR_-2, P3: ACLR_-1, P4:ACLR_+1, P5:ACLR_+2, P6:OBW
+        spectrum_results = spectrum_results.split(',')
+        spectrum_results = [
+            round(eval(spectrum_results[1]), 2),
+            round(eval(spectrum_results[3]) - eval(spectrum_results[1]), 2),
+            round(eval(spectrum_results[4]) - eval(spectrum_results[1]), 2),
+            round(eval(spectrum_results[2]) - eval(spectrum_results[1]), 2),
+            round(eval(spectrum_results[5]) - eval(spectrum_results[1]), 2),
+            round(eval(spectrum_results[6]) / 1000000, 2)
+        ]
+        logger.info(
+            f'Power: {spectrum_results[0]:.2f}, ACLR_-1: {spectrum_results[2]:.2f}, ACLR_1: {spectrum_results[3]:.2f}, ACLR_-2: {spectrum_results[1]:.2f}, ACLR_+2: {spectrum_results[4]:.2f}, OBW: {spectrum_results[5]:.2f}MHz')
+        return spectrum_results
 
     def get_in_band_emissions_fr1(self):
         iem_results = self.get_in_band_emission_query_fr1()
@@ -424,7 +447,7 @@ class CMW100(CMW):
         self.set_expect_power_fr1(self.tx_level + 5)
         self.set_rf_tx_port_fr1(self.port_tx)
         self.set_rf_setting_user_margin_fr1(10.00)
-        self.set_statistic_count_fr1(5)
+        self.set_modulation_count_fr1(5)
         self.set_aclr_count_fr1(5)
         self.set_sem_count_fr1(5)
         self.set_trigger_source_fr1('GPRF GEN1: Restart Marker')
@@ -470,7 +493,7 @@ class CMW100(CMW):
         self.set_rb_auto_detect_lte('OFF')
         self.set_meas_on_exception_lte('ON')
         self.set_sem_limit_lte(self.bw_lte)
-        self.cmw_query('SYST:ERR:ALL?')
+        self.system_err_all_query()
         self.set_measured_slot_lte('ALL')
         self.set_rf_setting_user_margin_lte(10.00)
         self.set_expect_power_lte(self.tx_level + 5)
@@ -478,7 +501,7 @@ class CMW100(CMW):
         self.cmw_query('*OPC?')
         self.set_rf_setting_user_margin_lte(10.00)
         self.set_rb_auto_detect_lte('ON')
-        self.set_statistic_count_lte(5)
+        self.set_modulation_count_lte(5)
         self.cmw_query('*OPC?')
         self.set_aclr_count_lte(5)
         self.cmw_query('*OPC?')
@@ -491,7 +514,7 @@ class CMW100(CMW):
         self.cmw_query('*OPC?')
         self.set_measured_subframe()
         self.set_scenario_activate_lte('SAL')
-        self.cmw_query('SYST:ERR:ALL?')
+        self.system_err_all_query()
         self.set_rf_tx_port_gprf(self.port_tx)
         self.cmw_query('*OPC?')
         self.set_rf_tx_port_lte(self.port_tx)
@@ -514,55 +537,33 @@ class CMW100(CMW):
 
     def tx_measure_wcdma(self):
         logger.info('---------Tx Measure----------')
-        self.command_cmw100_write(f'*CLS')
-        self.command_cmw100_write(f'CONF:WCDM:MEAS:MEV:SCO:MOD 5')
-        self.command_cmw100_write(f'CONF:WCDM:MEAS:MEV:SCO:SPEC 5')
-        self.command_cmw100_write(f'ROUT:WCDMA:MEAS:SCEN:SAL R1{self.port_tx}, RX1')
-        self.command_cmw100_write(f'CONF:WCDMA:MEAS:RFS:EATT {self.loss_tx}')
-        self.command_cmw100_write(f'CONF:WCDMA:MEAS:RFS:UMAR 10.00')
-        self.command_cmw100_write(f"TRIG:WCDM:MEAS:MEV:SOUR 'Free Run (Fast sync)'")
-        self.command_cmw100_write(f'TRIG:WCDM:MEAS:MEV:THR -30')
-        self.command_cmw100_write(f'CONF:WCDM:MEAS:MEV:REP SING')
-        self.command_cmw100_write(f'CONF:WCDM:MEAS:MEV:RES:ALL ON,ON,ON,ON,ON,ON,ON,ON,ON,ON,ON,ON,ON,ON,ON,ON,ON,ON')
-        self.command_cmw100_query('*OPC?')
-        self.command_cmw100_query('SYST:ERR:ALL?')
-        self.command_cmw100_write(f'CONF:WCDM:MEAS:BAND OB{self.band_wcdma}')
-        self.command_cmw100_write(f'CONF:WCDM:MEAS:RFS:FREQ {self.tx_chan_wcdma} CH')
-        self.command_cmw100_write(f'CONF:WCDM:MEAS:UES:DPDC ON')
-        self.command_cmw100_write(f'CONF:WCDM:MEAS:UES:SFOR 0')
-        self.command_cmw100_write(f'CONF:WCDM:MEAS:UES:SCOD 13496235')
-        self.command_cmw100_write(f'CONF:WCDM:MEAS:UES:ULC WCDM')
-        self.command_cmw100_query('SYST:ERR:ALL?')
-        self.command_cmw100_write(f'CONF:WCDMA:MEAS:RFS:UMAR 10.00')
-        self.command_cmw100_write(f'CONF:WCDM:MEAS:RFS:ENP {self.tx_level + 5}')
-        mod_results = self.command_cmw100_query(
-            f'READ:WCDM:MEAS:MEV:MOD:AVER?')  # P1 is EVM, P4 is Ferr, P8 is IQ Offset
-        mod_results = mod_results.split(',')
-        mod_results = [mod_results[1], mod_results[4], mod_results[8]]
-        mod_results = [eval(m) for m in mod_results]
-        logger.info(f'EVM: {mod_results[0]:.2f}, FREQ_ERR: {mod_results[1]:.2f}, IQ_OFFSET: {mod_results[2]:.2f}')
-        self.command_cmw100_write(f'INIT:WCDM:MEAS:MEV')
-        self.command_cmw100_write(f'*OPC?')
-        f_state = self.command_cmw100_query(f'FETC:WCDM:MEAS:MEV:STAT?')
-        while f_state != 'RDY':
-            time.sleep(0.2)
-            f_state = self.command_cmw100_query('FETC:WCDM:MEAS:MEV:STAT?')
-            self.command_cmw100_query('*OPC?')
-        spectrum_results = self.command_cmw100_query(
-            f'FETC:WCDM:MEAS:MEV:SPEC:AVER?')  # P1: Power, P2: ACLR_-2, P3: ACLR_-1, P4:ACLR_+1, P5:ACLR_+2, P6:OBW
-        spectrum_results = spectrum_results.split(',')
-        spectrum_results = [
-            round(eval(spectrum_results[1]), 2),
-            round(eval(spectrum_results[3]) - eval(spectrum_results[1]), 2),
-            round(eval(spectrum_results[4]) - eval(spectrum_results[1]), 2),
-            round(eval(spectrum_results[2]) - eval(spectrum_results[1]), 2),
-            round(eval(spectrum_results[5]) - eval(spectrum_results[1]), 2),
-            round(eval(spectrum_results[6]) / 1000000, 2)
-        ]
-        logger.info(
-            f'Power: {spectrum_results[0]:.2f}, ACLR_-1: {spectrum_results[2]:.2f}, ACLR_1: {spectrum_results[3]:.2f}, ACLR_-2: {spectrum_results[1]:.2f}, ACLR_+2: {spectrum_results[4]:.2f}, OBW: {spectrum_results[5]:.2f}MHz')
-        self.command_cmw100_write(f'STOP:WCDM:MEAS:MEV')
-        self.command_cmw100_query('*OPC?')
+        self.cmw_write(f'*CLS')
+        self.set_modulation_count_wcdma(5)
+        self.set_aclr_count_wcdma(5)
+        self.set_rf_tx_port_wcdma(self.port_tx)
+        self.set_rf_setting_external_tx_port_attenuation_wcdma(self.loss_tx)
+        self.set_rf_setting_user_margin_wcdma(10.00)
+        self.set_trigger_source_wcdma('Free Run (Fast sync)')
+        self.set_trigger_threshold_wcdma(-30)
+        self.set_repetition_wcdma(f'SING')
+        self.set_measurements_enable_all_wcdma()
+        self.cmw_query('*OPC?')
+        self.system_err_all_query()
+        self.set_band_wcdma(self.band_wcdma)
+        self.set_tx_freq_wcdma(self.tx_chan_wcdma)
+        self.set_ul_dpdch_wcdma('ON')
+        self.set_ul_dpcch_slot_format_wcdma(0)
+        self.set_scrambling_code_wcdma(13496235)
+        self.set_ul_signal_config_wcdma('WCDM')
+        self.system_err_all_query()
+        self.set_rf_setting_user_margin_wcdma(10.00)
+        self.set_expect_power_wcdma(self.tx_level + 5)
+        mod_results = self.get_modulation_avgerage_wcdma()
+        self.set_measure_start_on_wcdma()
+        self.cmw_write(f'*OPC?')
+        spectrum_results = self.get_aclr_average_wcdma()
+        self.set_measure_stop_wcdma()
+        self.cmw_query('*OPC?')
 
         return spectrum_results + mod_results
 
@@ -573,7 +574,7 @@ class CMW100(CMW):
         self.command_cmw100_write(f'CONF:GSM:MEAS:MEV:SCO:SMOD 5')
         self.command_cmw100_write(f'CONF:GSM:MEAS:MEV:SCO:SSW 5')
         self.command_cmw100_write(f'CONF:GSM:MEAS:SCEN:ACT STAN')
-        self.command_cmw100_query('*OPC?')
+        self.cmw_query('*OPC?')
         self.command_cmw100_write(f'ROUT:GSM:MEAS:SCEN:SAL R1{self.port_tx}, RX1')
         self.command_cmw100_write(f'CONF:GSM:MEAS:RFS:EATT {self.loss_tx}')
         self.command_cmw100_write(f'CONF:GSM:MEAS:RFS:UMAR 10.00')
@@ -581,24 +582,24 @@ class CMW100(CMW):
         self.command_cmw100_write(f'TRIG:GSM:MEAS:MEV:THR -20.0')
         self.command_cmw100_write(f'CONF:GSM:MEAS:MEV:REP SING')
         self.command_cmw100_write(f'CONF:GSM:MEAS:MEV:RES:ALL ON, ON, ON, ON, ON, ON, ON, ON, ON, ON, OFF, ON')
-        self.command_cmw100_query('*OPC?')
+        self.cmw_query('*OPC?')
         self.command_cmw100_write(
             f'CONF:GSM:MEAS:MEV:SMOD:OFR 100KHZ,200KHZ,250KHZ,400KHZ,600KHZ,800KHZ,1600KHZ,1800KHZ,OFF,OFF,OFF,OFF,OFF,OFF,OFF,OFF,OFF,OFF,OFF,OFF')
         self.command_cmw100_write(f'CONF:GSM:MEAS:MEV:SMOD:EAR ON,6,45,ON,90,129')
         self.command_cmw100_write(
             f'CONF:GSM:MEAS:MEV:SSW:OFR 400KHZ,600KHZ,1200KHZ,1800KHZ,OFF,OFF,OFF,OFF,OFF,OFF,OFF,OFF,OFF,OFF,OFF,OFF,OFF,OFF,OFF,OFF')
-        self.command_cmw100_query('SYST:ERR:ALL?')
+        self.system_err_all_query()
         self.command_cmw100_write(f'CONF:GSM:MEAS:BAND {self.band_tx_meas_dict_gsm[self.band_gsm]}')
-        self.command_cmw100_query('*OPC?')
+        self.cmw_query('*OPC?')
         self.command_cmw100_write(f'CONF:GSM:MEAS:CHAN {self.rx_chan_gsm}')
-        self.command_cmw100_query('*OPC?')
+        self.cmw_query('*OPC?')
         self.command_cmw100_write(f'CONF:GSM:MEAS:MEV:MOEX ON')
         self.command_cmw100_write(f'CONF:GSM:MEAS:MEV:TSEQ TSC{self.tsc}')
         self.command_cmw100_write(f'CONF:GSM:MEAS:MEV:MVI {",".join([self.mod_gsm] * 8)}')
-        self.command_cmw100_query('*OPC?')
+        self.cmw_query('*OPC?')
         self.command_cmw100_write(f'CONF:GSM:MEAS:MEV:MSL 0,1,0')
-        self.command_cmw100_query('*OPC?')
-        self.command_cmw100_query('SYST:ERR:ALL?')
+        self.cmw_query('*OPC?')
+        self.system_err_all_query()
         self.power_init_gsm()
         self.command_cmw100_write(f'CONF:GSM:MEAS:RFS:ENP {self.pwr_init_gsm}')
         mod_results = self.command_cmw100_query(
@@ -610,13 +611,13 @@ class CMW100(CMW):
         logger.info(
             f'Power: {mod_results[0]:.2f}, Phase_err_rms: {mod_results[1]:.2f}, Phase_peak: {mod_results[2]:.2f}, Ferr: {mod_results[3]:.2f}')
         self.command_cmw100_write(f'INIT:GSM:MEAS:MEV')
-        self.command_cmw100_write(f'*OPC?')
+        self.cmw_write(f'*OPC?')
         self.command_cmw100_write(f'CONF:GSM:MEAS:RFS:ENP {mod_results[0]:.2f}')
         f_state = self.command_cmw100_query(f'FETC:GSM:MEAS:MEV:STAT?')
         while f_state != 'RDY':
             time.sleep(0.2)
             f_state = self.command_cmw100_query('FETC:GSM:MEAS:MEV:STAT?')
-            self.command_cmw100_query('*OPC?')
+            self.cmw_query('*OPC?')
         pvt = self.command_cmw100_query(f'FETC:GSM:MEAS:MEV:PVT:AVER:SVEC?')  # PVT, but it is of no use
         orfs_mod = self.command_cmw100_query(f'FETC:GSM:MEAS:MEV:SMOD:FREQ?')  # MOD_ORFS
         orfs_mod = [round(eval(orfs_mod), 2) for orfs_mod in orfs_mod.split(',')[13:29]]
@@ -645,7 +646,7 @@ class CMW100(CMW):
         logger.info(f'ORFS_SW_-600KHz: {orfs_sw[2]}, ORFS_SW_600KHz: {orfs_sw[3]}')
         logger.info(f'ORFS_SW_-1200KHz: {orfs_sw[4]}, ORFS_SW_1200KHz: {orfs_sw[5]}')
         self.command_cmw100_write(f'STOP:WCDM:MEAS:MEV')
-        self.command_cmw100_query('*OPC?')
+        self.cmw_query('*OPC?')
 
         return mod_results + orfs_mod + orfs_sw  # [0~3] + [4~10] + [11~17]
 
@@ -653,7 +654,7 @@ class CMW100(CMW):
         logger.info('---------Tx Monitor----------')
         # self.sig_gen_lte()
         self.command_cmw100_write(f'CONFigure:LTE:MEAS:MEV:RES:PMONitor ON')
-        self.command_cmw100_query('*OPC?')
+        self.cmw_query('*OPC?')
         self.command_cmw100_write(f"TRIG:LTE:MEAS:MEV:SOUR 'GPRF Gen1: Restart Marker'")
         self.command_cmw100_write(f'CONFigure:LTE:MEAS:MEValuation:MSLot ALL')
         self.command_cmw100_write(f'TRIG:LTE:MEAS:MEV:THR -20.0')
@@ -671,7 +672,7 @@ class CMW100(CMW):
         self.command_cmw100_write(f'CONF:LTE:MEAS:RFS:FREQ {self.tx_freq_lte}KHz')
         self.command_cmw100_query('*OPC?')
         self.command_cmw100_write(f'CONF:LTE:MEAS:RFS:EATT {self.loss_tx}')
-        self.command_cmw100_query('*OPC?')
+        self.cmw_query('*OPC?')
         self.command_cmw100_write(f'ROUT:GPRF:MEAS:SCEN:SAL R1{self.port_tx}, RX1')
         self.command_cmw100_query('*OPC?')
         self.command_cmw100_write(f'ROUT:LTE:MEAS:SCEN:SAL R1{self.port_tx}, RX1')
