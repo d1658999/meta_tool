@@ -155,6 +155,18 @@ class CMW:
         """
         self.cmw_write(f'ROUTe:WCDMa:MEASurement:SCENario:SALone R1{port_tx} RX1')
 
+    def set_rf_tx_port_gsm(self, port_tx=1):
+        """
+        Activates the standalone scenario and selects the RF input path for the measured RF
+        signal.
+        For possible connector and converter values, see Chapter 5.5.1.4, "Values for RF Path
+        Selection", on page 1019.
+        Parameters:
+        <RXConnector> RF connector for the input path
+        <RFConverter> RX module for the input path
+        """
+        self.cmw_write(f'ROUTe:GSM:MEASurement:SCENario:SALone R1{port_tx} RX1')
+
     def set_rf_rx_port_gprf(self, port_rx=18):
         """
         Activates the standalone scenario and selects the output path for the generated RF
@@ -271,6 +283,20 @@ class CMW:
         """
         self.cmw_write(f'CONFigure:WCDMa:MEASurement:MEValuation:REPetition {rep}')
 
+    def set_repetition_gsm(self, rep='SING'):
+        """
+        Specifies the repetition mode of the measurement. The repetition mode specifies
+        whether the measurement is stopped after a single shot or repeated continuously. Use
+        CONFigure:..:MEAS<i>:...:SCOunt to determine the number of measurement
+        intervals per single shot.
+        Parameters:
+        <Repetition> SINGleshot | CONTinuous
+        SINGleshot: Single-shot measurement
+        CONTinuous: Continuous measurement
+        *RST:  SING
+        """
+        self.cmw_write(f'CONFigure:GSM:MEASurement:MEValuation:REPetition {rep}')
+
     def set_power_list_mode_gprf(self, on_off='OFF'):
         """
         Enables or disables the list mode for the power measurement.
@@ -343,6 +369,20 @@ class CMW:
         *RST:  'Free Run (Standard)'
         """
         self.cmw_write(f'TRIGger:WCDMa:MEASurement:MEValuation:SOURce {source}')
+
+    def set_trigger_source_gsm(self, source='Free Run'):
+        """
+        Selects the source of the trigger events. Some values are always available in this firm-
+        ware application. They are listed below. Depending on the installed options, additional
+        values are available. A complete list of all supported values can be displayed using
+        TRIGger:...:CATalog:SOURce?.
+        Parameters:
+        <Source> 'Power': Power trigger (received RF power)
+        'Acquisition': Frame trigger according to defined burst pattern
+        'Free Run': Free run (untriggered)
+        *RST:  'Power'
+        """
+        self.cmw_write(f'TRIGger:GSM:MEASurement:MEValuation:SOURce {source}')
 
     def set_trigger_slope_gprf(self, slope='REDGe'):
         """
@@ -543,6 +583,21 @@ class CMW:
         """
         self.cmw_write(f'CONFigure:WCDMa:MEASurement:RFSettings:UMARgin {margin}')
 
+    def set_rf_setting_user_margin_gsm(self, margin=10.00):
+        """
+        Sets the margin that the measurement adds to the expected nominal power to deter-
+        mine the reference power. The reference power minus the external input attenuation
+        must be within the power range of the selected input connector. Refer to the data
+        sheet.
+        Parameters:
+        <UserMargin> numeric
+        Range:  0 dB to (55 dB + external attenuation - expected
+        nominal power)
+        *RST:  0 dB
+        Default unit: dB
+        """
+        self.cmw_write(f'CONFigure:GSM:MEASurement:RFSettings:UMARgin {margin}')
+
     def set_rf_setting_external_tx_port_attenuation_gprf(self, attenuation):
         """
         Defines an external attenuation (or gain, if the value is negative), to be applied to the
@@ -596,7 +651,14 @@ class CMW:
 
     def set_rf_setting_external_tx_port_attenuation_gsm(self, attenuation):
         """
-        DBT
+        Defines an external attenuation (or gain, if the value is negative), to be applied to the
+        RF input connector.
+        For the combined signal path scenario, useCONFigure:GSM:SIGN<i>:
+        RFSettings:EATTenuation:INPut.
+        Parameters:
+        <ExternalAtt> Range:  -50 dB  to  90 dB
+        *RST:  0 dB
+        Default unit: dB
         """
         self.cmw_write(f'CONFigure:GSM:MEASurement:RFSettings:EATTenuation {attenuation}')
 
@@ -781,7 +843,16 @@ class CMW:
 
     def set_measure_stop_gsm(self):
         """
-        DBT
+        Starts, stops, or aborts the measurement:
+        ● INITiate... starts or restarts the measurement. The measurement enters the
+        "RUN" state.
+        ● STOP... halts the measurement immediately. The measurement enters the "RDY"
+        state. Measurement results are kept. The resources remain allocated to the mea-
+        surement.
+        ● ABORt... halts the measurement immediately. The measurement enters the
+        "OFF" state. All measurement values are set to NAV. Allocated resources are
+        released.
+        Use FETCh...STATe? to query the current measurement state.
         """
         self.cmw_write(f'STOP:GSM:MEASurement:MEValuation')
 
@@ -1188,9 +1259,55 @@ class CMW:
 
     def set_tx_freq_gsm(self, tx_freq):  # this is KHz
         """
-        DBT
+        Selects the center frequency of the RF analyzer.
+        If the center frequency is valid for the current frequency band, the corresponding chan-
+        nel number is also calculated and set.
+        See also:
+        ● GSM Frequency Bands and Channels
+        ● CONFigure:GSM:MEAS<i>:BAND
+        ● CONFigure:GSM:MEAS<i>:CHANnel
+        For the combined signal path scenario, use:
+        ● CONFigure:GSM:SIGN<i>:RFSettings:CHANnel:TCH[:CARRier<c>]
+        ● CONFigure:GSM:SIGN<i>:RFSettings:CHCCombined:TCH:CSWitched
+        ● CONFigure:GSM:SIGN<i>:RFSettings:HOPPing:ENABle:TCH[:
+        CARRier<c>]
+        ● CONFigure:GSM:SIGN<i>:RFSettings:HOPPing:MAIO:TCH[:
+        CARRier<c>]
+        ● CONFigure:GSM:SIGN<i>:RFSettings:HOPPing:HSN:TCH[:CARRier<c>]
+        ● CONFigure:GSM:SIGN<i>:RFSettings:HOPPing:SEQuence:TCH[:
+        CARRier<c>]
+        The supported frequency range depends on the instrument model and the available
+        options. The supported range can be smaller than stated here. Refer to the preface of
+        your model-specific base unit manual.
+        Parameters:
+        <Frequency> Range:  70E+6 Hz to 6E+9 Hz
+        *RST:  903E+6 Hz
+        Default unit: Hz
         """
         self.cmw_write(f'CONFigure:GSM:MEASurement:RFSettings:FREQuency {tx_freq}KHz')
+
+    def set_chan_gsm(self, rx_chan):  # this is channel
+        """
+        Selects the channel number. The channel number must be valid for the current fre-
+        quency band, for dependencies see GSM Frequency Bands and Channels.
+        The corresponding center frequency (CONFigure:GSM:MEAS<i>:RFSettings:
+        FREQuency) is calculated and set.
+        For the combined signal path scenario, use:
+        ● CONFigure:GSM:SIGN<i>:RFSettings:CHANnel:TCH[:CARRier<c>]
+        ● CONFigure:GSM:SIGN<i>:RFSettings:CHCCombined:TCH:CSWitched
+        ● CONFigure:GSM:SIGN<i>:RFSettings:HOPPing:ENABle:TCH[:
+        CARRier<c>]
+        ● CONFigure:GSM:SIGN<i>:RFSettings:HOPPing:MAIO:TCH[:
+        CARRier<c>]
+        ● CONFigure:GSM:SIGN<i>:RFSettings:HOPPing:HSN:TCH[:CARRier<c>]
+        ● CONFigure:GSM:SIGN<i>:RFSettings:HOPPing:SEQuence:TCH[:
+        CARRier<c>]
+        Parameters:
+        <Channel> GSM channel number
+        Range:  depends on frequency band
+        *RST:  65
+        """
+        self.cmw_write(f'CONFigure:GSM:MEASurement:CHANnel {rx_chan}')
 
     def set_plc_fr1(self, plc_id=0):
         """
@@ -1243,6 +1360,17 @@ class CMW:
         *RST:  OFF
         """
         self.cmw_write(f'CONFigure:LTE:MEASurement:MEValuation:MOEXception {meas_on_exception}')
+
+    def set_meas_on_exception_gsm(self, meas_on_exception='ON'):
+        """
+        Specifies whether measurement results identified as faulty or inaccurate are rejected.
+        Parameters:
+        <MeasOnException> OFF | ON
+        OFF: Faulty results are rejected.
+        ON: Results are never rejected.
+        *RST:  OFF
+        """
+        self.cmw_write(f'CONFigure:GSM:MEASurement:MEValuation:MOEXception {meas_on_exception}')
 
     def set_scs_bw_fr1(self, scs, bw):
         """
@@ -1669,6 +1797,18 @@ class CMW:
         """
         self.cmw_write(f'TRIGger:WCDMa:MEASurement:MEValuation:THReshold {threshold}')
 
+    def set_trigger_threshold_gsm(self, threshold=-20.0):
+        """
+        Defines the trigger threshold for power trigger sources.
+        Parameters:
+        <TrigThreshold> numeric
+        Range:  -50 dB  to  0 dB
+        *RST:  -20 dB
+        Default unit: dB (full scale, i.e. relative to reference level minus
+        external attenuation)
+        """
+        self.cmw_write(f'TRIGger:GSM:MEASurement:MEValuation:THReshold {threshold}')
+
     def set_measurements_enable_all_fr1(self):
         """
         CONFigure:NRSub:MEAS<i>:MEValuation:RESult[:ALL] <EVM>, <MagnitudeError>, <PhaseError>, <InbandEmissions>,
@@ -1895,7 +2035,7 @@ class CMW:
 
     def set_scenario_activate_lte(self, scenario='SAL'):
         """
-        CONF:NRS:MEAS:SCEN:ACT <senario>
+        CONF:LTE:MEAS:SCEN:ACT <senario>
         This cannot find from the manual of R&S
         guess:
         <senario>  SAL | CSP
@@ -1905,6 +2045,19 @@ class CMW:
         As to CMW100, it only can select SAL.If selecting CSP, it will shutdown
         """
         self.cmw_write(f'CONFigure:LTE:MEASurement:SCENario:ACT {scenario}')
+
+    def set_scenario_activate_gsm(self, scenario='STAN'):
+        """
+        CONF:GSM:MEAS:SCEN:ACT <senario>
+        This cannot find from the manual of R&S
+        guess:
+        <senario>  STAN | CSP
+        STAN: StandAlone
+        CSP: CombindSignalPath
+
+        As to CMW100, it only can select SAL.If selecting CSP, it will shutdown
+        """
+        self.cmw_write(f'CONFigure:GSM:MEASurement:SCENario:ACT {scenario}')
 
     def set_type_cyclic_prefix_lte(self, cyclic_prefix='NORM'):
         """
