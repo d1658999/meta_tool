@@ -509,7 +509,25 @@ class CMW:
         *RST:  0 dBm
         Default unit: dBm
         """
-        self.cmw_write(f'CONFigure:LTE:MEASurement:RFSettings:ENPower {exp_nom_pwr}')
+        self.cmw_write(f'CONFigure:WCDMa:MEASurement:RFSettings:ENPower {exp_nom_pwr}')
+
+    def set_expect_power_gsm(self, exp_nom_pwr=0.00):
+        """
+        Sets the expected nominal power of the measured RF signal.
+        For the combined signal path scenario, use:
+        ● CONFigure:GSM:SIGN<i>:RFSettings:ENPMode
+        ● CONFigure:GSM:SIGN<i>:RFSettings:ENPower
+        Parameters:
+        <ExpNomPower> The range of the expected nominal power can be calculated as
+        follows:
+        Range (Expected Nominal Power) = Range (Input Power) +
+        External Attenuation - User Margin
+        The input power range is stated in the data sheet.
+        *RST:  0 dBm
+        Default unit: dBm
+        """
+        _exp_nom_pwr = round(exp_nom_pwr, 2)
+        self.cmw_write(f'CONFigure:GSM:MEASurement:RFSettings:ENPower {_exp_nom_pwr}')
 
     def set_rx_level_gprf(self, rx_level=-70.0):
         """
@@ -792,7 +810,16 @@ class CMW:
 
     def set_measure_start_on_gsm(self):
         """
-        DBT
+        Starts, stops, or aborts the measurement:
+        ● INITiate... starts or restarts the measurement. The measurement enters the
+        "RUN" state.
+        ● STOP... halts the measurement immediately. The measurement enters the "RDY"
+        state. Measurement results are kept. The resources remain allocated to the mea-
+        surement.
+        ● ABORt... halts the measurement immediately. The measurement enters the
+        "OFF" state. All measurement values are set to NAV. Allocated resources are
+        released.
+        Use FETCh...STATe? to query the current measurement state.
         """
         self.cmw_write(f'INIT:GSM:MEASurement:MEValuation')
 
@@ -986,6 +1013,23 @@ class CMW:
         Usage:  Query only
         """
         return self.cmw_query('FETCh:WCDMa:MEASurement:MEValuation:STATe?')
+
+    def get_power_state_query_gsm(self):
+        """
+        Queries the main measurement state. Use FETCh:...:STATe:ALL? to query the
+        measurement state including the substates. Use INITiate..., STOP...,
+        ABORt... to change the measurement state.
+        Return values:
+        <MeasStatus> OFF | RUN | RDY
+        OFF: measurement switched off, no resources allocated, no
+        results available (when entered after ABORt...)
+        RUN: measurement running (after INITiate..., READ...),
+        synchronization pending or adjusted, resources active or queued
+        RDY: measurement has been terminated, valid results are avail-
+        able
+        *RST:  OFF
+        """
+        return self.cmw_query('FETCh:GSM:MEASurement:MEValuation:STATe?')
 
     def get_power_average_query_gprf(self):
         """
@@ -1192,9 +1236,51 @@ class CMW:
 
     def set_modulation_count_gsm(self, count=5):
         """
-        DBT
+        Specifies the statistic count of the measurement. The statistic count is equal to the
+        number of measurement intervals per single shot.
+        Parameters:
+        <StatisticCount> Number of measurement intervals for the modulation measure-
+        ment
+        Range:  1  to  1000
+        *RST:  10
         """
         self.cmw_write(f'CONFigure:GSM:MEASurement:MEValuation:SCOunt:MODulation {count}')
+
+    def set_pvt_count_gsm(self, count=5):
+        """
+        Specifies the statistic count of the measurement. The statistic count is equal to the
+        number of measurement intervals per single shot.
+        Parameters:
+        <StatisticCount> Number of measurement intervals for the power vs. time mea-
+        surement
+        Range:  1  to  1000
+        *RST:  10
+        """
+        self.cmw_write(f'CONFigure:GSM:MEASurement:MEValuation:SCOunt:PVTime {count}')
+
+    def set_spectrum_modulation_count_gsm(self, count=5):
+        """
+        Specifies the statistic count of the measurement. The statistic count is equal to the
+        number of measurement intervals per single shot.
+        Parameters:
+        <StatisticCount> Number of measurement intervals for the spectrum modulation
+        measurement
+        Range:  1  to  1000
+        *RST:  20
+        """
+        self.cmw_write(f'CONFigure:GSM:MEASurement:MEValuation:SCOunt:SMODulation {count}')
+
+    def set_spectrum_switching_count_gsm(self, count=5):
+        """
+        Specifies the statistic count of the measurement. The statistic count is equal to the
+        number of measurement intervals per single shot.
+        Parameters:
+        <StatisticCount> Number of measurement intervals for the spectrum switching
+        measurement
+        Range:  1  to  100
+        *RST:  10
+        """
+        self.cmw_write(f'CONFigure:GSM:MEASurement:MEValuation:SCOunt:SSWitching {count}')
 
     def set_tx_freq_fr1(self, tx_freq):  # this is KHz
         """
@@ -1722,12 +1808,6 @@ class CMW:
         """
         self.cmw_write(f'CONFigure:WCDMa:MEASurement:MEValuation:SCOunt:SPECtrum {count}')
 
-    def set_orfs_count_wcdma(self, count=5):
-        """
-        DBT
-        """
-        pass
-
     def set_sem_count_fr1(self, count=5):
         """
         Specifies the statistic count of the measurement. The statistic count is equal to the
@@ -1971,6 +2051,58 @@ class CMW:
         """
         items_en = 'ON, ON, ON, ON, ON, ON, ON, ON, ON, ON'
         self.cmw_write(f'CONFigure:WCDMa:MEASurement:MEValuation:RESult:ALL {items_en}')
+
+    def set_measurements_enable_all_gsm(self):
+        """
+        CONFigure:GSM:MEAS<i>:MEValuation:RESult[:ALL] <PvT>, <EVM>,
+        <MagnitudeError>, <PhaseError>, <IQ>, <ACPModFrequency>,
+        <ACPModTime>, <ACPSwitFreq>, <ACPSwitTime>, <ModScalar>, <BER>,
+        <AMPM>
+        Enables or disables the evaluation of results and shows or hides the views in the multi-
+        evaluation measurement. This command combines all other
+        CONFigure:GSM:MEAS<i>:MEValuation:RESult... commands.
+        Parameters:
+        <PvT> OFF | ON
+        Power vs. time
+        ON: Evaluate results and show the view
+        OFF: Do not evaluate results, hide the view (if applicable)
+        *RST:  ON
+        <EVM> OFF | ON
+        Error vector magnitude
+        *RST:  ON
+        <MagnitudeError> OFF | ON
+        Magnitude error
+        *RST:  OFF
+        <PhaseError> OFF | ON
+        Phase error
+        *RST:  ON
+        <IQ> OFF | ON
+        I/Q constellation
+        *RST:  OFF
+        <ACPModFrequency>OFF | ON
+        ACP spectrum modulation frequency
+        *RST:  ON
+        <ACPModTime> OFF | ON
+        ACP spectrum modulation time
+        *RST:  OFF
+        <ACPSwitFreq> OFF | ON
+        ACP spectrum switching frequency
+        *RST:  ON
+        <ACPSwitTime> OFF | ON
+        ACP spectrum switching time
+        *RST:  OFF
+        <ModScalar> OFF | ON
+        Scalar modulation results
+        *RST:  ON
+        <BER> OFF | ON
+        Bit error rate
+        *RST:  OFF
+        <AMPM> OFF | ON
+        AM-PM
+        *RST:  OFF
+        """
+        items_en = 'ON, ON, ON, ON, ON, ON, ON, ON, ON, ON, OFF, ON'
+        self.cmw_write(f'CONFigure:GSM:MEASurement:MEValuation:RESult:ALL {items_en}')
 
     def set_subframe_fr1(self, subframe=10):
         """
@@ -2324,6 +2456,58 @@ class CMW:
         """
         return self.cmw_query(f'READ:WCDMa:MEASurement:MEValuation:MODulation:AVERage?')
 
+    def get_modulation_average_query_gsm(self):
+        """
+        Returns the average single slot modulation results of the multi-evaluation measure-
+        ment.
+        The values described below are returned by FETCh and READ commands. CALCulate
+        commands return limit check results instead, one value for each result listed below.
+        The number to the left of each result parameter is provided for easy identification of the
+        parameter position within the result array.
+        Return values:
+        <1_Reliability> Reliability Indicator
+        <2_OutOfTolerance> Percentage of measurement intervals / bursts of the statistic
+        count (CONFigure:GSM:MEAS<i>:MEValuation:SCOunt:
+        MODulation) exceeding the specified modulation limits.
+        Range:  0 %  to  100 %
+        Default unit: %
+        <3_EVMRMS>
+        <4_EVMpeak>
+        Error vector magnitude RMS and peak value
+        Range:  0 %  to  100 %
+        Default unit: %
+        <5_MagErrorRMS>
+        <6_MagErrorPeak>
+        Magnitude error RMS and peak value
+        Range:  0 %  to  100 %
+        Default unit: %
+        <7_PhaseErrorRMS>
+        <8_PhaseErrorPeak>
+        Phase error RMS and peak value
+        Range:  0 deg  to  180 deg
+        Default unit: deg
+        <9_IQoffset> I/Q origin offset
+        Range:  -100 dB  to  0 dB
+        Default unit: dB
+        <10_IQimbalance> I/Q imbalance
+        Range:  -100 dB  to  0 dB
+        Default unit: dB
+        <11_FrequencyError> Carrier frequency error
+        Range:  -56000 Hz  to  56000 Hz
+        Default unit: Hz
+        <12_TimingError> Transmit time error
+        Range:  -100 Sym  to  100 Sym
+        Default unit: Symbol
+        <13_BurstPower> Burst power
+        Range:  -100 dBm  to  55 dBm
+        Default unit: dBm
+        <14_AMPMdelay> AMPM delay (determined for 8PSK and 16-QAM modulation
+        only - for GMSK zeros are returned)
+        Range:  -0.9225E-6 s  to  0.9225E-6 s
+        Default unit: s
+        """
+        return self.cmw_query(f'READ:GSM:MEASurement:MEValuation:MODulation:AVERage?')
+
     def get_aclr_average_query_fr1(self):
         """
         Returns the relative ACLR values for NR standalone, as displayed in the table below
@@ -2476,6 +2660,58 @@ class CMW:
         Default unit: dBm
         """
         return self.cmw_query(f'FETCh:WCDMa:MEASurement:MEValuation:SPECtrum:AVERage?')
+
+    def get_orfs_modulation_gsm(self):
+        """
+        Returns the average burst power measured at a series of frequencies. The frequencies
+        are determined by the offset values defined via the command CONFigure:GSM:
+        MEAS<i>:MEValuation:SMODulation:OFRequence. All defined offset values are
+        considered (irrespective of their activation status).
+        The values described below are returned by FETCh and READ commands. CALCulate
+        commands return limit check results instead, one value for each result listed below.
+        The number to the left of each result parameter is provided for easy identification of the
+        parameter position within the result array.
+        Return values:
+        <1_Reliability> Reliability Indicator
+        <2_PowOffsetM19>
+        ...
+        <21_PowOffsetM0>
+        <22_PowCarrier>
+        <23_PowOffsetP0> ...
+        <42_PowOffsetP19>
+        <PowOffsetM/P n> refers to the average burst power at the
+        carrier frequency minus/plus the frequency offset value number
+        n.
+        Range:  -100 dB  to  100 dB
+        Default unit: dB
+        """
+        return self.cmw_query('FETCh:GSM:MEASurement:MEValuation:SMODulation:FREQuency?')
+
+    def get_orfs_switching_gsm(self):
+        """
+        Returns the maximum burst power measured at a series of frequencies. The frequen-
+        cies are determined by the offset values defined via the command CONFigure:GSM:
+        MEAS<i>:MEValuation:SSWitching:OFRequence. All defined offset values are
+        considered (irrespective of their activation status).
+        The values described below are returned by FETCh and READ commands. CALCulate
+        commands return limit check results instead, one value for each result listed below.
+        The number to the left of each result parameter is provided for easy identification of the
+        parameter position within the result array.
+        Return values:
+        <1_Reliability> Reliability Indicator
+        <2_PowOffsetM19>
+        ...
+        <21_PowOffsetM0>
+        <22_PowCarrier>
+        <23_PowOffsetP0> ...
+        <42_PowOffsetP19>
+        <PowOffset M/P n> refers to the maximum burst power at
+        the carrier frequency minus/plus the frequency offset value num-
+        ber n.
+        Range:  -100 dBm  to  55 dBm
+        Default unit: dBm
+        """
+        return self.cmw_query('FETCh:GSM:MEASurement:MEValuation:SSWitching:FREQuency?')
 
     def get_in_band_emission_query_fr1(self):
         """
@@ -2863,6 +3099,157 @@ class CMW:
         """
         self.cmw_write(f'CONFigure:WCDMa:MEASurement:UESignal:ULConfig {ul_config}')
 
+    def set_spectrum_modulation_evaluation_area_gsm(self):
+        """
+        Defines the time intervals (evaluation areas) to be used for spectrum modulation mea-
+        surements.
+        Parameters:
+        <Enable1> OFF | ON
+        ON: Enable area 1
+        OFF: Disable area 1
+        *RST:  OFF
+        <Start1> Start of evaluation area 1
+        Range:  0 Sym  to  146 Sym
+        *RST:  6 Sym
+        Default unit: Symbol
+        <Stop1> Stop of evaluation area 1
+        Range:  1 Symbol  to  147 Symbol
+        *RST:  45 Symbol
+        Default unit: Symbol
+        <Enable2> OFF | ON
+        ON: Enable area 2
+        OFF: Disable area 2
+        *RST:  ON
+        <Start2> Start of evaluation area 2
+        Range:  0 Sym  to  146 Symbol
+        *RST:  90 Symbol
+        Default unit: Symbol
+        <Stop2> Stop of evaluation area 2
+        Range:  1 Symbol  to  147 Symbol
+        *RST:  129 Symbol
+        Default unit: Symbol
+        """
+        parameters = 'ON, 6, 45, ON, 90, 129'
+        self.cmw_write(f'CONFigure:GSM:MEASurement:MEValuation:SMODulation:EARea {parameters}')
+
+    def set_orfs_modulation_measurement_off_gsm(self):
+        """
+        Defines the frequency offsets to be used for spectrum modulation measurements. The
+        offsets are defined relative to the analyzer frequency. Up to 20 offsets can be defined
+        and enabled.
+        Parameters:
+        <FreqOffset0> ...
+        <FreqOffset19>
+        Set and enable frequency offset.
+        Range:  0 Hz  to  3E+6 Hz
+        *RST:  Offset 0 to 10 in MHz: 0.1, 0.2, 0.25, 0.4, 0.6, 0.8,
+        1, 1.2, 1.4, 1.6, 1.8 (all ON); Offset 11 to 19: 1.9
+        MHz (all OFF)
+        Default unit: Hz
+        Additional parameters: OFF | ON (disables / enables offset using
+        the previous/default value)
+        """
+        freq_sample = f'100KHZ, 200KHZ, 250KHZ, 400KHZ, 600KHZ, 800KHZ, 1600KHZ, 1800KHZ, ' \
+                      f'OFF, OFF, OFF, OFF, OFF, OFF, OFF, OFF, OFF, OFF, OFF, OFF'
+        self.cmw_write(f'CONFigure:GSM:MEASurement:MEValuation:SMODulation:OFRequence {freq_sample}')
+
+    def set_orfs_switching_measurement_off_gsm(self):
+        """
+        <FreqOffset0>, ..., <FreqOffset19>
+        Defines the frequency offsets to be used for spectrum switching measurements. The
+        offsets are defined relative to the analyzer frequency. Up to 20 offsets can be defined
+        and enabled.
+        Parameters:
+        <FreqOffset0> ...
+        <FreqOffset19>
+        Set and enable frequency offset.
+        Range:  0 Hz  to  3E+6 Hz
+        *RST:  Offset 0 to 3 in MHz: 0.4, 0.6, 1.2, 1.8 (all ON); Off-
+        set 4 to 19: 1.9 MHz (all OFF)
+        Default unit: Hz
+        Additional parameters: OFF | ON (disables / enables offset using
+        the previous/default value)
+        """
+        freq_sample = f'400KHZ, 600KHZ, 1200KHZ, 1800KHZ, ' \
+                      f'OFF, OFF, OFF, OFF, OFF, OFF, OFF, OFF, OFF, OFF, OFF, OFF, OFF, OFF, OFF, OFF'
+        self.cmw_write(f'CONFigure:GSM:MEASurement:MEValuation:Sswitching:OFRequence {freq_sample}')
+
+    def set_training_sequence_gsm(self, tsc):
+        """
+        Selects the training sequence of the analyzed bursts.
+        For the combined signal path scenario, use CONFigure:GSM:SIGN<i>:CELL:BCC.
+        Parameters:
+        <TSC> OFF | TSC0 | TSC1 | TSC2 | TSC3 | TSC4 | TSC5 | TSC6 |
+        TSC7 | TSCA | DUMM
+        OFF: Analyze all bursts, irrespective of their training sequence
+        TSC0 ... TSC7: Analyze bursts with a particular GSM training
+        sequence
+        TSCA: Analyze bursts with any of the GSM training sequences
+        TSC0 to TSC7
+        DUMMY: Analyze GSM-specific dummy bursts
+        """
+        self.cmw_write(f'CONFigure:GSM:MEASurement:MEValuation:TSEQuence TSC{tsc}')
+
+    def set_modulation_view_gsm(self, mod='GMSK'):
+        """
+        Defines the expected modulation scheme and burst type in all timeslots and adjusts
+        the power/time template accordingly.
+        Parameters:
+        <Timeslot0> ...
+        <Timeslot7>
+        ANY | OFF | GMSK | EPSK | ACCess | Q16
+        ANY: Any burst type can be analyzed
+        OFF: No signal expected
+        GMSK: GMSK-modulated normal bursts
+        EPSK: 8PSK-modulated normal bursts
+        ACCess: Access bursts
+        Q16: 16-QAM-modulated normal bursts
+        *RST:  ANY
+        """
+        mod_8 = ",".join([mod] * 8)
+        self.cmw_write(f'CONFigure:GSM:MEASurement:MEValuation:MVIew {mod_8}')
+
+    def set_measured_slot_gsm(self):
+        """
+        Defines settings for the measured slots.
+        For the combined signal path scenario, use CONFigure:GSM:SIGN<i>:MSLot:UL.
+        Parameters:
+        <SlotOffset> Start of the measurement interval relative to the GSM frame
+        boundary
+        Range:  0  to  7
+        *RST:  0
+        <SlotCount> Number of slots to be measured
+        Range:  1  to  8
+        *RST:  1
+        <MeasSlot> Slot to be measured for one-slot measurements
+        Range:  0  to  7
+        *RST:  0
+        """
+        parameters = '0, 1, 0'
+        self.cmw_write(f'CONFigure:GSM:MEASurement:MEValuation:MSLots {parameters}')
+
+    def get_pvt_average_query_gsm(self):
+        """
+        Returns special burst power values for the "Measure Slot".
+        The number to the left of each result parameter is provided for easy identification of the
+        parameter position within the result array.
+        Return values:
+        <1_Reliability> Reliability Indicator
+        <2_UsefulPartMin>
+        <3_UsefulPartMax>
+        Minimum and maximum power across the useful part of the
+        "Measure Slot".
+        Range:  -100 dB  to  100 dB
+        Default unit: dB
+        <4_Subvector1> ...
+        <15_Subvector12>
+        Burst power at position in μs: –28 , –18, –10, 0, 2, 4, 538.2,
+        540.2, 542.8, 552.8, 560.8, 570.8
+        Range:  -100 dB  to  100 dB
+        Default unit: dB
+        Usage:  Query only
+        """
+        self.cmw_query(f'FETCh:GSM:MEASurement:MEValuation:PVTime:AVERage:SVECtor?')
 
 
 
