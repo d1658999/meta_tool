@@ -1052,6 +1052,18 @@ class CMW:
         """
         return self.cmw_query('FETCh:GPRF:MEASurement:POWer:AVER?')
 
+    def get_power_monitor_average_query_lte(self):
+        """
+        Returns the total TX power of all carriers.
+        Return values:
+        <Reliability> Reliability Indicator
+        <OutOfTolerance> Out of tolerance result, i.e. percentage of measurement intervals
+        of the statistic count that exceed the specified limits
+        Default unit: %
+        <TXpower> Default unit: dBm
+        """
+        return self.cmw_query(f'FETCh:LTE:MEASurement:MEValuation:PMONitor:AVERage?')
+
     def get_arb_file_query_gprf(self):
         """
         Selects a waveform file for the ARB baseband mode.
@@ -2104,7 +2116,7 @@ class CMW:
         items_en = 'ON, ON, ON, ON, ON, ON, ON, ON, ON, ON, OFF, ON'
         self.cmw_write(f'CONFigure:GSM:MEASurement:MEValuation:RESult:ALL {items_en}')
 
-    def set_subframe_fr1(self, subframe=10):
+    def set_measured_subframe_fr1(self, subframe=10):
         """
         Configures how many subframes of each radio frame are measured.
         Parameters:
@@ -2113,6 +2125,25 @@ class CMW:
         *RST:  10
         """
         self.cmw_write(f'CONFigure:NRSub:MEASurement:MEValuation:NSUBframes {subframe}')
+
+    def set_measured_subframe_lte(self, offset=2, length=10, subframe=0):
+        """
+        CONFigure:LTE:MEAS<i>:MEValuation:MSUBframes <SubframeOffset>, <SubframeCount>, <MeasSubframe>
+        Configures the scope of the measurement, i.e. which subframes are measured.
+        Parameters:
+        <SubframeOffset> Start of the measured subframe range relative to the trigger
+        event
+        Range:  0  to  9
+        *RST:  0
+        <SubframeCount> Length of the measured subframe range
+        Range:  1  to  320
+        *RST:  1
+        <MeasSubframe> Subframe containing the measured slots for modulation and
+        spectrum results
+        Range:  0  to  <SubframeCount>-1
+        *RST:  0
+        """
+        self.cmw_write(f'CONFigure:LTE:MEASurement:MEValuation:MSUBframes {offset}, {length}, {subframe}')
 
     def set_measured_slot_fr1(self, measured_slot='ALL'):
         """
@@ -3010,25 +3041,6 @@ class CMW:
         """
         self.cmw_write(f'CONFigure:LTE:MEASurement:MEValuation:DSSPusch {delta}')
 
-    def set_measured_subframe(self, offset=2, length=10, subframe=0):
-        """
-        CONFigure:LTE:MEAS<i>:MEValuation:MSUBframes <SubframeOffset>, <SubframeCount>, <MeasSubframe>
-        Configures the scope of the measurement, i.e. which subframes are measured.
-        Parameters:
-        <SubframeOffset> Start of the measured subframe range relative to the trigger
-        event
-        Range:  0  to  9
-        *RST:  0
-        <SubframeCount> Length of the measured subframe range
-        Range:  1  to  320
-        *RST:  1
-        <MeasSubframe> Subframe containing the measured slots for modulation and
-        spectrum results
-        Range:  0  to  <SubframeCount>-1
-        *RST:  0
-        """
-        self.cmw_write(f'CONFigure:LTE:MEASurement:MEValuation:MSUBframes {offset}, {length}, {subframe}')
-
     def set_ul_dpdch_wcdma(self, dpdch_on='ON'):
         """
         Defines whether the UL DPCH contains a DPDCH.
@@ -3250,6 +3262,28 @@ class CMW:
         Usage:  Query only
         """
         self.cmw_query(f'FETCh:GSM:MEASurement:MEValuation:PVTime:AVERage:SVECtor?')
+
+    def set_measurement_tx_monitor_enable_lte(self, on_off='ON'):
+        """
+        Enables or disables the evaluation of results in the multi-evaluation measurement.
+        Mnemonic    | Description                      | Mnemonic      | Description
+        ------------|----------------------------------| --------------| ------------
+        EVMagnitude | Error vector magnitude           | EVMC          | EVM vs. subcarrier
+        MERRor      | Magnitude error                  | PERRor        | Phase error
+        IEMissions  | Inband emissions                 | IQ            | I/Q constellation diagram
+        ESFLatness  | Equalizer spectrum flatness      | TXM           | TX meas. statistical overview
+        SEMask      | Spectrum emission mask           | ACLR          | Adj. channel leakage power ratio
+        RBATable    | Resource block allocation table  | PMONitor      | Power monitor
+        BLER        | Block error ratio                | PDYNamics     | Power dynamics
+        -----------------------------------------------------------------------------
+        For reset values, see CONFigure:LTE:MEAS<i>:MEValuation:RESult[:ALL].
+        Parameters:
+        <Enable> OFF | ON
+        OFF: Do not evaluate results
+        ON: Evaluate results
+        *RST:  Depends on measurement
+        """
+        self.cmw_write(f'CONFigure:LTE:MEAS:MEV:RES:PMONitor {on_off}')
 
 
 

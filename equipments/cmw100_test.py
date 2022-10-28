@@ -87,6 +87,9 @@ class CMW100(CMW):
         self.set_rf_setting_external_tx_port_attenuation_gprf(self.loss_tx)
 
     def get_power_avgerage_gprf(self):
+        """
+        This function is used for FCC and CE certification
+        """
         self.set_measure_start_on_gprf()
         self.cmw_query('*OPC?')
         f_state = self.get_power_state_query_gprf()
@@ -95,6 +98,16 @@ class CMW100(CMW):
             self.cmw_query('*OPC?')
         power_average = round(eval(self.get_power_average_query_gprf()[1]), 2)
         logger.info(f'Get the GPRF power: {power_average}')
+        return power_average
+
+    def get_power_monitor_avgerage_lte(self):
+        f_state = self.get_power_state_query_lte()
+        while f_state != 'RDY':
+            f_state = self.get_power_state_query_lte()
+            self.cmw_query('*OPC?')
+        self.cmw_query('*OPC?')
+        power_average = self.get_power_monitor_average_query_lte()
+        logger.info(f'Get the LTE Monitor power: {power_average}')
         return power_average
 
     def get_modulation_avgerage_fr1(self):
@@ -407,6 +420,80 @@ class CMW100(CMW):
             self.set_generator_state_gprf()
             self.cmw_query('*OPC?')
 
+    def sync_fr1(self):
+        logger.info('---------Sync----------')
+        scs = 1 if self.band_fr1 in [34, 38, 39, 40, 41, 42, 48, 75, 76, 77, 78, 79] else 0
+        response = self.command(
+            f'AT+NRFSYNC={self.sync_path_dict[self.sync_path]},{self.sync_mode},{scs},{self.bw_fr1_dict[self.bw_fr1]},0,{self.rx_freq_fr1}',
+            delay=1)
+        while b'+NRFSYNC:1\r\n' not in response:
+            logger.info('**********Sync repeat**********')
+            time.sleep(1)
+            response = self.command(
+                f'AT+NRFSYNC={self.sync_path_dict[self.sync_path]},{self.sync_mode},{scs},{self.bw_fr1_dict[self.bw_fr1]},0,{self.rx_freq_fr1}',
+                delay=2)
+
+    def sync_lte(self):
+        logger.info('---------Sync----------')
+        response = self.command(f'AT+LSYNC={self.sync_path_dict[self.sync_path]},{self.sync_mode},{self.rx_freq_lte}',
+                                delay=1.2)
+        while b'+LSYNC:1\r\n' not in response:
+            logger.info('**********Sync repeat**********')
+            time.sleep(1)
+            response = self.command(
+                f'AT+LSYNC={self.sync_path_dict[self.sync_path]},{self.sync_mode},{self.rx_freq_lte}', delay=2)
+
+    def sync_wcdma(self):
+        logger.info('---------Sync----------')
+        self.command(f'AT+HDLSYNC={self.rx_chan_wcdma}', delay=0.5)
+
+    def sync_gsm(self):
+        logger.info('---------Sync----------')
+        self.command(f'AT+TESTRESET', delay=0.2)
+        self.command(
+            f'AT+TESTSYNC={self.band_tx_set_dict_gsm[self.band_gsm]},0,{self.rx_chan_gsm},{-1 * int(round(self.rx_level, 0))}',
+            delay=0.5)
+
+    def tx_set_fr1(self):
+        logger.info('---------Tx Set----------')
+        self.command(
+            f'AT+NTXSENDREQ={self.tx_path_dict[self.tx_path]},{self.tx_freq_fr1},{self.bw_fr1_dict[self.bw_fr1]},{self.scs_dict[self.scs]},{self.rb_size_fr1},{self.rb_start_fr1},{self.mcs_fr1_dict[self.mcs_fr1]},{self.type_dict[self.type_fr1]},{self.tx_level}')
+        logger.info(
+            f'TX_PATH: {self.tx_path}, BW: {self.bw_fr1}, TX_FREQ: {self.tx_freq_fr1}, RB_SIZE: {self.rb_size_fr1}, RB_OFFSET: {self.rb_start_fr1}, MCS: {self.mcs_fr1}, TX_LEVEL: {self.tx_level}')
+        # self.command_cmw100_query('*OPC?')
+
+    def tx_set_lte(self):
+        """
+        tx_path: TX1: 0 (main path)| TX2: 1 (sub path)
+        bw_lte: 1.4: 0 | 3: 1 | 5: 2 | 10: 3 | 15: 4 | 20: 5
+        tx_freq_lte:
+        rb_num:
+        rb_start:
+        mcs: "QPSK": 0 | "Q16": 11 | "Q64": 25 | "Q256": 27
+        pwr:
+
+        """
+        logger.info('---------Tx Set----------')
+        self.command(
+            f'AT+LTXSENDREQ={self.tx_path_dict[self.tx_path]},{self.bw_lte_dict[self.bw_lte]},{self.tx_freq_lte},{self.rb_size_lte},{self.rb_start_lte},{self.mcs_lte_dict[self.mcs_lte]},2,1,{self.tx_level}')
+        logger.info(
+            f'TX_PATH: {self.tx_path}, BW: {self.bw_lte}, TX_FREQ: {self.tx_freq_lte}, RB_SIZE: {self.rb_size_lte}, RB_OFFSET: {self.rb_start_lte}, MCS: {self.mcs_lte}, TX_LEVEL: {self.tx_level}')
+        # self.command_cmw100_query('*OPC?')
+
+    def tx_set_wcdma(self):
+        logger.info('---------Tx Set----------')
+        self.command(f'AT+HDELULCHAN')
+        self.command(f'AT+HTXPERSTART={self.tx_chan_wcdma}')
+        self.command(f'AT+HSETMAXPOWER={self.tx_level * 10}')
+        logger.info(f'Tx_chan: {self.tx_chan_wcdma}, Tx_level: {self.tx_level}')
+
+    def tx_set_gsm(self):
+        logger.info('---------Tx Set----------')
+        self.command(
+            f'AT+TESTTX={self.band_tx_set_dict_gsm[self.band_gsm]},{self.mod_dict_gsm[self.mod_gsm]},{self.rx_chan_gsm},1,1')
+        self.command(f'AT+TESTPWR=0,{self.pcl},{self.pcl},{self.pcl},{self.pcl}')
+        logger.info(f'Band: {self.band_gsm}, Modulation: {self.mod_gsm}, Chan: {self.rx_chan_gsm}, PCL: {self.pcl}')
+
     def set_sem_limit_fr1(self, bw):
         self.set_spectrum_limit_fr1(1, bw, 0.015, 0.0985, round(-13.5 - 10 * math.log10(bw / 5), 1), 'K030')
         self.set_spectrum_limit_fr1(2, bw, 1.5, 4.5, -8.5, 'M1')
@@ -478,14 +565,33 @@ class CMW100(CMW):
         else:
             self.set_spectrum_limit_lte(9, bw * 10, 'ON', 20, 25, -25, 'M1')
 
-    def tx_measure_fr1(self):
-        scs = 1 if self.band_fr1 in [34, 38, 39, 40, 41, 42, 48, 75, 76, 77, 78,
-                                     79] else 0  # for now FDD is forced to 15KHz and TDD is to be 30KHz
+    def select_mode_fdd_tdd(self, band):
+        if self.tech == 'FR1':
+            if band in [34, 38, 39, 40, 41, 42, 48, 75, 76, 77, 78, 79, ]:
+                self.set_duplexer_mode_fr1('TDD')
+            else:
+                self.set_duplexer_mode_fr1('FDD')
+        elif self.tech == 'LTE':
+            if band in [34, 38, 39, 40, 41, 42, 48, ]:
+                self.set_duplexer_mode_lte('TDD')
+            else:
+                self.set_duplexer_mode_lte('FDD')
+
+    def select_scs_fr1(self, band):
+        """
+        For now FDD is forced to 15KHz and TDD is to be 30KHz
+        """
+        if band in [34, 38, 39, 40, 41, 42, 48, 75, 76, 77, 78, 79, ]:
+            scs = 1
+        else:
+            scs = 0
         self.scs = 15 * (2 ** scs)  # for now TDD only use 30KHz, FDD only use 15KHz
+
+    def tx_measure_fr1(self):
         logger.info('---------Tx Measure----------')
-        mode = "TDD" if self.band_fr1 in [34, 38, 39, 40, 41, 42, 48, 75, 76, 77, 78, 79] else "FDD"
         self.system_base_option_version_query("CMW_NRSub6G_Meas")
-        self.set_duplexer_mode_fr1(mode)
+        self.select_mode_fdd_tdd(self.band_fr1)
+        self.select_scs_fr1(self.band_fr1)
         self.set_band_fr1(self.band_fr1)
         self.set_tx_freq_fr1(self.tx_freq_fr1)
         self.cmw_query('*OPC?')
@@ -513,7 +619,7 @@ class CMW100(CMW):
         self.set_trigger_threshold_fr1(-20)
         self.set_repetition_fr1('SING')
         self.set_measurements_enable_all_fr1()
-        self.set_subframe_fr1(10)
+        self.set_measured_subframe_fr1(10)
         self.set_measured_slot_fr1('ALL')
         self.set_scenario_activate_fr1('SAL')
         self.set_rf_setting_external_tx_port_attenuation_fr1(self.loss_tx)
@@ -537,8 +643,7 @@ class CMW100(CMW):
 
     def tx_measure_lte(self):
         logger.info('---------Tx Measure----------')
-        mode = 'TDD' if self.band_lte in [38, 39, 40, 41, 42, 48] else 'FDD'
-        self.set_duplexer_mode_lte(mode)
+        self.select_mode_fdd_tdd(self.band_lte)
         self.set_band_lte(self.band_lte)
         self.set_tx_freq_lte(self.tx_freq_lte)
         self.cmw_query('*OPC?')
@@ -571,7 +676,7 @@ class CMW100(CMW):
         self.set_repetition_lte('SING')
         self.set_measurements_enable_all_lte()
         self.cmw_query('*OPC?')
-        self.set_measured_subframe()
+        self.set_measured_subframe_lte()
         self.set_scenario_activate_lte('SAL')
         self.system_err_all_query()
         self.set_rf_tx_port_gprf(self.port_tx)
@@ -668,42 +773,38 @@ class CMW100(CMW):
         return mod_results + orfs_mod + orfs_sw  # [0~3] + [4~10] + [11~17]
 
     def tx_monitor_lte(self):
+        """
+        This is to measure the LTE power before measuring FR1 sensitivity for ENDC
+        """
         logger.info('---------Tx Monitor----------')
         # self.sig_gen_lte()
-        self.command_cmw100_write(f'CONFigure:LTE:MEAS:MEV:RES:PMONitor ON')
+        self.set_measurement_tx_monitor_enable_lte()
         self.cmw_query('*OPC?')
-        self.command_cmw100_write(f"TRIG:LTE:MEAS:MEV:SOUR 'GPRF Gen1: Restart Marker'")
-        self.command_cmw100_write(f'CONFigure:LTE:MEAS:MEValuation:MSLot ALL')
-        self.command_cmw100_write(f'TRIG:LTE:MEAS:MEV:THR -20.0')
-        self.command_cmw100_write(f'CONF:LTE:MEAS:MEV:REP SING')
-        self.command_cmw100_write(f'CONF:LTE:MEAS:MEV:MOEX ON')
-        self.command_cmw100_write(f'CONF:LTE:MEAS:MEV:CPR NORM')
-        self.command_cmw100_write(f'CONF:LTE:MEAS:MEV:MSUB 2, 10, 0')
-        self.command_cmw100_write(f'CONF:LTE:MEAS:MEV:RBAL:AUTO ON')
-        mode = 'TDD' if self.band_lte in [38, 39, 40, 41, 42, 48] else 'FDD'
-        self.command_cmw100_write(f'CONF:LTE:MEAS:DMODe {mode}')
-        self.command_cmw100_write(f'CONF:LTE:MEAS:BAND OB{self.band_lte}')
-        rb = f'0{self.bw_lte * 10}' if self.bw_lte < 10 else f'{self.bw_lte * 10}'
-        self.command_cmw100_write(f'CONF:LTE:MEAS:MEV:CBAN B{rb}')
-        self.command_cmw100_write(f'CONF:LTE:MEAS:MEV:MOD:MSCH {self.mcs_lte}')
-        self.command_cmw100_write(f'CONF:LTE:MEAS:RFS:FREQ {self.tx_freq_lte}KHz')
-        self.command_cmw100_query('*OPC?')
-        self.command_cmw100_write(f'CONF:LTE:MEAS:RFS:EATT {self.loss_tx}')
+        self.set_trigger_source_lte('GPRF Gen1: Restart Marker')
+        self.set_measured_slot_lte('ALL')
+        self.set_trigger_threshold_lte(-20.0)
+        self.set_repetition_lte('SING')
+        self.set_meas_on_exception_lte('ON')
+        self.set_type_cyclic_prefix_lte('NORM')
+        self.set_measured_subframe_lte()
+        self.set_rb_auto_detect_lte('ON')
+        self.select_mode_fdd_tdd(self.band_lte)
+        self.set_band_lte(self.band_lte)
+        self.set_bw_lte(self.bw_lte)
+        self.set_mcs_lte(self.mcs_lte)
+        self.set_tx_freq_lte(self.tx_freq_lte)
         self.cmw_query('*OPC?')
-        self.command_cmw100_write(f'ROUT:GPRF:MEAS:SCEN:SAL R1{self.port_tx}, RX1')
-        self.command_cmw100_query('*OPC?')
-        self.command_cmw100_write(f'ROUT:LTE:MEAS:SCEN:SAL R1{self.port_tx}, RX1')
-        self.command_cmw100_query('*OPC?')
-        self.command_cmw100_write(f'CONF:LTE:MEAS:RFS:UMAR 10.000000')
-        self.command_cmw100_write(f'CONF:LTE:MEAS:RFS:ENP {self.tx_level}.00')
-        self.command_cmw100_query('*OPC?')
-        self.command_cmw100_write(f'INIT:LTE:MEAS:MEV')
-        f_state = self.command_cmw100_query('FETC:LTE:MEAS:MEV:STAT?')
-        while f_state != 'RDY':
-            f_state = self.command_cmw100_query('FETC:LTE:MEAS:MEV:STAT?')
-            self.command_cmw100_query('*OPC?')
-        self.command_cmw100_query('*OPC?')
-        power_results = self.command_cmw100_query(f'FETCh:LTE:MEAS:MEV:PMON:AVER?')
+        self.set_rf_setting_external_tx_port_attenuation_lte(self.loss_tx)
+        self.cmw_query('*OPC?')
+        self.set_rf_tx_port_gprf(self.port_tx)
+        self.cmw_query('*OPC?')
+        self.set_rf_tx_port_lte(self.port_tx)
+        self.cmw_query('*OPC?')
+        self.set_rf_setting_user_margin_lte(10.00)
+        self.set_expect_power_lte(self.tx_level)
+        self.cmw_query('*OPC?')
+        self.set_measure_start_on_lte()
+        power_results = self.get_power_monitor_avgerage_lte()
         power = power_results.strip().split(',')[2]
         logger.info(f'LTE power by Tx monitor: {round(eval(power), 2)}')
         return round(eval(power), 2)
