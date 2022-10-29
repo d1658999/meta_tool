@@ -55,7 +55,11 @@ class CMW:
         Returns "0"
         Usage: Query only
         """
-        return self.cmw_query(f'SYSTem:BASE:OPTion:VERSion? {application}')
+        if application == "CMW_NRSub6G_Meas":
+            message = 'SYSTem:BASE:OPTion:VERSion? "CMW_NRSub6G_Meas"'
+        else:
+            message = 'SYSTem:BASE:OPTion:VERSion? "nonesense"'
+        return self.cmw_query(message)
 
     def system_err_all_query(self):
         """
@@ -949,7 +953,7 @@ class CMW:
         smart channel mode
         *RST:  OFF
         """
-        return self.cmw_query(f'SOUR:GPRF:GENerator1:STAT {state}')
+        self.cmw_write(f'SOUR:GPRF:GENerator1:STAT {state}')
 
     def get_power_state_query_gprf(self):
         """
@@ -3284,6 +3288,13 @@ class CMW:
         *RST:  Depends on measurement
         """
         self.cmw_write(f'CONFigure:LTE:MEAS:MEV:RES:PMONitor {on_off}')
+
+def main():
+    test = CMW('CMW100')
+    test.cmw_query('SYSTem:BASE:OPTion:VERSion? "CMW_NRSub6G_Meas"')
+
+if __name__ == '__main__':
+    main()
 
 
 

@@ -50,3 +50,14 @@ class VisaComport:
 
     def query(self, command):
         return self.inst.query(command)
+
+def main():
+    test = VisaComport('CMW100')
+    # print(test.query('*IDN?'))
+    # print(test.query('SYSTem:BASE:OPTion:VERSion? "CMW_NRSub6G_Meas"'))
+    t = "CMW_NRSub6G_Meas"
+    tt = f'SYSTem:BASE:OPTion:VERSion? {t}'
+    test.query(tt)
+
+if __name__ == '__main__':
+    main()

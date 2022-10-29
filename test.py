@@ -10,7 +10,8 @@ class CMW100(CMW):
         logger.info('good')
 
 def main():
-    cmw100 = CMW100()
+    tt = ['GMSK'] * 8
+    print(tt)
 
 
 

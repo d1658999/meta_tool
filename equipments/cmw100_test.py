@@ -320,11 +320,7 @@ class CMW100(CMW):
         scs: FDD is forced to 15KHz and TDD is to be 30KHz
         """
         logger.info('----------Sig Gen for FR1----------')
-        self.band_fr1 = int(self.band_fr1)
-        scs = 1 if self.band_fr1 in [34, 38, 39, 40, 41, 42, 48, 77, 78,
-                                     79] else 0  # for now FDD is forced to 15KHz and TDD is to be 30KHz
-        scs = 15 * (2 ** scs)
-        self.scs = scs
+        self.select_scs_fr1(self.band_fr1)
         self.system_base_option_version_query('CMW_NRSub6G_Meas')
         self.set_rf_rx_port_gprf(18)
         self.cmw_query('*OPC?')
@@ -338,7 +334,7 @@ class CMW100(CMW):
         self.cmw_query('*OPC?')
         self.set_uldl_periodicity_fr1()
         self.cmw_query('*OPC?')
-        self.set_waveform_fr1(self.bw_fr1, scs, mcs=4)
+        self.set_waveform_fr1(self.bw_fr1, self.scs, mcs=4)
         self.cmw_query('*OPC?')
         self.get_arb_file_query_gprf()
         self.set_rx_freq_gprf(self.rx_freq_fr1)
@@ -420,80 +416,6 @@ class CMW100(CMW):
             self.set_generator_state_gprf()
             self.cmw_query('*OPC?')
 
-    def sync_fr1(self):
-        logger.info('---------Sync----------')
-        scs = 1 if self.band_fr1 in [34, 38, 39, 40, 41, 42, 48, 75, 76, 77, 78, 79] else 0
-        response = self.command(
-            f'AT+NRFSYNC={self.sync_path_dict[self.sync_path]},{self.sync_mode},{scs},{self.bw_fr1_dict[self.bw_fr1]},0,{self.rx_freq_fr1}',
-            delay=1)
-        while b'+NRFSYNC:1\r\n' not in response:
-            logger.info('**********Sync repeat**********')
-            time.sleep(1)
-            response = self.command(
-                f'AT+NRFSYNC={self.sync_path_dict[self.sync_path]},{self.sync_mode},{scs},{self.bw_fr1_dict[self.bw_fr1]},0,{self.rx_freq_fr1}',
-                delay=2)
-
-    def sync_lte(self):
-        logger.info('---------Sync----------')
-        response = self.command(f'AT+LSYNC={self.sync_path_dict[self.sync_path]},{self.sync_mode},{self.rx_freq_lte}',
-                                delay=1.2)
-        while b'+LSYNC:1\r\n' not in response:
-            logger.info('**********Sync repeat**********')
-            time.sleep(1)
-            response = self.command(
-                f'AT+LSYNC={self.sync_path_dict[self.sync_path]},{self.sync_mode},{self.rx_freq_lte}', delay=2)
-
-    def sync_wcdma(self):
-        logger.info('---------Sync----------')
-        self.command(f'AT+HDLSYNC={self.rx_chan_wcdma}', delay=0.5)
-
-    def sync_gsm(self):
-        logger.info('---------Sync----------')
-        self.command(f'AT+TESTRESET', delay=0.2)
-        self.command(
-            f'AT+TESTSYNC={self.band_tx_set_dict_gsm[self.band_gsm]},0,{self.rx_chan_gsm},{-1 * int(round(self.rx_level, 0))}',
-            delay=0.5)
-
-    def tx_set_fr1(self):
-        logger.info('---------Tx Set----------')
-        self.command(
-            f'AT+NTXSENDREQ={self.tx_path_dict[self.tx_path]},{self.tx_freq_fr1},{self.bw_fr1_dict[self.bw_fr1]},{self.scs_dict[self.scs]},{self.rb_size_fr1},{self.rb_start_fr1},{self.mcs_fr1_dict[self.mcs_fr1]},{self.type_dict[self.type_fr1]},{self.tx_level}')
-        logger.info(
-            f'TX_PATH: {self.tx_path}, BW: {self.bw_fr1}, TX_FREQ: {self.tx_freq_fr1}, RB_SIZE: {self.rb_size_fr1}, RB_OFFSET: {self.rb_start_fr1}, MCS: {self.mcs_fr1}, TX_LEVEL: {self.tx_level}')
-        # self.command_cmw100_query('*OPC?')
-
-    def tx_set_lte(self):
-        """
-        tx_path: TX1: 0 (main path)| TX2: 1 (sub path)
-        bw_lte: 1.4: 0 | 3: 1 | 5: 2 | 10: 3 | 15: 4 | 20: 5
-        tx_freq_lte:
-        rb_num:
-        rb_start:
-        mcs: "QPSK": 0 | "Q16": 11 | "Q64": 25 | "Q256": 27
-        pwr:
-
-        """
-        logger.info('---------Tx Set----------')
-        self.command(
-            f'AT+LTXSENDREQ={self.tx_path_dict[self.tx_path]},{self.bw_lte_dict[self.bw_lte]},{self.tx_freq_lte},{self.rb_size_lte},{self.rb_start_lte},{self.mcs_lte_dict[self.mcs_lte]},2,1,{self.tx_level}')
-        logger.info(
-            f'TX_PATH: {self.tx_path}, BW: {self.bw_lte}, TX_FREQ: {self.tx_freq_lte}, RB_SIZE: {self.rb_size_lte}, RB_OFFSET: {self.rb_start_lte}, MCS: {self.mcs_lte}, TX_LEVEL: {self.tx_level}')
-        # self.command_cmw100_query('*OPC?')
-
-    def tx_set_wcdma(self):
-        logger.info('---------Tx Set----------')
-        self.command(f'AT+HDELULCHAN')
-        self.command(f'AT+HTXPERSTART={self.tx_chan_wcdma}')
-        self.command(f'AT+HSETMAXPOWER={self.tx_level * 10}')
-        logger.info(f'Tx_chan: {self.tx_chan_wcdma}, Tx_level: {self.tx_level}')
-
-    def tx_set_gsm(self):
-        logger.info('---------Tx Set----------')
-        self.command(
-            f'AT+TESTTX={self.band_tx_set_dict_gsm[self.band_gsm]},{self.mod_dict_gsm[self.mod_gsm]},{self.rx_chan_gsm},1,1')
-        self.command(f'AT+TESTPWR=0,{self.pcl},{self.pcl},{self.pcl},{self.pcl}')
-        logger.info(f'Band: {self.band_gsm}, Modulation: {self.mod_gsm}, Chan: {self.rx_chan_gsm}, PCL: {self.pcl}')
-
     def set_sem_limit_fr1(self, bw):
         self.set_spectrum_limit_fr1(1, bw, 0.015, 0.0985, round(-13.5 - 10 * math.log10(bw / 5), 1), 'K030')
         self.set_spectrum_limit_fr1(2, bw, 1.5, 4.5, -8.5, 'M1')
@@ -565,17 +487,26 @@ class CMW100(CMW):
         else:
             self.set_spectrum_limit_lte(9, bw * 10, 'ON', 20, 25, -25, 'M1')
 
+    def set_rx_level_search(self):
+        logger.info(f'==========Search: {self.rx_level} dBm==========')
+        self.set_rx_level_gprf(self.rx_level)
+        # self.command_cmw100_query('*OPC?')
+
     def select_mode_fdd_tdd(self, band):
         if self.tech == 'FR1':
             if band in [34, 38, 39, 40, 41, 42, 48, 75, 76, 77, 78, 79, ]:
                 self.set_duplexer_mode_fr1('TDD')
+                logger.info('========== Set TDD ==========')
             else:
                 self.set_duplexer_mode_fr1('FDD')
+                logger.info('========== Set FDD ==========')
         elif self.tech == 'LTE':
             if band in [34, 38, 39, 40, 41, 42, 48, ]:
                 self.set_duplexer_mode_lte('TDD')
+                logger.info('========== Set TDD ==========')
             else:
                 self.set_duplexer_mode_lte('FDD')
+                logger.info('========== Set FDD ==========')
 
     def select_scs_fr1(self, band):
         """
