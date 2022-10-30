@@ -10,6 +10,8 @@ import os
 import yaml
 
 from utils.log_init import log_set
+from utils.adb_control import get_serial_devices
+from utils.excel_handler import excel_folder_create
 
 # import ui_init
 # from power_supply import Psu
@@ -845,7 +847,7 @@ class MainApp:
             elif ch == 'H':
                 self.chan_H.set(True)
 
-        for script in ui_init['scripts']['scripts']:
+        for script in ui_init['test_scripts']['test_scripts']:
             if script == 'GENERAL':
                 self.general.set(True)
             elif script == 'FCC':
@@ -1042,8 +1044,8 @@ class MainApp:
             'instrument': {
                 'instrument': instrument,
             },
-            'scripts': {
-                'scripts': scripts,
+            'test_scripts': {
+                'test_scripts': scripts,
             },
             'type': {
                 'type_fr1': type_fr1,
@@ -2407,51 +2409,54 @@ class MainApp:
                 inst.run_rx_sweep_ch()
 
     def measure(self):
-        import want_test_band as wt
+        import utils.parameters.external_paramters as ext_pmt
+
+
         for button_run in self.button_run:
             button_run['state'] = tkinter.DISABLED
 
         self.export_ui_setting_yaml()
         # list-like
-        wt.tech = self.wanted_tech()
-        wt.endc_bands = self.wanted_band_ENDC()
-        wt.fr1_bands = self.wanted_band_FR1()
-        wt.lte_bands = self.wanted_band_LTE()
-        wt.wcdma_bands = self.wanted_band_WCDMA()
-        wt.gsm_bands = self.wanted_band_GSM()
-        wt.hsupa_bands = self.wanted_band_HSUPA()
-        wt.hsdpa_bands = self.wanted_band_HSDPA()
-        wt.lte_bandwidths = self.wanted_bw()
-        wt.fr1_bandwidths = self.wanted_bw_fr1()
-        wt.channel = self.wanted_chan()
-        wt.tx_max_pwr_sensitivity = self.wanted_ue_pwr()
-        wt.rb_ftm_lte = self.wanted_ftm_rb_lte()
-        wt.rb_ftm_fr1 = self.wanted_ftm_rb_fr1()
-        wt.tx_paths = self.wanted_tx_path()
-        wt.rx_paths = self.wanted_rx_path()
-        wt.mcs_lte = self.wanted_mcs_lte()
-        wt.mcs_fr1 = self.wanted_mcs_fr1()
-        wt.type_fr1 = self.wanted_type()
-        wt.scripts = self.wanted_scripts()
+        ext_pmt.devices_serial = get_serial_devices()
+        ext_pmt.tech = self.wanted_tech()
+        ext_pmt.endc_bands = self.wanted_band_ENDC()
+        ext_pmt.fr1_bands = self.wanted_band_FR1()
+        ext_pmt.lte_bands = self.wanted_band_LTE()
+        ext_pmt.wcdma_bands = self.wanted_band_WCDMA()
+        ext_pmt.gsm_bands = self.wanted_band_GSM()
+        ext_pmt.hsupa_bands = self.wanted_band_HSUPA()
+        ext_pmt.hsdpa_bands = self.wanted_band_HSDPA()
+        ext_pmt.lte_bandwidths = self.wanted_bw()
+        ext_pmt.fr1_bandwidths = self.wanted_bw_fr1()
+        ext_pmt.channel = self.wanted_chan()
+        ext_pmt.tx_max_pwr_sensitivity = self.wanted_ue_pwr()
+        ext_pmt.rb_ftm_lte = self.wanted_ftm_rb_lte()
+        ext_pmt.rb_ftm_fr1 = self.wanted_ftm_rb_fr1()
+        ext_pmt.tx_paths = self.wanted_tx_path()
+        ext_pmt.rx_paths = self.wanted_rx_path()
+        ext_pmt.mcs_lte = self.wanted_mcs_lte()
+        ext_pmt.mcs_fr1 = self.wanted_mcs_fr1()
+        ext_pmt.type_fr1 = self.wanted_type()
+        ext_pmt.scripts = self.wanted_scripts()
         # non list-lke
-        wt.port_tx = self.port_tx.get()
-        wt.port_tx_lte = self.port_tx_lte.get()
-        wt.port_tx_fr1 = self.port_tx_fr1.get()
-        wt.band_segment = self.band_segment.get()
-        wt.band_segment_fr1 = self.band_segment_fr1.get()
-        wt.rfout_anritsu = self.rfout_anritsu.get()
-        wt.asw_path = self.asw_path.get()
-        wt.srs_path = self.srs_path.get()
-        wt.srs_path_enable = self.srs_path_enable.get()
-        wt.sync_path = self.sync_path.get()
-        wt.sa_nsa = self.sa_nsa.get()
-        wt.mod_gsm = self.mod_gsm.get()
-        wt.tx_pcl_lb = self.pcl_lb.get()
-        wt.tx_pcl_mb = self.pcl_mb.get()
-        wt.tx_level = self.tx_level.get()
-        wt.psu_enable = self.psu_enable.get()
-        wt.odpm_enable = self.odpm_enable.get()
-        wt.condition = self.condition
+        ext_pmt.port_tx = self.port_tx.get()
+        ext_pmt.port_tx_lte = self.port_tx_lte.get()
+        ext_pmt.port_tx_fr1 = self.port_tx_fr1.get()
+        ext_pmt.band_segment = self.band_segment.get()
+        ext_pmt.band_segment_fr1 = self.band_segment_fr1.get()
+        ext_pmt.rfout_anritsu = self.rfout_anritsu.get()
+        ext_pmt.asw_path = self.asw_path.get()
+        ext_pmt.srs_path = self.srs_path.get()
+        ext_pmt.srs_path_enable = self.srs_path_enable.get()
+        ext_pmt.sync_path = self.sync_path.get()
+        ext_pmt.sa_nsa = self.sa_nsa.get()
+        ext_pmt.mod_gsm = self.mod_gsm.get()
+        ext_pmt.tx_pcl_lb = self.pcl_lb.get()
+        ext_pmt.tx_pcl_mb = self.pcl_mb.get()
+        ext_pmt.tx_level = self.tx_level.get()
+        ext_pmt.psu_enable = self.psu_enable.get()
+        ext_pmt.odpm_enable = self.odpm_enable.get()
+        ext_pmt.condition = self.condition
 
         if self.instrument.get() == 'Anritsu8820':
             from anritsu8820 import Anritsu8820
@@ -2508,6 +2513,7 @@ class MainApp:
 
         elif self.instrument.get() == 'Cmw100':
             from cmw100 import Cmw100
+            excel_folder_create()
             self.test_pipeline(Cmw100)
 
         for button_run in self.button_run:

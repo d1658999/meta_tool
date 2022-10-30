@@ -7,6 +7,7 @@ fr1_bands = [77, 78]
 endc_bands = ["3_78"]  # "3_78", "2_77","66_77"
 band_segment = 'A'  # 'A' | 'B' for B28A ,B28B
 band_segment_fr1 = 'B'
+devices_serial = None
 
 lte_bandwidths = [10]     # 1.4, 3, 5, 10, 15, 20
 fr1_bandwidths = [10]  # 10, 15, 20, 25, 30 , 40, 50, 60, 80, 90, 100, 70
@@ -60,10 +61,6 @@ scs = [1]  # 0: 15KHz | 1: 30KHz | 2: 60KHz
 tx_level_range_list = [-20, 26]  # tx_level_1, tx_level_2
 tx_pcl_range_list_lb = [19, 5]  # tx_pcl_1, tx_pcl_2; GMSK_LB: 5 ~ 19, EPSK_LB: 8~19
 tx_pcl_range_list_mb = [15, 0]  # tx_pcl_1, tx_pcl_2; GMSK_MB: 0 ~ 15, EPSK_MB: 2~15
-
-
-
-
 
 
 def main():

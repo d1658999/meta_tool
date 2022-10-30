@@ -10,7 +10,7 @@ from connection_interface.connection_serial import ModemComport
 from connection_interface.connection_visa import VisaComport
 # import fcc
 # import ce
-# import scripts
+# import test_scripts
 # # from varname import nameof
 # import math
 
@@ -1366,7 +1366,7 @@ class Cmw100:
                 # self.tx_level = wt.tx_level if ue_power_bool == 1 else -10
                 self.band_wcdma = item[2]
                 self.search_sensitivity_lmh_progress_wcdma()
-                # self.rx_desense_progress()
+                # self.rx_desense_process()
         self.rxs_relative_plot(self.filename, mode=1)  # mode=1: LMH mode
 
     def search_sensitivity_pipline_lte(self):
@@ -1546,11 +1546,11 @@ class Cmw100:
         #         for band_combo in wt.endc_bands:
         #             data = []
         #             [self.band_lte, self.band_fr1] = band_combo.split('_')
-        #             for bw_lte in scripts.ENDC[band_combo]:
+        #             for bw_lte in test_scripts.ENDC[band_combo]:
         #                 self.bw_lte = bw_lte
-        #                 for bw_fr1 in scripts.ENDC[band_combo][bw_lte]:
+        #                 for bw_fr1 in test_scripts.ENDC[band_combo][bw_lte]:
         #                     self.bw_fr1 = bw_fr1
-        #                     for chan_rb in scripts.ENDC[band_combo][bw_lte][bw_fr1]:
+        #                     for chan_rb in test_scripts.ENDC[band_combo][bw_lte][bw_fr1]:
         #                         (self.tx_freq_lte, self.tx_freq_fr1) = chan_rb[0]
         #                         (self.rb_size_lte, self.rb_start_lte) = chan_rb[1]
         #                         (self.rb_size_fr1, self.rb_start_fr1) = chan_rb[2]
@@ -1602,7 +1602,7 @@ class Cmw100:
         #             self.set_test_end_fr1(delay=0.5)
         #             self.set_test_end_lte(delay=0.5)
         #             self.endc_relative_power_senstivity_export_excel(data)
-        #         self.rx_desense_endc_progress()
+        #         self.rx_desense_endc_process()
         # self.rxs_endc_plot('Sensitivty_ENDC.xlsx')
 
     def search_sensitivity_pipline_fast_lte(
@@ -1630,7 +1630,7 @@ class Cmw100:
                             logger.debug(err)
                             logger.info(f'there is no data to plot because the band does not have this BW ')
 
-    def search_sensitivity_lmh_progress_gsm(self):
+    def search_sensitivity_lmh_process_gsm(self):
         rx_chan_list = cm_pmt_ftm.dl_chan_select_gsm(self.band_gsm)
 
         rx_chan_select_list = []
@@ -1770,7 +1770,7 @@ class Cmw100:
             self.filename = self.rx_power_relative_test_export_excel(data, self.band_lte, self.bw_lte, self.tx_level,
                                                                      mode=1)  # mode=1: LMH mode
 
-    def search_sensitivity_lmh_progress_fr1(self):
+    def search_sensitivity_lmh_process_fr1(self):
         rx_freq_list = cm_pmt_ftm.dl_freq_selected('FR1', self.band_fr1,
                                                    self.bw_fr1)  # [L_rx_freq, M_rx_ferq, H_rx_freq]
         rx_freq_select_list = []
@@ -1814,7 +1814,7 @@ class Cmw100:
             self.filename = self.rx_power_relative_test_export_excel(data, self.band_fr1, self.bw_fr1, self.tx_level,
                                                                      mode=1)  # mode=1: LMH mode
 
-    def search_sensitivity_lmh_fast_progress_lte(self):  # this is not yet used
+    def search_sensitivity_lmh_fast_process_lte(self):  # this is not yet used
         rx_freq_list = cm_pmt_ftm.dl_freq_selected('LTE', self.band_lte,
                                                    self.bw_lte)  # [L_rx_freq, M_rx_ferq, H_rx_freq]
         rx_freq_select_list = []
@@ -2373,7 +2373,7 @@ class Cmw100:
 
                 return filename
 
-    def rx_desense_progress(self):
+    def rx_desense_process(self):
         wb = openpyxl.load_workbook(self.filename)
         self.mcs = self.mcs_lte if self.mcs_lte is not None else self.mcs_fr1
 
@@ -6387,7 +6387,7 @@ def main():
     # cmw100.tx_level_sweep_pipeline_fr1()
 
     # cmw100.search_sensitivity_pipline_lte()
-    # cmw100.rx_desense_progress()
+    # cmw100.rx_desense_process()
     # cmw100.rxs_relative_plot('Sensitivty_10MHZ_LTE_LMH.xlsx', mode=1)
 
     # cmw100.search_sensitivity_pipline_lte()
@@ -6401,7 +6401,7 @@ def main():
     # cmw100.set_gprf_measurement()
     # cmw100.set_tx_freq_gprf()
     # cmw100.set_measure_start_on_gprf()
-    # cmw100.sensitivity_pipline_endc()
+    # cmw100.search_sensitivity_pipline_endc()
     # cmw100.preset_instrument()
     # cmw100.tx_monitor_lte()
     # cmw100.set_test_mode_wcdma()
