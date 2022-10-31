@@ -473,13 +473,15 @@ class RxTest(AtCmd, CMW100):
                     self.bw_fr1)  # for RB set(including special tx setting)
                 self.antenna_switch_v2()
                 self.tx_set_fr1()
-                aclr_mod_results = self.tx_measure_fr1()  # aclr_results + mod_results  # U_-2, U_-1, E_-1, Pwr, E_+1, U_+1, U_+2, EVM, Freq_Err, IQ_OFFSET
+                # aclr_results + mod_results  # U_-2, U_-1, E_-1, Pwr, E_+1, U_+1, U_+2, EVM, Freq_Err, IQ_OFFSET
+                aclr_mod_results = self.tx_measure_fr1()
                 # self.command_cmw100_query('*OPC?')
                 self.search_sensitivity_fr1()
                 self.query_rx_measure_fr1()
                 logger.info(f'Power: {aclr_mod_results[3]:.1f}, Sensitivity: {self.rx_level}')
+                # measured_power, measured_rx_level, rsrp_list, cinr_list, agc_list
                 data[self.tx_freq_fr1] = [aclr_mod_results[3], self.rx_level, self.rsrp_list, self.cinr_list,
-                                          self.agc_list]  # measured_power, measured_rx_level, rsrp_list, cinr_list, agc_list
+                                          self.agc_list]
                 self.set_test_end_fr1()
             parameters = {
                 'script': self.script,

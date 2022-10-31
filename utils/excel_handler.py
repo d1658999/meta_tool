@@ -150,11 +150,19 @@ def tx_power_relative_test_export_excel(data, parameters_dict):
             wb.remove(wb['Sheet'])
             # to create sheet
             if tech == 'LTE':
-                for mcs in ['QPSK', 'Q16', 'Q64', 'Q256']:  # some cmw10 might not have licesnse of Q256
+                # create dashboard
+                for mcs in ['QPSK', 'Q16', 'Q64', 'Q256']:  # some cmw100 might not have licesnse of Q256
+                    wb.create_sheet(f'Dashboard_{mcs}_PRB')
+                    wb.create_sheet(f'Dashboard_{mcs}_FRB')
+
+                # create the Raw data sheets
+                for mcs in ['QPSK', 'Q16', 'Q64', 'Q256']:  # some cmw100 might not have licesnse of Q256
                     wb.create_sheet(f'Raw_Data_{mcs}_PRB')
                     wb.create_sheet(f'Raw_Data_{mcs}_FRB')
 
-                    for sheetname in wb.sheetnames:
+                # create the title for every sheets
+                for sheetname in wb.sheetnames:
+                    if 'Raw_Data' in sheetname:
                         ws = wb[sheetname]
                         ws['A1'] = 'Band'
                         ws['B1'] = 'Tx_Freq'
@@ -180,12 +188,22 @@ def tx_power_relative_test_export_excel(data, parameters_dict):
                         ws['V1'] = 'Condition'
                         ws['W1'] = 'Temp0'
                         ws['X1'] = 'Temp1'
+                    else:  # to pass the dashboard
+                        pass
 
             elif tech == 'FR1':
+                # create dashboard
+                for mcs in ['QPSK', 'Q16', 'Q64', 'Q256']:  # some cmw100 might not have licesnse of Q256
+                    wb.create_sheet(f'Dashboard_{mcs}')
+                    wb.create_sheet(f'Dashboard_{mcs}')
+
+                # create the Raw data sheets
                 for mcs in ['QPSK', 'Q16', 'Q64', 'Q256', 'BPSK']:  # some cmw10 might not have licesnse of Q256
                     wb.create_sheet(f'Raw_Data_{mcs}')
 
-                    for sheetname in wb.sheetnames:
+                # create the title for every sheets
+                for sheetname in wb.sheetnames:
+                    if 'Raw_Data' in sheetname:
                         ws = wb[sheetname]
                         ws['A1'] = 'Band'
                         ws['B1'] = 'Tx_Freq'
@@ -213,70 +231,83 @@ def tx_power_relative_test_export_excel(data, parameters_dict):
                         ws['X1'] = 'Condition'
                         ws['Y1'] = 'Temp0'
                         ws['Z1'] = 'Temp1'
+                    else:  # to pass the dashboard
+                        pass
 
             elif tech == 'WCDMA':
+                # create dashboard
+                wb.create_sheet(f'Dashboard')
 
+                # create the Raw data sheets
                 wb.create_sheet(f'Raw_Data')
 
+                # create the title for every sheets
                 for sheetname in wb.sheetnames:
-                    ws = wb[sheetname]
-                    ws['A1'] = 'Band'
-                    ws['B1'] = 'Channel'
-                    ws['C1'] = 'Chan'
-                    ws['D1'] = 'Tx_Freq'
-                    ws['E1'] = 'Tx_level'
-                    ws['F1'] = 'Measured_Power'
-                    ws['G1'] = 'U_-1'
-                    ws['H1'] = 'U_+1'
-                    ws['I1'] = 'U_-2'
-                    ws['J1'] = 'U_+2'
-                    ws['K1'] = 'OBW'
-                    ws['L1'] = 'EVM'
-                    ws['M1'] = 'Freq_Err'
-                    ws['N1'] = 'IQ_OFFSET'
-                    ws['O1'] = 'Tx_Path'
-                    ws['P1'] = 'AS_Path'
-                    ws['Q1'] = 'Current(mA)'
-                    ws['R1'] = 'Condition'
-                    ws['S1'] = 'Temp0'
-                    ws['T1'] = 'Temp1'
+                    if 'Raw_Data' in sheetname:
+                        ws = wb[sheetname]
+                        ws['A1'] = 'Band'
+                        ws['B1'] = 'Channel'
+                        ws['C1'] = 'Chan'
+                        ws['D1'] = 'Tx_Freq'
+                        ws['E1'] = 'Tx_level'
+                        ws['F1'] = 'Measured_Power'
+                        ws['G1'] = 'U_-1'
+                        ws['H1'] = 'U_+1'
+                        ws['I1'] = 'U_-2'
+                        ws['J1'] = 'U_+2'
+                        ws['K1'] = 'OBW'
+                        ws['L1'] = 'EVM'
+                        ws['M1'] = 'Freq_Err'
+                        ws['N1'] = 'IQ_OFFSET'
+                        ws['O1'] = 'Tx_Path'
+                        ws['P1'] = 'AS_Path'
+                        ws['Q1'] = 'Current(mA)'
+                        ws['R1'] = 'Condition'
+                        ws['S1'] = 'Temp0'
+                        ws['T1'] = 'Temp1'
+                    else:  # to pass the dashboard
+                        pass
 
             elif tech == 'GSM':
+                # create dashboard
+                wb.create_sheet(f'Dashboard')
 
+                # create the Raw data sheets
                 wb.create_sheet(f'Raw_Data_GMSK')
                 wb.create_sheet(f'Raw_Data_EPSK')
 
+                # creat the title for every sheets
                 for sheetname in wb.sheetnames:
-                    ws = wb[sheetname]
-                    ws['A1'] = 'Band'
-                    ws['B1'] = 'Channel'
-                    ws['C1'] = 'Chan'
-                    ws['D1'] = 'Rx_Freq'
-                    ws['E1'] = 'Tx_PCL'
-                    ws['F1'] = 'Measured_Power'
-                    ws['G1'] = 'Phase_rms'
-                    ws['H1'] = 'EVM_rms'
-                    ws['I1'] = 'Ferr'
-                    ws['J1'] = 'ORFS_MOD_-200'
-                    ws['K1'] = 'ORFS_MOD_+200'
-                    ws['L1'] = 'ORFS_MOD_-400'
-                    ws['M1'] = 'ORFS_MOD_+400'
-                    ws['N1'] = 'ORFS_MOD_-600'
-                    ws['O1'] = 'ORFS_MOD_+600'
-                    ws['P1'] = 'ORFS_SW_-400'
-                    ws['Q1'] = 'ORFS_SW_+400'
-                    ws['R1'] = 'ORFS_SW_-600'
-                    ws['S1'] = 'ORFS_SW_+600'
-                    ws['T1'] = 'ORFS_SW_-1200'
-                    ws['U1'] = 'ORFS_SW_+1200'
-                    ws['V1'] = 'AS_Path'
-                    ws['W1'] = 'Current(mA)'
-                    ws['X1'] = 'Condition'
-                    ws['Y1'] = 'Temp0'
-                    ws['Z1'] = 'Temp1'
-
-            # create dashboard
-            wb.create_sheet(f'Dashboard')
+                    if 'Raw_Data' in sheetname:
+                        ws = wb[sheetname]
+                        ws['A1'] = 'Band'
+                        ws['B1'] = 'Channel'
+                        ws['C1'] = 'Chan'
+                        ws['D1'] = 'Rx_Freq'
+                        ws['E1'] = 'Tx_PCL'
+                        ws['F1'] = 'Measured_Power'
+                        ws['G1'] = 'Phase_rms'
+                        ws['H1'] = 'EVM_rms'
+                        ws['I1'] = 'Ferr'
+                        ws['J1'] = 'ORFS_MOD_-200'
+                        ws['K1'] = 'ORFS_MOD_+200'
+                        ws['L1'] = 'ORFS_MOD_-400'
+                        ws['M1'] = 'ORFS_MOD_+400'
+                        ws['N1'] = 'ORFS_MOD_-600'
+                        ws['O1'] = 'ORFS_MOD_+600'
+                        ws['P1'] = 'ORFS_SW_-400'
+                        ws['Q1'] = 'ORFS_SW_+400'
+                        ws['R1'] = 'ORFS_SW_-600'
+                        ws['S1'] = 'ORFS_SW_+600'
+                        ws['T1'] = 'ORFS_SW_-1200'
+                        ws['U1'] = 'ORFS_SW_+1200'
+                        ws['V1'] = 'AS_Path'
+                        ws['W1'] = 'Current(mA)'
+                        ws['X1'] = 'Condition'
+                        ws['Y1'] = 'Temp0'
+                        ws['Z1'] = 'Temp1'
+                    else:  # to pass the dashboard
+                        pass
 
             # save and close file
             wb.save(file_path)
@@ -301,8 +332,8 @@ def tx_power_relative_test_export_excel(data, parameters_dict):
                 for tx_level, measured_data in data.items():
                     chan = chan_judge_lte(band, bw, tx_freq_level)
                     ws.cell(row, 1).value = band
-                    ws.cell(row, 2).value = chan  # LMH
-                    ws.cell(row, 3).value = tx_freq_level  # this tx_freq_lte
+                    ws.cell(row, 2).value = tx_freq_level  # this freq_lte
+                    ws.cell(row, 3).value = chan  # LMH
                     ws.cell(row, 4).value = tx_level
                     ws.cell(row, 5).value = measured_data[3]
                     ws.cell(row, 6).value = measured_data[2]
@@ -326,8 +357,8 @@ def tx_power_relative_test_export_excel(data, parameters_dict):
                 for tx_freq, measured_data in data.items():
                     chan = chan_judge_lte(band, bw, tx_freq)
                     ws.cell(row, 1).value = band
-                    ws.cell(row, 2).value = chan  # # LMH
-                    ws.cell(row, 3).value = tx_freq
+                    ws.cell(row, 2).value = tx_freq
+                    ws.cell(row, 3).value = chan  # # LMH
                     ws.cell(row, 4).value = tx_freq_level  # this tx_level
                     ws.cell(row, 5).value = measured_data[3]
                     ws.cell(row, 6).value = measured_data[2]
@@ -349,7 +380,6 @@ def tx_power_relative_test_export_excel(data, parameters_dict):
                     ws.cell(row, 22).value = ext_pmt.condition
                     ws.cell(row, 23).value = measured_data[11]
                     ws.cell(row, 24).value = measured_data[12]
-
                     row += 1
 
         elif tech == 'FR1':
@@ -359,8 +389,8 @@ def tx_power_relative_test_export_excel(data, parameters_dict):
                 for tx_level, measured_data in data.items():
                     chan = chan_judge_fr1(band, bw, tx_freq_level)
                     ws.cell(row, 1).value = band
-                    ws.cell(row, 2).value = chan  # LMH
-                    ws.cell(row, 3).value = tx_freq_level  # this tx_freq_lte
+                    ws.cell(row, 2).value = tx_freq_level  # this freq_fr1
+                    ws.cell(row, 3).value = chan  # LMH
                     ws.cell(row, 4).value = tx_level
                     ws.cell(row, 5).value = measured_data[3]
                     ws.cell(row, 6).value = measured_data[2]
@@ -380,15 +410,14 @@ def tx_power_relative_test_export_excel(data, parameters_dict):
                     ws.cell(row, 20).value = rb_state
                     ws.cell(row, 21).value = sync_path
                     ws.cell(row, 22).value = asw_srs_path
-
                     row += 1
 
             elif tx_freq_level <= 100:
                 for tx_freq, measured_data in data.items():
                     chan = chan_judge_fr1(band, bw, tx_freq)
                     ws.cell(row, 1).value = band
-                    ws.cell(row, 2).value = chan  # LMH
-                    ws.cell(row, 3).value = tx_freq
+                    ws.cell(row, 2).value = tx_freq
+                    ws.cell(row, 3).value = chan  # LMH
                     ws.cell(row, 4).value = tx_freq_level  # this tx_level
                     ws.cell(row, 5).value = measured_data[3]
                     ws.cell(row, 6).value = measured_data[2]
@@ -412,7 +441,6 @@ def tx_power_relative_test_export_excel(data, parameters_dict):
                     ws.cell(row, 24).value = ext_pmt.condition
                     ws.cell(row, 25).value = measured_data[11]
                     ws.cell(row, 26).value = measured_data[12]
-
                     row += 1
 
         elif tech == 'WCDMA':
@@ -422,9 +450,9 @@ def tx_power_relative_test_export_excel(data, parameters_dict):
                 for tx_level, measured_data in data.items():
                     chan = chan_judge_wcdma(band, tx_freq_level)
                     ws.cell(row, 1).value = band
-                    ws.cell(row, 2).value = chan  # LMH
-                    ws.cell(row, 3).value = cm_pmt_ftm.trandfer_freq2chan_wcdma(band, tx_freq_level,
-                                                                                'tx')  # this channel
+                    # this channel
+                    ws.cell(row, 2).value = cm_pmt_ftm.trandfer_freq2chan_wcdma(band, tx_freq_level, 'tx')
+                    ws.cell(row, 3).value = chan  # LMH
                     ws.cell(row, 4).value = tx_freq_level  # this tx_freq_wcdma
                     ws.cell(row, 5).value = tx_level
                     ws.cell(row, 6).value = measured_data[0]
@@ -444,9 +472,8 @@ def tx_power_relative_test_export_excel(data, parameters_dict):
                 for tx_freq, measured_data in data.items():
                     chan = chan_judge_wcdma(band, tx_freq)
                     ws.cell(row, 1).value = band
-                    ws.cell(row, 2).value = chan  # # LMH
-                    ws.cell(row, 3).value = cm_pmt_ftm.trandfer_freq2chan_wcdma(band, tx_freq,
-                                                                                'tx')  # this channel
+                    ws.cell(row, 2).value = cm_pmt_ftm.trandfer_freq2chan_wcdma(band, tx_freq, 'tx')  # this channel
+                    ws.cell(row, 3).value = chan  # LMH
                     ws.cell(row, 4).value = tx_freq
                     ws.cell(row, 5).value = tx_freq_level  # this tx_level
                     ws.cell(row, 6).value = measured_data[0]
@@ -473,8 +500,8 @@ def tx_power_relative_test_export_excel(data, parameters_dict):
                 for tx_pcl, measured_data in data.items():
                     chan = chan_judge_gsm(band, tx_freq_level)
                     ws.cell(row, 1).value = band
-                    ws.cell(row, 2).value = chan  # LMH
-                    ws.cell(row, 3).value = cm_pmt_ftm.transfer_freq2chan_gsm(band, tx_freq_level)
+                    ws.cell(row, 2).value = cm_pmt_ftm.transfer_freq2chan_gsm(band, tx_freq_level)
+                    ws.cell(row, 3).value = chan  # LMH
                     ws.cell(row, 4).value = tx_freq_level  # this rx_freq_gsm
                     ws.cell(row, 5).value = tx_pcl
                     ws.cell(row, 6).value = measured_data[0]
@@ -501,8 +528,8 @@ def tx_power_relative_test_export_excel(data, parameters_dict):
                 for rx_freq, measured_data in data.items():
                     chan = chan_judge_gsm(band, rx_freq)
                     ws.cell(row, 1).value = band
-                    ws.cell(row, 2).value = chan  # LMH
-                    ws.cell(row, 3).value = cm_pmt_ftm.transfer_freq2chan_gsm(band, rx_freq)
+                    ws.cell(row, 2).value = cm_pmt_ftm.transfer_freq2chan_gsm(band, rx_freq)
+                    ws.cell(row, 3).value = chan  # LMH
                     ws.cell(row, 4).value = rx_freq  # this rx_freq_gsm
                     ws.cell(row, 5).value = tx_freq_level  # this pcl
                     ws.cell(row, 6).value = measured_data[0]
@@ -526,15 +553,15 @@ def tx_power_relative_test_export_excel(data, parameters_dict):
                     ws.cell(row, 24).value = ext_pmt.condition
                     ws.cell(row, 25).value = measured_data[17]
                     ws.cell(row, 26).value = measured_data[18]
-
                     row += 1
+
         wb.save(file_path)
         wb.close()
 
         return file_path
 
 
-def txp_aclr_evm_plot(file_path, parameters_dict):  # mode 0: general, mode 1: LMH
+def txp_aclr_evm_plot(file_path, parameters_dict):
     script = parameters_dict['script']
     tech = parameters_dict['tech']
     band = parameters_dict['band']
@@ -555,293 +582,303 @@ def txp_aclr_evm_plot(file_path, parameters_dict):  # mode 0: general, mode 1: L
     if script == 'GENERAL':
         if tech == 'LTE':
             for ws_name in wb.sheetnames:
-                logger.info(f'========={ws_name}==========')
-                ws = wb[ws_name]
+                if 'Raw_Data' in ws_name:
+                    logger.info(f'========={ws_name}==========')
+                    ws = wb[ws_name]
+                    ws_dashboard = wb['Dashboard_' + ws_name[9:]]
 
-                if ws._charts:  # if there is charts, delete it
-                    ws._charts.clear()
+                    if ws_dashboard._charts:  # if there is charts, delete it
+                        ws_dashboard._charts.clear()
 
-                logger.info('----------Power---------')
-                chart = LineChart()
-                chart.title = 'Power'
-                chart.y_axis.title = 'Power(dBm)'
-                chart.x_axis.title = 'Band'
-                chart.x_axis.tickLblPos = 'low'
+                    logger.info('----------Power---------')
+                    chart = LineChart()
+                    chart.title = 'Power'
+                    chart.y_axis.title = 'Power(dBm)'
+                    chart.x_axis.title = 'Band'
+                    chart.x_axis.tickLblPos = 'low'
 
-                chart.height = 20
-                chart.width = 32
+                    chart.height = 20
+                    chart.width = 32
 
-                y_data = Reference(ws, min_col=5, min_row=1, max_col=5, max_row=ws.max_row)
-                x_data = Reference(ws, min_col=1, min_row=2, max_col=2, max_row=ws.max_row)
-                chart.add_data(y_data, titles_from_data=True)
-                chart.set_categories(x_data)
+                    y_data = Reference(ws, min_col=5, min_row=1, max_col=5, max_row=ws.max_row)
+                    x_data = Reference(ws, min_col=1, min_row=2, max_col=2, max_row=ws.max_row)
+                    chart.add_data(y_data, titles_from_data=True)
+                    chart.set_categories(x_data)
 
-                chart.series[0].marker.symbol = 'circle'
-                chart.series[0].marker.size = 10
+                    chart.series[0].marker.symbol = 'circle'
+                    chart.series[0].marker.size = 10
 
-                ws.add_chart(chart, "Y1")
+                    ws_dashboard.add_chart(chart, "A1")
 
-                logger.info('----------ACLR---------')
-                chart = LineChart()
-                chart.title = 'ACLR'
-                chart.y_axis.title = 'ACLR(dB)'
-                chart.x_axis.title = 'Band'
-                chart.x_axis.tickLblPos = 'low'
-                chart.y_axis.scaling.min = -60
-                chart.y_axis.scaling.max = -20
+                    logger.info('----------ACLR---------')
+                    chart = LineChart()
+                    chart.title = 'ACLR'
+                    chart.y_axis.title = 'ACLR(dB)'
+                    chart.x_axis.title = 'Band'
+                    chart.x_axis.tickLblPos = 'low'
+                    chart.y_axis.scaling.min = -60
+                    chart.y_axis.scaling.max = -20
 
-                chart.height = 20
-                chart.width = 32
+                    chart.height = 20
+                    chart.width = 32
 
-                y_data = Reference(ws, min_col=6, min_row=1, max_col=11, max_row=ws.max_row)
-                x_data = Reference(ws, min_col=1, min_row=2, max_col=2, max_row=ws.max_row)
-                chart.add_data(y_data, titles_from_data=True)
-                chart.set_categories(x_data)
+                    y_data = Reference(ws, min_col=6, min_row=1, max_col=11, max_row=ws.max_row)
+                    x_data = Reference(ws, min_col=1, min_row=2, max_col=2, max_row=ws.max_row)
+                    chart.add_data(y_data, titles_from_data=True)
+                    chart.set_categories(x_data)
 
-                chart.series[0].marker.symbol = 'triangle'  # for EUTRA_-1
-                chart.series[0].marker.size = 10
-                chart.series[1].marker.symbol = 'circle'  # for EUTRA_+1
-                chart.series[1].marker.size = 10
-                chart.series[2].graphicalProperties.line.width = 50000  # for UTRA_-1
-                chart.series[3].graphicalProperties.line.width = 50000  # for UTRA_+1
-                chart.series[4].graphicalProperties.line.dashStyle = 'dash'  # for UTRA_-2
-                chart.series[5].graphicalProperties.line.dashStyle = 'dash'  # for UTRA_+2
+                    chart.series[0].marker.symbol = 'triangle'  # for EUTRA_-1
+                    chart.series[0].marker.size = 10
+                    chart.series[1].marker.symbol = 'circle'  # for EUTRA_+1
+                    chart.series[1].marker.size = 10
+                    chart.series[2].graphicalProperties.line.width = 50000  # for UTRA_-1
+                    chart.series[3].graphicalProperties.line.width = 50000  # for UTRA_+1
+                    chart.series[4].graphicalProperties.line.dashStyle = 'dash'  # for UTRA_-2
+                    chart.series[5].graphicalProperties.line.dashStyle = 'dash'  # for UTRA_+2
 
-                ws.add_chart(chart, "Y39")
+                    ws_dashboard.add_chart(chart, "A39")
 
-                logger.info('----------EVM---------')
-                chart = LineChart()
-                chart.title = 'EVM'
-                chart.y_axis.title = 'EVM(%)'
-                chart.x_axis.title = 'Band'
-                chart.x_axis.tickLblPos = 'low'
+                    logger.info('----------EVM---------')
+                    chart = LineChart()
+                    chart.title = 'EVM'
+                    chart.y_axis.title = 'EVM(%)'
+                    chart.x_axis.title = 'Band'
+                    chart.x_axis.tickLblPos = 'low'
 
-                chart.height = 20
-                chart.width = 32
+                    chart.height = 20
+                    chart.width = 32
 
-                y_data = Reference(ws, min_col=12, min_row=1, max_col=12, max_row=ws.max_row)
-                x_data = Reference(ws, min_col=1, min_row=2, max_col=2, max_row=ws.max_row)
-                chart.add_data(y_data, titles_from_data=True)
-                chart.set_categories(x_data)
+                    y_data = Reference(ws, min_col=12, min_row=1, max_col=12, max_row=ws.max_row)
+                    x_data = Reference(ws, min_col=1, min_row=2, max_col=2, max_row=ws.max_row)
+                    chart.add_data(y_data, titles_from_data=True)
+                    chart.set_categories(x_data)
 
-                chart.series[0].marker.symbol = 'circle'  # for EUTRA_+1
-                chart.series[0].marker.size = 10
+                    chart.series[0].marker.symbol = 'circle'  # for EUTRA_+1
+                    chart.series[0].marker.size = 10
 
-                ws.add_chart(chart, "Y77")
+                    ws_dashboard.add_chart(chart, "A77")
 
-                logger.info('----------Current---------')
-                chart = LineChart()
-                chart.title = 'Current'
-                chart.y_axis.title = 'Current(mA)'
-                chart.x_axis.title = 'Band'
-                chart.x_axis.tickLblPos = 'low'
+                    logger.info('----------Current---------')
+                    chart = LineChart()
+                    chart.title = 'Current'
+                    chart.y_axis.title = 'Current(mA)'
+                    chart.x_axis.title = 'Band'
+                    chart.x_axis.tickLblPos = 'low'
 
-                chart.height = 20
-                chart.width = 32
+                    chart.height = 20
+                    chart.width = 32
 
-                y_data = Reference(ws, min_col=21, min_row=1, max_col=21, max_row=ws.max_row)
-                x_data = Reference(ws, min_col=1, min_row=2, max_col=2, max_row=ws.max_row)
-                chart.add_data(y_data, titles_from_data=True)
-                chart.set_categories(x_data)
+                    y_data = Reference(ws, min_col=21, min_row=1, max_col=21, max_row=ws.max_row)
+                    x_data = Reference(ws, min_col=1, min_row=2, max_col=2, max_row=ws.max_row)
+                    chart.add_data(y_data, titles_from_data=True)
+                    chart.set_categories(x_data)
 
-                chart.series[0].marker.symbol = 'circle'
-                chart.series[0].marker.size = 10
+                    chart.series[0].marker.symbol = 'circle'
+                    chart.series[0].marker.size = 10
 
-                ws.add_chart(chart, "Y115")
+                    ws_dashboard.add_chart(chart, "A115")
+                else:
+                    pass
 
             wb.save(file_path)
             wb.close()
+
         elif tech == 'FR1':
             for ws_name in wb.sheetnames:
-                logger.info(f'========={ws_name}==========')
-                ws = wb[ws_name]
+                if 'Raw_Data' in ws_name:
+                    logger.info(f'========={ws_name}==========')
+                    ws = wb[ws_name]
+                    ws_dashboard = wb['Dashboard_' + ws_name[9:]]
 
-                if ws._charts != []:  # if there is charts, delete it
-                    ws._charts.clear()
+                    if ws_dashboard._charts:  # if there is charts, delete it
+                        ws_dashboard._charts.clear()
 
-                logger.info('----------Power---------')
-                chart = LineChart()
-                chart.title = 'Power'
-                chart.y_axis.title = 'Power(dBm)'
-                chart.x_axis.title = 'Band'
-                chart.x_axis.tickLblPos = 'low'
+                    logger.info('----------Power---------')
+                    chart = LineChart()
+                    chart.title = 'Power'
+                    chart.y_axis.title = 'Power(dBm)'
+                    chart.x_axis.title = 'Band'
+                    chart.x_axis.tickLblPos = 'low'
 
-                chart.height = 20
-                chart.width = 32
+                    chart.height = 20
+                    chart.width = 32
 
-                y_data = Reference(ws, min_col=5, min_row=1, max_col=5, max_row=ws.max_row)
-                x_data = Reference(ws, min_col=1, min_row=2, max_col=2, max_row=ws.max_row)
-                chart.add_data(y_data, titles_from_data=True)
-                chart.set_categories(x_data)
+                    y_data = Reference(ws, min_col=5, min_row=1, max_col=5, max_row=ws.max_row)
+                    x_data = Reference(ws, min_col=1, min_row=2, max_col=2, max_row=ws.max_row)
+                    chart.add_data(y_data, titles_from_data=True)
+                    chart.set_categories(x_data)
 
-                chart.series[0].marker.symbol = 'circle'  # for EUTRA_+1
-                chart.series[0].marker.size = 10
+                    chart.series[0].marker.symbol = 'circle'  # for EUTRA_+1
+                    chart.series[0].marker.size = 10
 
-                ws.add_chart(chart, "AA1")
+                    ws_dashboard.add_chart(chart, "A1")
 
-                logger.info('----------ACLR---------')
-                chart = LineChart()
-                chart.title = 'ACLR'
-                chart.y_axis.title = 'ACLR(dB)'
-                chart.x_axis.title = 'Band'
-                chart.x_axis.tickLblPos = 'low'
-                chart.y_axis.scaling.min = -60
-                chart.y_axis.scaling.max = -20
+                    logger.info('----------ACLR---------')
+                    chart = LineChart()
+                    chart.title = 'ACLR'
+                    chart.y_axis.title = 'ACLR(dB)'
+                    chart.x_axis.title = 'Band'
+                    chart.x_axis.tickLblPos = 'low'
+                    chart.y_axis.scaling.min = -60
+                    chart.y_axis.scaling.max = -20
 
-                chart.height = 20
-                chart.width = 32
+                    chart.height = 20
+                    chart.width = 32
 
-                y_data = Reference(ws, min_col=6, min_row=1, max_col=11, max_row=ws.max_row)
-                x_data = Reference(ws, min_col=1, min_row=2, max_col=2, max_row=ws.max_row)
-                chart.add_data(y_data, titles_from_data=True)
-                chart.set_categories(x_data)
+                    y_data = Reference(ws, min_col=6, min_row=1, max_col=11, max_row=ws.max_row)
+                    x_data = Reference(ws, min_col=1, min_row=2, max_col=2, max_row=ws.max_row)
+                    chart.add_data(y_data, titles_from_data=True)
+                    chart.set_categories(x_data)
 
-                chart.series[0].marker.symbol = 'triangle'  # for EUTRA_-1
-                chart.series[0].marker.size = 10
-                chart.series[1].marker.symbol = 'circle'  # for EUTRA_+1
-                chart.series[1].marker.size = 10
-                chart.series[2].graphicalProperties.line.width = 50000  # for UTRA_-1
-                chart.series[3].graphicalProperties.line.width = 50000  # for UTRA_+1
-                chart.series[4].graphicalProperties.line.dashStyle = 'dash'  # for UTRA_-2
-                chart.series[5].graphicalProperties.line.dashStyle = 'dash'  # for UTRA_+2
+                    chart.series[0].marker.symbol = 'triangle'  # for EUTRA_-1
+                    chart.series[0].marker.size = 10
+                    chart.series[1].marker.symbol = 'circle'  # for EUTRA_+1
+                    chart.series[1].marker.size = 10
+                    chart.series[2].graphicalProperties.line.width = 50000  # for UTRA_-1
+                    chart.series[3].graphicalProperties.line.width = 50000  # for UTRA_+1
+                    chart.series[4].graphicalProperties.line.dashStyle = 'dash'  # for UTRA_-2
+                    chart.series[5].graphicalProperties.line.dashStyle = 'dash'  # for UTRA_+2
 
-                ws.add_chart(chart, "AA39")
+                    ws_dashboard.add_chart(chart, "A39")
 
-                logger.info('----------EVM---------')
-                chart = LineChart()
-                chart.title = 'EVM'
-                chart.y_axis.title = 'EVM(%)'
-                chart.x_axis.title = 'Band'
-                chart.x_axis.tickLblPos = 'low'
+                    logger.info('----------EVM---------')
+                    chart = LineChart()
+                    chart.title = 'EVM'
+                    chart.y_axis.title = 'EVM(%)'
+                    chart.x_axis.title = 'Band'
+                    chart.x_axis.tickLblPos = 'low'
 
-                chart.height = 20
-                chart.width = 32
+                    chart.height = 20
+                    chart.width = 32
 
-                y_data = Reference(ws, min_col=12, min_row=1, max_col=12, max_row=ws.max_row)
-                x_data = Reference(ws, min_col=1, min_row=2, max_col=2, max_row=ws.max_row)
-                chart.add_data(y_data, titles_from_data=True)
-                chart.set_categories(x_data)
+                    y_data = Reference(ws, min_col=12, min_row=1, max_col=12, max_row=ws.max_row)
+                    x_data = Reference(ws, min_col=1, min_row=2, max_col=2, max_row=ws.max_row)
+                    chart.add_data(y_data, titles_from_data=True)
+                    chart.set_categories(x_data)
 
-                chart.series[0].marker.symbol = 'circle'  # for EUTRA_+1
-                chart.series[0].marker.size = 10
+                    chart.series[0].marker.symbol = 'circle'  # for EUTRA_+1
+                    chart.series[0].marker.size = 10
 
-                ws.add_chart(chart, "AA77")
+                    ws_dashboard.add_chart(chart, "A77")
 
-                logger.info('----------Current---------')
-                chart = LineChart()
-                chart.title = 'Current'
-                chart.y_axis.title = 'Current(mA)'
-                chart.x_axis.title = 'Band'
-                chart.x_axis.tickLblPos = 'low'
+                    logger.info('----------Current---------')
+                    chart = LineChart()
+                    chart.title = 'Current'
+                    chart.y_axis.title = 'Current(mA)'
+                    chart.x_axis.title = 'Band'
+                    chart.x_axis.tickLblPos = 'low'
 
-                chart.height = 20
-                chart.width = 32
+                    chart.height = 20
+                    chart.width = 32
 
-                y_data = Reference(ws, min_col=23, min_row=1, max_col=23, max_row=ws.max_row)
-                x_data = Reference(ws, min_col=1, min_row=2, max_col=2, max_row=ws.max_row)
-                chart.add_data(y_data, titles_from_data=True)
-                chart.set_categories(x_data)
+                    y_data = Reference(ws, min_col=23, min_row=1, max_col=23, max_row=ws.max_row)
+                    x_data = Reference(ws, min_col=1, min_row=2, max_col=2, max_row=ws.max_row)
+                    chart.add_data(y_data, titles_from_data=True)
+                    chart.set_categories(x_data)
 
-                chart.series[0].marker.symbol = 'circle'
-                chart.series[0].marker.size = 10
+                    chart.series[0].marker.symbol = 'circle'
+                    chart.series[0].marker.size = 10
 
-                ws.add_chart(chart, "AA115")
+                    ws_dashboard.add_chart(chart, "A115")
 
             wb.save(file_path)
             wb.close()
+
         elif tech == 'WCDMA':
             for ws_name in wb.sheetnames:
-                logger.info(f'========={ws_name}==========')
-                ws = wb[ws_name]
+                if 'Raw_Data' in ws_name:
+                    logger.info(f'========={ws_name}==========')
+                    ws = wb[ws_name]
+                    ws_dashboard = wb['Dashboard_' + ws_name[9:]]
 
-                if ws._charts != []:  # if there is charts, delete it
-                    ws._charts.clear()
+                    if ws_dashboard._charts:  # if there is charts, delete it
+                        ws_dashboard._charts.clear()
 
-                logger.info('----------Power---------')
-                chart = LineChart()
-                chart.title = 'Power'
-                chart.y_axis.title = 'Power(dBm)'
-                chart.x_axis.title = 'Band'
-                chart.x_axis.tickLblPos = 'low'
+                    logger.info('----------Power---------')
+                    chart = LineChart()
+                    chart.title = 'Power'
+                    chart.y_axis.title = 'Power(dBm)'
+                    chart.x_axis.title = 'Band'
+                    chart.x_axis.tickLblPos = 'low'
 
-                chart.height = 20
-                chart.width = 32
+                    chart.height = 20
+                    chart.width = 32
 
-                y_data = Reference(ws, min_col=6, min_row=1, max_col=6, max_row=ws.max_row)
-                x_data = Reference(ws, min_col=1, min_row=2, max_col=2, max_row=ws.max_row)
-                chart.add_data(y_data, titles_from_data=True)
-                chart.set_categories(x_data)
+                    y_data = Reference(ws, min_col=6, min_row=1, max_col=6, max_row=ws.max_row)
+                    x_data = Reference(ws, min_col=1, min_row=2, max_col=2, max_row=ws.max_row)
+                    chart.add_data(y_data, titles_from_data=True)
+                    chart.set_categories(x_data)
 
-                chart.series[0].marker.symbol = 'circle'  # for EUTRA_+1
-                chart.series[0].marker.size = 10
+                    chart.series[0].marker.symbol = 'circle'  # for EUTRA_+1
+                    chart.series[0].marker.size = 10
 
-                ws.add_chart(chart, "U1")
+                    ws_dashboard.add_chart(chart, "A1")
 
-                logger.info('----------ACLR---------')
-                chart = LineChart()
-                chart.title = 'ACLR'
-                chart.y_axis.title = 'ACLR(dB)'
-                chart.x_axis.title = 'Band'
-                chart.x_axis.tickLblPos = 'low'
-                chart.y_axis.scaling.min = -60
-                chart.y_axis.scaling.max = -20
+                    logger.info('----------ACLR---------')
+                    chart = LineChart()
+                    chart.title = 'ACLR'
+                    chart.y_axis.title = 'ACLR(dB)'
+                    chart.x_axis.title = 'Band'
+                    chart.x_axis.tickLblPos = 'low'
+                    chart.y_axis.scaling.min = -60
+                    chart.y_axis.scaling.max = -20
 
-                chart.height = 20
-                chart.width = 32
+                    chart.height = 20
+                    chart.width = 32
 
-                y_data = Reference(ws, min_col=7, min_row=1, max_col=10, max_row=ws.max_row)
-                x_data = Reference(ws, min_col=1, min_row=2, max_col=2, max_row=ws.max_row)
-                chart.add_data(y_data, titles_from_data=True)
-                chart.set_categories(x_data)
+                    y_data = Reference(ws, min_col=7, min_row=1, max_col=10, max_row=ws.max_row)
+                    x_data = Reference(ws, min_col=1, min_row=2, max_col=2, max_row=ws.max_row)
+                    chart.add_data(y_data, titles_from_data=True)
+                    chart.set_categories(x_data)
 
-                chart.series[0].marker.symbol = 'triangle'  # for UTRA_-1
-                chart.series[0].marker.size = 10
-                chart.series[1].marker.symbol = 'circle'  # for UTRA_+1
-                chart.series[1].marker.size = 10
-                chart.series[2].graphicalProperties.line.width = 50000  # for UTRA_-2
-                chart.series[3].graphicalProperties.line.width = 50000  # for UTRA_+2
+                    chart.series[0].marker.symbol = 'triangle'  # for UTRA_-1
+                    chart.series[0].marker.size = 10
+                    chart.series[1].marker.symbol = 'circle'  # for UTRA_+1
+                    chart.series[1].marker.size = 10
+                    chart.series[2].graphicalProperties.line.width = 50000  # for UTRA_-2
+                    chart.series[3].graphicalProperties.line.width = 50000  # for UTRA_+2
 
-                ws.add_chart(chart, "U39")
+                    ws_dashboard.add_chart(chart, "A39")
 
-                logger.info('----------EVM---------')
-                chart = LineChart()
-                chart.title = 'EVM'
-                chart.y_axis.title = 'EVM(%)'
-                chart.x_axis.title = 'Band'
-                chart.x_axis.tickLblPos = 'low'
+                    logger.info('----------EVM---------')
+                    chart = LineChart()
+                    chart.title = 'EVM'
+                    chart.y_axis.title = 'EVM(%)'
+                    chart.x_axis.title = 'Band'
+                    chart.x_axis.tickLblPos = 'low'
 
-                chart.height = 20
-                chart.width = 32
+                    chart.height = 20
+                    chart.width = 32
 
-                y_data = Reference(ws, min_col=12, min_row=1, max_col=12, max_row=ws.max_row)
-                x_data = Reference(ws, min_col=1, min_row=2, max_col=2, max_row=ws.max_row)
-                chart.add_data(y_data, titles_from_data=True)
-                chart.set_categories(x_data)
+                    y_data = Reference(ws, min_col=12, min_row=1, max_col=12, max_row=ws.max_row)
+                    x_data = Reference(ws, min_col=1, min_row=2, max_col=2, max_row=ws.max_row)
+                    chart.add_data(y_data, titles_from_data=True)
+                    chart.set_categories(x_data)
 
-                chart.series[0].marker.symbol = 'circle'  # for EUTRA_+1
-                chart.series[0].marker.size = 10
+                    chart.series[0].marker.symbol = 'circle'  # for EUTRA_+1
+                    chart.series[0].marker.size = 10
 
-                ws.add_chart(chart, "U77")
+                    ws_dashboard.add_chart(chart, "A77")
 
-                logger.info('----------Current---------')
-                chart = LineChart()
-                chart.title = 'Current'
-                chart.y_axis.title = 'Current(mA)'
-                chart.x_axis.title = 'Band'
-                chart.x_axis.tickLblPos = 'low'
+                    logger.info('----------Current---------')
+                    chart = LineChart()
+                    chart.title = 'Current'
+                    chart.y_axis.title = 'Current(mA)'
+                    chart.x_axis.title = 'Band'
+                    chart.x_axis.tickLblPos = 'low'
 
-                chart.height = 20
-                chart.width = 32
+                    chart.height = 20
+                    chart.width = 32
 
-                y_data = Reference(ws, min_col=17, min_row=1, max_col=17, max_row=ws.max_row)
-                x_data = Reference(ws, min_col=1, min_row=2, max_col=2, max_row=ws.max_row)
-                chart.add_data(y_data, titles_from_data=True)
-                chart.set_categories(x_data)
+                    y_data = Reference(ws, min_col=17, min_row=1, max_col=17, max_row=ws.max_row)
+                    x_data = Reference(ws, min_col=1, min_row=2, max_col=2, max_row=ws.max_row)
+                    chart.add_data(y_data, titles_from_data=True)
+                    chart.set_categories(x_data)
 
-                chart.series[0].marker.symbol = 'circle'
-                chart.series[0].marker.size = 10
+                    chart.series[0].marker.symbol = 'circle'
+                    chart.series[0].marker.size = 10
 
-                ws.add_chart(chart, "U115")
+                    ws_dashboard.add_chart(chart, "A115")
 
             wb.save(file_path)
             wb.close()
@@ -849,9 +886,10 @@ def txp_aclr_evm_plot(file_path, parameters_dict):  # mode 0: general, mode 1: L
             for ws_name in wb.sheetnames:
                 logger.info(f'========={ws_name}==========')
                 ws = wb[ws_name]
+                ws_dashboard = wb['Dashboard_' + ws_name[9:]]
 
-                if ws._charts != []:  # if there is charts, delete it
-                    ws._charts.clear()
+                if ws_dashboard._charts:  # if there is charts, delete it
+                    ws_dashboard._charts.clear()
 
                 logger.info('----------Power---------')
                 chart = LineChart()
@@ -871,7 +909,7 @@ def txp_aclr_evm_plot(file_path, parameters_dict):  # mode 0: general, mode 1: L
                 chart.series[0].marker.symbol = 'circle'  # for EUTRA_+1
                 chart.series[0].marker.size = 10
 
-                ws.add_chart(chart, "AA1")
+                ws_dashboard.add_chart(chart, "A1")
 
                 logger.info('----------ORFS_MOD---------')
                 chart = LineChart()
@@ -899,7 +937,7 @@ def txp_aclr_evm_plot(file_path, parameters_dict):  # mode 0: general, mode 1: L
                 chart.series[4].graphicalProperties.line.dashStyle = 'dash'  # for ORFS_-600
                 chart.series[5].graphicalProperties.line.dashStyle = 'dash'  # for ORFS_+600
 
-                ws.add_chart(chart, "AA39")
+                ws_dashboard.add_chart(chart, "A39")
 
                 logger.info('----------ORFS_SW---------')
                 chart = LineChart()
@@ -927,7 +965,7 @@ def txp_aclr_evm_plot(file_path, parameters_dict):  # mode 0: general, mode 1: L
                 chart.series[4].graphicalProperties.line.dashStyle = 'dash'  # for ORFS_-1200
                 chart.series[5].graphicalProperties.line.dashStyle = 'dash'  # for ORFS_+1200
 
-                ws.add_chart(chart, "AA77")
+                ws_dashboard.add_chart(chart, "A77")
 
                 if 'GMSK' in ws_name:
                     logger.info('----------PHASE_RMS---------')
@@ -948,7 +986,7 @@ def txp_aclr_evm_plot(file_path, parameters_dict):  # mode 0: general, mode 1: L
                     chart.series[0].marker.symbol = 'circle'
                     chart.series[0].marker.size = 10
 
-                    ws.add_chart(chart, "AA115")
+                    ws_dashboard.add_chart(chart, "A115")
 
                 elif 'EPSK' in ws_name:
                     logger.info('----------EVM_RMS---------')
@@ -969,7 +1007,7 @@ def txp_aclr_evm_plot(file_path, parameters_dict):  # mode 0: general, mode 1: L
                     chart.series[0].marker.symbol = 'circle'
                     chart.series[0].marker.size = 10
 
-                    ws.add_chart(chart, "AA115")
+                    ws_dashboard.add_chart(chart, "A115")
 
                 logger.info('----------Current---------')
                 chart = LineChart()
@@ -989,7 +1027,7 @@ def txp_aclr_evm_plot(file_path, parameters_dict):  # mode 0: general, mode 1: L
                 chart.series[0].marker.symbol = 'circle'
                 chart.series[0].marker.size = 10
 
-                ws.add_chart(chart, "AA153")
+                ws_dashboard.add_chart(chart, "A153")
 
             wb.save(file_path)
             wb.close()
@@ -1017,33 +1055,39 @@ def rx_power_relative_test_export_excel(data, parameters_dict):
             logger.info('----------file does not exist----------')
             wb = openpyxl.Workbook()
             wb.remove(wb['Sheet'])
+            # create dashboard
+            wb.create_sheet(f'Dashboard')
+
             # to create sheet
             if tech == 'LTE':
                 # create the title and sheet for TxManx and -10dBm
                 wb.create_sheet(f'Raw_Data_{mcs}_TxMax')
                 wb.create_sheet(f'Raw_Data_{mcs}_-10dBm')
                 for sheetname in wb.sheetnames:
-                    ws = wb[sheetname]
-                    ws['A1'] = 'Band'
-                    ws['B1'] = 'RX_Path'
-                    ws['C1'] = 'Chan'
-                    ws['D1'] = 'Tx_Freq'
-                    ws['E1'] = 'Tx_level'
-                    ws['F1'] = 'Power'
-                    ws['G1'] = 'Rx_Level'
-                    ws['H1'] = 'RSRP_RX0'
-                    ws['I1'] = 'RSRP_RX1'
-                    ws['J1'] = 'RSRP_RX2'
-                    ws['K1'] = 'RSRP_RX3'
-                    ws['L1'] = 'CINR_RX0'
-                    ws['M1'] = 'CINR_RX1'
-                    ws['N1'] = 'CINR_RX2'
-                    ws['O1'] = 'CINR_RX3'
-                    ws['P1'] = 'AGC_RX0'
-                    ws['Q1'] = 'AGC_RX1'
-                    ws['R1'] = 'AGC_RX2'
-                    ws['S1'] = 'AGC_RX3'
-                    ws['T1'] = 'TX_Path'
+                    if 'Raw_Data' in sheetname:
+                        ws = wb[sheetname]
+                        ws['A1'] = 'Band'
+                        ws['B1'] = 'RX_Path'
+                        ws['C1'] = 'Chan'
+                        ws['D1'] = 'Tx_Freq'
+                        ws['E1'] = 'Tx_level'
+                        ws['F1'] = 'Power'
+                        ws['G1'] = 'Rx_Level'
+                        ws['H1'] = 'RSRP_RX0'
+                        ws['I1'] = 'RSRP_RX1'
+                        ws['J1'] = 'RSRP_RX2'
+                        ws['K1'] = 'RSRP_RX3'
+                        ws['L1'] = 'CINR_RX0'
+                        ws['M1'] = 'CINR_RX1'
+                        ws['N1'] = 'CINR_RX2'
+                        ws['O1'] = 'CINR_RX3'
+                        ws['P1'] = 'AGC_RX0'
+                        ws['Q1'] = 'AGC_RX1'
+                        ws['R1'] = 'AGC_RX2'
+                        ws['S1'] = 'AGC_RX3'
+                        ws['T1'] = 'TX_Path'
+                    else:
+                        pass
 
                 # create the title and sheet for Desense
                 wb.create_sheet(f'Desens_{mcs}')
@@ -1059,27 +1103,30 @@ def rx_power_relative_test_export_excel(data, parameters_dict):
                 wb.create_sheet(f'Raw_Data_{mcs}_TxMax')
                 wb.create_sheet(f'Raw_Data_{mcs}_-10dBm')
                 for sheetname in wb.sheetnames:
-                    ws = wb[sheetname]
-                    ws['A1'] = 'Band'
-                    ws['B1'] = 'RX_Path'
-                    ws['C1'] = 'Chan'
-                    ws['D1'] = 'Tx_Freq'
-                    ws['E1'] = 'Tx_level'
-                    ws['F1'] = 'Power'
-                    ws['G1'] = 'Rx_Level'
-                    ws['H1'] = 'RSRP_RX0'
-                    ws['I1'] = 'RSRP_RX1'
-                    ws['J1'] = 'RSRP_RX2'
-                    ws['K1'] = 'RSRP_RX3'
-                    ws['L1'] = 'CINR_RX0'
-                    ws['M1'] = 'CINR_RX1'
-                    ws['N1'] = 'CINR_RX2'
-                    ws['O1'] = 'CINR_RX3'
-                    ws['P1'] = 'AGC_RX0'
-                    ws['Q1'] = 'AGC_RX1'
-                    ws['R1'] = 'AGC_RX2'
-                    ws['S1'] = 'AGC_RX3'
-                    ws['T1'] = 'TX_Path'
+                    if 'Raw_Data' in sheetname:
+                        ws = wb[sheetname]
+                        ws['A1'] = 'Band'
+                        ws['B1'] = 'RX_Path'
+                        ws['C1'] = 'Chan'
+                        ws['D1'] = 'Tx_Freq'
+                        ws['E1'] = 'Tx_level'
+                        ws['F1'] = 'Power'
+                        ws['G1'] = 'Rx_Level'
+                        ws['H1'] = 'RSRP_RX0'
+                        ws['I1'] = 'RSRP_RX1'
+                        ws['J1'] = 'RSRP_RX2'
+                        ws['K1'] = 'RSRP_RX3'
+                        ws['L1'] = 'CINR_RX0'
+                        ws['M1'] = 'CINR_RX1'
+                        ws['N1'] = 'CINR_RX2'
+                        ws['O1'] = 'CINR_RX3'
+                        ws['P1'] = 'AGC_RX0'
+                        ws['Q1'] = 'AGC_RX1'
+                        ws['R1'] = 'AGC_RX2'
+                        ws['S1'] = 'AGC_RX3'
+                        ws['T1'] = 'TX_Path'
+                    else:
+                        pass
 
                 # create the title and sheet for Desense
                 wb.create_sheet(f'Desens_{mcs}')
@@ -1122,9 +1169,6 @@ def rx_power_relative_test_export_excel(data, parameters_dict):
                     ws['E1'] = 'Rx_Freq'
                     ws['F1'] = 'Rx_Level'
                     ws['G1'] = 'RSSI'
-
-            # create dashboard
-            wb.create_sheet(f'Dashboard')
 
             # save and close file
             wb.save(file_path)
@@ -1174,6 +1218,7 @@ def rx_power_relative_test_export_excel(data, parameters_dict):
                 ws.cell(row, 19).value = measured_data[4][3]  # AGC_RX3
                 ws.cell(row, 20).value = tx_path
                 row += 1
+
         elif tech == 'FR1':
             max_row = ws.max_row
             row = max_row + 1  # skip title
@@ -1396,27 +1441,32 @@ def endc_relative_power_senstivity_export_excel(data):
         logger.info('----------file does not exist, so create a new one----------')
         wb = openpyxl.Workbook()
         wb.remove(wb['Sheet'])
+        # create dashboard
+        wb.create_sheet(f'Dashboard')
 
         # create the title and sheet for TxManx and -10dBm
         wb.create_sheet(f'Raw_Data_ENDC_FR1_TxMax')
         wb.create_sheet(f'Raw_Data_ENDC_FR1_-10dBm')
         for sheetname in wb.sheetnames:
-            ws = wb[sheetname]
-            ws['A1'] = 'Band_LTE'
-            ws['B1'] = 'Band_FR1'
-            ws['C1'] = 'Power_LTE_measured'
-            ws['D1'] = 'Power_FR1_measured'
-            ws['E1'] = 'Sensitivity_FR1'
-            ws['F1'] = 'BW_LTE'
-            ws['G1'] = 'BW_FR1'
-            ws['H1'] = 'Freq_tx_LTE'
-            ws['I1'] = 'Freq_tx_FR1'
-            ws['J1'] = 'Tx_level_LTE'
-            ws['K1'] = 'Tx_level_FR1'
-            ws['L1'] = 'rb_size_LTE'
-            ws['M1'] = 'rb_start_LTE'
-            ws['N1'] = 'rb_size_FR1'
-            ws['O1'] = 'rb_start_FR1'
+            if 'Raw_Data' in sheetname:
+                ws = wb[sheetname]
+                ws['A1'] = 'Band_LTE'
+                ws['B1'] = 'Band_FR1'
+                ws['C1'] = 'Power_LTE_measured'
+                ws['D1'] = 'Power_FR1_measured'
+                ws['E1'] = 'Sensitivity_FR1'
+                ws['F1'] = 'BW_LTE'
+                ws['G1'] = 'BW_FR1'
+                ws['H1'] = 'Freq_tx_LTE'
+                ws['I1'] = 'Freq_tx_FR1'
+                ws['J1'] = 'Tx_level_LTE'
+                ws['K1'] = 'Tx_level_FR1'
+                ws['L1'] = 'rb_size_LTE'
+                ws['M1'] = 'rb_start_LTE'
+                ws['N1'] = 'rb_size_FR1'
+                ws['O1'] = 'rb_start_FR1'
+            else:
+                pass
 
         # create the title and sheet for Desense
         wb.create_sheet(f'Desens_ENDC')
@@ -1428,9 +1478,6 @@ def endc_relative_power_senstivity_export_excel(data):
         ws['E1'] = 'Freq_tx_LTE'
         ws['F1'] = 'Freq_tx_FR1'
         ws['G1'] = 'Diff'
-
-        # create dashboard
-        wb.create_sheet(f'Dashboard')
 
         wb.save(file_path)
         wb.close()

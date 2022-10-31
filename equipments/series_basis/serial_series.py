@@ -47,6 +47,7 @@ class AtCmd:
         self.asw_on_off = 0  # 1: AS ON, 0: AS OFF
         self.asw_tech = None
         self.sync_path = None
+        self.asw_srs_path = None
         self.asw_path = None
         self.srs_path = None
         self.tx_path = None
@@ -436,12 +437,14 @@ class AtCmd:
         logger.info('---------Antenna Switch----------')
         self.command(f'AT+ANTSWSEL={self.asw_tech_dict[self.asw_tech]},{self.asw_path}')
         logger.info(f'RAT: {self.asw_tech}, ANT_PATH: {self.asw_path}')
+        self.asw_srs_path = self.asw_path
         # self.command_cmw100_query('*OPC?')
 
     def srs_switch(self):
         logger.info('---------SRS Switch----------')
         self.command(f'AT+NTXSRSSWPATHSET={self.srs_path}')
         logger.info(f'SRS_PATH: {self.srs_path}')
+        self.asw_srs_path = self.srs_path
 
     def rx_path_setting_fr1(self):
         """
@@ -591,3 +594,9 @@ class AtCmd:
                 self.rssi, self.fer = [round(r / 100, 2) for r in results]
                 logger.info(f'****RSSI: {self.rssi} ****')
                 logger.info(f'****FER: {self.fer} %****')
+
+    def query_thermister0(self):
+        return self.command('AT+GOOGTHERMISTOR=0,1')
+
+    def query_thermister1(self):
+        return self.command('AT+GOOGTHERMISTOR=1,1')
