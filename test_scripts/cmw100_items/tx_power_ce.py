@@ -23,7 +23,7 @@ def tx_power_pipline_ce_fr1(self):  # band > bw > mcs > rb
             else:
                 logger.info(f'B{self.band_fr1} does not have BW {self.bw_fr1}MHZ')
 
-    def tx_power_ce_fr1(self):
+def tx_power_ce_fr1(self):
         rx_freq_list = cm_pmt_ftm.dl_freq_selected('FR1', self.band_fr1,
                                                    self.bw_fr1)  # [L_rx_freq, M_rx_ferq, H_rx_freq]
         self.rx_freq_fr1 = rx_freq_list[1]

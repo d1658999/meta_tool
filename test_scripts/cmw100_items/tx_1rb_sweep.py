@@ -35,11 +35,11 @@ def tx_1rb_sweep_pipeline_fr1(self):
             logger.info(f'there is not file to plot BW{bw} ')
     self.tx_1rb_filename_judge = False
 
-    def run_tx_1rb_sweep(self):
-        for tech in wt.tech:
-            if tech == 'FR1':
-                self.tx_1rb_sweep_pipeline_fr1()
-            elif tech == 'LTE':
-                pass
+def run_tx_1rb_sweep(self):
+    for tech in wt.tech:
+        if tech == 'FR1':
+            self.tx_1rb_sweep_pipeline_fr1()
+        elif tech == 'LTE':
+            pass
             else:
                 pass
