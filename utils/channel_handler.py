@@ -1,8 +1,8 @@
 import utils.parameters.common_parameters_ftm as cm_pmt_ftm
 
-def channel_freq_select(chan, freq_list):
+def channel_freq_select(want_chan, freq_list):
     chan_freq_select_list = []
-    for ch in chan:
+    for ch in want_chan:
         if ch == 'L':
             chan_freq_select_list.append(freq_list[0])
         elif ch == 'M':

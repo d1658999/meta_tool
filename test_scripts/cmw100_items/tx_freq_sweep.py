@@ -120,7 +120,7 @@ def tx_freq_sweep_progress_gsm(self, plot=True):
                           rx_chan_range_list[:2]]
     rx_freq_range_list.append(step)
 
-    for script in wt.scripts:
+    for script in ext_pmt_ftm.scripts:
         if script == 'GENERAL':
             self.script = script
             data = {}

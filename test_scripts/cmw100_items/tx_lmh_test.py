@@ -7,6 +7,7 @@ from utils.loss_handler import get_loss
 from utils.adb_control import get_odpm_current
 from equipments.power_supply import Psu
 from utils.excel_handler import txp_aclr_evm_plot, tx_power_relative_test_export_excel, tx_power_fcc_ce_export_excel
+from utils.channel_handler import channel_freq_select
 
 logger = log_set('tx_lmh')
 
@@ -49,6 +50,12 @@ class TxTest(AtCmd, CMW100):
         else:
             return None
 
+    def select_asw_srs_path(self):
+        if self.srs_path_enable:
+            self.srs_switch()
+        else:
+            self.antenna_switch_v2()
+
     def tx_power_aclr_evm_lmh_pipeline_fr1(self):
         self.tx_level = ext_pmt.tx_level
         self.port_tx = ext_pmt.port_tx
@@ -71,13 +78,13 @@ class TxTest(AtCmd, CMW100):
                 self.band_fr1 = item[3]
                 self.type_fr1 = item[4]
                 if self.bw_fr1 in cm_pmt_ftm.bandwidths_selected_fr1(self.band_fr1):
-                    self.tx_power_aclr_evm_lmh_fr1(plot=False)
+                    self.tx_power_aclr_evm_lmh_fr1()
                 else:
                     logger.info(f'B{self.band_fr1} does not have BW {self.bw_fr1}MHZ')
         for bw in ext_pmt.fr1_bandwidths:
             try:
                 self.filename = f'TxP_ACLR_EVM_{bw}MHZ_{self.tech}_LMH.xlsx'
-                self.txp_aclr_evm_plot(self.filename, mode=1)  # mode=1: LMH mode
+                txp_aclr_evm_plot(self.filename, self.parameters)
             except TypeError:
                 logger.info(f'there is no data to plot because the band does not have this BW ')
             except FileNotFoundError:
@@ -101,13 +108,13 @@ class TxTest(AtCmd, CMW100):
                 self.bw_lte = item[2]
                 self.band_lte = item[3]
                 if self.bw_lte in cm_pmt_ftm.bandwidths_selected_lte(self.band_lte):
-                    self.tx_power_aclr_evm_lmh_lte(plot=False)
+                    self.tx_power_aclr_evm_lmh_lte()
                 else:
                     logger.info(f'B{self.band_lte} does not have BW {self.bw_lte}MHZ')
         for bw in ext_pmt.lte_bandwidths:
             try:
                 self.filename = f'TxP_ACLR_EVM_{bw}MHZ_{self.tech}_LMH.xlsx'
-                self.txp_aclr_evm_plot(self.filename, mode=1)  # mode=1: LMH mode
+                txp_aclr_evm_plot(self.filename, self.parameters)
             except TypeError:
                 logger.info(f'there is no data to plot because the band does not have this BW ')
             except FileNotFoundError:
@@ -122,8 +129,8 @@ class TxTest(AtCmd, CMW100):
                 self.tech = 'WCDMA'
                 for band in ext_pmt.wcdma_bands:
                     self.band_wcdma = band
-                    self.tx_power_aclr_evm_lmh_wcdma(plot=False)
-                self.txp_aclr_evm_plot(self.filename, mode=1)  # mode=1: LMH mode
+                    self.tx_power_aclr_evm_lmh_wcdma()
+                txp_aclr_evm_plot(self.filename, self.parameters)
 
     def tx_power_aclr_evm_lmh_pipeline_gsm(self):
         self.tx_level = ext_pmt.tx_level
@@ -137,8 +144,8 @@ class TxTest(AtCmd, CMW100):
                 for band in ext_pmt.gsm_bands:
                     self.pcl = ext_pmt.tx_pcl_lb if band in [850, 900] else ext_pmt.tx_pcl_mb
                     self.band_gsm = band
-                    self.tx_power_aclr_evm_lmh_gsm(plot=False)
-                self.txp_aclr_evm_plot(self.filename, mode=1)  # mode=1: LMH mode
+                    self.tx_power_aclr_evm_lmh_gsm()
+                txp_aclr_evm_plot(self.filename, self.parameters)
 
     def tx_power_aclr_evm_lmh_fr1(self):
         """
@@ -157,28 +164,19 @@ class TxTest(AtCmd, CMW100):
         # self.loss_rx = get_loss(rx_freq_list[1])
         logger.info('----------Test LMH progress---------')
         self.preset_instrument()
-        # self.set_test_end_fr1()
-        # self.set_test_mode_fr1()
-        # if self.srs_path_enable:
-        #     self.srs_switch()
-        # else:
-        #     self.antenna_switch_v2()
-        # self.sig_gen_fr1()
-        # self.sync_fr1()
+        self.set_test_end_fr1()
+        self.set_test_mode_fr1()
+        self.select_asw_srs_path()
+        self.sig_gen_fr1()
+        self.sync_fr1()
 
         scs = 1 if self.band_fr1 in [34, 38, 39, 40, 41, 42, 48, 77, 78,  # temp
                                      79] else 0  # for now FDD is forced to 15KHz and TDD is to be 30KHz  # temp
         scs = 15 * (2 ** scs)  # temp
         self.scs = scs  # temp
 
-        tx_freq_select_list = []
-        for chan in self.chan:
-            if chan == 'L':
-                tx_freq_select_list.append(cm_pmt_ftm.transfer_freq_rx2tx_fr1(self.band_fr1, rx_freq_list[0]))
-            elif chan == 'M':
-                tx_freq_select_list.append(cm_pmt_ftm.transfer_freq_rx2tx_fr1(self.band_fr1, rx_freq_list[1]))
-            elif chan == 'H':
-                tx_freq_select_list.append(cm_pmt_ftm.transfer_freq_rx2tx_fr1(self.band_fr1, rx_freq_list[2]))
+        tx_freq_lmh_list = [cm_pmt_ftm.transfer_freq_rx2tx_fr1(self.band_fr1, rx_freq) for rx_freq in rx_freq_list]
+        tx_freq_select_list = channel_freq_select(self.chan, tx_freq_lmh_list)
 
         for mcs in ext_pmt.mcs_fr1:
             self.mcs_fr1 = mcs
@@ -193,15 +191,12 @@ class TxTest(AtCmd, CMW100):
                             self.tx_freq_fr1 = tx_freq_fr1
                             self.rx_freq_fr1 = cm_pmt_ftm.transfer_freq_tx2rx_fr1(self.band_fr1, tx_freq_fr1)  # temp
                             self.loss_tx = get_loss(self.tx_freq_fr1)
-                            self.loss_rx = get_loss(rx_freq_list[1])  # temp
-                            self.set_test_end_fr1()  # temp
-                            self.set_test_mode_fr1()  # temp
-                            if self.srs_path_enable:  # temp
-                                self.srs_switch()  # temp
-                            else:  # temp
-                                self.antenna_switch_v2()  # temp
-                            self.sig_gen_fr1()  # temp
-                            self.sync_fr1()  # temp
+                            # self.loss_rx = get_loss(rx_freq_list[1])  # temp
+                            # self.set_test_end_fr1()  # temp
+                            # self.set_test_mode_fr1()  # temp
+                            # self.select_asw_srs_path() # temp
+                            # self.sig_gen_fr1()  # temp
+                            # self.sync_fr1()  # temp
                             self.tx_set_fr1()
                             aclr_mod_current_results = aclr_mod_results = self.tx_measure_fr1()
                             logger.debug(aclr_mod_results)
@@ -209,7 +204,7 @@ class TxTest(AtCmd, CMW100):
                             data_freq[self.tx_freq_fr1] = aclr_mod_current_results + self.get_temperature()
                         logger.debug(data_freq)
                         # ready to export to excel
-                        parameters = {
+                        self.parameters = {
                             'script': self.script,
                             'tech': self.tech,
                             'band': self.band_fr1,
@@ -226,7 +221,7 @@ class TxTest(AtCmd, CMW100):
                             'scs': self.scs,
                             'type': self.type_fr1,
                         }
-                        self.filename = tx_power_relative_test_export_excel(data_freq, parameters)
+                        self.filename = tx_power_relative_test_export_excel(data_freq, self.parameters)
         self.set_test_end_fr1()
 
     def tx_power_aclr_evm_lmh_lte(self):
@@ -252,14 +247,8 @@ class TxTest(AtCmd, CMW100):
         self.sig_gen_lte()
         self.sync_lte()
 
-        tx_freq_select_list = []
-        for chan in self.chan:
-            if chan == 'L':
-                tx_freq_select_list.append(cm_pmt_ftm.transfer_freq_rx2tx_lte(self.band_lte, rx_freq_list[0]))
-            elif chan == 'M':
-                tx_freq_select_list.append(cm_pmt_ftm.transfer_freq_rx2tx_lte(self.band_lte, rx_freq_list[1]))
-            elif chan == 'H':
-                tx_freq_select_list.append(cm_pmt_ftm.transfer_freq_rx2tx_lte(self.band_lte, rx_freq_list[2]))
+        tx_freq_lmh_list = [cm_pmt_ftm.transfer_freq_rx2tx_lte(self.band_lte, rx_freq) for rx_freq in rx_freq_list]
+        tx_freq_select_list = channel_freq_select(self.chan, tx_freq_lmh_list)
 
         for mcs in ext_pmt.mcs_lte:
             self.mcs_lte = mcs
@@ -281,9 +270,24 @@ class TxTest(AtCmd, CMW100):
                             data_freq[self.tx_freq_lte] = aclr_mod_current_results + self.get_temperature()
                         logger.debug(data_freq)
                         # ready to export to excel
-                        self.filename = tx_power_relative_test_export_excel(data_freq, self.band_lte, self.bw_lte,
-                                                                                 self.tx_level,
-                                                                                 mode=1)  # mode=1: LMH mode
+                        self.parameters = {
+                            'script': self.script,
+                            'tech': self.tech,
+                            'band': self.band_lte,
+                            'bw': self.bw_lte,
+                            'tx_freq_level': self.tx_freq_lte,
+                            'mcs': self.mcs_lte,
+                            'tx_path': self.tx_path,
+                            'mod': None,
+                            'rb_state': self.rb_state,
+                            'rb_size': self.rb_size_lte,
+                            'rb_start': self.rb_start_lte,
+                            'sync_path': self.sync_path,
+                            'asw_srs_path': self.asw_srs_path,
+                            'scs': self.scs,
+                            'type': None,
+                        }
+                        self.filename = tx_power_relative_test_export_excel(data_freq, self.parameters)
         self.set_test_end_lte()
 
     def tx_power_aclr_evm_lmh_wcdma(self):
@@ -300,14 +304,7 @@ class TxTest(AtCmd, CMW100):
         tx_chan_list = [cm_pmt_ftm.transfer_chan_rx2tx_wcdma(self.band_wcdma, rx_chan) for rx_chan in rx_chan_list]
         tx_rx_chan_list = list(zip(tx_chan_list, rx_chan_list))  # [(tx_chan, rx_chan),...]
 
-        tx_rx_chan_select_list = []
-        for chan in self.chan:
-            if chan == 'L':
-                tx_rx_chan_select_list.append(tx_rx_chan_list[0])
-            elif chan == 'M':
-                tx_rx_chan_select_list.append(tx_rx_chan_list[1])
-            elif chan == 'H':
-                tx_rx_chan_select_list.append(tx_rx_chan_list[2])
+        tx_rx_chan_select_list = channel_freq_select(self.chan, tx_rx_chan_list)
 
         self.preset_instrument()
 
@@ -334,14 +331,28 @@ class TxTest(AtCmd, CMW100):
                     aclr_mod_current_results = aclr_mod_results = self.tx_measure_wcdma()
                     logger.debug(aclr_mod_results)
                     aclr_mod_current_results.append(self.measure_current())
-                    data_chan[
-                        cm_pmt_ftm.transfer_chan2freq_wcdma(self.band_wcdma,
-                                                            self.tx_chan_wcdma)] = aclr_mod_current_results + self.get_temperature()
+                    tx_freq_wcdma = cm_pmt_ftm.transfer_chan2freq_wcdma(self.band_wcdma, self.tx_chan_wcdma)
+                    data_chan[tx_freq_wcdma] = aclr_mod_current_results + self.get_temperature()
                 logger.debug(data_chan)
                 # ready to export to excel
-                self.filename = tx_power_relative_test_export_excel(data_chan, self.band_wcdma, 5,
-                                                                         self.tx_level,
-                                                                         mode=1)  # mode=1: LMH mode
+                self.parameters = {
+                    'script': self.script,
+                    'tech': self.tech,
+                    'band': self.band_wcdma,
+                    'bw': 5,
+                    'tx_freq_level': self.tx_freq_wcdma,
+                    'mcs': 'QPSK',
+                    'tx_path': None,
+                    'mod': None,
+                    'rb_state': None,
+                    'rb_size': None,
+                    'rb_start': None,
+                    'sync_path': None,
+                    'asw_srs_path': self.asw_srs_path,
+                    'scs': None,
+                    'type': None,
+                }
+                self.filename = tx_power_relative_test_export_excel(data_chan, self.parameters)  # mode=1: LMH mode
         self.set_test_end_wcdma()
 
     def tx_power_aclr_evm_lmh_gsm(self):
@@ -352,18 +363,12 @@ class TxTest(AtCmd, CMW100):
                 rf_port:
                 freq_select: 'LMH'
                 tx_path:
-                data: {rx_freq: [power, phase_err_rms, phase_peak, ferr,orfs_mod_-200,orfs_mod_200,...orfs_sw-400,orfs_sw400,...], ...}
+                data: {rx_freq: [power, phase_err_rms, phase_peak, ferr,orfs_mod_-200,orfs_mod_200,...
+                orfs_sw-400,orfs_sw400,...], ...}
         """
         rx_chan_list = cm_pmt_ftm.dl_chan_select_gsm(self.band_gsm)
 
-        rx_chan_select_list = []
-        for chan in self.chan:
-            if chan == 'L':
-                rx_chan_select_list.append(rx_chan_list[0])
-            elif chan == 'M':
-                rx_chan_select_list.append(rx_chan_list[1])
-            elif chan == 'H':
-                rx_chan_select_list.append(rx_chan_list[2])
+        rx_chan_select_list = channel_freq_select(self.chan, rx_chan_list)
 
         self.preset_instrument()
         self.set_test_mode_gsm()
@@ -391,9 +396,24 @@ class TxTest(AtCmd, CMW100):
                     data_chan[self.rx_freq_gsm] = aclr_mod_current_results + self.get_temperature()
                 logger.debug(data_chan)
                 # ready to export to excel
-                self.filename = tx_power_relative_test_export_excel(data_chan, self.band_gsm, 0,
-                                                                         self.pcl,
-                                                                         mode=1)  # mode=1: LMH mode
+                self.parameters = {
+                    'script': self.script,
+                    'tech': self.tech,
+                    'band': self.band_gsm,
+                    'bw': 0,
+                    'tx_freq_level': self.tx_freq_fr1,
+                    'mcs': None,
+                    'tx_path': None,
+                    'mod': self.mod_gsm,
+                    'rb_state': None,
+                    'rb_size': None,
+                    'rb_start': None,
+                    'sync_path': None,
+                    'asw_srs_path': self.asw_srs_path,
+                    'scs': None,
+                    'type': None,
+                }
+                self.filename = tx_power_relative_test_export_excel(data_chan, self.parameters)  # mode=1: LMH mode
         self.set_test_end_gsm()
 
     def run_tx(self):
