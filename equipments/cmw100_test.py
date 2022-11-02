@@ -55,17 +55,17 @@ class CMW100(CMW):
         self.cmw_write('*RST')
         self.cmw_query('*OPC?')
 
-    def set_gprf_measurement_group(self):
+    def set_measurement_group_gprf(self):
         if self.tech == 'FR1':
-            self.set_gprf_measurement(self.port_tx, self.bw_fr1)
+            self.set_measurement_gprf(self.port_tx, self.bw_fr1)
         elif self.tech == 'LTE':
-            self.set_gprf_measurement(self.port_tx, self.bw_lte)
+            self.set_measurement_gprf(self.port_tx, self.bw_lte)
         elif self.tech == 'WCDMA':
-            self.set_gprf_measurement(self.port_tx, 5)
+            self.set_measurement_gprf(self.port_tx, 5)
         elif self.tech == 'GSM':
-            self.set_gprf_measurement(self.port_tx, 0.2)
+            self.set_measurement_gprf(self.port_tx, 0.2)
 
-    def set_gprf_measurement(self, port_tx, bw):
+    def set_measurement_gprf(self, port_tx, bw):
         logger.info('----------set GPRF Measurement----------')
         self.set_if_filter_gprf()
         self.set_bandpass_filter_bw_gprf(bw)

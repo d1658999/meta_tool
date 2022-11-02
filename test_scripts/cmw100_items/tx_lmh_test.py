@@ -6,16 +6,23 @@ import utils.parameters.common_parameters_ftm as cm_pmt_ftm
 from utils.loss_handler import get_loss
 from utils.adb_control import get_odpm_current
 from equipments.power_supply import Psu
-from utils.excel_handler import txp_aclr_evm_plot, tx_power_relative_test_export_excel, tx_power_fcc_ce_export_excel
+from utils.excel_handler import txp_aclr_evm_plot, tx_power_relative_test_export_excel
 from utils.channel_handler import channel_freq_select
+import utils.parameters.rb_parameters as rb_pmt
 
 logger = log_set('tx_lmh')
 
 
-class TxTest(AtCmd, CMW100):
+class TxTestGenre(AtCmd, CMW100):
     def __init__(self):
         AtCmd.__init__(self)
         CMW100.__init__(self)
+        self.tx_freq_wcdma = None
+        self.file_path = None
+        self.parameters = None
+        self.rb_state = None
+        self.script = None
+        self.chan = None
         self.srs_path_enable = ext_pmt.srs_path_enable
         self.psu = Psu()
 
@@ -83,8 +90,8 @@ class TxTest(AtCmd, CMW100):
                     logger.info(f'B{self.band_fr1} does not have BW {self.bw_fr1}MHZ')
         for bw in ext_pmt.fr1_bandwidths:
             try:
-                self.filename = f'TxP_ACLR_EVM_{bw}MHZ_{self.tech}_LMH.xlsx'
-                txp_aclr_evm_plot(self.filename, self.parameters)
+                # self.file_path = f'TxP_ACLR_EVM_{bw}MHZ_{self.tech}_LMH.xlsx'
+                txp_aclr_evm_plot(self.file_path, self.parameters)
             except TypeError:
                 logger.info(f'there is no data to plot because the band does not have this BW ')
             except FileNotFoundError:
@@ -113,8 +120,8 @@ class TxTest(AtCmd, CMW100):
                     logger.info(f'B{self.band_lte} does not have BW {self.bw_lte}MHZ')
         for bw in ext_pmt.lte_bandwidths:
             try:
-                self.filename = f'TxP_ACLR_EVM_{bw}MHZ_{self.tech}_LMH.xlsx'
-                txp_aclr_evm_plot(self.filename, self.parameters)
+                # self.file_path = f'TxP_ACLR_EVM_{bw}MHZ_{self.tech}_LMH.xlsx'
+                txp_aclr_evm_plot(self.file_path, self.parameters)
             except TypeError:
                 logger.info(f'there is no data to plot because the band does not have this BW ')
             except FileNotFoundError:
@@ -130,7 +137,7 @@ class TxTest(AtCmd, CMW100):
                 for band in ext_pmt.wcdma_bands:
                     self.band_wcdma = band
                     self.tx_power_aclr_evm_lmh_wcdma()
-                txp_aclr_evm_plot(self.filename, self.parameters)
+                txp_aclr_evm_plot(self.file_path, self.parameters)
 
     def tx_power_aclr_evm_lmh_pipeline_gsm(self):
         self.tx_level = ext_pmt.tx_level
@@ -145,7 +152,7 @@ class TxTest(AtCmd, CMW100):
                     self.pcl = ext_pmt.tx_pcl_lb if band in [850, 900] else ext_pmt.tx_pcl_mb
                     self.band_gsm = band
                     self.tx_power_aclr_evm_lmh_gsm()
-                txp_aclr_evm_plot(self.filename, self.parameters)
+                txp_aclr_evm_plot(self.file_path, self.parameters)
 
     def tx_power_aclr_evm_lmh_fr1(self):
         """
@@ -170,10 +177,10 @@ class TxTest(AtCmd, CMW100):
         self.sig_gen_fr1()
         self.sync_fr1()
 
-        scs = 1 if self.band_fr1 in [34, 38, 39, 40, 41, 42, 48, 77, 78,  # temp
-                                     79] else 0  # for now FDD is forced to 15KHz and TDD is to be 30KHz  # temp
-        scs = 15 * (2 ** scs)  # temp
-        self.scs = scs  # temp
+        # scs = 1 if self.band_fr1 in [34, 38, 39, 40, 41, 42, 48, 77, 78,  # temp
+        #                              79] else 0  # for now FDD is forced to 15KHz and TDD is to be 30KHz  # temp
+        # scs = 15 * (2 ** scs)  # temp
+        # self.scs = scs  # temp
 
         tx_freq_lmh_list = [cm_pmt_ftm.transfer_freq_rx2tx_fr1(self.band_fr1, rx_freq) for rx_freq in rx_freq_list]
         tx_freq_select_list = channel_freq_select(self.chan, tx_freq_lmh_list)
@@ -184,7 +191,8 @@ class TxTest(AtCmd, CMW100):
                 if script == 'GENERAL':
                     self.script = script
                     for rb_ftm in ext_pmt.rb_ftm_fr1:  # INNER_FULL, OUTER_FULL
-                        self.rb_size_fr1, self.rb_start_fr1 = ext_pmt.scripts.GENERAL_FR1[self.bw_fr1][self.scs][self.type_fr1][self.rb_alloc_fr1_dict[rb_ftm]]
+                        self.rb_size_fr1, self.rb_start_fr1 = \
+                            rb_pmt.GENERAL_FR1[self.bw_fr1][self.scs][self.type_fr1][self.rb_alloc_fr1_dict[rb_ftm]]
                         self.rb_state = rb_ftm  # INNER_FULL, OUTER_FULL
                         data_freq = {}
                         for tx_freq_fr1 in tx_freq_select_list:
@@ -221,7 +229,7 @@ class TxTest(AtCmd, CMW100):
                             'scs': self.scs,
                             'type': self.type_fr1,
                         }
-                        self.filename = tx_power_relative_test_export_excel(data_freq, self.parameters)
+                        self.file_path = tx_power_relative_test_export_excel(data_freq, self.parameters)
         self.set_test_end_fr1()
 
     def tx_power_aclr_evm_lmh_lte(self):
@@ -256,7 +264,7 @@ class TxTest(AtCmd, CMW100):
                 if script == 'GENERAL':
                     self.script = script
                     for rb_ftm in ext_pmt.rb_ftm_lte:  # PRB, FRB
-                        self.rb_size_lte, self.rb_start_lte = ext_pmt.scripts.GENERAL_LTE[self.bw_lte][
+                        self.rb_size_lte, self.rb_start_lte = rb_pmt.GENERAL_LTE[self.bw_lte][
                             self.rb_select_lte_dict[rb_ftm]]  # PRB: 0, # FRB: 1
                         self.rb_state = rb_ftm  # PRB, FRB
                         data_freq = {}
@@ -287,7 +295,7 @@ class TxTest(AtCmd, CMW100):
                             'scs': self.scs,
                             'type': None,
                         }
-                        self.filename = tx_power_relative_test_export_excel(data_freq, self.parameters)
+                        self.file_path = tx_power_relative_test_export_excel(data_freq, self.parameters)
         self.set_test_end_lte()
 
     def tx_power_aclr_evm_lmh_wcdma(self):
@@ -352,7 +360,7 @@ class TxTest(AtCmd, CMW100):
                     'scs': None,
                     'type': None,
                 }
-                self.filename = tx_power_relative_test_export_excel(data_chan, self.parameters)  # mode=1: LMH mode
+                self.file_path = tx_power_relative_test_export_excel(data_chan, self.parameters)  # mode=1: LMH mode
         self.set_test_end_wcdma()
 
     def tx_power_aclr_evm_lmh_gsm(self):
@@ -413,7 +421,7 @@ class TxTest(AtCmd, CMW100):
                     'scs': None,
                     'type': None,
                 }
-                self.filename = tx_power_relative_test_export_excel(data_chan, self.parameters)  # mode=1: LMH mode
+                self.file_path = tx_power_relative_test_export_excel(data_chan, self.parameters)  # mode=1: LMH mode
         self.set_test_end_gsm()
 
     def run_tx(self):
@@ -424,12 +432,6 @@ class TxTest(AtCmd, CMW100):
                 for script in ext_pmt.scripts:
                     if script == 'GENERAL':
                         self.tx_power_aclr_evm_lmh_pipeline_fr1()
-                    elif script == 'FCC':
-                        self.tx_power_pipline_fcc_fr1()
-                    elif script == 'CE':
-                        self.tx_power_pipline_ce_fr1()
-                    elif tech == 'WCDMA':
-                        self.tx_power_aclr_evm_lmh_pipeline_wcdma()
             elif tech == 'WCDMA':
                 self.tx_power_aclr_evm_lmh_pipeline_wcdma()
             elif tech == 'GSM':

@@ -5,7 +5,7 @@ from equipments.cmw100_test import CMW100
 from utils.log_init import log_set
 import utils.parameters.external_paramters as ext_pmt
 import utils.parameters.common_parameters_ftm as cm_pmt_ftm
-import utils.parameters.scripts_setting as scrpt_set
+import utils.parameters.rb_parameters as scrpt_set
 from utils.loss_handler import get_loss
 from utils.excel_handler import rxs_relative_plot, rxs_endc_plot, endc_relative_power_senstivity_export_excel
 from utils.excel_handler import rx_power_relative_test_export_excel, rx_desense_process, rx_desense_endc_process

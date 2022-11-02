@@ -6398,7 +6398,7 @@ def main():
     # cmw100.bw_fr1 = 100
     # cmw100.tx_level = 26
     # cmw100.loss_tx = 1
-    # cmw100.set_gprf_measurement()
+    # cmw100.set_measurement_gprf()
     # cmw100.set_tx_freq_gprf()
     # cmw100.set_measure_start_on_gprf()
     # cmw100.search_sensitivity_pipline_endc()

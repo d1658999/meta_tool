@@ -1,5 +1,6 @@
 import utils.parameters.common_parameters_ftm as cm_pmt_ftm
 
+
 def channel_freq_select(want_chan, freq_list):
     chan_freq_select_list = []
     for ch in want_chan:
@@ -50,8 +51,10 @@ def chan_judge_fr1(band_fr1, bw_fr1, tx_freq_fr1):
     elif rx_freq_fr1 > cm_pmt_ftm.dl_freq_selected('FR1', band_fr1, bw_fr1)[1]:
         return 'ch2'
 
+
 def main():
     pass
+
 
 if __name__ == '__main__':
     main()
