@@ -198,7 +198,7 @@ class TxTestFccCe(AtCmd, CMW100):
                             f"{self.mcs_fr1} for CE")
         self.set_test_end_fr1()
 
-    def run_tx(self):
+    def run(self):
         for tech in ext_pmt.tech:
             if tech == 'FR1':
                 for script in ext_pmt.scripts:

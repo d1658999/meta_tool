@@ -679,7 +679,7 @@ class RxTest(AtCmd, CMW100):
             self.filename = rx_power_relative_test_export_excel(data_freq, self.band_lte, self.bw_lte,
                                                                      rx_level)
 
-    def run_rx(self):
+    def run(self):
         for tech in ext_pmt.tech:
             if tech == 'LTE':
                 self.search_sensitivity_pipline_lte()

@@ -1735,7 +1735,7 @@ class CMW:
         on_off = 'ON' if _type_fr1 == 'DFTS' else 'OFF'  # DFTS: ON, CP: OFF
         self.cmw_write(f'CONFigure:NRSub:MEASurement:MEValuation:DFTPrecoding {on_off}')
 
-    def set_phase_compensation_fr1(self, phase_comp='OFF', user_freq=6E0):
+    def set_phase_compensation_fr1(self, phase_comp='OFF', user_freq=6000E+6):
         """
         Specifies the phase compensation applied by the UE during the modulation and
         upconversion.

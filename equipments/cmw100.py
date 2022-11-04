@@ -6264,7 +6264,7 @@ class Cmw100:
         wb.save(filename)
         wb.close()
 
-    def run_tx(self):
+    def run(self):
         for tech in wt.tech:
             if tech == 'LTE':
                 self.tx_power_aclr_evm_lmh_pipeline_lte()
@@ -6283,7 +6283,7 @@ class Cmw100:
             elif tech == 'GSM':
                 self.tx_power_aclr_evm_lmh_pipeline_gsm()
 
-    def run_rx(self):
+    def run(self):
         for tech in wt.tech:
             if tech == 'LTE':
                 self.search_sensitivity_pipline_lte()

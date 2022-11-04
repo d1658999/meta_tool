@@ -2374,36 +2374,36 @@ class MainApp:
         inst = inst_class(self.psu)
         if inst.__class__.__name__ == 'Cmw100':
             if self.wanted_test['tx']:
-                inst.run_tx()
+                inst.run()
 
             if self.wanted_test['rx']:
-                inst.run_rx()
+                inst.run()
 
             if self.wanted_test['tx_level_sweep']:
-                inst.run_tx_level_sweep()
+                inst.run()
 
             if self.wanted_test['tx_freq_sweep']:
-                inst.run_tx_freq_sweep()
+                inst.run()
 
             if self.wanted_test['tx_1rb_sweep']:
-                inst.run_tx_1rb_sweep()
+                inst.run()
 
         elif inst.__class__.__name__ == 'Anritsu8820':
             if self.wanted_test['tx']:
-                inst.run_tx()
+                inst.run()
 
             if self.wanted_test['rx']:
-                inst.run_rx()
+                inst.run()
 
             if self.wanted_test['rx_sweep']:
                 inst.run_rx_sweep_ch()
 
         elif inst.__class__.__name__ == 'Anritsu8821':
             if self.wanted_test['tx']:
-                inst.run_tx()
+                inst.run()
 
             if self.wanted_test['rx']:
-                inst.run_rx()
+                inst.run()
 
             if self.wanted_test['rx_sweep']:
                 inst.run_rx_sweep_ch()
@@ -2478,10 +2478,10 @@ class MainApp:
             # anritsu = Anritsu8820()
             #
             # if self.wanted_test['tx']:
-            #     anritsu.run_tx()
+            #     anritsu.run()
             #
             # if self.wanted_test['rx']:
-            #     anritsu.run_rx()
+            #     anritsu.run()
             #
             # if self.wanted_test['rx_sweep']:
             #     anritsu.run_rx_sweep_ch()
@@ -2500,10 +2500,10 @@ class MainApp:
             # anritsu = Anritsu8821()
             #
             # if self.wanted_test['tx']:
-            #     anritsu.run_tx()
+            #     anritsu.run()
             #
             # if self.wanted_test['rx']:
-            #     anritsu.run_rx()
+            #     anritsu.run()
             #
             # if self.wanted_test['rx_sweep']:
             #     anritsu.run_rx_sweep_ch()

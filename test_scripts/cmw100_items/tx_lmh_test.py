@@ -424,7 +424,7 @@ class TxTestGenre(AtCmd, CMW100):
                 self.file_path = tx_power_relative_test_export_excel(data_chan, self.parameters)  # mode=1: LMH mode
         self.set_test_end_gsm()
 
-    def run_tx(self):
+    def run(self):
         for tech in ext_pmt.tech:
             if tech == 'LTE':
                 self.tx_power_aclr_evm_lmh_pipeline_lte()
