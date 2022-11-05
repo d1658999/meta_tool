@@ -1,4 +1,4 @@
-from equipments.series_basis.callbox.serial_series import AtCmd
+from equipments.series_basis.serial_series import AtCmd
 from equipments.cmw100_test import CMW100
 from utils.log_init import log_set
 import utils.parameters.external_paramters as ext_pmt
@@ -33,13 +33,29 @@ class TxTestFreqSweep(AtCmd, CMW100):
         else:
             self.antenna_switch_v2()
 
-    def measure_current(self, n=1):
+    def pre_measure_current(self, n=1):
         if ext_pmt.odpm_enable:
             return get_odpm_current(n)
         elif ext_pmt.psu_enable:
-            return self.psu.current_average(n)
-        else:
+            return self.psu.psu_current_average(n)
+
+    def measure_current(self, band):
+        if not ext_pmt.odpm_enable and not ext_pmt.psu_enable:
             return None
+
+        elif self.tech == 'GSM':
+            current_list = []
+            for n in range(20):
+                current_list.append(self.pre_measure_current())
+            avg_sample = sum(current_list) / len(current_list)
+            logger.info(f'Average of above current for GSM: {avg_sample}')
+            return avg_sample
+        else:
+            if band in [34, 38, 39, 40, 41, 42, 48, 77, 78, 79] and self.tx_level > 15:
+                n = 10
+            else:
+                n = 1
+            return self.pre_measure_current(n)
 
     def tx_power_relative_test_initial_gsm(self):
         logger.info('----------Relatvie test initial----------')
@@ -230,7 +246,7 @@ class TxTestFreqSweep(AtCmd, CMW100):
                             for tx_level in range(tx_range_list[0], tx_range_list[1] + step, step):
                                 self.tx_level = tx_level
                                 logger.info(f'========Now Tx level = {self.tx_level} dBm========')
-                                self.command(f'AT+NTXPWRLVLSET={self.tx_level}')
+                                self.set_level_fr1(self.tx_level)
                                 self.set_rf_setting_user_margin_fr1(10.00)
                                 self.set_expect_power_fr1(self.tx_level + 5)
                                 self.set_measure_start_on_fr1()
@@ -245,7 +261,7 @@ class TxTestFreqSweep(AtCmd, CMW100):
                                 self.cmw_query('*OPC?')
                                 aclr_mod_current_results = aclr_mod_results = aclr_results + mod_results
                                 logger.debug(aclr_mod_results)
-                                aclr_mod_current_results.append(self.measure_current())
+                                aclr_mod_current_results.append(self.measure_current(self.band_fr1))
                                 data[tx_level] = aclr_mod_current_results
                             logger.debug(data)
                             self.parameters = {
@@ -327,8 +343,8 @@ class TxTestFreqSweep(AtCmd, CMW100):
                             for tx_level in range(tx_range_list[0], tx_range_list[1] + step, step):
                                 self.tx_level = tx_level
                                 logger.info(f'========Now Tx level = {self.tx_level} dBm========')
-                                self.command(f'AT+LTXPWRLVLSET={self.tx_level}')
-                                self.command(f'AT+LTXCHNSDREQ')
+                                self.set_level_lte(self.tx_level)
+                                self.set_chan_request_lte()
                                 self.set_rf_setting_user_margin_lte(10.00)
                                 self.set_expect_power_lte(self.tx_level + 5)
                                 mod_results = self.get_modulation_avgerage_lte()
@@ -344,7 +360,7 @@ class TxTestFreqSweep(AtCmd, CMW100):
                                 self.cmw_query('*OPC?')
                                 aclr_mod_current_results = aclr_mod_results = aclr_results + mod_results
                                 logger.debug(aclr_mod_results)
-                                aclr_mod_current_results.append(self.measure_current())
+                                aclr_mod_current_results.append(self.measure_current(self.band_lte))
                                 data[tx_level] = aclr_mod_current_results
                             logger.debug(data)
                             self.parameters = {
@@ -424,7 +440,7 @@ class TxTestFreqSweep(AtCmd, CMW100):
                         self.antenna_switch_v2()
                         spectrum_mod_current_results = spectrum_mod_results = self.tx_measure_wcdma()
                         logger.debug(spectrum_mod_results)
-                        spectrum_mod_current_results.append(self.measure_current())
+                        spectrum_mod_current_results.append(self.measure_current(self.band_wcdma))
                         data[tx_level] = spectrum_mod_current_results
                     logger.debug(data)
                     self.parameters = {
@@ -500,7 +516,7 @@ class TxTestFreqSweep(AtCmd, CMW100):
                         self.tx_set_gsm()
                         mod_orfs_current_results = mod_orfs_results = self.tx_measure_gsm()
                         logger.debug(mod_orfs_results)
-                        mod_orfs_current_results.append(self.measure_current())
+                        mod_orfs_current_results.append(self.measure_current(self.band_gsm))
                         data[tx_pcl] = mod_orfs_current_results
                     logger.debug(data)
                     self.parameters = {

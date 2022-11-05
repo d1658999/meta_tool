@@ -600,3 +600,12 @@ class AtCmd:
 
     def query_thermister1(self):
         return self.command('AT+GOOGTHERMISTOR=1,1')
+
+    def set_level_fr1(self, tx_level):
+        self.command(f'AT+LTXPWRLVLSET={tx_level}')
+
+    def set_level_lte(self, tx_level):
+        self.command(f'AT+LTXPWRLVLSET={tx_level}')
+
+    def set_chan_request_lte(self):
+        self.command(f'AT+LTXCHNSDREQ')

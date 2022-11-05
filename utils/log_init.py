@@ -3,11 +3,13 @@ import logging
 import sys
 from logging.config import fileConfig
 
+
 def log_set_old():
     config_file = Path('logging.ini')
     fileConfig(config_file)
     logger = logging.getLogger()
     return logger
+
 
 def log_set(name=__name__):
     # create logger
@@ -23,7 +25,6 @@ def log_set(name=__name__):
     # create formatter
     formatter = logging.Formatter('[%(asctime)s %(name)-10s - %(levelname)-8s] %(message)s', datefmt='%Y%m%d %H:%M:%S')
 
-
     # add formatter to handlers
     handler_stream.setFormatter(formatter)
     handler_console.setFormatter(formatter)
@@ -34,9 +35,11 @@ def log_set(name=__name__):
 
     return logger
 
+
 def main():
     log_set()
     logging.info('test123')
+
 
 if __name__ == '__main__':
     main()

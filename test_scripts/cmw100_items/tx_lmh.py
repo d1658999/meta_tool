@@ -1,4 +1,4 @@
-from equipments.series_basis.callbox.serial_series import AtCmd
+from equipments.series_basis.serial_series import AtCmd
 from equipments.cmw100_test import CMW100
 from utils.log_init import log_set
 import utils.parameters.external_paramters as ext_pmt
@@ -49,13 +49,29 @@ class TxTestGenre(AtCmd, CMW100):
         logger.info(f'thermistor1 get temp: {therm_list[1]}')
         return therm_list
 
-    def measure_current(self, n=1):
+    def pre_measure_current(self, n=1):
         if ext_pmt.odpm_enable:
             return get_odpm_current(n)
         elif ext_pmt.psu_enable:
-            return self.psu.current_average(n)
-        else:
+            return self.psu.psu_current_average(n)
+
+    def measure_current(self, band):
+        if not ext_pmt.odpm_enable and not ext_pmt.psu_enable:
             return None
+
+        elif self.tech == 'GSM':
+            current_list = []
+            for n in range(20):
+                current_list.append(self.pre_measure_current())
+            avg_sample = sum(current_list) / len(current_list)
+            logger.info(f'Average of above current for GSM: {avg_sample}')
+            return avg_sample
+        else:
+            if band in [34, 38, 39, 40, 41, 42, 48, 77, 78, 79] and self.tx_level > 15:
+                n = 10
+            else:
+                n = 1
+            return self.pre_measure_current(n)
 
     def select_asw_srs_path(self):
         if self.srs_path_enable:
@@ -117,7 +133,7 @@ class TxTestGenre(AtCmd, CMW100):
                             self.tx_set_fr1()
                             aclr_mod_current_results = aclr_mod_results = self.tx_measure_fr1()
                             logger.debug(aclr_mod_results)
-                            aclr_mod_current_results.append(self.measure_current())
+                            aclr_mod_current_results.append(self.measure_current(self.band_fr1))
                             data_freq[self.tx_freq_fr1] = aclr_mod_current_results + self.get_temperature()
                         logger.debug(data_freq)
                         # ready to export to excel
@@ -184,7 +200,7 @@ class TxTestGenre(AtCmd, CMW100):
                             self.tx_set_lte()
                             aclr_mod_current_results = aclr_mod_results = self.tx_measure_lte()
                             logger.debug(aclr_mod_results)
-                            aclr_mod_current_results.append(self.measure_current())
+                            aclr_mod_current_results.append(self.measure_current(self.band_lte))
                             data_freq[self.tx_freq_lte] = aclr_mod_current_results + self.get_temperature()
                         logger.debug(data_freq)
                         # ready to export to excel
@@ -249,7 +265,7 @@ class TxTestGenre(AtCmd, CMW100):
                     self.antenna_switch_v2()
                     aclr_mod_current_results = aclr_mod_results = self.tx_measure_wcdma()
                     logger.debug(aclr_mod_results)
-                    aclr_mod_current_results.append(self.measure_current())
+                    aclr_mod_current_results.append(self.measure_current(self.band_wcdma))
                     tx_freq_wcdma = cm_pmt_ftm.transfer_chan2freq_wcdma(self.band_wcdma, self.tx_chan_wcdma)
                     data_chan[tx_freq_wcdma] = aclr_mod_current_results + self.get_temperature()
                 logger.debug(data_chan)
@@ -312,7 +328,7 @@ class TxTestGenre(AtCmd, CMW100):
                     self.tx_set_gsm()
                     aclr_mod_current_results = aclr_mod_results = self.tx_measure_gsm()
                     logger.debug(aclr_mod_results)
-                    aclr_mod_current_results.append(self.measure_current())
+                    aclr_mod_current_results.append(self.measure_current(self.band_gsm))
                     data_chan[self.rx_freq_gsm] = aclr_mod_current_results + self.get_temperature()
                 logger.debug(data_chan)
                 # ready to export to excel

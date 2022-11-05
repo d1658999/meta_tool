@@ -41,11 +41,12 @@ def get_odpm_current(count=1):
     n = 0
     current = 0
     while n < count:
-        temp = sp.run(r'adb shell pmic s2mpg14 getcurrent 36 | grep mA', capture_output=True).stdout.decode().strip().split('=')[1]
+        temp = sp.run(r'adb shell pmic s2mpg14 getcurrent 36 | grep mA',
+                      capture_output=True).stdout.decode().strip().split('=')[1]
         if eval(temp) > current:
             current = eval(temp)
         n += 1
-    print(f'Get the current: {current} mA')
+    print(f'Get the ODPM current: {current} mA')
     return round(current, 2)
 
 def main():

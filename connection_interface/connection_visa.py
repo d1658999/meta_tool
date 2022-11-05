@@ -14,7 +14,6 @@ class VisaComport:
         if equipment_name in ['CMW100', 'Cmw100', 'cmw100']:
             try:
                 self.inst = pyvisa.ResourceManager().open_resource('TCPIP0::127.0.0.1::INSTR')
-                self.inst.timeout = 5000
 
             except Exception as err:
                 logger.info(err)
@@ -26,21 +25,47 @@ class VisaComport:
 
         elif '8820' in equipment_name or '8821' in equipment_name:
             gpib_wanted = None
-            for gpib in self.get_gpib():  # this is to search GPIB for 8820/8821
+            for gpib in self.get_gpib_usb():  # this is to search GPIB for 8820/8821
                 inst = pyvisa.ResourceManager().open_resource(gpib)
                 inst_res = inst.query('*IDN?').strip()
                 if '8820' in inst or '8821' in inst_res:
                     gpib_wanted = gpib
+                    break
 
             self.inst = pyvisa.ResourceManager().open_resource(gpib_wanted)  # to build object of 'inst'
-            self.inst.timeout = 5000
             logger.info(f"Connect to {self.inst.query('*IDN?').strip()}")
 
+        elif equipment_name in ['psu', 'PSU']:
+            psu_list = ['E3631A', 'E3642A', 'E36313A']
+            psu_select = None
+            try:
+                gpib_usb_wanted = None
+                for gpib_usb in self.get_gpib_usb():  # this is to search GPIB for PSU
+                    inst = pyvisa.ResourceManager().open_resource(gpib_usb)
+                    inst_res = inst.query('*IDN?').strip()
+                    logger.info('----------Search PSU we are using----------')
+                    for psu in psu_list:
+                        if psu in inst_res:
+                            gpib_usb_wanted = gpib_usb
+                            psu_select = psu
+                            break
+
+                self.inst = pyvisa.ResourceManager().open_resource(gpib_usb_wanted)  # to build object of 'inst'
+
+            except Exception as err:
+                logger.info(err)
+                logger.info('Please check if connecting to PSU')
+
+            else:
+                logger.info(f'Connect to {psu_select}')
+
+        self.inst.timeout = 5000  # set the default timeout
+
     @staticmethod
-    def get_gpib():
+    def get_gpib_usb():
         resources = []
         for resource in pyvisa.ResourceManager().list_resources():
-            if 'GPIB' in resource:
+            if 'GPIB' in resource or 'USB' in resource:
                 resources.append(resource)
                 logger.debug(resource)
         return resources

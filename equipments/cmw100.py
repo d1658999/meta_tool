@@ -238,7 +238,7 @@ class Cmw100:
         if wt.odpm_enable:
             return get_odpm_current()
         elif wt.psu_enable:
-            return self.psu.current_average()
+            return self.psu.psu_current_average()
         else:
             return None
 
