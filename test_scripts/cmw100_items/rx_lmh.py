@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from equipments.series_basis.serial_series import AtCmd
+from equipments.series_basis.modem_usb_serial.serial_series import AtCmd
 from equipments.cmw100_test import CMW100
 from utils.log_init import log_set
 import utils.parameters.external_paramters as ext_pmt
