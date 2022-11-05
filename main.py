@@ -10,7 +10,7 @@ import os
 import yaml
 
 from utils.log_init import log_set
-from utils.adb_control import get_serial_devices
+from utils.adb_handler import get_serial_devices
 from utils.excel_handler import excel_folder_create
 
 # import ui_init
