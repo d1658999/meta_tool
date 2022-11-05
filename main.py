@@ -34,8 +34,8 @@ class MainApp:
         button_run_ftm_ce = builder.get_object("button_run_ftm_ce", master)
         button_run_ftm_endc = builder.get_object("button_run_ftm_endc", master)
         button_run_signaling = builder.get_object("button_run_signaling", master)
-        self.button_run = [button_run_ftm, button_run_ftm_fcc, button_run_ftm_ce, button_run_ftm_endc,
-                           button_run_signaling]
+        self.button_run_list = [button_run_ftm, button_run_ftm_fcc, button_run_ftm_ce, button_run_ftm_endc,
+                                button_run_signaling]
         ICON_FILE = PROJECT_PATH / pathlib.Path('utils') / pathlib.Path('Wave.ico')
         self.mainwindow.iconbitmap(ICON_FILE)
         # self.checkbox_hsupa = builder.get_object("checkbutton_WCDMA", master)
@@ -847,7 +847,7 @@ class MainApp:
             elif ch == 'H':
                 self.chan_H.set(True)
 
-        for script in ui_init['test_scripts']['test_scripts']:
+        for script in ui_init['scripts']['scripts']:
             if script == 'GENERAL':
                 self.general.set(True)
             elif script == 'FCC':
@@ -2370,8 +2370,8 @@ class MainApp:
 
 
 
-    def test_pipeline(self, inst_class):
-        inst = inst_class(self.psu)
+    def test_pipeline(self, inst_class_dict):
+        inst = inst_class_dict()
         if inst.__class__.__name__ == 'Cmw100':
             if self.wanted_test['tx']:
                 inst.run()
@@ -2412,7 +2412,7 @@ class MainApp:
         import utils.parameters.external_paramters as ext_pmt
 
 
-        for button_run in self.button_run:
+        for button_run in self.button_run_list:
             button_run['state'] = tkinter.DISABLED
 
         self.export_ui_setting_yaml()
@@ -2512,11 +2512,41 @@ class MainApp:
             pass
 
         elif self.instrument.get() == 'Cmw100':
-            from cmw100 import Cmw100
-            excel_folder_create()
-            self.test_pipeline(Cmw100)
+            from test_scripts.cmw100_items.tx_lmh import TxTestGenre
+            from test_scripts.cmw100_items.rx_lmh import RxTestGenre
+            from test_scripts.cmw100_items.tx_level_sweep import TxTestLevelSweep
+            from test_scripts.cmw100_items.tx_freq_sweep import TxTestFreqSweep
+            from test_scripts.cmw100_items.tx_1rb_sweep import TxTest1RbSweep
+            from test_scripts.cmw100_items.tx_power_fcc_ce import TxTestFccCe
 
-        for button_run in self.button_run:
+            excel_folder_create()
+            # self.test_pipeline(inst_class_dict)
+            if self.wanted_test['tx']:
+                for script in ext_pmt.scripts:
+                    if script == 'GENERAL':
+                        inst = TxTestGenre()
+                        inst.run()
+                    elif script in ['FCC', 'CE']:
+                        inst = TxTestFccCe()
+                        inst.run(script)
+
+            if self.wanted_test['rx']:
+                inst = RxTestGenre()
+                inst.run()
+
+            if self.wanted_test['tx_level_sweep']:
+                inst = TxTestLevelSweep()
+                inst.run()
+
+            if self.wanted_test['tx_freq_sweep']:
+                inst = TxTestFreqSweep()
+                inst.run()
+
+            if self.wanted_test['tx_1rb_sweep']:
+                inst = TxTest1RbSweep()
+                inst.run()
+
+        for button_run in self.button_run_list:
             button_run['state'] = tkinter.NORMAL
 
 

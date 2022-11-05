@@ -449,9 +449,7 @@ class TxTestGenre(AtCmd, CMW100):
             if tech == 'LTE':
                 self.tx_power_aclr_evm_lmh_pipeline_lte()
             elif tech == 'FR1':
-                for script in ext_pmt.scripts:
-                    if script == 'GENERAL':
-                        self.tx_power_aclr_evm_lmh_pipeline_fr1()
+                self.tx_power_aclr_evm_lmh_pipeline_fr1()
             elif tech == 'WCDMA':
                 self.tx_power_aclr_evm_lmh_pipeline_wcdma()
             elif tech == 'GSM':

@@ -14,7 +14,7 @@ import time
 logger = log_set('freq_sweep')
 
 
-class TxTestFreqSweep(AtCmd, CMW100):
+class TxTestLevelSweep(AtCmd, CMW100):
     def __init__(self):
         AtCmd.__init__(self)
         CMW100.__init__(self)

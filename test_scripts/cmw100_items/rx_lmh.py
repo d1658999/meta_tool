@@ -15,7 +15,7 @@ from utils.channel_handler import channel_freq_select
 logger = log_set('tx_lmh')
 
 
-class RxTest(AtCmd, CMW100):
+class RxTestGenre(AtCmd, CMW100):
     def __init__(self):
         AtCmd.__init__(self)
         CMW100.__init__(self)
