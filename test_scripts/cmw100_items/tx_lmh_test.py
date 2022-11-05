@@ -63,98 +63,7 @@ class TxTestGenre(AtCmd, CMW100):
         else:
             self.antenna_switch_v2()
 
-    def tx_power_aclr_evm_lmh_pipeline_fr1(self):
-        self.tx_level = ext_pmt.tx_level
-        self.port_tx = ext_pmt.port_tx
-        self.chan = ext_pmt.channel
-        self.sa_nsa_mode = ext_pmt.sa_nsa
-        items = [
-            (tech, tx_path, bw, band, type_)
-            for tech in ext_pmt.tech
-            for tx_path in ext_pmt.tx_paths
-            for bw in ext_pmt.fr1_bandwidths
-            for band in ext_pmt.fr1_bands
-            for type_ in ext_pmt.type_fr1
-        ]
-
-        for item in items:
-            if item[0] == 'FR1' and ext_pmt.fr1_bands != []:
-                self.tech = item[0]
-                self.tx_path = item[1]
-                self.bw_fr1 = item[2]
-                self.band_fr1 = item[3]
-                self.type_fr1 = item[4]
-                if self.bw_fr1 in cm_pmt_ftm.bandwidths_selected_fr1(self.band_fr1):
-                    self.tx_power_aclr_evm_lmh_fr1()
-                else:
-                    logger.info(f'B{self.band_fr1} does not have BW {self.bw_fr1}MHZ')
-        for bw in ext_pmt.fr1_bandwidths:
-            try:
-                # self.file_path = f'TxP_ACLR_EVM_{bw}MHZ_{self.tech}_LMH.xlsx'
-                txp_aclr_evm_plot(self.file_path, self.parameters)
-            except TypeError:
-                logger.info(f'there is no data to plot because the band does not have this BW ')
-            except FileNotFoundError:
-                logger.info(f'there is not file to plot BW{bw} ')
-
-    def tx_power_aclr_evm_lmh_pipeline_lte(self):
-        self.tx_level = ext_pmt.tx_level
-        self.port_tx = ext_pmt.port_tx
-        self.chan = ext_pmt.channel
-        items = [
-            (tech, tx_path, bw, band)
-            for tech in ext_pmt.tech
-            for tx_path in ext_pmt.tx_paths
-            for bw in ext_pmt.lte_bandwidths
-            for band in ext_pmt.lte_bands
-        ]
-        for item in items:
-            if item[0] == 'LTE' and ext_pmt.lte_bands != []:
-                self.tech = item[0]
-                self.tx_path = item[1]
-                self.bw_lte = item[2]
-                self.band_lte = item[3]
-                if self.bw_lte in cm_pmt_ftm.bandwidths_selected_lte(self.band_lte):
-                    self.tx_power_aclr_evm_lmh_lte()
-                else:
-                    logger.info(f'B{self.band_lte} does not have BW {self.bw_lte}MHZ')
-        for bw in ext_pmt.lte_bandwidths:
-            try:
-                # self.file_path = f'TxP_ACLR_EVM_{bw}MHZ_{self.tech}_LMH.xlsx'
-                txp_aclr_evm_plot(self.file_path, self.parameters)
-            except TypeError:
-                logger.info(f'there is no data to plot because the band does not have this BW ')
-            except FileNotFoundError:
-                logger.info(f'there is not file to plot BW{bw} ')
-
-    def tx_power_aclr_evm_lmh_pipeline_wcdma(self):
-        self.tx_level = ext_pmt.tx_level
-        self.port_tx = ext_pmt.port_tx
-        self.chan = ext_pmt.channel
-        for tech in ext_pmt.tech:
-            if tech == 'WCDMA' and ext_pmt.wcdma_bands != []:
-                self.tech = 'WCDMA'
-                for band in ext_pmt.wcdma_bands:
-                    self.band_wcdma = band
-                    self.tx_power_aclr_evm_lmh_wcdma()
-                txp_aclr_evm_plot(self.file_path, self.parameters)
-
-    def tx_power_aclr_evm_lmh_pipeline_gsm(self):
-        self.tx_level = ext_pmt.tx_level
-        self.port_tx = ext_pmt.port_tx
-        self.chan = ext_pmt.channel
-        self.mod_gsm = ext_pmt.mod_gsm
-        self.tsc = 0 if self.mod_gsm == 'GMSK' else 5
-        for tech in ext_pmt.tech:
-            if tech == 'GSM' and ext_pmt.gsm_bands != []:
-                self.tech = 'GSM'
-                for band in ext_pmt.gsm_bands:
-                    self.pcl = ext_pmt.tx_pcl_lb if band in [850, 900] else ext_pmt.tx_pcl_mb
-                    self.band_gsm = band
-                    self.tx_power_aclr_evm_lmh_gsm()
-                txp_aclr_evm_plot(self.file_path, self.parameters)
-
-    def tx_power_aclr_evm_lmh_fr1(self):
+    def tx_power_aclr_evm_lmh_process_fr1(self):
         """
         order: tx_path > bw > band > mcs > rb > chan
         band_fr1:
@@ -232,7 +141,7 @@ class TxTestGenre(AtCmd, CMW100):
                         self.file_path = tx_power_relative_test_export_excel(data_freq, self.parameters)
         self.set_test_end_fr1()
 
-    def tx_power_aclr_evm_lmh_lte(self):
+    def tx_power_aclr_evm_lmh_process_lte(self):
         """
         order: tx_path > bw > band > mcs > rb > chan
         band_lte:
@@ -292,13 +201,13 @@ class TxTestGenre(AtCmd, CMW100):
                             'rb_start': self.rb_start_lte,
                             'sync_path': self.sync_path,
                             'asw_srs_path': self.asw_srs_path,
-                            'scs': self.scs,
+                            'scs': None,
                             'type': None,
                         }
                         self.file_path = tx_power_relative_test_export_excel(data_freq, self.parameters)
         self.set_test_end_lte()
 
-    def tx_power_aclr_evm_lmh_wcdma(self):
+    def tx_power_aclr_evm_lmh_process_wcdma(self):
         """
                 order: tx_path > bw > band > mcs > rb > chan
                 band_wcdma:
@@ -363,7 +272,7 @@ class TxTestGenre(AtCmd, CMW100):
                 self.file_path = tx_power_relative_test_export_excel(data_chan, self.parameters)  # mode=1: LMH mode
         self.set_test_end_wcdma()
 
-    def tx_power_aclr_evm_lmh_gsm(self):
+    def tx_power_aclr_evm_lmh_process_gsm(self):
         """
                 order: tx_path > band > chan
                 band_gsm:
@@ -423,6 +332,97 @@ class TxTestGenre(AtCmd, CMW100):
                 }
                 self.file_path = tx_power_relative_test_export_excel(data_chan, self.parameters)  # mode=1: LMH mode
         self.set_test_end_gsm()
+
+    def tx_power_aclr_evm_lmh_pipeline_fr1(self):
+        self.tx_level = ext_pmt.tx_level
+        self.port_tx = ext_pmt.port_tx
+        self.chan = ext_pmt.channel
+        self.sa_nsa_mode = ext_pmt.sa_nsa
+        items = [
+            (tech, tx_path, bw, band, type_)
+            for tech in ext_pmt.tech
+            for tx_path in ext_pmt.tx_paths
+            for bw in ext_pmt.fr1_bandwidths
+            for band in ext_pmt.fr1_bands
+            for type_ in ext_pmt.type_fr1
+        ]
+
+        for item in items:
+            if item[0] == 'FR1' and ext_pmt.fr1_bands != []:
+                self.tech = item[0]
+                self.tx_path = item[1]
+                self.bw_fr1 = item[2]
+                self.band_fr1 = item[3]
+                self.type_fr1 = item[4]
+                if self.bw_fr1 in cm_pmt_ftm.bandwidths_selected_fr1(self.band_fr1):
+                    self.tx_power_aclr_evm_lmh_process_fr1()
+                else:
+                    logger.info(f'B{self.band_fr1} does not have BW {self.bw_fr1}MHZ')
+        for bw in ext_pmt.fr1_bandwidths:
+            try:
+                # self.file_path = f'TxP_ACLR_EVM_{bw}MHZ_{self.tech}_LMH.xlsx'
+                txp_aclr_evm_plot(self.file_path, self.parameters)
+            except TypeError:
+                logger.info(f'there is no data to plot because the band does not have this BW ')
+            except FileNotFoundError:
+                logger.info(f'there is not file to plot BW{bw} ')
+
+    def tx_power_aclr_evm_lmh_pipeline_lte(self):
+        self.tx_level = ext_pmt.tx_level
+        self.port_tx = ext_pmt.port_tx
+        self.chan = ext_pmt.channel
+        items = [
+            (tech, tx_path, bw, band)
+            for tech in ext_pmt.tech
+            for tx_path in ext_pmt.tx_paths
+            for bw in ext_pmt.lte_bandwidths
+            for band in ext_pmt.lte_bands
+        ]
+        for item in items:
+            if item[0] == 'LTE' and ext_pmt.lte_bands != []:
+                self.tech = item[0]
+                self.tx_path = item[1]
+                self.bw_lte = item[2]
+                self.band_lte = item[3]
+                if self.bw_lte in cm_pmt_ftm.bandwidths_selected_lte(self.band_lte):
+                    self.tx_power_aclr_evm_lmh_process_lte()
+                else:
+                    logger.info(f'B{self.band_lte} does not have BW {self.bw_lte}MHZ')
+        for bw in ext_pmt.lte_bandwidths:
+            try:
+                # self.file_path = f'TxP_ACLR_EVM_{bw}MHZ_{self.tech}_LMH.xlsx'
+                txp_aclr_evm_plot(self.file_path, self.parameters)
+            except TypeError:
+                logger.info(f'there is no data to plot because the band does not have this BW ')
+            except FileNotFoundError:
+                logger.info(f'there is not file to plot BW{bw} ')
+
+    def tx_power_aclr_evm_lmh_pipeline_wcdma(self):
+        self.tx_level = ext_pmt.tx_level
+        self.port_tx = ext_pmt.port_tx
+        self.chan = ext_pmt.channel
+        for tech in ext_pmt.tech:
+            if tech == 'WCDMA' and ext_pmt.wcdma_bands != []:
+                self.tech = 'WCDMA'
+                for band in ext_pmt.wcdma_bands:
+                    self.band_wcdma = band
+                    self.tx_power_aclr_evm_lmh_process_wcdma()
+                txp_aclr_evm_plot(self.file_path, self.parameters)
+
+    def tx_power_aclr_evm_lmh_pipeline_gsm(self):
+        self.tx_level = ext_pmt.tx_level
+        self.port_tx = ext_pmt.port_tx
+        self.chan = ext_pmt.channel
+        self.mod_gsm = ext_pmt.mod_gsm
+        self.tsc = 0 if self.mod_gsm == 'GMSK' else 5
+        for tech in ext_pmt.tech:
+            if tech == 'GSM' and ext_pmt.gsm_bands != []:
+                self.tech = 'GSM'
+                for band in ext_pmt.gsm_bands:
+                    self.pcl = ext_pmt.tx_pcl_lb if band in [850, 900] else ext_pmt.tx_pcl_mb
+                    self.band_gsm = band
+                    self.tx_power_aclr_evm_lmh_process_gsm()
+                txp_aclr_evm_plot(self.file_path, self.parameters)
 
     def run(self):
         for tech in ext_pmt.tech:
