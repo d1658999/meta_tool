@@ -1,7 +1,7 @@
 import math
 import time
 
-from equipments.series_basis.cmw_series import CMW
+from equipments.series_basis.callbox.cmw_series import CMW
 from utils.log_init import log_set
 
 logger = log_set('CMW100')

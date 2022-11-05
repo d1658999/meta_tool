@@ -1,11 +1,9 @@
-from equipments.series_basis.serial_series import AtCmd
+from equipments.series_basis.callbox.serial_series import AtCmd
 from equipments.cmw100_test import CMW100
 from utils.log_init import log_set
 import utils.parameters.external_paramters as ext_pmt
 import utils.parameters.common_parameters_ftm as cm_pmt_ftm
 from utils.loss_handler import get_loss
-from utils.adb_control import get_odpm_current
-from equipments.power_supply import Psu
 from utils.excel_handler import txp_aclr_evm_current_plot, tx_power_relative_test_export_excel
 from utils.channel_handler import channel_freq_select
 import utils.parameters.rb_parameters as rb_pmt

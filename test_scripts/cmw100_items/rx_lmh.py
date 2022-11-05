@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from equipments.series_basis.serial_series import AtCmd
+from equipments.series_basis.callbox.serial_series import AtCmd
 from equipments.cmw100_test import CMW100
 from utils.log_init import log_set
 import utils.parameters.external_paramters as ext_pmt
@@ -9,7 +9,6 @@ import utils.parameters.rb_parameters as scrpt_set
 from utils.loss_handler import get_loss
 from utils.excel_handler import rxs_relative_plot, rxs_endc_plot, rx_power_endc_test_export_excel
 from utils.excel_handler import rx_power_relative_test_export_excel, rx_desense_process, rx_desense_endc_process
-from utils.excel_handler import excel_folder_path
 from utils.channel_handler import channel_freq_select
 
 
