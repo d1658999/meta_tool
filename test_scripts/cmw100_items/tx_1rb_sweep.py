@@ -6,7 +6,7 @@ import utils.parameters.common_parameters_ftm as cm_pmt_ftm
 from utils.loss_handler import get_loss
 from utils.adb_control import get_odpm_current
 from equipments.power_supply import Psu
-from utils.excel_handler import txp_aclr_evm_plot, tx_power_relative_test_export_excel
+from utils.excel_handler import txp_aclr_evm_current_plot, tx_power_relative_test_export_excel
 from utils.channel_handler import channel_freq_select
 import utils.parameters.rb_parameters as rb_pmt
 
@@ -61,7 +61,7 @@ class TxTestFreqSweep(AtCmd, CMW100):
         for bw in ext_pmt.fr1_bandwidths:
             try:
                 # self.filename = f'Tx_1RB_sweep_{bw}MHZ_{self.tech}.xlsx'
-                txp_aclr_evm_plot(self.file_path, self.parameters)
+                txp_aclr_evm_current_plot(self.file_path, self.parameters)
             except TypeError:
                 logger.info(f'there is no data to plot because the band does not have this BW ')
             except FileNotFoundError:
@@ -120,6 +120,7 @@ class TxTestFreqSweep(AtCmd, CMW100):
                                 'asw_srs_path': self.asw_srs_path,
                                 'scs': self.scs,
                                 'type': self.type_fr1,
+                                'test_item': '1rb_sweep',
                             }
                             self.file_path = tx_power_relative_test_export_excel(data, self.parameters)
 

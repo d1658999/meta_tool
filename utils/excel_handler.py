@@ -47,6 +47,24 @@ rx_path_fr1_dict = {
 }
 
 
+def select_file_name_genre_tx(bw, tech, test_item='lmh'):
+    """
+    select:
+        level_sweep
+        lmh
+        freq_sweep
+        1rb_sweep
+    """
+    if test_item == 'level_sweep':
+        return f'Tx_level_sweep_{bw}MHZ_{tech}.xlsx'
+    elif test_item == 'lmh':
+        return f'Tx_Pwr_ACLR_EVM_{bw}MHZ_{tech}_LMH.xlsx'
+    elif test_item == 'freq_sweep':
+        return f'Tx_freq_sweep_{bw}MHZ_{tech}.xlsx'
+    elif test_item == '1rb_sweep':
+        return f'Tx_1RB_sweep_{bw}MHZ_{tech}.xlsx'
+
+
 def excel_folder_create():
     file_dir = excel_folder_path()
     file_dir.mkdir(parents=True, exist_ok=True)
@@ -134,13 +152,14 @@ def tx_power_relative_test_export_excel(data, parameters_dict):
     asw_srs_path = parameters_dict['asw_srs_path']
     scs = parameters_dict['scs']
     type_ = parameters_dict['type']
+    test_item = parameters_dict['test_item']
     logger.info('----------save to excel----------')
     filename = None
     if script == 'GENERAL':
         if tx_freq_level >= 100:
-            filename = f'relative power_{bw}MHZ_{tech}_LMH.xlsx'
+            filename = select_file_name_genre_tx(bw, tech, test_item)
         elif tx_freq_level <= 100:
-            filename = f'TxP_ACLR_EVM_{bw}MHZ_{tech}_LMH.xlsx'
+            filename = select_file_name_genre_tx(bw, tech, test_item)
 
         file_path = Path(excel_folder_path()) / Path(filename)
 
@@ -328,7 +347,7 @@ def tx_power_relative_test_export_excel(data, parameters_dict):
         if tech == 'LTE':
             max_row = ws.max_row
             row = max_row + 1
-            if tx_freq_level >= 100:
+            if tx_freq_level >= 100:  # level_sweep
                 for tx_level, measured_data in data.items():
                     chan = chan_judge_lte(band, bw, tx_freq_level)
                     ws.cell(row, 1).value = band
@@ -351,14 +370,16 @@ def tx_power_relative_test_export_excel(data, parameters_dict):
                     ws.cell(row, 18).value = tx_path
                     ws.cell(row, 19).value = sync_path
                     ws.cell(row, 20).value = asw_srs_path
+                    ws.cell(row, 21).value = measured_data[10]
+                    ws.cell(row, 22).value = ext_pmt.condition
                     row += 1
 
-            elif tx_freq_level <= 100:
+            elif tx_freq_level <= 100:  # 1rb_sweep, lmh, freq_sweep
                 for tx_freq, measured_data in data.items():
-                    chan = chan_judge_lte(band, bw, tx_freq)
+                    chan = chan_judge_lte(band, bw, tx_freq) if test_item != 'freq_sweep' else None
                     ws.cell(row, 1).value = band
                     ws.cell(row, 2).value = tx_freq
-                    ws.cell(row, 3).value = chan  # # LMH
+                    ws.cell(row, 3).value = chan  # LMH
                     ws.cell(row, 4).value = tx_freq_level  # this tx_level
                     ws.cell(row, 5).value = measured_data[3]
                     ws.cell(row, 6).value = measured_data[2]
@@ -376,16 +397,16 @@ def tx_power_relative_test_export_excel(data, parameters_dict):
                     ws.cell(row, 18).value = tx_path
                     ws.cell(row, 19).value = sync_path
                     ws.cell(row, 20).value = asw_srs_path
-                    ws.cell(row, 21).value = measured_data[10]
-                    ws.cell(row, 22).value = ext_pmt.condition
-                    ws.cell(row, 23).value = measured_data[11]
-                    ws.cell(row, 24).value = measured_data[12]
+                    ws.cell(row, 21).value = measured_data[10] if test_item == 'lmh' else None
+                    ws.cell(row, 22).value = ext_pmt.condition if test_item == 'lmh' else None
+                    ws.cell(row, 23).value = measured_data[11] if test_item == 'lmh' else None
+                    ws.cell(row, 24).value = measured_data[12] if test_item == 'lmh' else None
                     row += 1
 
         elif tech == 'FR1':
             max_row = ws.max_row
             row = max_row + 1
-            if tx_freq_level >= 100:
+            if tx_freq_level >= 100:  # level_sweep
                 for tx_level, measured_data in data.items():
                     chan = chan_judge_fr1(band, bw, tx_freq_level)
                     ws.cell(row, 1).value = band
@@ -410,11 +431,13 @@ def tx_power_relative_test_export_excel(data, parameters_dict):
                     ws.cell(row, 20).value = rb_state
                     ws.cell(row, 21).value = sync_path
                     ws.cell(row, 22).value = asw_srs_path
+                    ws.cell(row, 23).value = measured_data[10]
+                    ws.cell(row, 24).value = ext_pmt.condition
                     row += 1
 
-            elif tx_freq_level <= 100:
+            elif tx_freq_level <= 100:  # 1rb_sweep, lmh, freq_sweep
                 for tx_freq, measured_data in data.items():
-                    chan = chan_judge_fr1(band, bw, tx_freq)
+                    chan = chan_judge_fr1(band, bw, tx_freq) if test_item != 'freq_sweep' else None
                     ws.cell(row, 1).value = band
                     ws.cell(row, 2).value = tx_freq
                     ws.cell(row, 3).value = chan  # LMH
@@ -437,16 +460,16 @@ def tx_power_relative_test_export_excel(data, parameters_dict):
                     ws.cell(row, 20).value = rb_state
                     ws.cell(row, 21).value = sync_path
                     ws.cell(row, 22).value = asw_srs_path
-                    ws.cell(row, 23).value = measured_data[10]
-                    ws.cell(row, 24).value = ext_pmt.condition
-                    ws.cell(row, 25).value = measured_data[11]
-                    ws.cell(row, 26).value = measured_data[12]
+                    ws.cell(row, 23).value = measured_data[10] if test_item == 'lmh' else None
+                    ws.cell(row, 24).value = ext_pmt.condition if test_item == 'lmh' else None
+                    ws.cell(row, 25).value = measured_data[11] if test_item == 'lmh' else None
+                    ws.cell(row, 26).value = measured_data[12] if test_item == 'lmh' else None
                     row += 1
 
         elif tech == 'WCDMA':
             max_row = ws.max_row
             row = max_row + 1
-            if tx_freq_level >= 100:
+            if tx_freq_level >= 100:  # level_sweep
                 for tx_level, measured_data in data.items():
                     chan = chan_judge_wcdma(band, tx_freq_level)
                     ws.cell(row, 1).value = band
@@ -466,11 +489,13 @@ def tx_power_relative_test_export_excel(data, parameters_dict):
                     ws.cell(row, 14).value = measured_data[8]
                     ws.cell(row, 15).value = tx_path
                     ws.cell(row, 16).value = asw_srs_path
+                    ws.cell(row, 17).value = measured_data[10]
+                    ws.cell(row, 18).value = ext_pmt.condition
                     row += 1
 
-            elif tx_freq_level <= 100:
+            elif tx_freq_level <= 100:  # 1rb_sweep, lmh, freq_sweep
                 for tx_freq, measured_data in data.items():
-                    chan = chan_judge_wcdma(band, tx_freq)
+                    chan = chan_judge_wcdma(band, tx_freq) if test_item != 'freq_sweep' else None
                     ws.cell(row, 1).value = band
                     ws.cell(row, 2).value = cm_pmt_ftm.trandfer_freq2chan_wcdma(band, tx_freq, 'tx')  # this channel
                     ws.cell(row, 3).value = chan  # LMH
@@ -487,16 +512,16 @@ def tx_power_relative_test_export_excel(data, parameters_dict):
                     ws.cell(row, 14).value = measured_data[8]
                     ws.cell(row, 15).value = tx_path
                     ws.cell(row, 16).value = asw_srs_path
-                    ws.cell(row, 17).value = measured_data[9]
-                    ws.cell(row, 18).value = ext_pmt.condition
-                    ws.cell(row, 19).value = measured_data[10]
-                    ws.cell(row, 20).value = measured_data[11]
+                    ws.cell(row, 17).value = measured_data[9] if test_item == 'lmh' else None
+                    ws.cell(row, 18).value = ext_pmt.condition if test_item == 'lmh' else None
+                    ws.cell(row, 19).value = measured_data[10] if test_item == 'lmh' else None
+                    ws.cell(row, 20).value = measured_data[11] if test_item == 'lmh' else None
                     row += 1
 
         elif tech == 'GSM':
             max_row = ws.max_row
             row = max_row + 1
-            if tx_freq_level >= 100:
+            if tx_freq_level >= 100:  # level_sweep
                 for tx_pcl, measured_data in data.items():
                     chan = chan_judge_gsm(band, tx_freq_level)
                     ws.cell(row, 1).value = band
@@ -521,12 +546,14 @@ def tx_power_relative_test_export_excel(data, parameters_dict):
                     ws.cell(row, 20).value = measured_data[14]
                     ws.cell(row, 21).value = measured_data[15]
                     ws.cell(row, 22).value = asw_srs_path
+                    ws.cell(row, 23).value = measured_data[10]
+                    ws.cell(row, 24).value = ext_pmt.condition
 
                     row += 1
 
-            elif tx_freq_level <= 100:
+            elif tx_freq_level <= 100:  # 1rb_sweep, lmh, freq_sweep
                 for rx_freq, measured_data in data.items():
-                    chan = chan_judge_gsm(band, rx_freq)
+                    chan = chan_judge_gsm(band, rx_freq) if test_item != 'freq_sweep' else None
                     ws.cell(row, 1).value = band
                     ws.cell(row, 2).value = cm_pmt_ftm.transfer_freq2chan_gsm(band, rx_freq)
                     ws.cell(row, 3).value = chan  # LMH
@@ -549,10 +576,10 @@ def tx_power_relative_test_export_excel(data, parameters_dict):
                     ws.cell(row, 20).value = measured_data[14]
                     ws.cell(row, 21).value = measured_data[15]
                     ws.cell(row, 22).value = asw_srs_path
-                    ws.cell(row, 23).value = measured_data[16]
-                    ws.cell(row, 24).value = ext_pmt.condition
-                    ws.cell(row, 25).value = measured_data[17]
-                    ws.cell(row, 26).value = measured_data[18]
+                    ws.cell(row, 23).value = measured_data[16] if test_item == 'lmh' else None
+                    ws.cell(row, 24).value = ext_pmt.condition if test_item == 'lmh' else None
+                    ws.cell(row, 25).value = measured_data[17] if test_item == 'lmh' else None
+                    ws.cell(row, 26).value = measured_data[18] if test_item == 'lmh' else None
                     row += 1
 
         wb.save(file_path)
@@ -561,7 +588,7 @@ def tx_power_relative_test_export_excel(data, parameters_dict):
         return file_path
 
 
-def txp_aclr_evm_plot(file_path, parameters_dict):
+def txp_aclr_evm_current_plot(file_path, parameters_dict):
     script = parameters_dict['script']
     tech = parameters_dict['tech']
     band = parameters_dict['band']
@@ -1427,9 +1454,11 @@ def rxs_relative_plot(file_path, parameters_dict):
             wb.close()
 
 
-def endc_relative_power_senstivity_export_excel(data):
+def rx_power_endc_test_export_excel(data):
     """
-    :param data:  data = [int(self.band_lte), int(self.band_fr1), self.power_monitor_endc_lte, self.power_endc_fr1, self.rx_level, self.bw_lte, self.bw_fr1, self.tx_freq_lte, self.tx_freq_fr1, self.tx_level_endc_lte, self.tx_level_endc_fr1, self.rb_size_lte, self.rb_start_lte, self.rb_size_fr1, self.rb_start_fr1]
+    :param data:  data = [int(self.band_lte), int(self.band_fr1), self.power_monitor_endc_lte, self.power_endc_fr1,
+    self.rx_level, self.bw_lte, self.bw_fr1, self.tx_freq_lte, self.tx_freq_fr1, self.tx_level_endc_lte,
+    self.tx_level_endc_fr1, self.rb_size_lte, self.rb_start_lte, self.rb_size_fr1, self.rb_start_fr1]
     :return:
     """
     logger.info('----------save to excel----------')

@@ -7,7 +7,7 @@ import utils.parameters.external_paramters as ext_pmt
 import utils.parameters.common_parameters_ftm as cm_pmt_ftm
 import utils.parameters.rb_parameters as scrpt_set
 from utils.loss_handler import get_loss
-from utils.excel_handler import rxs_relative_plot, rxs_endc_plot, endc_relative_power_senstivity_export_excel
+from utils.excel_handler import rxs_relative_plot, rxs_endc_plot, rx_power_endc_test_export_excel
 from utils.excel_handler import rx_power_relative_test_export_excel, rx_desense_process, rx_desense_endc_process
 from utils.excel_handler import excel_folder_path
 from utils.channel_handler import channel_freq_select
@@ -412,7 +412,7 @@ class RxTest(AtCmd, CMW100):
                          self.rb_start_lte, self.rb_size_fr1, self.rb_start_fr1])
             self.set_test_end_fr1(delay=0.5)
             self.set_test_end_lte(delay=0.5)
-        file_path = endc_relative_power_senstivity_export_excel(data)
+        file_path = rx_power_endc_test_export_excel(data)
         # file_name = 'Sensitivty_ENDC.xlsx'
         # file_path = Path(excel_folder_path()) / Path(file_name)
         rx_desense_endc_process(file_path)
@@ -440,7 +440,7 @@ class RxTest(AtCmd, CMW100):
                                     self.search_sensitivity_lmh_fast_process_lte()
                                 else:
                                     logger.info(f'B{self.band_lte} does not have BW {self.bw_lte}MHZ')
-                            # self.txp_aclr_evm_plot(self.filename, mode=1)  # mode=1: LMH mode
+                            # self.txp_aclr_evm_current_plot(self.filename, mode=1)  # mode=1: LMH mode
                         except TypeError as err:
                             logger.debug(err)
                             logger.info(f'there is no data to plot because the band does not have this BW ')

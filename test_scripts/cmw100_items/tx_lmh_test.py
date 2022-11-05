@@ -6,7 +6,7 @@ import utils.parameters.common_parameters_ftm as cm_pmt_ftm
 from utils.loss_handler import get_loss
 from utils.adb_control import get_odpm_current
 from equipments.power_supply import Psu
-from utils.excel_handler import txp_aclr_evm_plot, tx_power_relative_test_export_excel
+from utils.excel_handler import txp_aclr_evm_current_plot, tx_power_relative_test_export_excel
 from utils.channel_handler import channel_freq_select
 import utils.parameters.rb_parameters as rb_pmt
 
@@ -137,6 +137,7 @@ class TxTestGenre(AtCmd, CMW100):
                             'asw_srs_path': self.asw_srs_path,
                             'scs': self.scs,
                             'type': self.type_fr1,
+                            'test_item': 'lmh',
                         }
                         self.file_path = tx_power_relative_test_export_excel(data_freq, self.parameters)
         self.set_test_end_fr1()
@@ -203,6 +204,7 @@ class TxTestGenre(AtCmd, CMW100):
                             'asw_srs_path': self.asw_srs_path,
                             'scs': None,
                             'type': None,
+                            'test_item': 'lmh',
                         }
                         self.file_path = tx_power_relative_test_export_excel(data_freq, self.parameters)
         self.set_test_end_lte()
@@ -268,6 +270,7 @@ class TxTestGenre(AtCmd, CMW100):
                     'asw_srs_path': self.asw_srs_path,
                     'scs': None,
                     'type': None,
+                    'test_item': 'lmh',
                 }
                 self.file_path = tx_power_relative_test_export_excel(data_chan, self.parameters)  # mode=1: LMH mode
         self.set_test_end_wcdma()
@@ -329,6 +332,7 @@ class TxTestGenre(AtCmd, CMW100):
                     'asw_srs_path': self.asw_srs_path,
                     'scs': None,
                     'type': None,
+                    'test_item': 'lmh',
                 }
                 self.file_path = tx_power_relative_test_export_excel(data_chan, self.parameters)  # mode=1: LMH mode
         self.set_test_end_gsm()
@@ -361,7 +365,7 @@ class TxTestGenre(AtCmd, CMW100):
         for bw in ext_pmt.fr1_bandwidths:
             try:
                 # self.file_path = f'TxP_ACLR_EVM_{bw}MHZ_{self.tech}_LMH.xlsx'
-                txp_aclr_evm_plot(self.file_path, self.parameters)
+                txp_aclr_evm_current_plot(self.file_path, self.parameters)
             except TypeError:
                 logger.info(f'there is no data to plot because the band does not have this BW ')
             except FileNotFoundError:
@@ -391,7 +395,7 @@ class TxTestGenre(AtCmd, CMW100):
         for bw in ext_pmt.lte_bandwidths:
             try:
                 # self.file_path = f'TxP_ACLR_EVM_{bw}MHZ_{self.tech}_LMH.xlsx'
-                txp_aclr_evm_plot(self.file_path, self.parameters)
+                txp_aclr_evm_current_plot(self.file_path, self.parameters)
             except TypeError:
                 logger.info(f'there is no data to plot because the band does not have this BW ')
             except FileNotFoundError:
@@ -407,7 +411,7 @@ class TxTestGenre(AtCmd, CMW100):
                 for band in ext_pmt.wcdma_bands:
                     self.band_wcdma = band
                     self.tx_power_aclr_evm_lmh_process_wcdma()
-                txp_aclr_evm_plot(self.file_path, self.parameters)
+                txp_aclr_evm_current_plot(self.file_path, self.parameters)
 
     def tx_power_aclr_evm_lmh_pipeline_gsm(self):
         self.tx_level = ext_pmt.tx_level
@@ -422,7 +426,7 @@ class TxTestGenre(AtCmd, CMW100):
                     self.pcl = ext_pmt.tx_pcl_lb if band in [850, 900] else ext_pmt.tx_pcl_mb
                     self.band_gsm = band
                     self.tx_power_aclr_evm_lmh_process_gsm()
-                txp_aclr_evm_plot(self.file_path, self.parameters)
+                txp_aclr_evm_current_plot(self.file_path, self.parameters)
 
     def run(self):
         for tech in ext_pmt.tech:

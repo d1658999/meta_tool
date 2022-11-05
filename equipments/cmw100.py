@@ -1601,7 +1601,7 @@ class Cmw100:
         #                                          self.rb_start_lte, self.rb_size_fr1, self.rb_start_fr1])
         #             self.set_test_end_fr1(delay=0.5)
         #             self.set_test_end_lte(delay=0.5)
-        #             self.endc_relative_power_senstivity_export_excel(data)
+        #             self.rx_power_endc_test_export_excel(data)
         #         self.rx_desense_endc_process()
         # self.rxs_endc_plot('Sensitivty_ENDC.xlsx')
 
@@ -1625,7 +1625,7 @@ class Cmw100:
                                     self.search_sensitivity_lmh_fast_progress_lte()
                                 else:
                                     logger.info(f'B{self.band_lte} does not have BW {self.bw_lte}MHZ')
-                            # self.txp_aclr_evm_plot(self.filename, mode=1)  # mode=1: LMH mode
+                            # self.txp_aclr_evm_current_plot(self.filename, mode=1)  # mode=1: LMH mode
                         except TypeError as err:
                             logger.debug(err)
                             logger.info(f'there is no data to plot because the band does not have this BW ')
@@ -4124,7 +4124,7 @@ class Cmw100:
 
         self.set_test_end_fr1()
         # if plot == True:
-        #     self.txp_aclr_evm_plot(self.filename, mode=1)  # mode=1: LMH mode
+        #     self.txp_aclr_evm_current_plot(self.filename, mode=1)  # mode=1: LMH mode
         # else:
         #     pass
 
@@ -4180,7 +4180,7 @@ class Cmw100:
 
         self.set_test_end_fr1()
         # if plot == True:
-        #     self.txp_aclr_evm_plot(self.filename, mode=1)  # mode=1: LMH mode
+        #     self.txp_aclr_evm_current_plot(self.filename, mode=1)  # mode=1: LMH mode
         # else:
         #     pass
 
