@@ -12,10 +12,8 @@ import yaml
 from utils.log_init import log_set
 from utils.adb_handler import get_serial_devices
 from utils.excel_handler import excel_folder_create
-
-# import ui_init
-# from power_supply import Psu
-# from temp_chamber import TempChamber
+from equipments.power_supply import Psu
+from equipments.temp_chamber import TempChamber
 
 logger = log_set('GUI')
 
@@ -1132,7 +1130,7 @@ class MainApp:
         self.UHB_all_state_fr1()
 
     def thermal_dis(self):
-        from adb_control import thermal_charger_disable
+        from utils.adb_handler import thermal_charger_disable
         thermal_charger_disable()
 
     def init_select(self):
