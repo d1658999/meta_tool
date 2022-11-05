@@ -1044,8 +1044,8 @@ class MainApp:
             'instrument': {
                 'instrument': instrument,
             },
-            'test_scripts': {
-                'test_scripts': scripts,
+            'scripts': {
+                'scripts': scripts,
             },
             'type': {
                 'type_fr1': type_fr1,
