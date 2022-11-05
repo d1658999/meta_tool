@@ -9,7 +9,7 @@ import utils.parameters.rb_parameters as rb_pmt
 import utils.parameters.fcc as fcc
 import utils.parameters.ce as ce
 
-logger = log_set('FCC_CE')
+logger = log_set('tx_fcc_ce')
 
 
 class TxTestFccCe(AtCmd, CMW100):

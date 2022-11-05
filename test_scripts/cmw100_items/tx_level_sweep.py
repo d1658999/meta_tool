@@ -11,7 +11,7 @@ from utils.channel_handler import channel_freq_select
 import utils.parameters.rb_parameters as rb_pmt
 import time
 
-logger = log_set('freq_sweep')
+logger = log_set('level_sweep')
 
 
 class TxTestLevelSweep(AtCmd, CMW100):

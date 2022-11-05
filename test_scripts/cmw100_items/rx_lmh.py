@@ -12,7 +12,7 @@ from utils.excel_handler import rx_power_relative_test_export_excel, rx_desense_
 from utils.channel_handler import channel_freq_select
 
 
-logger = log_set('tx_lmh')
+logger = log_set('rx_lmh')
 
 
 class RxTestGenre(AtCmd, CMW100):
