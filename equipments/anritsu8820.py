@@ -203,15 +203,15 @@ class Anritsu8820(Anritsu):
 
         elif s == 'WCDMA':
             self.set_rf_out_port('MAIN')
-            self.inst.write('BANDIND AUTO')
+            self.set_band_indicator('AUTO')
             # self.inst.write('ATTFLAG OFF')
             # self.inst.write('MEASREP OFF')
-            self.inst.write('DRXCYCLNG 64')
-            self.inst.write('BER_SAMPLE 10000')
-            self.inst.write('CONF_MEAS ON')
-            self.inst.write('RX_TIMEOUT 5')
-            self.inst.write('DOMAINIDRMC CS')
-            self.inst.write('REGMODE AUTO')
+            self.set_drx_cycling(64)
+            self.set_ber_sample(10000)
+            self.set_config_measurement('ON')
+            self.set_rx_timeout(5)
+            self.set_domain_drmc('CS')
+            self.set_register_mode('AUTO')
 
         elif s == 'GSM':
             pass

@@ -329,6 +329,55 @@ class Anritsu:
         """
         self.anritsu_write(f'SIB2_NS NS_{ns_num}')
 
+    def set_band_indicator(self, mode='AUTO'):
+        """
+        Set band indicator
+        <mode> AUTO | OFF
+        """
+        self.anritsu_write(f'BANDIND {mode}')
+
+    def set_drx_cycling(self, length=64):
+        """
+        Set DRX Cycle Length
+        <length>
+        """
+        self.anritsu_write(f'DRXCYCLNG {length}')
+
+    def set_ber_sample(self, sample=10000):
+        """
+        Set the sample of BER
+        <sample>
+        """
+        self.anritsu_write(f'BER_SAMPLE {sample}')
+
+    def set_config_measurement(self, mode='ON'):
+        """
+        set the config measurement
+        <mode> ON | OFF
+        """
+        self.anritsu_write(f'CONF_MEAS {mode}')
+
+    def set_rx_timeout(self, timeout=5):
+        """
+        Set the timout of RX
+        <timeout>
+        """
+        self.anritsu_write(f'RX_TIMEOUT {timeout}')
+
+    def set_domain_drmc(self, mode='CS'):
+        """
+        This might select the drmc path
+        <mode> CS | PS
+        """
+        self.anritsu_write(f'DOMAINIDRMC {mode}')
+
+    def set_register_mode(self, mode='AUTO'):
+        """
+        WCDMA: AUTO
+        HSUPA/HSDPA: COMBINED
+        """
+        self.anritsu_write(f'REGMODE {mode}')
+
     def get_standard_query(self):
         """
         To check the standard in equipment
