@@ -1,18 +1,17 @@
 import pyvisa
-import logging
-from logging.config import fileConfig
 import time
-import want_test_band as wt
+import utils.parameters.external_paramters as ext_pmt
+from connection_interface.connection_visa import VisaComport
+from utils.log_init import log_set
 
-fileConfig('logging.ini')
-logger = logging.getLogger()
+logger = log_set('temp_chamber')
 
 
 class TempChamber:
     def __init__(self):
-        self.build_object()
+        self.tpchb = VisaComport('temp_chamber')
 
-    def tpchb_init(self, target_temp=wt.temp):
+    def tpchb_init(self, target_temp=ext_pmt.temp):
         logger.info('----------Init Temp----------')
         logger.info(self.tpchb.query("*IDN?").strip())
         logger.info(f'Start to go to temp {target_temp} C')
@@ -27,22 +26,8 @@ class TempChamber:
                 time.sleep(10)
                 temp_state = float(self.tpchb.query('TEMP?').strip().split(',')[0])
                 logger.info(f'Now the room temp is {temp_state}C')
-        logger.info(f'Acheieve to the target temp {target_temp}, and need to wait 2 min')
+        logger.info(f'Achieve to the target temp {target_temp}, and need to wait 2 min')
         time.sleep(120)
-
-    def build_object(self):
-        logger.info('start to connect')
-        gpib_want = None
-        for gpib in self.get_gpib_tpchb():  # this is to search GPIB for PSU
-            inst = pyvisa.ResourceManager().open_resource(gpib)
-            inst = inst.query('*IDN?').strip()
-            logger.info('----------Search temp chamber we are using----------')
-            if 'NA:CMD_ERR' in inst:
-                gpib_want = gpib
-                break
-
-        self.tpchb = pyvisa.ResourceManager().open_resource(gpib_want)  # to build inst object
-        self.tpchb.timeout = 5000
 
     @staticmethod
     def get_gpib_tpchb():
@@ -56,10 +41,7 @@ class TempChamber:
 
 
 def main():
-    psu = Psu(True)
-    psu.psu_init()
-    # rm = pyvisa.ResourceManager().list_resources()
-    # print(rm)
+    pass
 
 
 if __name__ == '__main__':

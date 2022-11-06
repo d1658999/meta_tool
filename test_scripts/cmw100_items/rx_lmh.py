@@ -11,7 +11,6 @@ from utils.excel_handler import rxs_relative_plot, rxs_endc_plot, rx_power_endc_
 from utils.excel_handler import rx_power_relative_test_export_excel, rx_desense_process, rx_desense_endc_process
 from utils.channel_handler import channel_freq_select
 
-
 logger = log_set('rx_lmh')
 
 
@@ -19,6 +18,18 @@ class RxTestGenre(AtCmd, CMW100):
     def __init__(self):
         AtCmd.__init__(self)
         CMW100.__init__(self)
+        self.tx_freq_wcdma = None
+        self.file_path = None
+        self.power_monitor_endc_lte = None
+        self.power_endc_fr1 = None
+        self.chan_rb = None
+        self.band_combo = None
+        self.port_tx_fr1 = None
+        self.port_tx_lte = None
+        self.tx_level_endc_fr1 = None
+        self.tx_level_endc_lte = None
+        self.mcs_wcdma = None
+        self.ue_power_bool = None
         self.script = None
         self.chan = None
         self.resolution = None
@@ -184,7 +195,6 @@ class RxTestGenre(AtCmd, CMW100):
         self.sa_nsa_mode = ext_pmt.sa_nsa
         self.script = 'GENERAL'
         self.mcs_fr1 = 'QPSK'
-        self.file_path = None
         items = [
             (tech, tx_path, bw, ue_power_bool, band)
             for tech in ext_pmt.tech
@@ -234,7 +244,6 @@ class RxTestGenre(AtCmd, CMW100):
         self.chan = ext_pmt.channel
         self.mcs_lte = 'QPSK'
         self.script = 'GENERAL'
-        self.file_path = None
         items = [
             (tech, tx_path, bw, ue_power_bool, band)
             for tech in ext_pmt.tech
@@ -284,7 +293,6 @@ class RxTestGenre(AtCmd, CMW100):
         self.chan = ext_pmt.channel
         self.mcs_wcdma = 'QPSK'
         self.script = 'GENERAL'
-        self.file_path = None
         items = [
             (tech, tx_path, band)
             for tech in ext_pmt.tech
@@ -311,7 +319,6 @@ class RxTestGenre(AtCmd, CMW100):
         self.chan = ext_pmt.channel
         self.mod_gsm = ext_pmt.mod_gsm
         self.script = 'GENERAL'
-        self.file_path = None
         items = [
             (tech, band)
             for tech in ext_pmt.tech
@@ -521,13 +528,15 @@ class RxTestGenre(AtCmd, CMW100):
                     self.bw_lte)  # for RB set
                 self.antenna_switch_v2()
                 self.tx_set_lte()
-                aclr_mod_results = self.tx_measure_lte()  # aclr_results + mod_results  # U_-2, U_-1, E_-1, Pwr, E_+1, U_+1, U_+2, EVM, Freq_Err, IQ_OFFSET
+                aclr_mod_results = self.tx_measure_lte()  # aclr_results + mod_results  # U_-2, U_-1, E_-1, Pwr,
+                # E_+1, U_+1, U_+2, EVM, Freq_Err, IQ_OFFSET
                 # self.command_cmw100_query('*OPC?')
                 self.search_sensitivity_lte()
                 self.query_rx_measure_lte()
                 logger.info(f'Power: {aclr_mod_results[3]:.1f}, Sensitivity: {self.rx_level}')
                 data[self.tx_freq_lte] = [aclr_mod_results[3], self.rx_level, self.rsrp_list, self.cinr_list,
-                                          self.agc_list]  # measured_power, measured_rx_level, rsrp_list, cinr_list, agc_list
+                                          self.agc_list]  # measured_power, measured_rx_level, rsrp_list, cinr_list,
+                # agc_list
                 self.set_test_end_lte()
             parameters = {
                 'script': self.script,
@@ -668,7 +677,8 @@ class RxTestGenre(AtCmd, CMW100):
                                                                                                    self.bw_lte)  # for RB set
             self.tx_set_lte()
             self.tx_measure_lte()
-            aclr_mod_results = self.tx_measure_lte()  # aclr_results + mod_results  # U_-2, U_-1, E_-1, Pwr, E_+1, U_+1, U_+2, EVM, Freq_Err, IQ_OFFSET
+            aclr_mod_results = self.tx_measure_lte()  # aclr_results + mod_results  # U_-2, U_-1, E_-1, Pwr, E_+1,
+            # U_+1, U_+2, EVM, Freq_Err, IQ_OFFSET
             self.rx_path_setting_lte()
             self.query_rx_measure_lte()
             logger.info(f'Power: {aclr_mod_results[3]:.1f}, Sensitivity: {self.esens_list}')
@@ -676,7 +686,7 @@ class RxTestGenre(AtCmd, CMW100):
             rsrp_max_index = self.rsrp_list.index(rsrp_max)
             rx_level = self.esens_list[rsrp_max_index]
             self.filename = rx_power_relative_test_export_excel(data_freq, self.band_lte, self.bw_lte,
-                                                                     rx_level)
+                                                                rx_level)
 
     def run(self):
         for tech in ext_pmt.tech:
@@ -697,6 +707,7 @@ class RxTestGenre(AtCmd, CMW100):
 def main():
     p = Path.cwd()
     print(p)
+
 
 if __name__ == '__main__':
     main()

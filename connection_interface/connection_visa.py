@@ -32,8 +32,8 @@ class VisaComport:
                     gpib_wanted = gpib
                     break
 
-            self.inst = pyvisa.ResourceManager().open_resource(gpib_wanted)  # to build object of 'inst'
             logger.info(f"Connect to {self.inst.query('*IDN?').strip()}")
+            self.inst = pyvisa.ResourceManager().open_resource(gpib_wanted)  # to build object of 'inst'
 
         elif equipment_name in ['psu', 'PSU']:
             psu_list = ['E3631A', 'E3642A', 'E36313A']
@@ -50,14 +50,32 @@ class VisaComport:
                             psu_select = psu
                             break
 
-                self.inst = pyvisa.ResourceManager().open_resource(gpib_usb_wanted)  # to build object of 'inst'
-
             except Exception as err:
                 logger.info(err)
                 logger.info('Please check if connecting to PSU')
 
             else:
-                logger.info(f'Connect to {psu_select}')
+                logger.info(f'Connect to {psu_select} successfully')
+                self.inst = pyvisa.ResourceManager().open_resource(gpib_usb_wanted)  # to build object of 'inst'
+
+        elif equipment_name == 'temp_chamber':
+            gpib_wanted = None
+            try:
+                for gpib in self.get_gpib_usb():  # this is to search GPIB for PSU
+                    inst = pyvisa.ResourceManager().open_resource(gpib)
+                    inst = inst.query('*IDN?').strip()
+                    logger.info('----------Search temp chamber we are using----------')
+                    if 'NA:CMD_ERR' in inst:
+                        gpib_wanted = gpib
+                        break
+
+            except Exception as err:
+                logger.info(err)
+                logger.info('Please check if connecting to temp_chamber')
+
+            else:
+                logger.info(f'Connect to temp_chamber successfully')
+                self.inst = pyvisa.ResourceManager().open_resource(gpib_wanted)  # to build object of 'inst'
 
         self.inst.timeout = 5000  # set the default timeout
 
