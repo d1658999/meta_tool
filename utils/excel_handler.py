@@ -69,6 +69,7 @@ def excel_folder_create():
     file_dir = excel_folder_path()
     file_dir.mkdir(parents=True, exist_ok=True)
     logger.info('----------folder create ----------')
+    logger.info(file_dir)
 
 
 def excel_folder_path():

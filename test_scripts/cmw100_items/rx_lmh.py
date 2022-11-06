@@ -590,7 +590,8 @@ class RxTestGenre(AtCmd, CMW100):
                     # self.query_rx_measure_wcdma()
                     # logger.info(f'Power: {aclr_mod_results[3]:.1f}, Sensitivity: {self.rx_level}')
                     # data[self.tx_freq_lte] = [aclr_mod_results[3], self.rx_level, self.rsrp_list, self.cinr_list,
-                    #                           self.agc_list]  # measured_power, measured_rx_level, rsrp_list, cinr_list, agc_list
+                    #                           self.agc_list]  # measured_power, measured_rx_level, rsrp_list
+                    #                           , cinr_list, agc_list
                     self.set_test_end_wcdma()
                 parameters = {
                     'script': self.script,
@@ -637,7 +638,8 @@ class RxTestGenre(AtCmd, CMW100):
                     data[self.rx_chan_gsm] = [self.rx_level, self.rssi]
                     # logger.info(f'Power: {aclr_mod_results[3]:.1f}, Sensitivity: {self.rx_level}')
                     # data[self.tx_freq_lte] = [aclr_mod_results[3], self.rx_level, self.rsrp_list, self.cinr_list,
-                    #                           self.agc_list]  # measured_power, measured_rx_level, rsrp_list, cinr_list, agc_list
+                    #                           self.agc_list]  # measured_power, measured_rx_level, rsrp_list
+                    #                           , cinr_list, agc_list
                     self.set_test_end_gsm()
                 parameters = {
                     'script': self.script,
@@ -674,7 +676,8 @@ class RxTestGenre(AtCmd, CMW100):
             self.sig_gen_lte()
             self.sync_lte()
             self.rb_size_lte, self.rb_start_lte = cm_pmt_ftm.special_uplink_config_sensitivity_lte(self.band_lte,
-                                                                                                   self.bw_lte)  # for RB set
+                                                                                                   self.bw_lte)
+            # for RB set
             self.tx_set_lte()
             self.tx_measure_lte()
             aclr_mod_results = self.tx_measure_lte()  # aclr_results + mod_results  # U_-2, U_-1, E_-1, Pwr, E_+1,
