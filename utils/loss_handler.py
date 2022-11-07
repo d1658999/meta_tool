@@ -3,29 +3,34 @@ from pathlib import Path
 
 
 def read_loss_file():
+    # file_path = Path('loss.csv')  # test use
     file_path = Path('utils') / Path('loss.csv')
     with open(file_path, 'r') as csvfile:
         rows = csv.reader(csvfile)
         next(rows)  # skip the title
-        loss_list = []
+        loss_dict = {}
         for row in list(rows):
-            loss_list.append((int(row[0]), float(row[1])))
-        return loss_list
+            loss_dict[int(row[0])] = float(row[1])
+        return loss_dict
 
 
 def get_loss(freq):
-    loss_table = read_loss_file()
+    loss_table_dict = read_loss_file()
     want_loss = None
-    for lt in loss_table:
-        if freq > lt[0] * 1000:
-            want_loss = lt[1]
-        elif lt[0] * 1000 > freq:
+    for f in loss_table_dict:
+        if freq >= int(f) * 1000:
+            want_loss = float(loss_table_dict[f])
+        elif int(f) * 1000 > freq:
             break
     return want_loss
 
 
 def main():
-    pass
+    file = read_loss_file()
+    file = sorted(file.keys())
+    print(file)
+    # for f in file:
+    #     print(f, file[f], (type(f), type(file[f])))
 
 
 if __name__ == '__main__':

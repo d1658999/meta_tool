@@ -2,6 +2,7 @@ import time
 
 from equipments.series_basis.callbox.anritsu_series import Anritsu
 from utils.log_init import log_set
+from utils.loss_handler import read_loss_file
 
 logger = log_set('Anritsu8820')
 
@@ -216,11 +217,18 @@ class Anritsu8820(Anritsu):
         elif s == 'GSM':
             pass
 
-    def set_path_loss(self):
-        """
+    def set_path_loss(self, standard):
+        logger.info('Set LOSS')
+        self.set_loss_table_delete()  # delete the unknown loss table first
 
-        """
-        self.anritsu_write()
+        loss_title = 'LOSSTBLVAL'
+        loss_dict = read_loss_file()
+        freq = sorted(loss_dict.keys())
+        for f in freq:
+            self.set_loss_table(loss_title, f, loss_dict[f], loss_dict[f], loss_dict[f])
+        s = standard  # WCDMA|GSM|LTE
+        logger.debug("Current Format: " + s)
+        self.set_loss_common(s)
 
     def set_handover(self, standard, dl_ch, bw=5):
         s = standard  # WCDMA|GSM|LTE

@@ -378,6 +378,35 @@ class Anritsu:
         """
         self.anritsu_write(f'REGMODE {mode}')
 
+    def set_loss_table_delete(self):
+        """
+        Delete the unknown loss table
+        """
+        self.anritsu_write(f'DELLOSSTBL')
+
+    def set_loss_table(self, loss_title, freq, loss_dl, loss_ul, loss_aux):
+        """
+        This is only suitable for 8820
+        """
+        self.anritsu_write(f'{loss_title}, {freq}MHz, {loss_dl}, {loss_ul}, {loss_aux}')
+        logger.info(f'{loss_title}, {freq}MHz, {loss_dl}, {loss_ul}, {loss_aux}')
+
+    def set_loss_common(self, standard):
+        """
+        loss status to set common for 8820
+        """
+        if standard == 'LTE':
+            self.anritsu_write("EXTLOSSW COMMON")
+            self.anritsu_query('*OPC?')
+        elif standard == 'WCDMA':
+            self.anritsu_write("DLEXTLOSSW COMMON")  # Set DL external loss to COMMON
+            self.anritsu_write("ULEXTLOSSW COMMON")  # Set UL external loss to COMMON
+            self.anritsu_write("AUEXTLOSSW COMMON")  # Set AUX external loss to COMMON
+            self.anritsu_query('*OPC?')
+        elif standard == "GSM":
+            self.anritsu_write("EXTLOSSW COMMON")
+            self.anritsu_query('*OPC?')
+
     def get_standard_query(self):
         """
         To check the standard in equipment
