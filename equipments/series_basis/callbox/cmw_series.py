@@ -121,7 +121,7 @@ class CMW:
         <RXConnector> RF connector for the input path
         <RFConverter> RX module for the input path
         """
-        self.cmw_write(f'ROUTe:GPRF:MEASurement:SCENario:SALone R1{port_tx} RX1')
+        self.cmw_write(f'ROUTe:GPRF:MEASurement:SCENario:SALone R1{port_tx}, RX1')
 
     def set_rf_tx_port_fr1(self, port_tx=1):
         """
@@ -133,7 +133,7 @@ class CMW:
         <RXConnector> RF connector for the input path
         <RFConverter> RX module for the input path
         """
-        self.cmw_write(f'ROUTe:NRSub:MEASurement:SCENario:SALone R1{port_tx} RX1')
+        self.cmw_write(f'ROUTe:NRSub:MEASurement:SCENario:SALone R1{port_tx}, RX1')
 
     def set_rf_tx_port_lte(self, port_tx=1):
         """
@@ -145,7 +145,7 @@ class CMW:
         <RXConnector> RF connector for the input path
         <RFConverter> RX module for the input path
         """
-        self.cmw_write(f'ROUTe:LTE:MEASurement:SCENario:SALone R1{port_tx} RX1')
+        self.cmw_write(f'ROUTe:LTE:MEASurement:SCENario:SALone R1{port_tx}, RX1')
 
     def set_rf_tx_port_wcdma(self, port_tx=1):
         """
@@ -157,7 +157,7 @@ class CMW:
         <RXConnector> RF connector for the input path
         <RFConverter> RX module for the input path
         """
-        self.cmw_write(f'ROUTe:WCDMa:MEASurement:SCENario:SALone R1{port_tx} RX1')
+        self.cmw_write(f'ROUTe:WCDMa:MEASurement:SCENario:SALone R1{port_tx}, RX1')
 
     def set_rf_tx_port_gsm(self, port_tx=1):
         """
@@ -169,7 +169,7 @@ class CMW:
         <RXConnector> RF connector for the input path
         <RFConverter> RX module for the input path
         """
-        self.cmw_write(f'ROUTe:GSM:MEASurement:SCENario:SALone R1{port_tx} RX1')
+        self.cmw_write(f'ROUTe:GSM:MEASurement:SCENario:SALone R1{port_tx}, RX1')
 
     def set_rf_rx_port_gprf(self, port_rx=18):
         """
@@ -181,7 +181,7 @@ class CMW:
         <TXConnector> RF connector for the output path
         <RFConverter> TX module for the output path
         """
-        self.cmw_write(f'ROUTe:GPRF:GENerator:SCENario:SALone R1{port_rx} TX1')
+        self.cmw_write(f'ROUTe:GPRF:GENerator:SCENario:SALone R1{port_rx}, TX1')
 
     def set_rf_rx_port_fr1(self, port_rx=18):
         """
@@ -193,7 +193,7 @@ class CMW:
         <TXConnector> RF connector for the output path
         <RFConverter> TX module for the output path
         """
-        self.cmw_write(f'ROUTe:NRsub:GENerator:SCENario:SALone R1{port_rx} TX1')
+        self.cmw_write(f'ROUTe:NRsub:GENerator:SCENario:SALone R1{port_rx}, TX1')
 
     def set_rf_rx_port_lte(self, port_rx=18):
         """
@@ -205,7 +205,7 @@ class CMW:
         <TXConnector> RF connector for the output path
         <RFConverter> TX module for the output path
         """
-        self.cmw_write(f'ROUTe:LTE:GENerator:SCENario:SALone R1{port_rx} TX1')
+        self.cmw_write(f'ROUTe:LTE:GENerator:SCENario:SALone R1{port_rx}, TX1')
 
     def set_rf_rx_port_wcdma(self, port_rx=18):
         """
@@ -217,7 +217,7 @@ class CMW:
         <TXConnector> RF connector for the output path
         <RFConverter> TX module for the output path
         """
-        self.cmw_write(f'ROUTe:WCDMa:GENerator:SCENario:SALone R1{port_rx} TX1')
+        self.cmw_write(f'ROUTe:WCDMa:GENerator:SCENario:SALone R1{port_rx}, TX1')
 
     def set_power_count_gprf(self, count=2):
         """
@@ -340,7 +340,7 @@ class CMW:
         Power trigger (received RF power)
         *RST:  'IF Power'
         """
-        self.cmw_write(f'TRIGger:NRSub:MEASurement:MEValuation:SOURce {source}')
+        self.cmw_write(f'TRIGger:NRSub:MEASurement:MEValuation:SOURce "{source}"')
 
     def set_trigger_source_lte(self, source='Free Run'):
         """
@@ -357,7 +357,7 @@ class CMW:
         Power trigger (received RF power)
         *RST:  'IF Power'
         """
-        self.cmw_write(f'TRIGger:LTE:MEASurement:MEValuation:SOURce {source}')
+        self.cmw_write(f'TRIGger:LTE:MEASurement:MEValuation:SOURce "{source}"')
 
     def set_trigger_source_wcdma(self, source='Free Run'):
         """
@@ -372,7 +372,7 @@ class CMW:
         'IF Power (Sync)': Power trigger (extended synchronization)
         *RST:  'Free Run (Standard)'
         """
-        self.cmw_write(f'TRIGger:WCDMa:MEASurement:MEValuation:SOURce {source}')
+        self.cmw_write(f'TRIGger:WCDMa:MEASurement:MEValuation:SOURce "{source}"')
 
     def set_trigger_source_gsm(self, source='Free Run'):
         """
@@ -386,7 +386,7 @@ class CMW:
         'Free Run': Free run (untriggered)
         *RST:  'Power'
         """
-        self.cmw_write(f'TRIGger:GSM:MEASurement:MEValuation:SOURce {source}')
+        self.cmw_write(f'TRIGger:GSM:MEASurement:MEValuation:SOURce "{source}"')
 
     def set_trigger_slope_gprf(self, slope='REDGe'):
         """
@@ -899,8 +899,9 @@ class CMW:
         """
         self.cmw_write(f'SOURce:GPRF:GENerator1:BBMode {mode}')
 
-    def set_generator_cmw_port_uasge_all_gprf(self):
+    def set_generator_cmw_port_uasge_all_gprf(self, port=18):
         """
+        CONFigure:GPRF:GEN<i>:CMWS:USAGe:TX:ALL <TXConnBench>, <Usage>...
         Activates or deactivates the individual RF connectors of a connector bench.
         For possible bench values, see Chapter 2.5.1.2, "Values for Signal Path Selection",
         on page 65.
@@ -913,9 +914,9 @@ class CMW:
         Parameters for setting and query:
         <TXConnBench> Selects a bench with 4 or 8 connectors
         """
-        self.cmw_write(f'CONFigure:GPRF:GENerator:CMWS:USAGe:TX:ALL ON, ON, ON, ON, ON, ON, ON, ON')
+        self.cmw_write(f'CONFigure:GPRF:GENerator:CMWS:USAGe:TX:ALL R1{port}, ON, ON, ON, ON, ON, ON, ON, ON')
 
-    def set_arb_file_gprf(self, file_path):
+    def set_arb_file_gprf(self, waveform_path):
         """
         Selects a waveform file for the ARB baseband mode.
         This command supports path aliases (e.g. @WAVEFORM). Use MMEMory:ALIases? to
@@ -935,7 +936,7 @@ class CMW:
         Optional parameter, specifying that a query returns the absolute
         path.
         """
-        self.cmw_write(f'SOURce:GPRF:GENerator1:ARB:FILE {file_path}')
+        self.cmw_write(f'SOURce:GPRF:GENerator1:ARB:FILE "{waveform_path}"')
 
     def set_generator_state_gprf(self, state='ON'):
         """
@@ -1116,7 +1117,7 @@ class CMW:
         0.5 ms, 1 ms, 1.25 ms, 2 ms, 2.5 ms, 3 ms, 4 ms, 5 ms, 10 ms
         *RST:  MS5
         """
-        self.cmw_write(f'CONFigure:NRSub::MEASurement:ULDL:PERiodicity {periodicity}')
+        self.cmw_write(f'CONFigure:NRSub:MEASurement:ULDL:PERiodicity {periodicity}')
 
     def set_duplexer_mode_fr1(self, mode='FDD'):
         """
@@ -1439,7 +1440,7 @@ class CMW:
         <PhsLayerCellID> Range:  0  to  503
         *RST:  0
         """
-        self.cmw_write(f'CONFigure:LTE:MEASurement:MEValuation::PLCid {plc_id}')
+        self.cmw_write(f'CONFigure:LTE:MEASurement:MEValuation:PLCid {plc_id}')
 
     def set_meas_on_exception_fr1(self, meas_on_exception='ON'):
         """
@@ -1519,7 +1520,7 @@ class CMW:
         *RST:  B200
         """
         bw10 = f'0{bw * 10}' if bw < 10 else f'{bw * 10}'
-        self.cmw_write(f'CONFigurat:LTE:MEASurement:MEValuation:CBANdwidth B{bw10}')
+        self.cmw_write(f'CONFigure:LTE:MEASurement:MEValuation:CBANdwidth B{bw10}')
 
     def set_spectrum_limit_fr1(self, area, bw10, start_freq, stop_freq, level, rbw):
         """
@@ -1607,7 +1608,7 @@ class CMW:
         M1: 1 MHz
         *RST:  K030 (<no> = 1) / M1 (<no> = 2 to 12)
         """
-        self.cmw_write(f'CONFigure:LTE:MEASuremnet:MEValuation:LIMit:SEMask:LIMit{no}:CBANdwidth{bw10} '
+        self.cmw_write(f'CONFigure:LTE:MEAS:MEValuation:LIMit:SEMask:LIMit{no}:CBANdwidth{bw10} '
                        f'{enable}, {start_freq}MHz, {stop_freq}MHz, {level}, {rbw}')
 
     def set_pusch_fr1(self, mcs, rb_size, rb_start):
@@ -1735,7 +1736,7 @@ class CMW:
         on_off = 'ON' if _type_fr1 == 'DFTS' else 'OFF'  # DFTS: ON, CP: OFF
         self.cmw_write(f'CONFigure:NRSub:MEASurement:MEValuation:DFTPrecoding {on_off}')
 
-    def set_phase_compensation_fr1(self, phase_comp='OFF', user_freq=6000E+6):
+    def set_phase_compensation_fr1(self, phase_comp='OFF', user_freq=6000000000):
         """
         Specifies the phase compensation applied by the UE during the modulation and
         upconversion.

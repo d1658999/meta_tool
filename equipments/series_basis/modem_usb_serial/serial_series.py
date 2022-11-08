@@ -20,7 +20,7 @@ class AtCmd:
         self.band_wcdma = None
         self.band_gsm = None
         self.tx_level = None
-        self.rx_level = None
+        self.rx_level = ext_pmt.init_rx_sync_level
         self.pcl = None
         self.pwr_init_gsm = None
         self.loss_tx = None
@@ -46,16 +46,16 @@ class AtCmd:
         self.mod_gsm = None
         self.asw_on_off = 0  # 1: AS ON, 0: AS OFF
         self.asw_tech = None
-        self.sync_path = None
+        self.sync_path = ext_pmt.sync_path
         self.asw_srs_path = None
-        self.asw_path = None
-        self.srs_path = None
+        self.asw_path = ext_pmt.asw_path
+        self.srs_path = ext_pmt.srs_path
         self.tx_path = None
         self.rx_path_fr1 = None
         self.rx_path_lte = None
         self.rx_path_wcdma = None
         self.rx_path_gsm = None
-        self.sync_mode = None
+        self.sync_mode = 0  # 0: MAIN , 1: 4RX, 2: 6RX
         self.sync_wcdma = None
         self.sync_gsm = None
         self.rx_chan_wcdma = None
@@ -301,16 +301,16 @@ class AtCmd:
 
     def sync_fr1(self):
         logger.info('---------Sync----------')
-        self.select_scs_fr1(self.band_fr1)
+        scs = 1 if self.band_fr1 in [34, 38, 39, 40, 41, 42, 48, 75, 76, 77, 78, 79] else 0
         response = self.command(
-            f'AT+NRFSYNC={self.sync_path_dict[self.sync_path]},{self.sync_mode},{self.scs},'
+            f'AT+NRFSYNC={self.sync_path_dict[self.sync_path]},{self.sync_mode},{scs},'
             f'{self.bw_fr1_dict[self.bw_fr1]},0,{self.rx_freq_fr1}',
             delay=1)
         while b'+NRFSYNC:1\r\n' not in response:
             logger.info('**********Sync repeat**********')
             time.sleep(1)
             response = self.command(
-                f'AT+NRFSYNC={self.sync_path_dict[self.sync_path]},{self.sync_mode},{self.scs},'
+                f'AT+NRFSYNC={self.sync_path_dict[self.sync_path]},{self.sync_mode},{scs},'
                 f'{self.bw_fr1_dict[self.bw_fr1]},0,{self.rx_freq_fr1}',
                 delay=2)
 

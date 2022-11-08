@@ -171,14 +171,14 @@ def tx_power_relative_test_export_excel(data, parameters_dict):
             # to create sheet
             if tech == 'LTE':
                 # create dashboard
-                for mcs in ['QPSK', 'Q16', 'Q64', 'Q256']:  # some cmw100 might not have licesnse of Q256
-                    wb.create_sheet(f'Dashboard_{mcs}_PRB')
-                    wb.create_sheet(f'Dashboard_{mcs}_FRB')
+                for _ in ['QPSK', 'Q16', 'Q64', 'Q256']:  # some cmw100 might not have licesnse of Q256
+                    wb.create_sheet(f'Dashboard_{_}_PRB')
+                    wb.create_sheet(f'Dashboard_{_}_FRB')
 
                 # create the Raw data sheets
-                for mcs in ['QPSK', 'Q16', 'Q64', 'Q256']:  # some cmw100 might not have licesnse of Q256
-                    wb.create_sheet(f'Raw_Data_{mcs}_PRB')
-                    wb.create_sheet(f'Raw_Data_{mcs}_FRB')
+                for _ in ['QPSK', 'Q16', 'Q64', 'Q256']:  # some cmw100 might not have licesnse of Q256
+                    wb.create_sheet(f'Raw_Data_{_}_PRB')
+                    wb.create_sheet(f'Raw_Data_{_}_FRB')
 
                 # create the title for every sheets
                 for sheetname in wb.sheetnames:
@@ -213,13 +213,13 @@ def tx_power_relative_test_export_excel(data, parameters_dict):
 
             elif tech == 'FR1':
                 # create dashboard
-                for mcs in ['QPSK', 'Q16', 'Q64', 'Q256']:  # some cmw100 might not have licesnse of Q256
-                    wb.create_sheet(f'Dashboard_{mcs}')
-                    wb.create_sheet(f'Dashboard_{mcs}')
+                for _ in ['QPSK', 'Q16', 'Q64', 'Q256', 'BPSK']:  # some cmw100 might not have licesnse of Q256
+                    wb.create_sheet(f'Dashboard_{_}')
+
 
                 # create the Raw data sheets
-                for mcs in ['QPSK', 'Q16', 'Q64', 'Q256', 'BPSK']:  # some cmw10 might not have licesnse of Q256
-                    wb.create_sheet(f'Raw_Data_{mcs}')
+                for _ in ['QPSK', 'Q16', 'Q64', 'Q256', 'BPSK']:  # some cmw100 might not have licesnse of Q256
+                    wb.create_sheet(f'Raw_Data_{_}')
 
                 # create the title for every sheets
                 for sheetname in wb.sheetnames:

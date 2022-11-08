@@ -107,7 +107,7 @@ class TxTest1RbSweep(AtCmd, CMW100):
                                 'tech': self.tech,
                                 'band': self.band_fr1,
                                 'bw': self.bw_fr1,
-                                'tx_freq_level': self.tx_freq_fr1,
+                                'tx_freq_level': self.tx_level,
                                 'mcs': self.mcs_fr1,
                                 'tx_path': self.tx_path,
                                 'mod': None,

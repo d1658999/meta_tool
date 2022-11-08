@@ -1,3 +1,4 @@
+from pathlib import Path
 from equipments.series_basis.modem_usb_serial.serial_series import AtCmd
 from equipments.cmw100_test import CMW100
 from utils.log_init import log_set
@@ -17,6 +18,7 @@ class TxTestGenre(AtCmd, CMW100):
     def __init__(self):
         AtCmd.__init__(self)
         CMW100.__init__(self)
+        self.psu = None
         self.tx_freq_wcdma = None
         self.file_path = None
         self.parameters = None
@@ -24,7 +26,6 @@ class TxTestGenre(AtCmd, CMW100):
         self.script = None
         self.chan = None
         self.srs_path_enable = ext_pmt.srs_path_enable
-        self.psu = Psu()
 
     def get_temperature(self):
         """
@@ -48,11 +49,12 @@ class TxTestGenre(AtCmd, CMW100):
         logger.info(f'thermistor0 get temp: {therm_list[0]}')
         logger.info(f'thermistor1 get temp: {therm_list[1]}')
         return therm_list
-
+    
     def pre_measure_current(self, n=1):
         if ext_pmt.odpm_enable:
             return get_odpm_current(n)
         elif ext_pmt.psu_enable:
+            self.psu = Psu()
             return self.psu.psu_current_average(n)
 
     def measure_current(self, band):
@@ -92,8 +94,8 @@ class TxTestGenre(AtCmd, CMW100):
         """
         rx_freq_list = cm_pmt_ftm.dl_freq_selected('FR1', self.band_fr1,
                                                    self.bw_fr1)  # [L_rx_freq, M_rx_ferq, H_rx_freq]
-        # self.rx_freq_fr1 = rx_freq_list[1]
-        # self.loss_rx = get_loss(rx_freq_list[1])
+        self.rx_freq_fr1 = rx_freq_list[1]
+        self.loss_rx = get_loss(rx_freq_list[1])
         logger.info('----------Test LMH progress---------')
         self.preset_instrument()
         self.set_test_end_fr1()
@@ -142,7 +144,7 @@ class TxTestGenre(AtCmd, CMW100):
                             'tech': self.tech,
                             'band': self.band_fr1,
                             'bw': self.bw_fr1,
-                            'tx_freq_level': self.tx_freq_fr1,
+                            'tx_freq_level': self.tx_level,
                             'mcs': self.mcs_fr1,
                             'tx_path': self.tx_path,
                             'mod': None,
@@ -209,7 +211,7 @@ class TxTestGenre(AtCmd, CMW100):
                             'tech': self.tech,
                             'band': self.band_lte,
                             'bw': self.bw_lte,
-                            'tx_freq_level': self.tx_freq_lte,
+                            'tx_freq_level': self.tx_level,
                             'mcs': self.mcs_lte,
                             'tx_path': self.tx_path,
                             'mod': None,
@@ -275,7 +277,7 @@ class TxTestGenre(AtCmd, CMW100):
                     'tech': self.tech,
                     'band': self.band_wcdma,
                     'bw': 5,
-                    'tx_freq_level': self.tx_freq_wcdma,
+                    'tx_freq_level': self.tx_level,
                     'mcs': 'QPSK',
                     'tx_path': None,
                     'mod': None,
@@ -337,7 +339,7 @@ class TxTestGenre(AtCmd, CMW100):
                     'tech': self.tech,
                     'band': self.band_gsm,
                     'bw': 0,
-                    'tx_freq_level': self.tx_freq_fr1,
+                    'tx_freq_level': self.tx_level,
                     'mcs': None,
                     'tx_path': None,
                     'mod': self.mod_gsm,
@@ -380,8 +382,9 @@ class TxTestGenre(AtCmd, CMW100):
                     logger.info(f'B{self.band_fr1} does not have BW {self.bw_fr1}MHZ')
         for bw in ext_pmt.fr1_bandwidths:
             try:
-                # self.file_path = f'TxP_ACLR_EVM_{bw}MHZ_{self.tech}_LMH.xlsx'
-                txp_aclr_evm_current_plot(self.file_path, self.parameters)
+                file_name = f'Tx_Pwr_ACLR_EVM_{bw}MHZ_{self.tech}_LMH.xlsx'
+                file_path = Path(self.file_path).parent / Path(file_name)
+                txp_aclr_evm_current_plot(file_path, self.parameters)
             except TypeError:
                 logger.info(f'there is no data to plot because the band does not have this BW ')
             except FileNotFoundError:
@@ -410,8 +413,9 @@ class TxTestGenre(AtCmd, CMW100):
                     logger.info(f'B{self.band_lte} does not have BW {self.bw_lte}MHZ')
         for bw in ext_pmt.lte_bandwidths:
             try:
-                # self.file_path = f'TxP_ACLR_EVM_{bw}MHZ_{self.tech}_LMH.xlsx'
-                txp_aclr_evm_current_plot(self.file_path, self.parameters)
+                file_name = f'Tx_Pwr_ACLR_EVM_{bw}MHZ_{self.tech}_LMH.xlsx'
+                file_path = Path(self.file_path).parent / Path(file_name)
+                txp_aclr_evm_current_plot(file_path, self.parameters)
             except TypeError:
                 logger.info(f'there is no data to plot because the band does not have this BW ')
             except FileNotFoundError:

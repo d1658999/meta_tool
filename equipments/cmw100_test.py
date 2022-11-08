@@ -2,7 +2,9 @@ import math
 import time
 
 from equipments.series_basis.callbox.cmw_series import CMW
+import utils.parameters.external_paramters as ext_pmt
 from utils.log_init import log_set
+
 
 logger = log_set('CMW100')
 
@@ -19,7 +21,7 @@ class CMW100(CMW):
         self.band_wcdma = None
         self.band_gsm = None
         self.tx_level = None
-        self.rx_level = None
+        self.rx_level = ext_pmt.init_rx_sync_level
         self.pcl = None
         self.pwr_init_gsm = None
         self.loss_tx = None
@@ -287,27 +289,28 @@ class CMW100(CMW):
 
     def set_waveform_fr1(self, bw, scs, mcs):
         if self.band_fr1 in [34, 38, 39, 40, 41, 42, 48, 77, 78, 79]:
-            file_path = f'C:\\CMW100_WV\\SMU_NodeB_NR_Ant0_NR_{bw}MHz_SCS{scs}_TDD_Sens_MCS{mcs}_rescale.wv'
+            waveform_path = f'C:\\CMW100_WV\\SMU_NodeB_NR_Ant0_NR_{bw}MHz_SCS{scs}_TDD_Sens_MCS{mcs}_rescale.wv'
         else:
-            file_path = f'C:\\CMW100_WV\\SMU_NodeB_NR_Ant0_LTE_NR_{bw}MHz_SCS{scs}_FDD_Sens_MCS_{mcs}.wv'
+            waveform_path = f'C:\\CMW100_WV\\SMU_NodeB_NR_Ant0_LTE_NR_{bw}MHz_SCS{scs}_FDD_Sens_MCS_{mcs}.wv'
 
-        self.set_arb_file_gprf(file_path)
+        self.set_arb_file_gprf(waveform_path)
 
     def set_waveform_lte(self, bw):
-        if self.band_fr1 in [34, 38, 39, 40, 41, 42, 48]:
-            file_path = f'C:\\CMW100_WV\\SMU_Channel_CC0_RxAnt0_RF_Verification_10M_SIMO_01.wv'
+        if self.band_lte in [34, 38, 39, 40, 41, 42, 48]:
+            waveform_path = f'C:\\CMW100_WV\\SMU_Channel_CC0_RxAnt0_RF_Verification_10M_SIMO_01.wv'
         else:
-            file_path = f'C:\\CMW100_WV\\SMU_NodeB_Ant0_FRC_{bw}MHz.wv'
+            bw = '1p4' if bw == 1.4 else f'0{bw}' if bw <= 5 else bw
+            waveform_path = f'C:\\CMW100_WV\\SMU_NodeB_Ant0_FRC_{bw}MHz.wv'
 
-        self.set_arb_file_gprf(file_path)
+        self.set_arb_file_gprf(waveform_path)
 
     def set_waveform_wcdma(self):
-        file_path = r'C:\CMW100_WV\3G_CAL_FINAL.wv'
-        self.set_arb_file_gprf(file_path)
+        waveform_path = r'C:\CMW100_WV\3G_CAL_FINAL.wv'
+        self.set_arb_file_gprf(waveform_path)
 
     def set_waveform_gsm(self):
-        file_path = r'C:\CMW100_WV\2G_FINAL.wv'
-        self.set_arb_file_gprf(file_path)
+        waveform_path = r'C:\CMW100_WV\2G_FINAL.wv'
+        self.set_arb_file_gprf(waveform_path)
 
     def power_init_gsm(self):
         if self.band_gsm in [850, 900]:
@@ -448,44 +451,40 @@ class CMW100(CMW):
             self.set_spectrum_limit_lte(4, bw * 10, 'OFF', 2.8, 5, -25, 'M1')
 
         if bw < 3:
-            self.set_spectrum_limit_lte(5, bw * 10, 'OFF', 5, 6, -25, 'M1')
+            self.set_spectrum_limit_lte(5, bw * 10, 'OFF', bw * 2, bw * 2, -25, 'M1')
         elif bw == 3:
             self.set_spectrum_limit_lte(5, bw * 10, 'ON', 5, 6, -25, 'M1')
         elif bw > 3:
             self.set_spectrum_limit_lte(5, bw * 10, 'ON', 5, 6, -13, 'M1')
 
         if bw < 5:
-            self.set_spectrum_limit_lte(6, bw * 10, 'OFF', 6, 10, -25, 'M1')
+            self.set_spectrum_limit_lte(6, bw * 10, 'OFF', bw * 2, bw * 2, -25, 'M1')
         elif bw == 5:
             self.set_spectrum_limit_lte(6, bw * 10, 'ON', 6, 10, -25, 'M1')
         elif bw > 5:
             self.set_spectrum_limit_lte(6, bw * 10, 'ON', 6, 10, -13, 'M1')
 
         if bw < 10:
-            self.set_spectrum_limit_lte(7, bw * 10, 'OFF', 10, 15, -25, 'M1')
+            self.set_spectrum_limit_lte(7, bw * 10, 'OFF', bw * 2, bw * 2, -25, 'M1')
         elif bw == 10:
             self.set_spectrum_limit_lte(7, bw * 10, 'ON', 10, 15, -25, 'M1')
         elif bw > 10:
             self.set_spectrum_limit_lte(7, bw * 10, 'ON', 10, 15, -13, 'M1')
 
         if bw < 15:
-            self.set_spectrum_limit_lte(8, bw * 10, 'OFF', 15, 20, -25, 'M1')
+            self.set_spectrum_limit_lte(8, bw * 10, 'OFF', bw * 2, bw * 2, -25, 'M1')
         elif bw == 15:
             self.set_spectrum_limit_lte(8, bw * 10, 'ON', 15, 20, -25, 'M1')
         elif bw > 15:
             self.set_spectrum_limit_lte(8, bw * 10, 'ON', 15, 20, -13, 'M1')
 
         if bw < 15:
-            self.set_spectrum_limit_lte(9, bw * 10, 'OFF', 10, 15, -25, 'M1')
+            self.set_spectrum_limit_lte(9, bw * 10, 'OFF', bw * 2, bw * 2, -25, 'M1')
         elif bw == 15:
-            self.set_spectrum_limit_lte(9, bw * 10, 'ON', 10, 15, -25, 'M1')
+            self.set_spectrum_limit_lte(9, bw * 10, 'OFF', 20, 20, -25, 'M1')
         elif bw > 15:
-            self.set_spectrum_limit_lte(8, bw * 10, 'ON', 10, 15, -13, 'M1')
-
-        if bw == 20:
-            self.set_spectrum_limit_lte(9, bw * 10, 'OFF', 20, 25, -25, 'M1')
-        else:
             self.set_spectrum_limit_lte(9, bw * 10, 'ON', 20, 25, -25, 'M1')
+
 
     def set_rx_level_search(self):
         logger.info(f'==========Search: {self.rx_level} dBm==========')
@@ -496,17 +495,17 @@ class CMW100(CMW):
         if self.tech == 'FR1':
             if band in [34, 38, 39, 40, 41, 42, 48, 75, 76, 77, 78, 79, ]:
                 self.set_duplexer_mode_fr1('TDD')
-                logger.info('========== Set TDD ==========')
+                logger.debug('========== Set TDD ==========')
             else:
                 self.set_duplexer_mode_fr1('FDD')
-                logger.info('========== Set FDD ==========')
+                logger.debug('========== Set FDD ==========')
         elif self.tech == 'LTE':
             if band in [34, 38, 39, 40, 41, 42, 48, ]:
                 self.set_duplexer_mode_lte('TDD')
-                logger.info('========== Set TDD ==========')
+                logger.debug('========== Set TDD ==========')
             else:
                 self.set_duplexer_mode_lte('FDD')
-                logger.info('========== Set FDD ==========')
+                logger.debug('========== Set FDD ==========')
 
     def select_scs_fr1(self, band):
         """
@@ -559,6 +558,7 @@ class CMW100(CMW):
         self.cmw_query(f'*OPC?')
         self.set_rf_tx_port_fr1(self.port_tx)
         self.cmw_query(f'*OPC?')
+        self.system_err_all_query()
         self.set_measure_start_on_fr1()
         self.cmw_query(f'*OPC?')
         mod_results = self.get_modulation_avgerage_fr1()
