@@ -38,6 +38,12 @@ class Anritsu:
         """
         self.anritsu_write('CALLSO')
 
+    def set_connecting(self):
+        """
+        To connect to Test Mode
+        """
+        self.anritsu_write('CALLSA')
+
     def set_standard(self, standard='LTE'):
         """
          <standard> LTE | WCDMA | GSM
@@ -172,21 +178,6 @@ class Anritsu:
         <num> 00000000,00000000,00000000,00000000 for anritsu default
         """
         self.anritsu_write(f'OPC_ALL {num}')
-
-    def set_authentication_all(self, standard):
-        """
-        set all authentication
-        """
-        s = standard
-        if s == 'LTE':
-            self.set_authentication('ON')
-            self.set_authentication_algorithm()
-            self.set_authentication_key()
-            self.set_opc()
-        elif s == 'WCDMA':
-            self.set_authentication_algorithm()
-            self.set_authentication_key()
-            self.set_opc()
 
     def set_ul_rb_start(self, pos='MIN'):
         """
@@ -407,12 +398,144 @@ class Anritsu:
             self.anritsu_write("EXTLOSSW COMMON")
             self.anritsu_query('*OPC?')
 
+    def set_calling_threshold(self, hold=1):
+        """
+        This might be calling ready and start?
+        """
+        self.anritsu_write(f'CALLTHD {hold}')
+
+    def set_calling_clear(self):
+        """
+        To clear UE Report and call processing.
+        """
+        self.anritsu_write('CALLRFR')
+
+    def set_to_measure(self):
+        """
+            Anritsu8820 use 'SWP' to measure no matter what the test items are
+        """
+        self.anritsu_write('SWP')
+
+    def set_power_measure_on_off(self, switch='ON'):
+        """
+        Set [Power Measurement] to [On]
+        """
+        self.anritsu_write(f'PWR_MEAS {switch}')
+
+    def set_aclr_measure_on_off(self, switch='ON'):
+        """
+        Set [ACLR Measurement] to [On] for LTE
+        """
+        self.anritsu_write(f'ACLR_MEAS {switch}')
+
+    def set_adj_measure_on_off(self, switch='ON'):
+        """
+        Set [ACLR Measurement] to [On] for WCDMA
+        """
+        self.anritsu_write(f'ADJ_MEAS {switch}')
+
+    def set_sem_measure_on_off(self, switch='ON'):
+        """
+        Set [SEM Measurement] to [On]
+        """
+        self.anritsu_write(f'SEM_MEAS {switch}')
+
+    def set_obw_measure_on_off(self, switch='ON'):
+        """
+        Set [OBW Measurement] to [On]
+        """
+        self.anritsu_write(f'OBW_MEAS {switch}')
+
+    def set_mod_measure_on_off(self, switch='ON'):
+        """
+        Set [MOD Measurement] to [On]
+        """
+        self.anritsu_write(f'MOD_MEAS {switch}')
+
+    def set_evm_origin_offset_on_off(self, switch='ON'):
+        """
+        Set [EVM include Origin Offset] to [On]
+        """
+        self.anritsu_write(f'INC_ORGNOFS {switch}')
+
+    def set_power_template_on_off(self, switch='ON'):
+        """
+        Set [Power template] to [On] for LTE
+        """
+        self.anritsu_write(f'PWRTEMP {switch}')
+
+    def set_power_wdr_on_off(self, switch='ON'):
+        """
+        Set [Power template] to [On] for WCDMA
+        """
+        self.anritsu_write(f'PT_WDR {switch}')
+
+    def set_power_count(self, count=1):
+        """
+        Set the average count of power
+        """
+        self.anritsu_write(f'PWR_AVG {count}')
+
+    def set_aclr_count(self, count=1):
+        """
+        Set the average count of power for LTE
+        """
+        self.anritsu_write(f'ACLR_AVG {count}')
+
+    def set_adj_count(self, count=1):
+        """
+        Set the average count of power for WCDMA
+        """
+        self.anritsu_write(f'ADJ_AVG {count}')
+
+    def set_sem_count(self, count=1):
+        """
+        Set the average count of spectrum mask
+        """
+        self.anritsu_write(f'SEM_AVG {count}')
+
+    def set_obw_count(self, count=1):
+        """
+        Set the average count of OBW
+        """
+        self.anritsu_write(f'OBW_AVG {count}')
+
+    def set_mod_count(self, count=1):
+        """
+        Set the average count of Modulation
+        """
+        self.anritsu_write(f'MOD_AVG {count}')
+
+    def set_power_template_count(self, count=1):
+        """
+        Set [Power template] to [count] times for LTE
+        """
+        self.anritsu_write(f'PWRTEMP_AVG {count}')
+
+    def set_power_wdr_count(self, count=1):
+        """
+        Set [Power template] to [count] times for WCDMA
+        """
+        self.anritsu_write(f'PT_WDR_AVG {count}')
+
     def get_standard_query(self):
         """
         To check the standard in equipment
         return: LTE | WCDMA | GSM
         """
         return self.anritsu_query("STDSEL?").strip()
+
+    def get_calling_state_query(self):
+        """
+         To confirm the call processing status
+        """
+        return self.anritsu_query('CALLSTAT?')
+
+
+
+
+
+
 
 
 
