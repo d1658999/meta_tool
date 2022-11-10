@@ -460,20 +460,20 @@ class Anritsu8820(Anritsu):
             self.set_registration_after_calling_hsdpa()
 
     def set_registration_after_calling_hsdpa(self):
-        self.inst.write('SCRSEL FMEAS')
-        self.inst.write('SET_PWRPAT HSMAXPWR')
+        self.set_screen_select('FMEAS')
+        self.set_power_pattern('HSMAXPWR')
         self.set_init_power(1)
         self.set_init_aclr('WCDMA', 1)
 
     def set_registration_after_calling_hsupa(self):
-        self.inst.write('SCRSEL FMEAS')
-        self.inst.write('SET_PWRPAT HSMAXPWR')
+        self.set_screen_select('FMEAS')
+        self.set_power_pattern('HSMAXPWR')
         self.set_output_level(-86)
         self.set_init_power(1)
         self.set_init_aclr('WCDMA', 1)
-        self.inst.write('TPUTU_MEAS ON')
-        self.inst.write('TPUTU_SAMPLE 15')
-        self.inst.write('EHICHPAT ACK')
+        self.set_throughput_on_off('ON')
+        self.set_throughput_sample_hsupa(15)
+        self.set_ehich_pattern('ACK')
 
     def set_uplink_channel(self, standard, ul_ch):
         """
@@ -499,7 +499,7 @@ class Anritsu8820(Anritsu):
             pass
 
     def set_init_power(self, count=1):
-        self.set_power_measure_on_off('ON') # Set [Power Measurement] to [On]
+        self.set_power_measure_on_off('ON')  # Set [Power Measurement] to [On]
         self.set_power_count(count)  # Set [Average Count] to [count] times
 
     def set_init_aclr(self, standard, count=1):
@@ -558,11 +558,11 @@ class Anritsu8820(Anritsu):
     def set_init_hsdpa(self):
         self.set_channel_coding('FIXREFCH')
         self.set_dpch_timing_offset(6)
-        self.inst.write('SET_PWRPAT HSMAXPWR')
-        self.inst.write('REGMODE COMBINED')
-        self.inst.write('DOMAINIDRMC CS')
-        self.inst.write('AUTHENT_ALGO XOR')
-        self.inst.write('HSHSET HSET1_QPSK')
+        self.set_power_pattern('HSMAXPWR')
+        self.set_register_mode('COMBINED')
+        self.set_domain_drmc('CS')
+        self.set_authentication_algorithm('XOR')
+        self.set_hsupa_setting('HSET1_QPSK')
         self.set_throughput_on_off('OFF')
         self.set_input_level(-10)
         self.anritsu_query('*OPC?')
@@ -570,11 +570,110 @@ class Anritsu8820(Anritsu):
     def set_init_hsupa(self):
         self.set_channel_coding('EDCHTEST')
         self.set_dpch_timing_offset(6)
-        self.inst.write('MAXULPWR 21')
-        self.inst.write('TPCALGO 2')
-        self.inst.write('DOMAINIDRMC CS')
-        self.inst.write('AUTHENT_ALGO XOR')
-        self.inst.write('HSUSET TTI10_QPSK')
+        self.set_max_ul_tx_power(21)
+        self.set_tpc_algorithm(2)
+        self.set_domain_drmc('CS')
+        self.set_authentication_algorithm('XOR')
+        self.set_hsupa_setting('TTI10_QPSK')
         self.anritsu_query('*OPC?')
+
+    def set_init_rx(self, standard):
+        s = standard
+        if s == 'LTE':
+            self.inst.write('TESTPRM RX_SENS')
+            self.set_tpc('AUTO')
+            self.set_input_level(5)
+            self.set_output_level(-70)
+            self.set_rx_sample(1000)
+            self.inst.write('TPUT_EARLY ON')
+            self.set_init_power()
+            self.inst.write('MOD_MEAS OFF')
+
+        elif s == 'WCDMA':
+            self.set_input_level(5)
+            self.set_output_level(-70)
+            self.set_rx_sample(1000)  # this is should be ber_sample?
+            self.inst.write('TPUT_EARLY OFF')
+            self.set_init_power()
+        elif s == 'GSM':
+            pass
+
+    def set_rb_location(self, band, bw):
+        rb_num, rb_location = cm_pmt_anritsu.special_uplink_config_sensitivity(band, bw)
+        self.inst.write(f'ULRMC_RB {rb_num}')
+        self.inst.write(f'ULRB_START {rb_location}')
+
+    def query_etfci(self):
+        result = Decimal(self.inst.query('AVG_ETFCI?').strip())
+        return result
+
+    def preset_subtest1(self):
+        if self.chcoding == 'EDCHTEST':  # this is HSUPA
+            self.inst.write('SET_HSDELTA_CQI 8')
+            self.inst.write('SET_HSSUBTEST SUBTEST1')
+            self.set_tpc('ILPC')
+            self.set_input_level(16)
+            time.sleep(0.15)
+            self.set_tpc('ALT')
+            self.set_input_level(26)
+            logger.debug('TPC DOWN')
+            time.sleep(0.15)
+            self.inst.write('TPC_CMD_DOWN')
+            time.sleep(0.1)
+            self.set_to_measure()
+        elif self.chcoding == 'FIXREFCH':  # this is HSDPA
+            self.set_input_level(24)
+            self.set_output_level(-86)
+            self.set_tpc('ALL1')
+            self.inst.write('DTCHPAT PN9')
+            self.inst.write('SET_HSDELTA_CQI 8')
+            self.inst.write('SET_HSSUBTEST SUBTEST1')
+            time.sleep(0.1)
+            self.set_to_measure()
+
+    def get_hsdpa_evm(self):
+        """
+        evm = [po, p1, p2, p3], phase_disc = [theta0, theta1]
+        :return:
+        """
+        self.inst.write('DDPCHTOFS 6')
+        # self.inst.write('CHCODING FIXREFCH')
+        self.inst.write('SET_PWRPAT HSPC')
+        self.inst.write('SET_HSDELTA_CQI 7')
+        self.inst.write('SET_HSSUBTEST SUBTEST3')
+        self.inst.write('OLVL -86.0')
+        self.inst.write('DTCHPAT PN9')
+        self.inst.write('SCRSEL TDMEAS')
+        self.inst.write('MEASOBJ HSDPCCH_MA')
+        self.inst.write('HSMA_ITEM EVMPHASE')
+        self.inst.write('TDM_RRC OFF')
+        self.set_input_level(35)
+        self.inst.write('TPCPAT ALL1')
+        time.sleep(0.3)
+        self.inst.write('TPCPAT ALT')
+        time.sleep(0.1)
+        self.set_to_measure()
+        evm_hpm = self.inst.query('POINT_EVM? ALL').strip().split(',')  # p0, p1, p2, p3
+        logger.debug(evm_hpm)
+        phase_disc_hpm = self.inst.query('POINT_PHASEDISC? ALL').strip().split(',')  # theta0, theta1
+        logger.debug(phase_disc_hpm)
+
+        # below is for LPM -18dBm
+        # self.set_tpc('ILPC')
+        # self.inst.write('HSSCCH OFF')
+        # self.inst.write('CQIFEEDBACK 0')
+        # self.set_input_level(-18)
+        # time.sleep(1)
+        # self.set_tpc('ALT')
+        # self.inst.write('HSSCCH ON')
+        # self.inst.write('CQIFEEDBACK 4')
+        # self.set_input_level(-10)
+        # self.set_to_measure()
+        # evm_lpm = self.inst.query('POINT_EVM? ALL').strip().split(',')  # p0, p1, p2, p3
+        # logger.debug(evm_lpm)
+        # phase_disc_lpm = self.inst.query('POINT_PHASEDISC? ALL').strip().split(',')  # theta0, theta1
+        # logger.debug(phase_disc_lpm)
+
+        return evm_hpm, phase_disc_hpm
 
 

@@ -190,7 +190,7 @@ class Anritsu:
         """
         set bandwidth
         """
-        self.anritsu_write(f'BANDWIDTH {str(bw)}MHZ')
+        self.anritsu_write(f'BANDWIDTH {bw}MHZ')
 
     def set_tpc(self, tpc='ILPC'):
         """
@@ -199,6 +199,13 @@ class Anritsu:
         LTE: AUTO | ALL3 |ALL1 | ALL0 | ALLM1| ALT | UCMD
         """
         self.anritsu_write(f'TPCPAT {tpc}')
+
+    def set_tpc_algorithm(self, algo=2):
+        """
+         set [Power Control Algorithm]
+         <algo> 2 for HSUPA | HSDPA most setting
+        """
+        self.anritsu_write(f'TPCALGO {algo}')
 
     def set_uplink_channel(self, standard, ul_ch):
         """
@@ -234,13 +241,13 @@ class Anritsu:
         """
         set the input level of equipment, that is same as the tx_power level for DUT
         """
-        self.anritsu_write(f'ILVL {str(input_level)}')
+        self.anritsu_write(f'ILVL {input_level}')
 
-    def set_output_level(self, output_level=-60):
+    def set_output_level(self, output_level=-60.0):
         """
         set the output level of equipment, that is same as the rx_power level for DUT
         """
-        self.anritsu_write(f'OLVL {str(output_level)}')
+        self.anritsu_write(f'OLVL {output_level}')
 
     def set_rf_out_port(self, port='MAIN'):
         """
@@ -412,7 +419,7 @@ class Anritsu:
 
     def set_to_measure(self):
         """
-            Anritsu8820 use 'SWP' to measure no matter what the test items are
+        Anritsu8820 use 'SWP' to measure no matter what the test items are
         """
         self.anritsu_write('SWP')
 
@@ -549,6 +556,63 @@ class Anritsu:
         """
         self.anritsu_write(f'DDPCHTOFS {offset}')
 
+    def set_screen_select(self, func):
+        """
+        display the measurement
+        <func> FMEAS | TDMEAS
+        """
+        self.anritsu_write(f'SCRSEL {func}')
+
+    def ser_ber_sample(self, sample=10000):
+        """
+        Set number of sample for [WCDMA] and [GSM]
+        """
+        self.anritsu_write(f'')
+
+    def set_rx_sample(self, sample=1000):
+        """
+        Set number of sample for [LTE] and [HSDPA] Throughput measurement
+        """
+        self.anritsu_write(f'TPUT_SAMPLE {sample}')
+
+    def set_throughput_sample_hsupa(self, num=15):
+        """
+        Set HSUPA throughput - number of sample
+        """
+        self.anritsu_write(f'TPUTU_SAMPLE {num}')
+
+    def set_ehich_pattern(self, pattern='ACK'):
+        """
+        Set E-hich pattern
+        """
+        self.anritsu_write(f'EHICHPAT {pattern}')
+
+    def set_power_pattern(self, pattern='HSMAXPWR'):
+        """
+        Set power pattern
+        <pattern> HSMAXPWR | HSPC
+        HSPC:  set [CQI Feedback Cycle] to [4 ms], [Ack-Nack Repetition Factor] to [1], [CQI
+        Repetition Factor] to [1], and [TPC Algorithm] to [2]
+        HSMAXPWR:  set [CQI Feedback Cycle] to [4 ms], [Ack-Nack Repetition Factor] to [3],
+        [CQI Repetition Factor] to [2], and [TPC Algorithm] to [2]
+        """
+        self.anritsu_write(f'SET_PWRPAT {pattern}')
+
+    def set_max_ul_tx_power(self, allowed=21):
+        """
+         set [Maximum Allowed UL TX Power] for HSUPA
+        """
+        self.anritsu_write(f'MAXULPWR {allowed}')
+
+    def set_hsupa_setting(self, setting='TTI10_QPSK '):
+        """
+         set [HSUPA Set of Parameters]
+         <setting> HSET1_QPSK | TTI10_QPSK
+         HSET1_QPSK: HSDPA
+         TTI10_QPSK: HSUPA
+        """
+        self.anritsu_write(f'HSHSET {setting}')
+
     def get_standard_query(self):
         """
         To check the standard in equipment
@@ -561,6 +625,8 @@ class Anritsu:
          To confirm the call processing status
         """
         return self.anritsu_query('CALLSTAT?')
+
+
 
 
 
