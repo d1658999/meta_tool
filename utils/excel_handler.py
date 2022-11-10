@@ -664,7 +664,7 @@ def txp_aclr_evm_current_plot(file_path, parameters_dict):
                     chart.series[4].graphicalProperties.line.dashStyle = 'dash'  # for UTRA_-2
                     chart.series[5].graphicalProperties.line.dashStyle = 'dash'  # for UTRA_+2
 
-                    ws_dashboard.add_chart(chart, "A39")
+                    ws_dashboard.add_chart(chart, "A41")
 
                     logger.info('----------EVM---------')
                     chart = LineChart()
@@ -684,7 +684,7 @@ def txp_aclr_evm_current_plot(file_path, parameters_dict):
                     chart.series[0].marker.symbol = 'circle'  # for EUTRA_+1
                     chart.series[0].marker.size = 10
 
-                    ws_dashboard.add_chart(chart, "A77")
+                    ws_dashboard.add_chart(chart, "A81")
 
                     logger.info('----------Current---------')
                     chart = LineChart()
@@ -704,7 +704,7 @@ def txp_aclr_evm_current_plot(file_path, parameters_dict):
                     chart.series[0].marker.symbol = 'circle'
                     chart.series[0].marker.size = 10
 
-                    ws_dashboard.add_chart(chart, "A115")
+                    ws_dashboard.add_chart(chart, "A121")
                 else:
                     pass
 
@@ -767,7 +767,7 @@ def txp_aclr_evm_current_plot(file_path, parameters_dict):
                     chart.series[4].graphicalProperties.line.dashStyle = 'dash'  # for UTRA_-2
                     chart.series[5].graphicalProperties.line.dashStyle = 'dash'  # for UTRA_+2
 
-                    ws_dashboard.add_chart(chart, "A39")
+                    ws_dashboard.add_chart(chart, "A41")
 
                     logger.info('----------EVM---------')
                     chart = LineChart()
@@ -787,7 +787,7 @@ def txp_aclr_evm_current_plot(file_path, parameters_dict):
                     chart.series[0].marker.symbol = 'circle'  # for EUTRA_+1
                     chart.series[0].marker.size = 10
 
-                    ws_dashboard.add_chart(chart, "A77")
+                    ws_dashboard.add_chart(chart, "A81")
 
                     logger.info('----------Current---------')
                     chart = LineChart()
@@ -807,7 +807,7 @@ def txp_aclr_evm_current_plot(file_path, parameters_dict):
                     chart.series[0].marker.symbol = 'circle'
                     chart.series[0].marker.size = 10
 
-                    ws_dashboard.add_chart(chart, "A115")
+                    ws_dashboard.add_chart(chart, "A121")
 
             wb.save(file_path)
             wb.close()
@@ -866,7 +866,7 @@ def txp_aclr_evm_current_plot(file_path, parameters_dict):
                     chart.series[2].graphicalProperties.line.width = 50000  # for UTRA_-2
                     chart.series[3].graphicalProperties.line.width = 50000  # for UTRA_+2
 
-                    ws_dashboard.add_chart(chart, "A39")
+                    ws_dashboard.add_chart(chart, "A41")
 
                     logger.info('----------EVM---------')
                     chart = LineChart()
@@ -886,7 +886,7 @@ def txp_aclr_evm_current_plot(file_path, parameters_dict):
                     chart.series[0].marker.symbol = 'circle'  # for EUTRA_+1
                     chart.series[0].marker.size = 10
 
-                    ws_dashboard.add_chart(chart, "A77")
+                    ws_dashboard.add_chart(chart, "A81")
 
                     logger.info('----------Current---------')
                     chart = LineChart()
@@ -906,7 +906,7 @@ def txp_aclr_evm_current_plot(file_path, parameters_dict):
                     chart.series[0].marker.symbol = 'circle'
                     chart.series[0].marker.size = 10
 
-                    ws_dashboard.add_chart(chart, "A115")
+                    ws_dashboard.add_chart(chart, "A121")
 
             wb.save(file_path)
             wb.close()
@@ -965,7 +965,7 @@ def txp_aclr_evm_current_plot(file_path, parameters_dict):
                 chart.series[4].graphicalProperties.line.dashStyle = 'dash'  # for ORFS_-600
                 chart.series[5].graphicalProperties.line.dashStyle = 'dash'  # for ORFS_+600
 
-                ws_dashboard.add_chart(chart, "A39")
+                ws_dashboard.add_chart(chart, "A41")
 
                 logger.info('----------ORFS_SW---------')
                 chart = LineChart()
@@ -993,7 +993,7 @@ def txp_aclr_evm_current_plot(file_path, parameters_dict):
                 chart.series[4].graphicalProperties.line.dashStyle = 'dash'  # for ORFS_-1200
                 chart.series[5].graphicalProperties.line.dashStyle = 'dash'  # for ORFS_+1200
 
-                ws_dashboard.add_chart(chart, "A77")
+                ws_dashboard.add_chart(chart, "A81")
 
                 if 'GMSK' in ws_name:
                     logger.info('----------PHASE_RMS---------')
@@ -1035,7 +1035,7 @@ def txp_aclr_evm_current_plot(file_path, parameters_dict):
                     chart.series[0].marker.symbol = 'circle'
                     chart.series[0].marker.size = 10
 
-                    ws_dashboard.add_chart(chart, "A115")
+                    ws_dashboard.add_chart(chart, "A121")
 
                 logger.info('----------Current---------')
                 chart = LineChart()
@@ -1055,7 +1055,7 @@ def txp_aclr_evm_current_plot(file_path, parameters_dict):
                 chart.series[0].marker.symbol = 'circle'
                 chart.series[0].marker.size = 10
 
-                ws_dashboard.add_chart(chart, "A153")
+                ws_dashboard.add_chart(chart, "A161")
 
             wb.save(file_path)
             wb.close()
@@ -1318,7 +1318,7 @@ def rxs_relative_plot(file_path, parameters_dict):
     wb = openpyxl.load_workbook(file_path)
     if script == 'GENERAL':
         if tech == 'LTE':
-            ws_dashboard = wb[f'dashboard']
+            ws_dashboard = wb[f'Dashboard']
             ws_desens = wb[f'Desens_{mcs}']
             ws_txmax = wb[f'Raw_Data_{mcs}_TxMax']
             ws_txmin = wb[f'Raw_Data_{mcs}_-10dBm']
@@ -1360,7 +1360,7 @@ def rxs_relative_plot(file_path, parameters_dict):
             wb.close()
 
         elif tech == 'FR1':
-            ws_dashboard = wb[f'dashboard']
+            ws_dashboard = wb[f'Dashboard']
             ws_desens = wb[f'Desens_{mcs}']
             ws_txmax = wb[f'Raw_Data_{mcs}_TxMax']
             ws_txmin = wb[f'Raw_Data_{mcs}_-10dBm']
@@ -1402,7 +1402,7 @@ def rxs_relative_plot(file_path, parameters_dict):
             wb.close()
 
         elif tech == 'WCDMA':
-            ws_dashboard = wb[f'dashboard']
+            ws_dashboard = wb[f'Dashboard']
             ws = wb[f'Raw_Data']
 
             if ws_dashboard._charts:  # if there is charts, delete it
@@ -1429,7 +1429,7 @@ def rxs_relative_plot(file_path, parameters_dict):
             wb.close()
 
         elif tech == 'GSM':
-            ws_dashboard = wb[f'dashboard']
+            ws_dashboard = wb[f'Dashboard']
             ws = wb[f'Raw_Data']
 
             if ws_dashboard._charts:  # if there is charts, delete it

@@ -223,10 +223,10 @@ class RxTestGenre(AtCmd, CMW100):
                     'mcs': self.mcs_fr1,
                 }
                 self.bw_fr1 = bw
-                # file_name = f'Sensitivty_{self.bw_fr1}MHZ_{self.tech}_LMH.xlsx'
-                # file_path = Path(excel_folder_path()) / Path(file_name)
-                rx_desense_process(self.file_path, self.mcs_fr1)
-                rxs_relative_plot(self.file_path, parameters)
+                file_name = f'Sensitivty_{self.bw_fr1}MHZ_{self.tech}_LMH.xlsx'
+                file_path = Path(self.file_path).parent / Path(file_name)
+                rx_desense_process(file_path, self.mcs_fr1)
+                rxs_relative_plot(file_path, parameters)
             except TypeError as err:
                 logger.debug(err)
                 logger.info(
@@ -272,10 +272,10 @@ class RxTestGenre(AtCmd, CMW100):
                     'mcs': self.mcs_lte,
                 }
                 self.bw_lte = bw
-                # file_name = f'Sensitivty_{self.bw_lte}MHZ_{self.tech}_LMH.xlsx'
-                # file_path = Path(excel_folder_path()) / Path(file_name)
-                rx_desense_process(self.file_path, self.mcs_lte)
-                rxs_relative_plot(self.file_path, parameters)
+                file_name = f'Sensitivty_{self.bw_lte}MHZ_{self.tech}_LMH.xlsx'
+                file_path = Path(self.file_path).parent / Path(file_name)
+                rx_desense_process(file_path, self.mcs_lte)
+                rxs_relative_plot(file_path, parameters)
             except TypeError as err:
                 logger.debug(err)
                 logger.info(
