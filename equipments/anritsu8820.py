@@ -475,6 +475,29 @@ class Anritsu8820(Anritsu):
         self.inst.write('TPUTU_SAMPLE 15')
         self.inst.write('EHICHPAT ACK')
 
+    def set_uplink_channel(self, standard, ul_ch):
+        """
+            Use this function only in FDD test mode.
+            For Anritsu8820C, it could be used in link mode
+        """
+        s = standard
+        if s == 'LTE' or s == 'WCDMA':
+            return self.set_ulchan(ul_ch)
+
+        elif s == 'GSM':
+            pass
+
+    def set_downlink_channel(self, standard, dl_ch):
+        """
+        Use this function only in FDD test mode
+        For Anritsu8820C, it could be used in link mode
+        """
+        s = standard
+        if s == 'LTE' or s == 'WCDMA':
+            return self.set_dlchan(dl_ch)
+        elif s == 'GSM':
+            pass
+
     def set_init_power(self, count=1):
         self.set_power_measure_on_off('ON') # Set [Power Measurement] to [On]
         self.set_power_count(count)  # Set [Average Count] to [count] times
@@ -526,5 +549,32 @@ class Anritsu8820(Anritsu):
         elif s == 'GSM':
             pass
 
+    def set_init_hspa(self):
+        if self.chcoding == 'EDCHTEST':  # this is HSUPA
+            self.set_init_hsupa()
+        elif self.chcoding == 'FIXREFCH':  # this is HSDPA
+            self.set_init_hsdpa()
+
+    def set_init_hsdpa(self):
+        self.set_channel_coding('FIXREFCH')
+        self.set_dpch_timing_offset(6)
+        self.inst.write('SET_PWRPAT HSMAXPWR')
+        self.inst.write('REGMODE COMBINED')
+        self.inst.write('DOMAINIDRMC CS')
+        self.inst.write('AUTHENT_ALGO XOR')
+        self.inst.write('HSHSET HSET1_QPSK')
+        self.set_throughput_on_off('OFF')
+        self.set_input_level(-10)
+        self.anritsu_query('*OPC?')
+
+    def set_init_hsupa(self):
+        self.set_channel_coding('EDCHTEST')
+        self.set_dpch_timing_offset(6)
+        self.inst.write('MAXULPWR 21')
+        self.inst.write('TPCALGO 2')
+        self.inst.write('DOMAINIDRMC CS')
+        self.inst.write('AUTHENT_ALGO XOR')
+        self.inst.write('HSUSET TTI10_QPSK')
+        self.anritsu_query('*OPC?')
 
 

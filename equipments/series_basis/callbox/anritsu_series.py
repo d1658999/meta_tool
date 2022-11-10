@@ -470,6 +470,12 @@ class Anritsu:
         """
         self.anritsu_write(f'PT_WDR {switch}')
 
+    def set_throughput_on_off(self, switch='OFF'):
+        """
+        Set throughput measurement to On or OFF for HSDPA
+        """
+        self.anritsu_write(f'TPUT_MEAS {switch}')
+
     def set_power_count(self, count=1):
         """
         Set the average count of power
@@ -512,11 +518,36 @@ class Anritsu:
         """
         self.anritsu_write(f'PWRTEMP_AVG {count}')
 
+    def set_dlchan(self, dl_ch):
+        """
+        Set downlink chan for LTE and WCDMA
+        """
+        self.anritsu_write(f'DLCHAN {dl_ch}')
+
+    def set_ulchan(self, ul_ch):
+        """
+        Set uplink chan for LTE and WCDMA
+        """
+        self.anritsu_write(f'ULCHAN {ul_ch}')
+
     def set_power_wdr_count(self, count=1):
         """
         Set [Power template] to [count] times for WCDMA
         """
         self.anritsu_write(f'PT_WDR_AVG {count}')
+
+    def set_channel_coding(self, mode):
+        """
+        Set [Channel Coding] to [<mode> RF Test]
+        <mode> FIXREFCH | EDCHTEST for HSDPA | HSUPA
+        """
+        self.anritsu_write(f'CHCODING {mode}')
+
+    def set_dpch_timing_offset(self, offset=6):
+        """
+        Set DPCH Timing Offset
+        """
+        self.anritsu_write(f'DDPCHTOFS {offset}')
 
     def get_standard_query(self):
         """
