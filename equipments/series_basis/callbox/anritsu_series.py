@@ -1,4 +1,5 @@
 import time
+from decimal import Decimal
 from connection_interface.connection_visa import VisaComport
 from utils.log_init import log_set
 import utils.parameters.common_parameters_anritsu as cm_pmt_anritsu
@@ -483,6 +484,12 @@ class Anritsu:
         """
         self.anritsu_write(f'TPUT_MEAS {switch}')
 
+    def set_throughput_early_on_off(self, switch='ON'):
+        """
+        set throughput_early on/off
+        """
+        self.anritsu_write(f'TPUT_EARLY {switch}')
+
     def set_power_count(self, count=1):
         """
         Set the average count of power
@@ -613,6 +620,80 @@ class Anritsu:
         """
         self.anritsu_write(f'HSHSET {setting}')
 
+    def set_rb_size(self, size):
+        """
+        Set RB size or RB numbers
+        """
+        self.anritsu_write(f'ULRMC_RB {size}')
+
+    def set_rb_start(self, start):
+        """
+        Set RB start or RN offset
+        """
+        self.anritsu_write(f'ULRMC_START {start}')
+
+    def set_delta_cqi(self, delta=8):
+        """
+        Set [Delta CQI setting] for HSUPA
+        """
+        self.anritsu_write(f'SET_HSDELTA_CQI {delta}')
+
+    def set_subtest(self, subtest):
+        """
+        Set subtest item
+        """
+        self.anritsu_write(f'SET_HSSUBTEST {subtest}')
+
+    def set_tpc_cmd_down(self):
+        """
+        Reduce [TxPower] only 1 dB and wait 150 ms.
+        """
+        self.anritsu_write('TPC_CMD_DOWN')
+
+    def set_tpc_cmd_up(self):
+        """
+        raise [TxPower] only 1 dB and wait 150 ms.
+        """
+        self.anritsu_write('TPC_CMD_UP')
+
+    def set_dtch_data_pattern(self, pattern='PN09'):
+        """
+        DTCH Data Pattern
+        """
+        self.anritsu_write(f'DTCHPAT {pattern}')
+
+    def set_measurement_object(self, ob='HSDPCCH_MA'):
+        """
+        Set [Measurement Object] to [HS-DPCCH Modulation Analysis]
+        <ob> HSDPCCH_MA | HSDPCCH_PC
+        HSDPCCH_PC: HS-DPCCH Power Control
+        HSDPCCH_MA: HS-DPCCH Modulation Analysis
+        OUTSYNC_AUTO: Out of Synchronisation(Auto)
+        PHASEDISC: Phase Discontinuity
+        ILPC_AUTO: Inner Loop Power Control (Auto)
+        RACHTMSK: RACH with Time Mask
+        COMPRESS: Compressed Mode
+        ILPC: Inner Loop Power Control
+        8PSK: 8PSK
+        MSNB: GMSK
+        """
+        self.anritsu_write(f'MEASOBJ {ob}')
+
+    def set_hsma_item(self, mode):
+        """
+        Set measurement result of HS-DPCCH (Modulation Analysis)
+        <mode> EVMPHASE | CDP
+        EVMPHASE: [EVM to Phase Disc]
+        CDP: [CDP Ratio]
+        """
+        self.anritsu_write(f'HMA_ITEM {mode}')
+
+    def set_rrc_filter(self, mode='OFF'):
+        """
+        set rrc filter
+        """
+        self.anritsu_write(f'TDM_RRC {mode}')
+
     def get_standard_query(self):
         """
         To check the standard in equipment
@@ -625,6 +706,37 @@ class Anritsu:
          To confirm the call processing status
         """
         return self.anritsu_query('CALLSTAT?')
+
+    def get_etfci_query(self):
+        """
+         Read the E-TFCI measurement result
+        """
+        return Decimal(self.anritsu_query('AVG_ETFCI?').strip())
+
+    def get_evm_hpm(self):
+        """
+        evm for HSDPA H-power mode
+        """
+        return self.anritsu_query('POINT_EVM? ALL').strip().split(',')  # p0, p1, p2, p3
+
+    def get_phase_disc_query(self):
+        """
+        phase disc for HSDPA H-power mode
+        """
+        return self.anritsu_query('POINT_PHASEDISC? ALL').strip().split(',')  # theta0, theta1
+
+    def get_power_average_query(self):
+        """
+        Get the average power
+        """
+        return self.anritsu_query('POWER? AVG').strip()
+
+    def get_measure_state_query(self):
+        """
+        response the state of measuring
+        """
+        return self.anritsu_query('mstat?').strip()
+
 
 
 

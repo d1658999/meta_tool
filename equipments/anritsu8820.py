@@ -1,4 +1,5 @@
 import time
+from decimal import Decimal
 
 from equipments.series_basis.callbox.anritsu_series import Anritsu
 from utils.log_init import log_set
@@ -580,37 +581,33 @@ class Anritsu8820(Anritsu):
     def set_init_rx(self, standard):
         s = standard
         if s == 'LTE':
-            self.inst.write('TESTPRM RX_SENS')
+            self.set_test_parameter('RX_SENS')
             self.set_tpc('AUTO')
             self.set_input_level(5)
             self.set_output_level(-70)
             self.set_rx_sample(1000)
-            self.inst.write('TPUT_EARLY ON')
+            self.set_throughput_early_on_off('ON')
             self.set_init_power()
-            self.inst.write('MOD_MEAS OFF')
+            self.set_mod_measure_on_off('OFF')
 
         elif s == 'WCDMA':
             self.set_input_level(5)
             self.set_output_level(-70)
             self.set_rx_sample(1000)  # this is should be ber_sample?
-            self.inst.write('TPUT_EARLY OFF')
+            self.set_throughput_early_on_off('OFF')
             self.set_init_power()
         elif s == 'GSM':
             pass
 
     def set_rb_location(self, band, bw):
         rb_num, rb_location = cm_pmt_anritsu.special_uplink_config_sensitivity(band, bw)
-        self.inst.write(f'ULRMC_RB {rb_num}')
-        self.inst.write(f'ULRB_START {rb_location}')
-
-    def query_etfci(self):
-        result = Decimal(self.inst.query('AVG_ETFCI?').strip())
-        return result
+        self.set_rb_size(rb_num)
+        self.set_rb_start(rb_location)
 
     def preset_subtest1(self):
         if self.chcoding == 'EDCHTEST':  # this is HSUPA
-            self.inst.write('SET_HSDELTA_CQI 8')
-            self.inst.write('SET_HSSUBTEST SUBTEST1')
+            self.set_delta_cqi(8)
+            self.set_subtest('SUBTEST1')
             self.set_tpc('ILPC')
             self.set_input_level(16)
             time.sleep(0.15)
@@ -618,16 +615,16 @@ class Anritsu8820(Anritsu):
             self.set_input_level(26)
             logger.debug('TPC DOWN')
             time.sleep(0.15)
-            self.inst.write('TPC_CMD_DOWN')
+            self.set_tpc_cmd_down()
             time.sleep(0.1)
             self.set_to_measure()
         elif self.chcoding == 'FIXREFCH':  # this is HSDPA
             self.set_input_level(24)
             self.set_output_level(-86)
             self.set_tpc('ALL1')
-            self.inst.write('DTCHPAT PN9')
-            self.inst.write('SET_HSDELTA_CQI 8')
-            self.inst.write('SET_HSSUBTEST SUBTEST1')
+            self.set_dtch_data_pattern('PN9')
+            self.set_delta_cqi(8)
+            self.set_subtest('SUBTEST1')
             time.sleep(0.1)
             self.set_to_measure()
 
@@ -636,26 +633,26 @@ class Anritsu8820(Anritsu):
         evm = [po, p1, p2, p3], phase_disc = [theta0, theta1]
         :return:
         """
-        self.inst.write('DDPCHTOFS 6')
+        self.set_dpch_timing_offset(6)
         # self.inst.write('CHCODING FIXREFCH')
-        self.inst.write('SET_PWRPAT HSPC')
-        self.inst.write('SET_HSDELTA_CQI 7')
-        self.inst.write('SET_HSSUBTEST SUBTEST3')
-        self.inst.write('OLVL -86.0')
-        self.inst.write('DTCHPAT PN9')
-        self.inst.write('SCRSEL TDMEAS')
-        self.inst.write('MEASOBJ HSDPCCH_MA')
-        self.inst.write('HSMA_ITEM EVMPHASE')
-        self.inst.write('TDM_RRC OFF')
+        self.set_power_pattern('HSPC')
+        self.set_delta_cqi(7)
+        self.set_subtest('SUBTEST3')
+        self.set_output_level(-86.0)
+        self.set_dtch_data_pattern('PN9')
+        self.set_screen_select('TDMEAS')
+        self.set_measurement_object('HSDPCCH_MA')
+        self.set_hsma_item('EVMPHASE')
+        self.set_rrc_filter('OFF')
         self.set_input_level(35)
-        self.inst.write('TPCPAT ALL1')
+        self.set_tpc('ALL1')
         time.sleep(0.3)
-        self.inst.write('TPCPAT ALT')
+        self.set_tpc('ALT')
         time.sleep(0.1)
         self.set_to_measure()
-        evm_hpm = self.inst.query('POINT_EVM? ALL').strip().split(',')  # p0, p1, p2, p3
+        evm_hpm = self.get_evm_hpm()
         logger.debug(evm_hpm)
-        phase_disc_hpm = self.inst.query('POINT_PHASEDISC? ALL').strip().split(',')  # theta0, theta1
+        phase_disc_hpm = self.get_phase_disc_query()
         logger.debug(phase_disc_hpm)
 
         # below is for LPM -18dBm
@@ -675,5 +672,319 @@ class Anritsu8820(Anritsu):
         # logger.debug(phase_disc_lpm)
 
         return evm_hpm, phase_disc_hpm
+
+    @staticmethod
+    def get_worse_phase_disc(phase_disc):
+        [temp1, temp2] = phase_disc
+        phase_disc = [Decimal(x) for x in phase_disc]
+        phase_disc_worst = max(list(map(abs, phase_disc)))
+        if abs(Decimal(temp1)) == phase_disc_worst:
+            return Decimal(temp1)
+        elif abs(Decimal(temp2)) == phase_disc_worst:
+            return Decimal(temp2)
+
+    def get_subtest1_power_aclr(self):
+        """
+        :return: power, ACLR, subtest_number for HSUPA
+        :return: power, ACLR, EVM, subtest_number for HSDPA
+        """
+        logger.info('Start to subtest1')
+        if self.chcoding == 'EDCHTEST':  # this is HSUPA
+            logger.info('start to measure HSUPA')
+            self.preset_subtest1()
+            power = self.get_uplink_power('WCDMA')
+            result = self.get_etfci_query()
+            logger.debug(f'Now ETFCI result is: {result}')
+            mstat = int(self.get_measure_state_query())
+            logger.debug(f'mstat: {mstat}')
+            if mstat == cm_pmt_anritsu.MESUREMENT_TIMEOUT:
+                logger.debug('time out and recall')
+                self.set_end()
+                time.sleep(3)
+                self.set_connecting()
+                self.preset_subtest1()
+            result = cm_pmt_anritsu.HSUPA_ETFCI_SUBTEST1
+            logger.debug('force to the subtest1 ETFCI')
+            while result == cm_pmt_anritsu.HSUPA_ETFCI_SUBTEST1:
+                logger.debug('TPC UP')
+                self.set_tpc_cmd_up()
+                time.sleep(0.15)
+                self.set_to_measure()
+                power = self.get_uplink_power('WCDMA')
+                result = self.get_etfci_query()
+                logger.debug(f'Now ETFCI result is: {result}')
+
+            while result != cm_pmt_anritsu.HSUPA_ETFCI_SUBTEST1:
+                logger.debug('TPC DOWN')
+                self.set_tpc_cmd_down()
+                time.sleep(0.15)
+                self.set_to_measure()
+                power = self.get_uplink_power('WCDMA')
+                result = self.get_etfci_query()
+                logger.debug(f'Now ETFCI result is: {result}')
+
+            logger.info(f'Subtest1 to capture the final power is {power}')
+
+            aclr = self.get_uplink_aclr('WCDMA')
+
+            self.set_tpc('ILPC')
+            self.set_input_level(5)
+
+            return power, aclr, 1
+
+        elif self.chcoding == 'FIXREFCH':  # this is HSDPA
+            logger.info('start to measure HSDPA')
+            self.preset_subtest1()
+            power = self.get_uplink_power('WCDMA')
+            aclr = self.get_uplink_aclr('WCDMA')
+
+            return power, aclr, 1
+
+    def preset_subtest2(self):
+        if self.chcoding == 'EDCHTEST':  # this is HSUPA
+            self.set_delta_cqi(8)
+            self.set_subtest('SUBTEST2')
+            self.set_tpc('ILPC')
+            self.set_input_level(14)
+            time.sleep(0.15)
+            self.set_tpc('ALT')
+            self.set_input_level(26)
+            logger.debug('TPC DOWN')
+            self.set_tpc_cmd_down()
+            time.sleep(0.15)
+            self.set_to_measure()
+        elif self.chcoding == 'FIXREFCH':  # this is HSDPA
+            self.set_input_level(24)
+            self.set_output_level(-86)
+            self.set_tpc('ALL1')
+            self.set_dtch_data_pattern('PN9')
+            self.set_delta_cqi(8)
+            self.set_subtest('SUBTEST2')
+            time.sleep(0.15)
+            self.set_to_measure()
+
+    def get_subtest2_power_aclr(self):
+        logger.info('Start to subtest2')
+        if self.chcoding == 'EDCHTEST':  # this is HSUPA
+            self.preset_subtest2()
+            power = self.get_uplink_power('WCDMA')
+            result = self.get_etfci_query()
+            logger.debug(f'Now ETFCI result is: {result}')
+            mstat = int(self.get_measure_state_query())
+            logger.debug(f'mstat: {mstat}')
+            if mstat == cm_pmt_anritsu.MESUREMENT_TIMEOUT:
+                self.preset_subtest2()
+            result = cm_pmt_anritsu.HSUPA_ETFCI_SUBTEST2
+            logger.debug('force to the subtest2 ETFCI')
+            while result == cm_pmt_anritsu.HSUPA_ETFCI_SUBTEST2:
+                logger.debug('TPC UP')
+                self.set_tpc_cmd_up()
+                time.sleep(0.15)
+                self.set_to_measure()
+                power = self.get_uplink_power('WCDMA')
+                result = self.get_etfci_query()
+                logger.debug(f'Now ETFCI result is: {result}')
+
+            while result != cm_pmt_anritsu.HSUPA_ETFCI_SUBTEST2:
+                logger.debug('TPC DOWN')
+                self.set_tpc_cmd_down()
+                time.sleep(0.15)
+                self.set_to_measure()
+                power = self.get_uplink_power('WCDMA')
+                result = self.get_etfci_query()
+                logger.debug(f'Now ETFCI result is: {result}')
+
+            logger.info(f'Subtest2 to capture the final power is {power}')
+            aclr = self.get_uplink_aclr('WCDMA')
+
+            self.set_tpc('ILPC')
+            self.set_input_level(5)
+
+            return power, aclr, 2
+
+        elif self.chcoding == 'FIXREFCH':  # this is HSDPA
+            logger.info('start to measure HSDPA')
+            self.preset_subtest2()
+            power = self.get_uplink_power('WCDMA')
+            aclr = self.get_uplink_aclr('WCDMA')
+            evm = self.get_uplink_evm('WCDMA')
+
+            return power, aclr, 2
+
+    def preset_subtest3(self):
+        if self.chcoding == 'EDCHTEST':
+            self.set_delta_cqi(8)
+            self.set_subtest('SUBTEST3')
+            self.set_tpc('ILPC')
+            self.set_input_level(15)
+            time.sleep(0.15)
+            self.set_tpc('ALT')
+            self.set_input_level(26)
+            logger.debug('TPC DOWN')
+            self.set_tpc_cmd_down()
+            time.sleep(0.15)
+            self.set_to_measure()
+        elif self.chcoding == 'FIXREFCH':
+            self.set_input_level(24)
+            self.set_output_level(-86)
+            self.set_tpc('ALL1')
+            self.set_dtch_data_pattern('PN9')
+            self.set_delta_cqi(8)
+            self.set_subtest('SUBTEST3')
+            time.sleep(0.15)
+            self.set_to_measure()
+
+    def get_subtest3_power_aclr(self):
+        logger.info('Start to subtest3')
+        if self.chcoding == 'EDCHTEST':  # this is HSUPA
+            self.preset_subtest3()
+            power = self.get_uplink_power('WCDMA')
+            result = self.get_etfci_query()
+            logger.debug(f'Now ETFCI result is: {result}')
+            mstat = int(self.get_measure_state_query())
+            logger.debug(f'mstat: {mstat}')
+            if mstat == cm_pmt_anritsu.MESUREMENT_TIMEOUT:
+                self.preset_subtest3()
+            result = cm_pmt_anritsu.HSUPA_ETFCI_SUBTEST3
+            logger.debug('force to the subtest3 ETFCI')
+            while result == cm_pmt_anritsu.HSUPA_ETFCI_SUBTEST3:
+                logger.debug('TPC UP')
+                self.set_tpc_cmd_up()
+                time.sleep(0.15)
+                self.set_to_measure()
+                power = self.get_uplink_power('WCDMA')
+                result = self.get_etfci_query()
+                logger.debug(f'Now ETFCI result is: {result}')
+
+            while result != cm_pmt_anritsu.HSUPA_ETFCI_SUBTEST3:
+                logger.debug('TPC DOWN')
+                self.set_tpc_cmd_down()
+                time.sleep(0.15)
+                self.set_to_measure()
+                power = self.get_uplink_power('WCDMA')
+                result = self.get_etfci_query()
+                logger.debug(f'Now ETFCI result is: {result}')
+
+            logger.info(f'Subtest3 to capture the final power is {power}')
+            aclr = self.get_uplink_aclr('WCDMA')
+
+            self.set_tpc('ILPC')
+            self.set_input_level(5)
+
+            return power, aclr, 3
+        elif self.chcoding == 'FIXREFCH':  # this is HSDPA
+            logger.info('start to measure HSDPA')
+            self.preset_subtest3()
+            power = self.get_uplink_power('WCDMA')
+            aclr = self.get_uplink_aclr('WCDMA')
+            evm, phase_disc = self.get_hsdpa_evm()
+            evm = Decimal(max(evm))
+            phase_disc = Decimal(self.get_worse_phase_disc(phase_disc))
+
+            return power, aclr, evm, 3
+
+    def preset_subtest4(self):
+        if self.chcoding == 'EDCHTEST':
+            self.set_delta_cqi(8)
+            self.set_subtest('SUBTEST4')
+            self.set_tpc('ILPC')
+            self.set_input_level(14)
+            time.sleep(0.15)
+            self.set_tpc('ALT')
+            self.set_input_level(26)
+            logger.debug('TPC DOWN')
+            self.set_tpc_cmd_down()
+            time.sleep(0.15)
+            self.set_to_measure()
+        elif self.chcoding == 'FIXREFCH':
+            self.set_input_level(24)
+            self.set_output_level(-86)
+            self.set_tpc('ALL1')
+            self.set_dtch_data_pattern('PN9')
+            self.set_delta_cqi(8)
+            self.set_subtest('SUBTEST4')
+            time.sleep(0.15)
+            self.set_to_measure()
+
+    def get_subtest4_power_aclr(self):
+        logger.info('Start to subtest4')
+        if self.chcoding == 'EDCHTEST':  # this is HSUPA
+            self.preset_subtest4()
+            power = self.get_uplink_power('WCDMA')
+            result = self.get_etfci_query()
+            logger.debug(f'Now ETFCI result is: {result}')
+            mstat = int(self.get_measure_state_query())
+            logger.debug(f'mstat: {mstat}')
+            if mstat == cm_pmt_anritsu.MESUREMENT_TIMEOUT:
+                self.preset_subtest4()
+            result = cm_pmt_anritsu.HSUPA_ETFCI_SUBTEST4
+            logger.debug('force to the subtest4 ETFCI')
+            while result == cm_pmt_anritsu.HSUPA_ETFCI_SUBTEST4:
+                logger.debug('TPC UP')
+                self.set_tpc_cmd_up()
+                time.sleep(0.15)
+                self.set_to_measure()
+                power = self.get_uplink_power('WCDMA')
+                result = self.get_etfci_query()
+                logger.debug(f'Now ETFCI result is: {result}')
+
+            while result != cm_pmt_anritsu.HSUPA_ETFCI_SUBTEST4:
+                logger.debug('TPC DOWN')
+                self.set_tpc_cmd_down()
+                time.sleep(0.15)
+                self.set_to_measure()
+                power = self.get_uplink_power('WCDMA')
+                result = self.get_etfci_query()
+                logger.debug(f'Now ETFCI result is: {result}')
+
+            logger.info(f'Subtest4 to capture the final power is {power}')
+            aclr = self.get_uplink_aclr('WCDMA')
+
+            self.set_tpc('ILPC')
+            self.set_input_level(5)
+
+            return power, aclr, 4
+        elif self.chcoding == 'FIXREFCH':  # this is HSDPA
+            logger.info('start to measure HSDPA')
+            self.preset_subtest4()
+            power = self.get_uplink_power('WCDMA')
+            aclr = self.get_uplink_aclr('WCDMA')
+            evm = self.get_uplink_evm('WCDMA')
+
+            return power, aclr, 4
+
+    def preset_subtest5(self):
+        self.set_throughput_sample_hsupa('OFF')
+        self.inst.write('SUBTEST5_VER NEW')
+        self.inst.write('SET_HSDELTA_CQI 8')
+        self.inst.write('SET_HSSUBTEST SUBTEST5')
+        self.set_tpc('ILPC')
+        self.set_input_level(16)
+        time.sleep(0.15)
+        self.set_input_level(26)
+        self.set_tpc('ALL1')
+        time.sleep(1)
+        self.set_to_measure()
+
+    def get_uplink_power(self, standard):
+        """
+        Get UL power
+        """
+        s = standard  # WCDMA|GSM|LTE
+        logger.debug("Current Format: " + s)
+        if s == 'LTE':
+            # power = Decimal(self.inst.query('POWER? AVG').strip())
+            power = round(self.get_power_average_query(), 1)
+            self.anritsu_query('*OPC?')
+            logger.info(f'POWER: {power}')
+            return power
+        elif s == 'WCDMA':
+            # power = Decimal(self.inst.query('AVG_POWER?').strip())
+            power = round(self.get_power_average_query(), 2)
+            self.anritsu_query('*OPC?')
+            logger.info(f'POWER: {power}')
+            return power
+        elif s == 'GSM':
+            pass
 
 
