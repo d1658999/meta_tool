@@ -694,6 +694,14 @@ class Anritsu:
         """
         self.anritsu_write(f'TDM_RRC {mode}')
 
+    def set_subtest5_versin(self, ver='NEW'):
+        """
+        <ver> NEW | OLD
+        OLD: [Subtest5 –before v8.7.0]
+        NEW: [Sub-test5 – after v8.8.0]
+        """
+        self.anritsu_write(f'SUBTEST5_VER {ver}')
+
     def get_standard_query(self):
         """
         To check the standard in equipment
@@ -735,7 +743,7 @@ class Anritsu:
         """
         response the state of measuring
         """
-        return self.anritsu_query('mstat?').strip()
+        return self.anritsu_query('MSTAT?').strip()
 
 
 
