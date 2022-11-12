@@ -1,0 +1,107 @@
+FR1:
+  Q16:
+    1:
+      EDGE_1RB_LEFT: 22.0
+      EDGE_1RB_RIGHT: 21.0
+      EDGE_FULL_LEFT: 20.0
+      EDGE_FULL_RIGHT: 19.0
+      INNER_1RB_LEFT: 24.0
+      INNER_1RB_RIGHT: 23.0
+      INNER_FULL: 26.0
+      OUTER_FULL: 25.0
+    2:
+      EDGE_1RB_LEFT: 22.0
+      EDGE_1RB_RIGHT: 21.0
+      EDGE_FULL_LEFT: 20.0
+      EDGE_FULL_RIGHT: 19.0
+      INNER_1RB_LEFT: 24.0
+      INNER_1RB_RIGHT: 23.0
+      INNER_FULL: 26.0
+      OUTER_FULL: 25.0
+    3:
+      EDGE_1RB_LEFT: 22.0
+      EDGE_1RB_RIGHT: 21.0
+      EDGE_FULL_LEFT: 20.0
+      EDGE_FULL_RIGHT: 19.0
+      INNER_1RB_LEFT: 24.0
+      INNER_1RB_RIGHT: 23.0
+      INNER_FULL: 26.5
+      OUTER_FULL: 25.0
+  QPSK:
+    1:
+      EDGE_1RB_LEFT: 22.0
+      EDGE_1RB_RIGHT: 21.0
+      EDGE_FULL_LEFT: 20.0
+      EDGE_FULL_RIGHT: 19.0
+      INNER_1RB_LEFT: 24.0
+      INNER_1RB_RIGHT: 23.0
+      INNER_FULL: 26.0
+      OUTER_FULL: 25.0
+    2:
+      EDGE_1RB_LEFT: 22.0
+      EDGE_1RB_RIGHT: 21.0
+      EDGE_FULL_LEFT: 20.0
+      EDGE_FULL_RIGHT: 19.0
+      INNER_1RB_LEFT: 24.0
+      INNER_1RB_RIGHT: 23.0
+      INNER_FULL: 26.0
+      OUTER_FULL: 25.0
+    3:
+      EDGE_1RB_LEFT: 22.0
+      EDGE_1RB_RIGHT: 21.0
+      EDGE_FULL_LEFT: 20.0
+      EDGE_FULL_RIGHT: 19.0
+      INNER_1RB_LEFT: 24.0
+      INNER_1RB_RIGHT: 23.0
+      INNER_FULL: 26.5
+      OUTER_FULL: 25.0
+GSM:
+  EPSK:
+    900:
+      Genre: 29.5
+    1800:
+      Genre: 27.5
+    1900:
+      Genre: 27.5
+  GMSK:
+    850:
+      Genre: 29.5
+    900:
+      Genre: 32.5
+    1800:
+      Genre: 29.5
+    1900:
+      Genre: 29.5
+LTE:
+  Q16:
+    1:
+      FRB: 25.0
+      PRB: 26.0
+    2:
+      FRB: 25.0
+      PRB: 26.0
+    3:
+      FRB: 25.0
+      PRB: 26.5
+  QPSK:
+    1:
+      FRB: 25.0
+      PRB: 26.0
+    2:
+      FRB: 25.0
+      PRB: 26.0
+    3:
+      FRB: 25.0
+      PRB: 26.5
+WCDMA:
+  QPSK:
+    1:
+      Genre: 24.7
+    2:
+      Genre: 24.7
+    4:
+      Genre: 24.7
+    5:
+      Genre: 24.7
+    8:
+      Genre: 24.7
