@@ -955,9 +955,9 @@ class Anritsu8820(Anritsu):
 
     def preset_subtest5(self):
         self.set_throughput_sample_hsupa('OFF')
-        self.inst.write('SUBTEST5_VER NEW')
-        self.inst.write('SET_HSDELTA_CQI 8')
-        self.inst.write('SET_HSSUBTEST SUBTEST5')
+        self.set_subtest5_versin('NEW')
+        self.set_delta_cqi(8)
+        self.set_subtest('SUBTEST5')
         self.set_tpc('ILPC')
         self.set_input_level(16)
         time.sleep(0.15)
@@ -965,6 +965,27 @@ class Anritsu8820(Anritsu):
         self.set_tpc('ALL1')
         time.sleep(1)
         self.set_to_measure()
+
+    def get_subtest5_power_aclr(self):
+        logger.info('Start to subtest5')
+        if self.chcoding == 'EDCHTEST':  # this is HSUPA
+            self.preset_subtest5()
+            mstat = int(self.inst.query('mstat?').strip())
+            logger.debug(f'mstat: {mstat}')
+            if mstat == cm_pmt_anritsu.MESUREMENT_TIMEOUT:
+                self.preset_subtest5()
+            logger.info('subtest5:')
+            power = self.get_uplink_power('WCDMA')
+            aclr = self.get_uplink_aclr('WCDMA')
+
+            self.inst.write('TPUTU_MEAS OFF')
+            self.inst.write('SET_HSSUBTEST SUBTEST1')
+            self.set_tpc('ILPC')
+            self.set_input_level(5)
+
+            return power, aclr, 5
+        elif self.chcoding == 'FIXREFCH':
+            logger.info("HSDPA doesn't have subtest5")
 
     def get_uplink_power(self, standard):
         """
@@ -985,6 +1006,77 @@ class Anritsu8820(Anritsu):
             logger.info(f'POWER: {power}')
             return power
         elif s == 'GSM':
+            pass
+
+    def get_uplink_aclr(self, standard):
+        """
+            LTE:
+                Get LTE ACLR
+                return in [EUTRA-1, EUTRA+1, UTRA-1, URTA+1, UTRA-2, URTA+2,]
+            WCDMA:
+                Get LTE ACLR
+                return in [LOW5, UP5, LOW10, UP10,] format
+
+        """
+        s = standard  # WCDMA|GSM|LTE
+        logger.debug("Current Format: " + s)
+        aclr = []
+        if s == 'LTE':
+            aclr.append(Decimal(self.inst.query('MODPWR? E_LOW1,AVG').strip()))
+            aclr.append(Decimal(self.inst.query('MODPWR? E_UP1,AVG').strip()))
+            aclr.append(Decimal(self.inst.query('MODPWR? LOW1,AVG').strip()))
+            aclr.append(Decimal(self.inst.query('MODPWR? UP1,AVG').strip()))
+            aclr.append(Decimal(self.inst.query('MODPWR? LOW2,AVG').strip()))
+            aclr.append(Decimal(self.inst.query('MODPWR? UP2,AVG').strip()))
+            self.inst.query('*OPC?')
+            logger.info(f'ACLR: {aclr}')
+            return aclr
+        elif s == 'WCDMA':
+            aclr.append(Decimal(self.inst.query('AVG_MODPWR? LOW5').strip()))
+            aclr.append(Decimal(self.inst.query('AVG_MODPWR? UP5').strip()))
+            aclr.append(Decimal(self.inst.query('AVG_MODPWR? LOW10').strip()))
+            aclr.append(Decimal(self.inst.query('AVG_MODPWR? UP10').strip()))
+            self.inst.query('*OPC?')
+            logger.info(f'ACLR: {aclr}')
+            return aclr
+        elif s == 'GSM':
+            pass
+
+    def get_uplink_evm(self, standard):
+        """
+            Get Error Vector Magnitude (EVM) - PUSCH @ max power
+        """
+        s = standard  # WCDMA|GSM|LTE
+        logger.debug("Current Format: " + s)
+        if s == 'LTE':
+            evm = Decimal(self.inst.query('EVM? AVG').strip())
+            self.inst.query('*OPC?')
+            logger.info(f'EVM: {evm}')
+            return evm
+        elif s == 'WCDMA':
+            evm = Decimal(self.inst.query('AVG_EVM?').strip())
+            self.inst.query('*OPC?')
+            logger.info(f'EVM: {evm}')
+            return evm
+        elif s == 'GSM':
+            pass
+
+    def aclr_ch_judge(self, standard, band, dl_ch, bw=None):
+        if standard == 'LTE':
+            if dl_ch < cm_pmt_anritsu.dl_ch_selected(self.std, band, bw)[1]:
+                self.aclr_ch = 'ch01'
+            elif dl_ch == cm_pmt_anritsu.dl_ch_selected(self.std, band, bw)[1]:
+                self.aclr_ch = 'ch02'
+            elif dl_ch > cm_pmt_anritsu.dl_ch_selected(self.std, band, bw)[1]:
+                self.aclr_ch = 'ch03'
+        elif standard == 'WCDMA':
+            if dl_ch < cm_pmt_anritsu.dl_ch_selected(self.std, band)[1]:
+                self.aclr_ch = 'ch01'
+            elif dl_ch == cm_pmt_anritsu.dl_ch_selected(self.std, band)[1]:
+                self.aclr_ch = 'ch02'
+            elif dl_ch > cm_pmt_anritsu.dl_ch_selected(self.std, band)[1]:
+                self.aclr_ch = 'ch03'
+        elif standard == 'GSM':
             pass
 
 
