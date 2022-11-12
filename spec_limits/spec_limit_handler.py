@@ -1,22 +1,35 @@
 import yaml
 import csv
+from pathlib import Path
+from utils.log_init import log_set
 
-CSV_PATH_FR1 = 'power_limits_fr1.csv'
-CSV_PATH_LTE = 'power_limits_lte.csv'
-CSV_PATH_WCDMA = 'power_limits_wcdma.csv'
-CSV_PATH_GSM = 'power_limits_gsm.csv'
-PWR_LIMITS_YAML_PATH = 'power_limits.yaml'
+logger = log_set('spec_limits')
+
+
+CSV_PWR_FILE_FR1 = 'power_limits_fr1.csv'
+CSV_PWR_FILE_LTE = 'power_limits_lte.csv'
+CSV_PWR_FILE_WCDMA = 'power_limits_wcdma.csv'
+CSV_PWR_FILE_GSM = 'power_limits_gsm.csv'
+PWR_LIMITS_YAML_NAME = 'power_limits.yaml'
+
+CSV_PWR_PATH_FR1 = Path('spec_limits') / Path(CSV_PWR_FILE_FR1)
+CSV_PWR_PATH_LTE = Path('spec_limits') / Path(CSV_PWR_FILE_LTE)
+CSV_PWR_PATH_WCDMA = Path('spec_limits') / Path(CSV_PWR_FILE_WCDMA)
+CSV_PWR_PATH_GSM = Path('spec_limits') / Path(CSV_PWR_FILE_GSM)
+PWR_LIMITS_YAML_PATH = Path('spec_limits') / PWR_LIMITS_YAML_NAME
+
 TECHs = ['FR1', 'LTE', 'WCDMA', 'GSM']
 
 def power_limits_csv2yaml():
     """
     tech -> modultation -> band -> rb_state
     """
+    logger.info('tranfer spec_limits csv file to yaml')
     with open(PWR_LIMITS_YAML_PATH, 'w', encoding='utf-8') as outfile:
         contents = {}
         for tech in TECHs:  # FR1, LTE, WCDMA, GSM
             if tech == 'FR1':
-                with open(CSV_PATH_FR1, 'r') as csvfile:
+                with open(CSV_PWR_PATH_FR1, 'r') as csvfile:
                     rows = csv.reader(csvfile)
                     next(rows)  # skip the title
                     for row in list(rows):
@@ -35,7 +48,7 @@ def power_limits_csv2yaml():
                         }
 
             elif tech == 'LTE':
-                with open(CSV_PATH_LTE, 'r') as csvfile:
+                with open(CSV_PWR_PATH_LTE, 'r') as csvfile:
                     rows = csv.reader(csvfile)
                     next(rows)  # skip the title
                     for row in list(rows):
@@ -48,7 +61,7 @@ def power_limits_csv2yaml():
                         }
 
             elif tech == 'WCDMA':
-                with open(CSV_PATH_WCDMA, 'r') as csvfile:
+                with open(CSV_PWR_PATH_WCDMA, 'r') as csvfile:
                     rows = csv.reader(csvfile)
                     next(rows)  # skip the title
                     for row in list(rows):
@@ -60,7 +73,7 @@ def power_limits_csv2yaml():
                         }
 
             elif tech == 'GSM':
-                with open(CSV_PATH_GSM, 'r') as csvfile:
+                with open(CSV_PWR_PATH_GSM, 'r') as csvfile:
                     rows = csv.reader(csvfile)
                     next(rows)  # skip the title
                     for row in list(rows):
@@ -74,10 +87,22 @@ def power_limits_csv2yaml():
 
 
 def import_power_limits():
+    logger.info('import power yaml file ')
     with open(PWR_LIMITS_YAML_PATH, 'r') as s:
         spec_power_limits = yaml.safe_load(s)
         return spec_power_limits
 
+def import_aclr_limits():
+    logger.info('import aclr yaml file ')
+    with open(ACLR_LIMITS_YAML_PATH, 'r') as s:
+        spec_power_limits = yaml.safe_load(s)
+        return spec_power_limits
+
+def import_evm_limits():
+    logger.info('import evm yaml file ')
+    with open(PWR_LIMITS_YAML_PATH, 'r') as s:
+        spec_power_limits = yaml.safe_load(s)
+        return spec_power_limits
 
 def main():  # test use
     power_limits_csv2yaml()
