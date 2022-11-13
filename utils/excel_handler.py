@@ -76,7 +76,7 @@ def excel_folder_path():
     return Path('output') / Path(ext_pmt.devices_serial)
 
 
-def tx_power_fcc_ce_export_excel(data, parameters_dict):
+def tx_power_fcc_ce_export_excel_ftm(data, parameters_dict):
     script = parameters_dict['script']
     tech = parameters_dict['tech']
     band = parameters_dict['band']
@@ -133,7 +133,7 @@ def tx_power_fcc_ce_export_excel(data, parameters_dict):
     return file_path
 
 
-def tx_power_relative_test_export_excel(data, parameters_dict):
+def tx_power_relative_test_export_excel_ftm(data, parameters_dict):
     """
     data is dict like:
     tx_level: [ U_-2, U_-1, E_-1, Pwr, E_+1, U_+1, U_+2, EVM, Freq_Err, IQ_OFFSET]
@@ -589,7 +589,7 @@ def tx_power_relative_test_export_excel(data, parameters_dict):
         return file_path
 
 
-def txp_aclr_evm_current_plot(file_path, parameters_dict):
+def txp_aclr_evm_current_plot_ftm(file_path, parameters_dict):
     script = parameters_dict['script']
     tech = parameters_dict['tech']
     band = parameters_dict['band']
@@ -1061,7 +1061,7 @@ def txp_aclr_evm_current_plot(file_path, parameters_dict):
             wb.close()
 
 
-def rx_power_relative_test_export_excel(data, parameters_dict):
+def rx_power_relative_test_export_excel_ftm(data, parameters_dict):
     """
     data is dict like:
     rx_level: [ Power, Rx_level, [RSRP0-3], [CINR0-3], [AFC0-3]]
@@ -1307,7 +1307,119 @@ def rx_power_relative_test_export_excel(data, parameters_dict):
         return file_path
 
 
-def rxs_relative_plot(file_path, parameters_dict):
+def rx_power_endc_test_export_excel_ftm(data):
+    """
+    :param data:  data = [int(self.band_lte), int(self.band_fr1), self.power_monitor_endc_lte, self.power_endc_fr1,
+    self.rx_level, self.bw_lte, self.bw_fr1, self.tx_freq_lte, self.tx_freq_fr1, self.tx_level_endc_lte,
+    self.tx_level_endc_fr1, self.rb_size_lte, self.rb_start_lte, self.rb_size_fr1, self.rb_start_fr1]
+    :return:
+    """
+    logger.info('----------save to excel----------')
+    filename = f'Sensitivty_ENDC.xlsx'
+
+    file_path = Path(excel_folder_path()) / Path(filename)
+
+    if Path(file_path).exists() is False:
+        logger.info('----------file does not exist, so create a new one----------')
+        wb = openpyxl.Workbook()
+        wb.remove(wb['Sheet'])
+        # create dashboard
+        wb.create_sheet(f'Dashboard')
+
+        # create the title and sheet for TxManx and -10dBm
+        wb.create_sheet(f'Raw_Data_ENDC_FR1_TxMax')
+        wb.create_sheet(f'Raw_Data_ENDC_FR1_-10dBm')
+        for sheetname in wb.sheetnames:
+            if 'Raw_Data' in sheetname:
+                ws = wb[sheetname]
+                ws['A1'] = 'Band_LTE'
+                ws['B1'] = 'Band_FR1'
+                ws['C1'] = 'Power_LTE_measured'
+                ws['D1'] = 'Power_FR1_measured'
+                ws['E1'] = 'Sensitivity_FR1'
+                ws['F1'] = 'BW_LTE'
+                ws['G1'] = 'BW_FR1'
+                ws['H1'] = 'Freq_tx_LTE'
+                ws['I1'] = 'Freq_tx_FR1'
+                ws['J1'] = 'Tx_level_LTE'
+                ws['K1'] = 'Tx_level_FR1'
+                ws['L1'] = 'rb_size_LTE'
+                ws['M1'] = 'rb_start_LTE'
+                ws['N1'] = 'rb_size_FR1'
+                ws['O1'] = 'rb_start_FR1'
+            else:
+                pass
+
+        # create the title and sheet for Desense
+        wb.create_sheet(f'Desens_ENDC')
+        ws = wb[f'Desens_ENDC']
+        ws['A1'] = 'Band_LTE'
+        ws['B1'] = 'Band_FR1'
+        ws['C1'] = 'BW_LTE'
+        ws['D1'] = 'BW_FR1'
+        ws['E1'] = 'Freq_tx_LTE'
+        ws['F1'] = 'Freq_tx_FR1'
+        ws['G1'] = 'Diff'
+
+        wb.save(file_path)
+        wb.close()
+
+    logger.info('----------file exist----------')
+    wb = openpyxl.load_workbook(file_path)
+
+    for d in data:
+        sheetname = f'Raw_Data_ENDC_FR1_TxMax' if d[2] > 0 else f'Raw_Data_ENDC_FR1_-10dBm'
+        ws = wb[sheetname]
+        max_row = ws.max_row
+        max_col = ws.max_column
+        row = max_row + 1
+        for col in range(max_col):
+            ws.cell(row, col + 1).value = d[col]
+
+    wb.save(file_path)
+    wb.close()
+
+    return file_path
+
+
+def rx_desense_process_ftm(file_path, mcs):
+    """
+    cell column: Band	| Rx_Path | Chan | Diff | TX_Path
+    """
+    wb = openpyxl.load_workbook(file_path)
+    ws_txmax = wb[f'Raw_Data_{mcs}_TxMax']
+    ws_txmin = wb[f'Raw_Data_{mcs}_-10dBm']
+    ws_desens = wb[f'Desens_{mcs}']
+    for row in range(2, ws_txmax.max_row + 1):
+        ws_desens.cell(row, 1).value = ws_txmax.cell(row, 1).value
+        ws_desens.cell(row, 2).value = ws_txmax.cell(row, 2).value
+        ws_desens.cell(row, 3).value = ws_txmax.cell(row, 3).value
+        ws_desens.cell(row, 4).value = ws_txmax.cell(row, 7).value - ws_txmin.cell(row, 7).value
+        ws_desens.cell(row, 5).value = ws_txmax.cell(row, 20).value
+
+    wb.save(file_path)
+    wb.close()
+
+
+def rx_desense_endc_process_ftm(file_path):
+    wb = openpyxl.load_workbook(file_path)
+    ws_txmax = wb[f'Raw_Data_ENDC_FR1_TxMax']
+    ws_txmin = wb[f'Raw_Data_ENDC_FR1_-10dBm']
+    ws_desens = wb[f'Desens_ENDC']
+    for row in range(2, ws_txmax.max_row + 1):
+        ws_desens.cell(row, 1).value = ws_txmax.cell(row, 1).value
+        ws_desens.cell(row, 2).value = ws_txmax.cell(row, 2).value
+        ws_desens.cell(row, 3).value = ws_txmax.cell(row, 6).value
+        ws_desens.cell(row, 4).value = ws_txmax.cell(row, 7).value
+        ws_desens.cell(row, 5).value = ws_txmax.cell(row, 8).value
+        ws_desens.cell(row, 6).value = ws_txmax.cell(row, 9).value
+        ws_desens.cell(row, 7).value = ws_txmax.cell(row, 5).value - ws_txmin.cell(row, 5).value
+
+    wb.save(file_path)
+    wb.close()
+
+
+def rxs_relative_plot_ftm(file_path, parameters_dict):
     logger.info('----------Plot Chart---------')
     # tech ='LTE'
     # mcs_lte = 'QPSK'
@@ -1455,82 +1567,7 @@ def rxs_relative_plot(file_path, parameters_dict):
             wb.close()
 
 
-def rx_power_endc_test_export_excel(data):
-    """
-    :param data:  data = [int(self.band_lte), int(self.band_fr1), self.power_monitor_endc_lte, self.power_endc_fr1,
-    self.rx_level, self.bw_lte, self.bw_fr1, self.tx_freq_lte, self.tx_freq_fr1, self.tx_level_endc_lte,
-    self.tx_level_endc_fr1, self.rb_size_lte, self.rb_start_lte, self.rb_size_fr1, self.rb_start_fr1]
-    :return:
-    """
-    logger.info('----------save to excel----------')
-    filename = f'Sensitivty_ENDC.xlsx'
-
-    file_path = Path(excel_folder_path()) / Path(filename)
-
-    if Path(file_path).exists() is False:
-        logger.info('----------file does not exist, so create a new one----------')
-        wb = openpyxl.Workbook()
-        wb.remove(wb['Sheet'])
-        # create dashboard
-        wb.create_sheet(f'Dashboard')
-
-        # create the title and sheet for TxManx and -10dBm
-        wb.create_sheet(f'Raw_Data_ENDC_FR1_TxMax')
-        wb.create_sheet(f'Raw_Data_ENDC_FR1_-10dBm')
-        for sheetname in wb.sheetnames:
-            if 'Raw_Data' in sheetname:
-                ws = wb[sheetname]
-                ws['A1'] = 'Band_LTE'
-                ws['B1'] = 'Band_FR1'
-                ws['C1'] = 'Power_LTE_measured'
-                ws['D1'] = 'Power_FR1_measured'
-                ws['E1'] = 'Sensitivity_FR1'
-                ws['F1'] = 'BW_LTE'
-                ws['G1'] = 'BW_FR1'
-                ws['H1'] = 'Freq_tx_LTE'
-                ws['I1'] = 'Freq_tx_FR1'
-                ws['J1'] = 'Tx_level_LTE'
-                ws['K1'] = 'Tx_level_FR1'
-                ws['L1'] = 'rb_size_LTE'
-                ws['M1'] = 'rb_start_LTE'
-                ws['N1'] = 'rb_size_FR1'
-                ws['O1'] = 'rb_start_FR1'
-            else:
-                pass
-
-        # create the title and sheet for Desense
-        wb.create_sheet(f'Desens_ENDC')
-        ws = wb[f'Desens_ENDC']
-        ws['A1'] = 'Band_LTE'
-        ws['B1'] = 'Band_FR1'
-        ws['C1'] = 'BW_LTE'
-        ws['D1'] = 'BW_FR1'
-        ws['E1'] = 'Freq_tx_LTE'
-        ws['F1'] = 'Freq_tx_FR1'
-        ws['G1'] = 'Diff'
-
-        wb.save(file_path)
-        wb.close()
-
-    logger.info('----------file exist----------')
-    wb = openpyxl.load_workbook(file_path)
-
-    for d in data:
-        sheetname = f'Raw_Data_ENDC_FR1_TxMax' if d[2] > 0 else f'Raw_Data_ENDC_FR1_-10dBm'
-        ws = wb[sheetname]
-        max_row = ws.max_row
-        max_col = ws.max_column
-        row = max_row + 1
-        for col in range(max_col):
-            ws.cell(row, col + 1).value = d[col]
-
-    wb.save(file_path)
-    wb.close()
-
-    return file_path
-
-
-def rxs_endc_plot(file_path):
+def rxs_endc_plot_ftm(file_path):
     logger.info('----------Plot Chart---------')
     wb = openpyxl.load_workbook(file_path)
     ws_dashboard = wb[f'dashboard']
@@ -1575,38 +1612,3 @@ def rxs_endc_plot(file_path):
     wb.close()
 
 
-def rx_desense_process(file_path, mcs):
-    """
-    cell column: Band	| Rx_Path | Chan | Diff | TX_Path
-    """
-    wb = openpyxl.load_workbook(file_path)
-    ws_txmax = wb[f'Raw_Data_{mcs}_TxMax']
-    ws_txmin = wb[f'Raw_Data_{mcs}_-10dBm']
-    ws_desens = wb[f'Desens_{mcs}']
-    for row in range(2, ws_txmax.max_row + 1):
-        ws_desens.cell(row, 1).value = ws_txmax.cell(row, 1).value
-        ws_desens.cell(row, 2).value = ws_txmax.cell(row, 2).value
-        ws_desens.cell(row, 3).value = ws_txmax.cell(row, 3).value
-        ws_desens.cell(row, 4).value = ws_txmax.cell(row, 7).value - ws_txmin.cell(row, 7).value
-        ws_desens.cell(row, 5).value = ws_txmax.cell(row, 20).value
-
-    wb.save(file_path)
-    wb.close()
-
-
-def rx_desense_endc_process(file_path):
-    wb = openpyxl.load_workbook(file_path)
-    ws_txmax = wb[f'Raw_Data_ENDC_FR1_TxMax']
-    ws_txmin = wb[f'Raw_Data_ENDC_FR1_-10dBm']
-    ws_desens = wb[f'Desens_ENDC']
-    for row in range(2, ws_txmax.max_row + 1):
-        ws_desens.cell(row, 1).value = ws_txmax.cell(row, 1).value
-        ws_desens.cell(row, 2).value = ws_txmax.cell(row, 2).value
-        ws_desens.cell(row, 3).value = ws_txmax.cell(row, 6).value
-        ws_desens.cell(row, 4).value = ws_txmax.cell(row, 7).value
-        ws_desens.cell(row, 5).value = ws_txmax.cell(row, 8).value
-        ws_desens.cell(row, 6).value = ws_txmax.cell(row, 9).value
-        ws_desens.cell(row, 7).value = ws_txmax.cell(row, 5).value - ws_txmin.cell(row, 5).value
-
-    wb.save(file_path)
-    wb.close()

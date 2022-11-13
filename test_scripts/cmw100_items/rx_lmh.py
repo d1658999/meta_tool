@@ -7,8 +7,8 @@ import utils.parameters.external_paramters as ext_pmt
 import utils.parameters.common_parameters_ftm as cm_pmt_ftm
 import utils.parameters.rb_parameters as scrpt_set
 from utils.loss_handler import get_loss
-from utils.excel_handler import rxs_relative_plot, rxs_endc_plot, rx_power_endc_test_export_excel
-from utils.excel_handler import rx_power_relative_test_export_excel, rx_desense_process, rx_desense_endc_process
+from utils.excel_handler import rxs_relative_plot_ftm, rxs_endc_plot_ftm, rx_power_endc_test_export_excel_ftm
+from utils.excel_handler import rx_power_relative_test_export_excel_ftm, rx_desense_process_ftm, rx_desense_endc_process_ftm
 from utils.channel_handler import channel_freq_select
 
 logger = log_set('rx_lmh')
@@ -225,8 +225,8 @@ class RxTestGenre(AtCmd, CMW100):
                 self.bw_fr1 = bw
                 file_name = f'Sensitivty_{self.bw_fr1}MHZ_{self.tech}_LMH.xlsx'
                 file_path = Path(self.file_path).parent / Path(file_name)
-                rx_desense_process(file_path, self.mcs_fr1)
-                rxs_relative_plot(file_path, parameters)
+                rx_desense_process_ftm(file_path, self.mcs_fr1)
+                rxs_relative_plot_ftm(file_path, parameters)
             except TypeError as err:
                 logger.debug(err)
                 logger.info(
@@ -274,8 +274,8 @@ class RxTestGenre(AtCmd, CMW100):
                 self.bw_lte = bw
                 file_name = f'Sensitivty_{self.bw_lte}MHZ_{self.tech}_LMH.xlsx'
                 file_path = Path(self.file_path).parent / Path(file_name)
-                rx_desense_process(file_path, self.mcs_lte)
-                rxs_relative_plot(file_path, parameters)
+                rx_desense_process_ftm(file_path, self.mcs_lte)
+                rxs_relative_plot_ftm(file_path, parameters)
             except TypeError as err:
                 logger.debug(err)
                 logger.info(
@@ -312,7 +312,7 @@ class RxTestGenre(AtCmd, CMW100):
             'tech': self.tech,
             'mcs': self.mcs_wcdma,
         }
-        rxs_relative_plot(self.file_path, parameters)
+        rxs_relative_plot_ftm(self.file_path, parameters)
 
     def search_sensitivity_pipline_gsm(self):
         self.port_tx = ext_pmt.port_tx
@@ -337,7 +337,7 @@ class RxTestGenre(AtCmd, CMW100):
             'tech': self.tech,
             'mcs': 'GMSK',
         }
-        rxs_relative_plot(self.file_path, parameters)
+        rxs_relative_plot_ftm(self.file_path, parameters)
 
     def search_sensitivity_pipline_endc(self):
         self.tx_level_endc_lte = ext_pmt.tx_level_endc_lte
@@ -418,11 +418,11 @@ class RxTestGenre(AtCmd, CMW100):
                          self.rb_start_lte, self.rb_size_fr1, self.rb_start_fr1])
             self.set_test_end_fr1(delay=0.5)
             self.set_test_end_lte(delay=0.5)
-        file_path = rx_power_endc_test_export_excel(data)
+        file_path = rx_power_endc_test_export_excel_ftm(data)
         # file_name = 'Sensitivty_ENDC.xlsx'
         # file_path = Path(excel_folder_path()) / Path(file_name)
-        rx_desense_endc_process(file_path)
-        rxs_endc_plot(file_path)
+        rx_desense_endc_process_ftm(file_path)
+        rxs_endc_plot_ftm(file_path)
 
     def search_sensitivity_pipline_fast_lte(self):  # this is not yet used
         """
@@ -446,7 +446,7 @@ class RxTestGenre(AtCmd, CMW100):
                                     self.search_sensitivity_lmh_fast_process_lte()
                                 else:
                                     logger.info(f'B{self.band_lte} does not have BW {self.bw_lte}MHZ')
-                            # self.txp_aclr_evm_current_plot(self.filename, mode=1)  # mode=1: LMH mode
+                            # self.txp_aclr_evm_current_plot_ftm(self.filename, mode=1)  # mode=1: LMH mode
                         except TypeError as err:
                             logger.debug(err)
                             logger.info(f'there is no data to plot because the band does not have this BW ')
@@ -499,7 +499,7 @@ class RxTestGenre(AtCmd, CMW100):
                 'tx_path': self.tx_path,
                 'rx_path': rx_path,
             }
-            self.file_path = rx_power_relative_test_export_excel(data, parameters)
+            self.file_path = rx_power_relative_test_export_excel_ftm(data, parameters)
 
     def search_sensitivity_lmh_process_lte(self):
         rx_freq_list = cm_pmt_ftm.dl_freq_selected('LTE', self.band_lte,
@@ -548,7 +548,7 @@ class RxTestGenre(AtCmd, CMW100):
                 'tx_path': self.tx_path,
                 'rx_path': rx_path,
             }
-            self.file_path = rx_power_relative_test_export_excel(data, parameters)
+            self.file_path = rx_power_relative_test_export_excel_ftm(data, parameters)
 
     def search_sensitivity_lmh_process_wcdma(self):
         rx_chan_list = cm_pmt_ftm.dl_chan_select_wcdma(self.band_wcdma)
@@ -603,7 +603,7 @@ class RxTestGenre(AtCmd, CMW100):
                     'tx_path': self.tx_path,
                     'rx_path': rx_path,
                 }
-                self.file_path = rx_power_relative_test_export_excel(data, parameters)
+                self.file_path = rx_power_relative_test_export_excel_ftm(data, parameters)
             else:
                 logger.info(f"WCDMA doesn't have this RX path {self.rx_path_wcdma_dict[self.rx_path_wcdma]}")
                 continue
@@ -651,7 +651,7 @@ class RxTestGenre(AtCmd, CMW100):
                     'tx_path': self.tx_path,
                     'rx_path': rx_path,
                 }
-                self.file_path = rx_power_relative_test_export_excel(data, parameters)
+                self.file_path = rx_power_relative_test_export_excel_ftm(data, parameters)
             else:
                 logger.info(f"GSM doesn't have this RX path {self.rx_path_gsm_dict[self.rx_path_gsm]}")
 
@@ -688,8 +688,8 @@ class RxTestGenre(AtCmd, CMW100):
             rsrp_max = max(self.rsrp_list)
             rsrp_max_index = self.rsrp_list.index(rsrp_max)
             rx_level = self.esens_list[rsrp_max_index]
-            self.filename = rx_power_relative_test_export_excel(data_freq, self.band_lte, self.bw_lte,
-                                                                rx_level)
+            self.filename = rx_power_relative_test_export_excel_ftm(data_freq, self.band_lte, self.bw_lte,
+                                                                    rx_level)
 
     def run(self):
         for tech in ext_pmt.tech:

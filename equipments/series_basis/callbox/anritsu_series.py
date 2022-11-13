@@ -424,6 +424,12 @@ class Anritsu:
         """
         self.anritsu_write('SWP')
 
+    def set_ber_measure_on_off(self, switch='ON'):
+        """
+        Set [BER Measurement] to [On]
+        """
+        self.anritsu_write(f'PWR_MEAS {switch}')
+
     def set_power_measure_on_off(self, switch='ON'):
         """
         Set [Power Measurement] to [On]
@@ -478,11 +484,17 @@ class Anritsu:
         """
         self.anritsu_write(f'PT_WDR {switch}')
 
-    def set_throughput_on_off(self, switch='OFF'):
+    def set_throughput_hsdpa_on_off(self, switch='OFF'):
         """
         Set throughput measurement to On or OFF for HSDPA
         """
         self.anritsu_write(f'TPUT_MEAS {switch}')
+
+    def set_throughput_hsupa_on_off(self, switch='OFF'):
+        """
+        Set throughput measurement to On or OFF for HSUPA
+        """
+        self.anritsu_write(f'TPUTU_MEAS {switch}')
 
     def set_throughput_early_on_off(self, switch='ON'):
         """
@@ -582,11 +594,11 @@ class Anritsu:
         """
         self.anritsu_write(f'TPUT_SAMPLE {sample}')
 
-    def set_throughput_sample_hsupa(self, num=15):
+    def set_throughput_sample_hsupa(self, sample=15):
         """
         Set HSUPA throughput - number of sample
         """
-        self.anritsu_write(f'TPUTU_SAMPLE {num}')
+        self.anritsu_write(f'TPUTU_SAMPLE {sample}')
 
     def set_ehich_pattern(self, pattern='ACK'):
         """
@@ -713,7 +725,13 @@ class Anritsu:
         """
          To confirm the call processing status
         """
-        return self.anritsu_query('CALLSTAT?')
+        return self.anritsu_query('CALLSTAT?').strip()
+
+    def get_measure_state_query(self):
+        """
+        Response the state of measuring
+        """
+        return self.anritsu_query('MSTAT?').strip()
 
     def get_etfci_query(self):
         """
@@ -721,7 +739,7 @@ class Anritsu:
         """
         return Decimal(self.anritsu_query('AVG_ETFCI?').strip())
 
-    def get_evm_hpm(self):
+    def get_evm_hpm_hsdpa(self):
         """
         evm for HSDPA H-power mode
         """
@@ -739,12 +757,71 @@ class Anritsu:
         """
         return self.anritsu_query('POWER? AVG').strip()
 
-    def get_measure_state_query(self):
+    def get_evm_query_lte(self):
         """
-        response the state of measuring
+        Response the average evm for LTE
         """
-        return self.anritsu_query('MSTAT?').strip()
+        return self.anritsu_query('EVM? AVG').strip()
 
+    def get_evm_query_wcdma(self):
+        """
+        Response the average evm for WCDMA
+        """
+        return self.anritsu_query('AVG_EVM?').strip()
+
+    def get_aclr_query_lte(self):
+        """
+        Get the ACLR value for LTE
+        """
+        aclr_list = []
+        aclr_list.append(round(self.anritsu_query('MODPWR? E_LOW1,AVG').strip(), 2))
+        aclr_list.append(round(self.anritsu_query('MODPWR? E_UP1,AVG').strip(), 2))
+        aclr_list.append(round(self.anritsu_query('MODPWR? LOW1,AVG').strip(), 2))
+        aclr_list.append(round(self.anritsu_query('MODPWR? UP1,AVG').strip(), 2))
+        aclr_list.append(round(self.anritsu_query('MODPWR? LOW2,AVG').strip(), 2))
+        aclr_list.append(round(self.anritsu_query('MODPWR? UP2,AVG').strip(), 2))
+        return aclr_list
+
+    def get_aclr_query_wcdma(self):
+        """
+        Get the ACLR value for WCDMA
+        """
+        aclr_list = []
+        aclr_list.append(round(self.anritsu_query('AVG_MODPWR? LOW5').strip(), 2))
+        aclr_list.append(round(self.anritsu_query('AVG_MODPWR? UP5').strip(), 2))
+        aclr_list.append(round(self.anritsu_query('AVG_MODPWR? LOW10').strip(), 2))
+        aclr_list.append(round(self.anritsu_query('AVG_MODPWR? UP10').strip(), 2))
+        return aclr_list
+
+    def get_ber_per_query_wcdma(self):
+        """
+        write (BER? PER) and we can get the x % and the x will lower than 0.1 for WCDMA
+        :return: PASS or FAIL
+        """
+        ber = self.anritsu_query('BER? PER').strip()
+        if ber >= 0.1:
+            return 'FAIL'
+        else:
+            return 'PASS'
+
+    def get_throughput_per_query(self):
+        """
+        query the throughput by percent(%) for LTE
+        """
+        return self.anritsu_query('TPUT? PER').strip()
+
+
+    def get_throughput_pass_query(self):
+        """
+        Query the state if it is pass for LTE
+        """
+        return self.anritsu_query('TPUTPASS?').strip()
+
+    def get_output_level_query(self):
+        """
+        Query the output level
+        """
+        return self.anritsu_query('OLVL?').strip()
 
 
 
