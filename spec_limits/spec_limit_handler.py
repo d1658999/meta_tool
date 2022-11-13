@@ -95,14 +95,14 @@ def import_power_limits():
 def import_aclr_limits():
     logger.info('import aclr yaml file ')
     with open(ACLR_LIMITS_YAML_PATH, 'r') as s:
-        spec_power_limits = yaml.safe_load(s)
-        return spec_power_limits
+        spec_aclr_limits = yaml.safe_load(s)
+        return spec_aclr_limits
 
 def import_evm_limits():
     logger.info('import evm yaml file ')
     with open(PWR_LIMITS_YAML_PATH, 'r') as s:
-        spec_power_limits = yaml.safe_load(s)
-        return spec_power_limits
+        spec_evm_limits = yaml.safe_load(s)
+        return spec_evm_limits
 
 def main():  # test use
     power_limits_csv2yaml()
