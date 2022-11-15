@@ -42,24 +42,6 @@ class Anritsu8820(Anritsu):
         flymode.fly_off()
         flymode.com_close()
 
-    def aclr_ch_judge(self, standard, band, dl_ch, bw=None):
-        if standard == 'LTE':
-            if dl_ch < cm_pmt_anritsu.dl_ch_selected(self.std, band, bw)[1]:
-                self.aclr_ch = 'ch01'
-            elif dl_ch == cm_pmt_anritsu.dl_ch_selected(self.std, band, bw)[1]:
-                self.aclr_ch = 'ch02'
-            elif dl_ch > cm_pmt_anritsu.dl_ch_selected(self.std, band, bw)[1]:
-                self.aclr_ch = 'ch03'
-        elif standard == 'WCDMA':
-            if dl_ch < cm_pmt_anritsu.dl_ch_selected(self.std, band)[1]:
-                self.aclr_ch = 'ch01'
-            elif dl_ch == cm_pmt_anritsu.dl_ch_selected(self.std, band)[1]:
-                self.aclr_ch = 'ch02'
-            elif dl_ch > cm_pmt_anritsu.dl_ch_selected(self.std, band)[1]:
-                self.aclr_ch = 'ch03'
-        elif standard == 'GSM':
-            pass
-
     def preset(self):
         """
         Preset Anritsu 8820C

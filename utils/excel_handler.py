@@ -4,6 +4,7 @@ from pathlib import Path
 
 from utils.log_init import log_set
 import utils.parameters.common_parameters_ftm as cm_pmt_ftm
+import utils.parameters.common_parameters_anritsu as cm_pmt_anritsu
 import utils.parameters.external_paramters as ext_pmt
 from utils.channel_handler import chan_judge_fr1, chan_judge_lte, chan_judge_wcdma, chan_judge_gsm
 
@@ -215,7 +216,6 @@ def tx_power_relative_test_export_excel_ftm(data, parameters_dict):
                 # create dashboard
                 for _ in ['QPSK', 'Q16', 'Q64', 'Q256', 'BPSK']:  # some cmw100 might not have licesnse of Q256
                     wb.create_sheet(f'Dashboard_{_}')
-
 
                 # create the Raw data sheets
                 for _ in ['QPSK', 'Q16', 'Q64', 'Q256', 'BPSK']:  # some cmw100 might not have licesnse of Q256
@@ -1309,9 +1309,9 @@ def rx_power_relative_test_export_excel_ftm(data, parameters_dict):
 
 def rx_power_endc_test_export_excel_ftm(data):
     """
-    :param data:  data = [int(self.band_lte), int(self.band_fr1), self.power_monitor_endc_lte, self.power_endc_fr1,
-    self.rx_level, self.bw_lte, self.bw_fr1, self.tx_freq_lte, self.tx_freq_fr1, self.tx_level_endc_lte,
-    self.tx_level_endc_fr1, self.rb_size_lte, self.rb_start_lte, self.rb_size_fr1, self.rb_start_fr1]
+    :param data:  data = [int(band_lte), int(band_fr1), power_monitor_endc_lte, power_endc_fr1,
+    rx_level, bw_lte, bw_fr1, tx_freq_lte, tx_freq_fr1, tx_level_endc_lte,
+    tx_level_endc_fr1, rb_size_lte, rb_start_lte, rb_size_fr1, rb_start_fr1]
     :return:
     """
     logger.info('----------save to excel----------')
@@ -1612,3 +1612,1138 @@ def rxs_endc_plot_ftm(file_path):
     wb.close()
 
 
+# =================== below is for anritsu ===================
+
+def create_sheet_title_rx_freq_sweep(sheet):
+    sh = sheet
+    sh['A1'] = 'Band'
+    sh['B1'] = 'DL_chan'
+    sh['C1'] = 'Sensitivity'
+    sh['D1'] = 'Tx_power'
+
+
+def create_excel_rx_freq_sweep(standard, band, power_selected, bw=5):
+    wb = openpyxl.Workbook()
+    wb.remove(wb['Sheet'])
+
+    if power_selected == 1:
+        sheet = f'Band{band}_TxMax'
+        wb.create_sheet(sheet)
+    else:
+        sheet = f'Band{band}_TxMin'
+        wb.create_sheet(sheet)
+
+    # create titile for first row
+    create_sheet_title_rx_freq_sweep(sheet)
+
+    # save file
+    excel_path = f'Rx_Freq_Sweep_{bw}MHZ_{standard}.xlsx' if ext_pmt.condition is None \
+        else f'Rx_Freq_Sweep_{bw}MHZ_standard_{ext_pmt.condition}.xlsx'
+    wb.save(excel_path)
+    wb.close()
+
+
+def create_excel_rx_lmh(standard, bw=5):
+    if standard == 'LTE':
+        wb = openpyxl.Workbook()
+        wb.remove(wb['Sheet'])
+        wb.create_sheet('Sensitivity_TxMax')
+        wb.create_sheet('Sensitivity_TxMin')
+        wb.create_sheet('Desens')
+        wb.create_sheet('PWR_TxMax')
+        wb.create_sheet('PWR_TxMin')
+
+        for sheet in wb.sheetnames:
+            sh = wb[sheet]
+            sh['A1'] = 'Band'
+            sh['B1'] = 'ch0'
+            sh['C1'] = 'ch1'
+            sh['D1'] = 'ch2'
+
+        excel_path = f'Sens_sig_{bw}MHZ_{standard}.xlsx' if ext_pmt.condition is None \
+            else f'Sens_sig_{bw}MHZ_LTE_{ext_pmt.condition}.xlsx'
+        wb.save(excel_path)
+        wb.close()
+
+
+def create_excel_tx_lmh(standard, bw=5, chcoding=None):
+    excel_file = None
+    if standard == 'LTE':
+        excel_file = f'Tx_sig_{bw}MHZ_{standard}.xlsx' if ext_pmt.condition is None \
+            else f'Tx_sig_{bw}MHZ_{standard}_{ext_pmt.condition}.xlsx'
+    elif standard == 'WCDMA' and chcoding == 'REFMEASCH':  # WCDMA
+        excel_file = f'Tx_sig_WCDMA.xlsx' if ext_pmt.condition is None else f'Tx_sig_WCDMA_{ext_pmt.condition}.xlsx'
+    elif standard == 'WCDMA' and chcoding == 'EDCHTEST':  # HSUPA
+        excel_file = f'Tx_sig_HSUPA.xlsx' if ext_pmt.condition is None else f'Tx_sig_HSUPA_{ext_pmt.condition}.xlsx'
+    elif standard == 'WCDMA' and chcoding == 'FIXREFCH':  # HSDPA
+        excel_file = f'Tx_sig_HSDPA.xlsx' if ext_pmt.condition is None else f'Tx_sig_HSDPA_{ext_pmt.condition}.xlsx'
+
+    excel_path = excel_folder_path() / excel_file
+    wb = None
+    if standard == 'LTE':
+        wb = openpyxl.Workbook()
+        wb.remove(wb['Sheet'])
+        wb.create_sheet('PWR_Q_1')
+        wb.create_sheet('PWR_Q_P')
+        wb.create_sheet('PWR_Q_F')
+        wb.create_sheet('PWR_16_P')
+        wb.create_sheet('PWR_16_F')
+        wb.create_sheet('PWR_64_P')
+        wb.create_sheet('PWR_64_F')
+        wb.create_sheet('ACLR_Q_P')
+        wb.create_sheet('ACLR_Q_F')
+        wb.create_sheet('ACLR_16_P')
+        wb.create_sheet('ACLR_16_F')
+        wb.create_sheet('ACLR_64_P')
+        wb.create_sheet('ACLR_64_F')
+        wb.create_sheet('EVM_Q_P')
+        wb.create_sheet('EVM_Q_F')
+        wb.create_sheet('EVM_16_P')
+        wb.create_sheet('EVM_16_F')
+        wb.create_sheet('EVM_64_P')
+        wb.create_sheet('EVM_64_F')
+
+        for sheet in wb.sheetnames:
+            if 'ACLR' in sheet:
+                sh = wb[sheet]
+                sh['A1'] = 'Band'
+                sh['B1'] = 'Channel'
+                sh['C1'] = 'EUTRA_-1'
+                sh['D1'] = 'EUTRA_+1'
+                sh['E1'] = 'UTRA_-1'
+                sh['F1'] = 'UTRA_+1'
+                sh['G1'] = 'UTRA_-2'
+                sh['H1'] = 'UTRA_+2'
+
+            else:
+                sh = wb[sheet]
+                sh['A1'] = 'Band'
+                sh['B1'] = 'ch0'
+                sh['C1'] = 'ch1'
+                sh['D1'] = 'ch2'
+
+    elif standard == 'WCDMA' and chcoding == 'REFMEASCH':  # this is WCDMA
+        wb = openpyxl.Workbook()
+        wb.remove(wb['Sheet'])
+        wb.create_sheet('PWR')
+        wb.create_sheet('ACLR')
+        wb.create_sheet('EVM')
+
+        for sheet in wb.sheetnames:
+            if 'ACLR' in sheet:
+                sh = wb[sheet]
+                sh['A1'] = 'Band'
+                sh['B1'] = 'Channel'
+                sh['C1'] = 'UTRA_-1'
+                sh['D1'] = 'UTRA_+1'
+                sh['E1'] = 'UTRA_-2'
+                sh['F1'] = 'UTRA_+2'
+            else:
+                sh = wb[sheet]
+                sh['A1'] = 'Band'
+                sh['B1'] = 'ch01'
+                sh['C1'] = 'ch02'
+                sh['D1'] = 'ch03'
+
+    elif standard == 'WCDMA' and chcoding == 'EDCHTEST':  # this is HSUPA
+        wb = openpyxl.Workbook()
+        wb.remove(wb['Sheet'])
+        wb.create_sheet('PWR')
+        wb.create_sheet('ACLR')
+
+        for sheet in wb.sheetnames:
+            if 'ACLR' in sheet:
+                sh = wb[sheet]
+                sh['A1'] = 'Band'
+                sh['B1'] = 'Channel'
+                sh['C1'] = 'UTRA_-1'
+                sh['D1'] = 'UTRA_+1'
+                sh['E1'] = 'UTRA_-2'
+                sh['F1'] = 'UTRA_+2'
+                sh['G1'] = 'subtest_number'
+            else:
+                sh = wb[sheet]
+                sh['A1'] = 'Band'
+                sh['B1'] = 'ch01'
+                sh['C1'] = 'ch02'
+                sh['D1'] = 'ch03'
+                sh['E1'] = 'subtest_number'
+
+    elif standard == 'WCDMA' and chcoding == 'FIXREFCH':  # this is HSDPA
+        wb = openpyxl.Workbook()
+        wb.remove(wb['Sheet'])
+        wb.create_sheet('PWR')
+        wb.create_sheet('ACLR')
+        wb.create_sheet('EVM')
+
+        for sheet in wb.sheetnames:
+            if 'ACLR' in sheet:
+                sh = wb[sheet]
+                sh['A1'] = 'Band'
+                sh['B1'] = 'Channel'
+                sh['C1'] = 'UTRA_-1'
+                sh['D1'] = 'UTRA_+1'
+                sh['E1'] = 'UTRA_-2'
+                sh['F1'] = 'UTRA_+2'
+                sh['G1'] = 'subtest_number'
+            else:
+                sh = wb[sheet]
+                sh['A1'] = 'Band'
+                sh['B1'] = 'ch01'
+                sh['C1'] = 'ch02'
+                sh['D1'] = 'ch03'
+                sh['E1'] = 'subtest_number'
+
+    wb.save(excel_path)
+    wb.close()
+
+    return excel_path
+
+
+def fill_desens(excel_path):
+    wb = openpyxl.load_workbook(excel_path)
+
+    ws = wb['Desens']
+    ws_s_txmax = wb['Sensitivity_TxMax']
+    ws_s_txmin = wb['Sensitivity_TxMin']
+    max_row = max(ws_s_txmax.max_row, ws_s_txmin.max_row)
+    for row in range(2, max_row + 1):
+        for col in range(1, ws.max_column + 1):
+            if col == 1:
+                ws.cell(row, col).value = ws_s_txmax.cell(row, col).value
+            else:
+                try:
+                    logger.debug(ws_s_txmax.cell(row, col).value)
+                    logger.debug(ws_s_txmin.cell(row, col).value)
+                    ws.cell(row, col).value = round(ws_s_txmax.cell(row, col).value -
+                                                    ws_s_txmin.cell(row, col).value, 1)
+                except TypeError:
+                    if ws_s_txmax.cell(row, col).value is None and ws_s_txmin.cell(row, col).value is not None:
+                        logger.debug('Sensitivity_TxMax is None')
+                        ws.cell(row, col).value = - round(ws_s_txmin.cell(row, col).value, 1)
+                    elif ws_s_txmin.cell(row, col).value is None and ws_s_txmax.cell(row, col).value is not None:
+                        logger.debug('Sensitivity_TxMin is None')
+                        ws.cell(row, col).value = round(ws_s_txmax.cell(row, col).value, 1)
+                    else:
+                        logger.debug('Sensitivity_TxMax and Sensitivity_TxMin are None')
+
+    wb.save(excel_path)
+    wb.close()
+
+
+def fill_sensitivity_freq_sweep(row, ws, band, dl_ch, data):
+    # data[x]: 0 = power, 1 = sensitivity, 2 = PER
+    ws.cell(row, 1).value = band
+    ws.cell(row, 2).value = dl_ch
+    logger.debug('sensitivity')
+    ws.cell(row, 3).value = data[1]
+    logger.debug('power')
+    ws.cell(row, 4).value = data[0]
+
+
+def fill_sensitivity_lmh(standard, row, ws, band, dl_ch, data, items_selected, bw=5):
+    # items_selected: 0 = power, 1 = sensitivity, 2 = PER
+    ws.cell(row, 1).value = band
+
+    if dl_ch < cm_pmt_anritsu.dl_ch_selected(standard, band, bw)[1]:
+        ws.cell(row, 2).value = data[items_selected]
+        if items_selected == 0:
+            logger.debug('power of L ch')
+        elif items_selected == 1:
+            logger.debug('sensitivity of L ch')
+    elif dl_ch == cm_pmt_anritsu.dl_ch_selected(standard, band, bw)[1]:
+        ws.cell(row, 3).value = data[items_selected]
+        if items_selected == 0:
+            logger.debug('power of M ch')
+        elif items_selected == 1:
+            logger.debug('sensitivity of M ch')
+    elif dl_ch > cm_pmt_anritsu.dl_ch_selected(standard, band, bw)[1]:
+        ws.cell(row, 4).value = data[items_selected]
+        if items_selected == 0:
+            logger.debug('power of H ch')
+        elif items_selected == 1:
+            logger.debug('sensitivity of H ch')
+
+
+def fill_power_aclr_evm_hspa(standard, chcoding, row, ws, band, dl_ch, test_items, items_selected, subtest):
+    if standard == 'WCDMA':
+        if chcoding == 'EDCHTEST' or chcoding == 'FIXREFCH':  # this is for HSUPA pr HSDPA
+            ws.cell(row, 1).value = band
+            if items_selected == 0 or items_selected == 2:  # when select power or evm
+                ws.cell(row, 5).value = subtest
+                if dl_ch < cm_pmt_anritsu.dl_ch_selected(standard, band)[1]:
+                    ws.cell(row, 2).value = test_items[items_selected]
+                    if items_selected == 0:
+                        logger.debug('the power of L ch')
+                    elif items_selected == 2:
+                        logger.debug('the evm of L ch')
+                elif dl_ch == cm_pmt_anritsu.dl_ch_selected(standard, band)[1]:
+                    ws.cell(row, 3).value = test_items[items_selected]
+                    if items_selected == 0:
+                        logger.debug('the power of M ch')
+                    elif items_selected == 2:
+                        logger.debug('the evm of M ch')
+                elif dl_ch > cm_pmt_anritsu.dl_ch_selected(standard, band)[1]:
+                    ws.cell(row, 4).value = test_items[items_selected]
+                    if items_selected == 0:
+                        logger.debug('the power of H ch')
+                    elif items_selected == 2:
+                        logger.debug('the evm of H ch')
+
+            elif items_selected == 1:  # when select aclr
+                ws.cell(row, 7).value = subtest
+                if dl_ch < cm_pmt_anritsu.dl_ch_selected(standard, band)[1]:
+                    ws.cell(row, 2).value = 'ch01'
+                    for col, aclr_item in enumerate(test_items[items_selected]):
+                        ws.cell(row, 3 + col).value = aclr_item
+                    logger.debug('the ALCR of L ch')
+                elif dl_ch == cm_pmt_anritsu.dl_ch_selected(standard, band)[1]:
+                    ws.cell(row, 2).value = 'ch02'
+                    for col, aclr_item in enumerate(test_items[items_selected]):
+                        ws.cell(row, 3 + col).value = aclr_item
+                    logger.debug('the ACLR of M ch')
+                elif dl_ch > cm_pmt_anritsu.dl_ch_selected(standard, band)[1]:
+                    ws.cell(row, 2).value = 'ch03'
+                    for col, aclr_item in enumerate(test_items[items_selected]):
+                        ws.cell(row, 3 + col).value = aclr_item
+                    logger.debug('the ACLR of H ch')
+
+    else:
+        logger.info('It might be error to go here!!')
+
+
+def fill_power_aclr_evm(standard, row, ws, band, dl_ch, test_items, items_selected,
+                        bw=5):  # items_selected: 0 = POWER, 1 = ACLR, 2 = EVM
+    ws.cell(row, 1).value = band
+    if items_selected == 0 or items_selected == 2:  # when select power or evm
+        if dl_ch < cm_pmt_anritsu.dl_ch_selected(standard, band, bw)[1]:
+            ws.cell(row, 2).value = test_items[items_selected]
+            if items_selected == 0:
+                logger.debug('the power of L ch')
+            elif items_selected == 2:
+                logger.debug('the evm of L ch')
+        elif dl_ch == cm_pmt_anritsu.dl_ch_selected(standard, band, bw)[1]:
+            ws.cell(row, 3).value = test_items[items_selected]
+            if items_selected == 0:
+                logger.debug('the power of M ch')
+            elif items_selected == 2:
+                logger.debug('the evm of M ch')
+        elif dl_ch > cm_pmt_anritsu.dl_ch_selected(standard, band, bw)[1]:
+            ws.cell(row, 4).value = test_items[items_selected]
+            if items_selected == 0:
+                logger.debug('the power of H ch')
+            elif items_selected == 2:
+                logger.debug('the evm of H ch')
+
+    elif items_selected == 1:  # when select aclr
+        if dl_ch < cm_pmt_anritsu.dl_ch_selected(standard, band, bw)[1]:
+            ws.cell(row, 2).value = 'ch01'
+            for col, aclr_item in enumerate(test_items[items_selected]):
+                ws.cell(row, 3 + col).value = aclr_item
+            logger.debug('the ALCR of L ch')
+        elif dl_ch == cm_pmt_anritsu.dl_ch_selected(standard, band, bw)[1]:
+            ws.cell(row, 2).value = 'ch02'
+            for col, aclr_item in enumerate(test_items[items_selected]):
+                ws.cell(row, 3 + col).value = aclr_item
+            logger.debug('the ACLR of M ch')
+        elif dl_ch > cm_pmt_anritsu.dl_ch_selected(standard, band, bw)[1]:
+            ws.cell(row, 2).value = 'ch03'
+            for col, aclr_item in enumerate(test_items[items_selected]):
+                ws.cell(row, 3 + col).value = aclr_item
+            logger.debug('the ACLR of H ch')
+
+
+def fill_progress_rx_sweep(standard, ws, band, dl_ch, data,
+                           power_selected, bw=5):  # items_selected: 0 = power, 1 = sensitivity, 2 = PER
+    if standard == 'LTE':
+        if power_selected == 1:
+            logger.debug(f'capture band: {band}, {bw}MHZ, {dl_ch}, TxMax, sensitivity')
+        elif power_selected == 0:
+            logger.debug(f'capture band: {band}, {bw}MHZ, {dl_ch}, TxMin, sensitivity')
+
+        if ws.max_row == 1:  # only title
+            fill_sensitivity_freq_sweep(2, ws, band, dl_ch, data)
+            logger.debug('Only title')
+        else:
+            for row in range(2, ws.max_row + 1):  # not only title
+                if ws.cell(row, 1).value == band and ws.cell(row, 2).value == dl_ch:  # if band is in the row
+                    fill_sensitivity_freq_sweep(row, ws, band, dl_ch, data)
+                    logger.debug('Band and dl_ch are found')
+                    break
+
+                elif row == ws.max_row:  # if band and dl_ch are found and final row
+                    fill_sensitivity_freq_sweep(row + 1, ws, band, dl_ch, data)
+                    logger.debug('Band and dl_ch are not found')
+                    break
+                else:
+                    logger.debug('continue to search')
+                    continue
+
+    elif standard == 'WCDMA':
+        if power_selected == 1:
+            logger.debug(f'capture band: {band}, {dl_ch}, TxMax, sensitivity')
+        elif power_selected == 0:
+            logger.debug(f'capture band: {band}, {dl_ch}, TxMin, sensitivity')
+
+        if ws.max_row == 1:  # only title
+            fill_sensitivity_freq_sweep(2, ws, band, dl_ch, data)
+            logger.debug('Only title')
+        else:
+            for row in range(2, ws.max_row + 1):  # not only title
+                if ws.cell(row, 1).value == band and ws.cell(row, 2).value == dl_ch:  # if band is in the row
+                    fill_sensitivity_freq_sweep(row, ws, band, dl_ch, data)
+                    logger.debug('Band and dl_ch are found')
+                    break
+
+                elif row == ws.max_row:  # if band and dl_ch are found and final row
+                    fill_sensitivity_freq_sweep(row + 1, ws, band, dl_ch, data)
+                    logger.debug('Band and dl_ch are not found')
+                    break
+                else:
+                    logger.debug('continue to search')
+                    continue
+    elif standard == 'GSM':
+        pass
+
+
+def fill_progress_rx(standard, ws, band, dl_ch, data, items_selected, power_selected,
+                     bw=None):  # items_selected: 0 = power, 1 = sensitivity, 2 = PER
+    if standard == 'LTE':
+        if power_selected == 1:
+            logger.debug(f'capture band: {band}, {bw}MHZ, {dl_ch}, TxMax, sensitivity')
+        elif power_selected == 0:
+            logger.debug(f'capture band: {band}, {bw}MHZ, {dl_ch}, TxMin, sensitivity')
+
+        if ws.max_row == 1:  # only title
+            fill_sensitivity_lmh(standard, 2, ws, band, dl_ch, data, items_selected, bw)
+            logger.debug('Only title')
+        else:
+            for row in range(2, ws.max_row + 1):  # not only title
+                if ws.cell(row, 1).value == band:  # if band is in the row
+                    # POWER and EVM
+                    fill_sensitivity_lmh(standard, row, ws, band, dl_ch, data, items_selected, bw)
+                    logger.debug('Band is found')
+                    break
+
+                elif ws.cell(row, 1).value != band and row == ws.max_row:  # if band is not in the row and final row
+                    fill_sensitivity_lmh(standard, row + 1, ws, band, dl_ch, data, items_selected, bw)
+                    logger.debug('Band is not found and the row is final and then to add new line')
+                    break
+                else:
+                    logger.debug('continue to search')
+                    continue
+
+    elif standard == 'WCDMA':
+        if power_selected == 1:
+            logger.debug(f'capture band: {band}, {dl_ch}, TxMax, sensitivity')
+        elif power_selected == 0:
+            logger.debug(f'capture band: {band}, {dl_ch}, TxMin, sensitivity')
+
+        if ws.max_row == 1:  # only title
+            fill_sensitivity_lmh(standard, 2, ws, band, dl_ch, data, items_selected)
+            logger.debug('Only title')
+        else:
+            for row in range(2, ws.max_row + 1):  # not only title
+                if ws.cell(row, 1).value == band:  # if band is in the row
+                    # POWER and EVM
+                    fill_sensitivity_lmh(standard, row, ws, band, dl_ch, data, items_selected)
+                    logger.debug('Band is found')
+                    break
+
+                elif ws.cell(row, 1).value != band and row == ws.max_row:  # if band is not in the row and final row
+                    fill_sensitivity_lmh(standard, row + 1, ws, band, dl_ch, data, items_selected)
+                    logger.debug('Band is not found and the row is final and then to add new line')
+                    break
+                else:
+                    logger.debug('continue to search')
+    elif standard == 'GSM':
+        pass
+
+
+def fill_progress_hspa_tx(standard, chcoding, ws, band, dl_ch, test_items, test_items_selected, subtest):
+    aclr_ch = cm_pmt_anritsu.aclr_ch_judge(standard, band, dl_ch)  # this is for ACLR fill in ACLR_TAB
+
+    logger.debug(f'capture band: {band}, {aclr_ch}')
+
+    if ws.max_row == 1:  # only title
+        fill_power_aclr_evm_hspa(standard, chcoding, 2, ws, band, dl_ch, test_items, test_items_selected, subtest)
+        logger.debug('Only title')
+
+    else:
+        for row in range(2, ws.max_row + 1):  # not only title
+            if ws.cell(row, 1).value == band and (
+                    test_items_selected == 0 or test_items_selected == 2):  # if band is in the row
+                # POWER and EVM
+                if ws.cell(row, 5).value == subtest:
+                    fill_power_aclr_evm_hspa(standard, chcoding, row, ws, band, dl_ch, test_items, test_items_selected,
+                                             subtest)
+                    logger.debug('Band is found')
+                    break
+                elif ws.cell(row, 5).value != subtest and row == ws.max_row:
+                    fill_power_aclr_evm_hspa(standard, chcoding, row + 1, ws, band, dl_ch, test_items,
+                                             test_items_selected, subtest)
+                    logger.debug('Band is the same, but subtest in not the same')
+                    break
+
+            elif ws.cell(row, 1).value != band and row == ws.max_row:  # if band is not in the row and final row
+                fill_power_aclr_evm_hspa(standard, chcoding, row + 1, ws, band, dl_ch, test_items, test_items_selected,
+                                         subtest)
+                logger.debug('Band is not found and the row is final and then to add new line')
+                break
+
+            elif ws.cell(row, 1).value == band and test_items_selected == 1 \
+                    and ws.cell(row, 2).value == aclr_ch:
+
+                if ws.cell(row, 7).value == subtest:
+                    fill_power_aclr_evm_hspa(standard, chcoding, row, ws, band, dl_ch, test_items, test_items_selected,
+                                             subtest)
+                    logger.debug('ch is the same for ACLR and subtest is the same')
+                    break
+                elif ws.cell(row, 7).value != subtest and row == ws.max_row:
+                    fill_power_aclr_evm_hspa(standard, chcoding, row + 1, ws, band, dl_ch, test_items,
+                                             test_items_selected, subtest)
+                    logger.debug('ch is the same for ACLR and subtest is not the same')
+                    break
+
+            elif ws.cell(row, 1).value == band and row == ws.max_row and test_items_selected == 1 and ws.cell(row,
+                                                                                                              2).value != aclr_ch:
+                if ws.cell(row, 7).value == subtest:
+                    fill_power_aclr_evm_hspa(standard, chcoding, row + 1, ws, band, dl_ch, test_items,
+                                             test_items_selected, subtest)
+                    logger.debug('ch is not the same for ACLR and subtest is the same')
+                    break
+                elif ws.cell(row, 7).value != subtest:
+                    fill_power_aclr_evm_hspa(standard, chcoding, row + 1, ws, band, dl_ch, test_items,
+                                             test_items_selected, subtest)
+                    logger.debug('ch is not the same for ACLR and subtest is not the same')
+                    break
+            else:
+                logger.debug('continue to search')
+                continue
+
+
+def fill_progress_tx(standard, ws, band, dl_ch, test_items, test_items_selected,
+                     bw=None):  # items_selected: 0 = POWER, 1 = ACLR, 2 = EVM
+    aclr_ch = cm_pmt_anritsu.aclr_ch_judge(standard, band, dl_ch, bw)  # this is for ACLR fill in ACLR_TAB
+
+    if standard == 'LTE':
+        logger.debug(f'capture band: {band}, {bw}MHZ, {aclr_ch}')
+        if ws.max_row == 1:  # only title
+            fill_power_aclr_evm(standard, 2, ws, band, dl_ch, test_items, test_items_selected, bw)
+            logger.debug('Only title')
+        else:
+            for row in range(2, ws.max_row + 1):  # not only title
+                if ws.cell(row, 1).value == band and (
+                        test_items_selected == 0 or test_items_selected == 2):  # if band is in the row
+                    # POWER and EVM
+                    fill_power_aclr_evm(standard, row, ws, band, dl_ch, test_items, test_items_selected, bw)
+                    logger.debug('Band is found')
+                    break
+                elif ws.cell(row, 1).value == band and row == ws.max_row and test_items_selected == 1 and ws.cell(
+                        row, 2).value != aclr_ch:
+                    fill_power_aclr_evm(standard, row + 1, ws, band, dl_ch, test_items, test_items_selected,
+                                        bw)
+                    logger.debug('ch is not the same for ACLR')
+                    break
+                elif ws.cell(row, 1).value == band and test_items_selected == 1 and ws.cell(row,
+                                                                                            2).value == aclr_ch:
+                    fill_power_aclr_evm(standard, row, ws, band, dl_ch, test_items, test_items_selected, bw)
+                    logger.debug('ch is the same for ACLR')
+                    break
+                elif ws.cell(row, 1).value != band and row == ws.max_row:  # if band is not in the row and final row
+                    fill_power_aclr_evm(standard, row + 1, ws, band, dl_ch, test_items, test_items_selected,
+                                        bw)
+                    logger.debug('Band is not found and the row is final and then to add new line')
+                    break
+                else:
+                    logger.debug('continue to search')
+                    continue
+    elif standard == 'WCDMA':
+        logger.debug(f'capture band: {band}, {aclr_ch}')
+
+        if ws.max_row == 1:  # only title
+            fill_power_aclr_evm(standard, 2, ws, band, dl_ch, test_items, test_items_selected)
+            logger.debug('Only title')
+        else:
+            for row in range(2, ws.max_row + 1):  # not only title
+                if ws.cell(row, 1).value == band and (
+                        test_items_selected == 0 or test_items_selected == 2):  # if band is in the row
+                    # POWER and EVM
+                    fill_power_aclr_evm(standard, row, ws, band, dl_ch, test_items, test_items_selected)
+                    logger.debug('Band is found')
+                    break
+                elif ws.cell(row, 1).value == band and row == ws.max_row and test_items_selected == 1 and ws.cell(
+                        row, 2).value != aclr_ch:
+                    fill_power_aclr_evm(standard, row + 1, ws, band, dl_ch, test_items, test_items_selected)
+                    logger.debug('ch is not the same for ACLR')
+                    break
+                elif ws.cell(row, 1).value == band and test_items_selected == 1 and ws.cell(row,
+                                                                                            2).value == aclr_ch:
+                    fill_power_aclr_evm(standard, row, ws, band, dl_ch, test_items, test_items_selected)
+                    logger.debug('ch is the same for ACLR')
+                    break
+                elif ws.cell(row, 1).value != band and row == ws.max_row:  # if band is not in the row and final row
+                    fill_power_aclr_evm(standard, row + 1, ws, band, dl_ch, test_items, test_items_selected)
+                    logger.debug('Band is not found and the row is final and then to add new line')
+                    break
+                else:
+                    logger.debug('continue to search')
+                    continue
+
+
+def fill_values_rx_sweep(standard, data, band, dl_ch, power_selected, bw=None):
+    """
+    data format:[Tx Power, Sensitivity, PER]
+    """
+    band = band
+    bw = bw
+    if standard == 'LTE':
+        excel_path = f'Sweep_{bw}MHZ_LTE.xlsx' if ext_pmt.condition is None \
+            else f'Sweep_{bw}MHZ_LTE_{ext_pmt.condition}.xlsx'
+        if Path(excel_path).exists() is False:
+            create_excel_rx_freq_sweep(standard, power_selected, bw)
+            logger.debug('Create Excel')
+
+        wb = openpyxl.load_workbook(excel_path)
+        logger.debug('Open Excel')
+
+        if power_selected == 1:
+            logger.debug(f'start to fill Sweep of Sensitivity and Power level')
+            ws_name = f'Band{band}_Sweep_TxMax'
+            # check sheet if it is in the workboook
+            if ws_name not in wb.sheetnames:
+                wb.create_sheet(ws_name)
+
+            ws = wb[ws_name]
+            # check if it has the title at first row
+            if ws.cell(1, 1).value is None:
+                create_sheet_title_rx_freq_sweep(ws)
+
+            logger.debug('fill sensitivity and power')
+            fill_progress_rx_sweep(standard, ws, band, dl_ch, data,
+                                   power_selected)  # progress of filling sensitivity progress
+
+        elif power_selected == 0:
+            logger.debug(f'start to fill Sweep of Sensitivity and Power level')
+            ws_name = f'Band{band}_Sweep_TxMin'
+
+            # check sheet if it is in the workboook
+            if ws_name not in wb.sheetnames:
+                wb.create_sheet(f'Band{band}_Sweep_TxMin')
+
+            ws = wb[ws_name]
+            # check if it has the title at first row
+            if ws.cell(1, 1).value is None:
+                create_sheet_title_rx_freq_sweep(ws)
+
+            logger.debug('fill sensitivity')
+            fill_progress_rx_sweep(standard, ws, band, dl_ch, data,
+                                   power_selected)  # progress of filling sensitivity progress
+
+        wb.save(excel_path)
+        wb.close()
+
+        return excel_path
+
+    elif standard == 'WCDMA':
+        excel_path = f'Sweep_WCDMA.xlsx' if ext_pmt.condition is None else f'Sweep_WCDMA_{ext_pmt.condition}.xlsx'
+        if Path(excel_path).exists() is False:
+            create_excel_rx_freq_sweep(standard, power_selected, bw)
+            logger.debug('Create Excel')
+
+        wb = openpyxl.load_workbook(excel_path)
+        logger.debug('Open Excel')
+
+        if power_selected == 1:
+            logger.debug(f'start to fill Sweep of  Sensitivity and Power level')
+            ws_name = f'Band{band}_Sweep_TxMax'
+            # check sheet if it is in the workboook
+            if ws_name not in wb.sheetnames:
+                wb.create_sheet(ws_name)
+
+            ws = wb[ws_name]
+            # check if it has the title at first row
+            if ws.cell(1, 1).value is None:
+                create_sheet_title_rx_freq_sweep(ws)
+
+            logger.debug('fill sensitivity and power')
+            fill_progress_rx_sweep(standard, ws, band, dl_ch, data,
+                                   power_selected)  # progress of filling sensitivity progress
+
+        elif power_selected == 0:
+            logger.debug(f'start to fill Sweep of  Sensitivity and Power level')
+            ws_name = f'Band{band}_Sweep_TxMin'
+            # check sheet if it is in the workboook
+            if ws_name not in wb.sheetnames:
+                wb.create_sheet(ws_name)
+
+            ws = wb[ws_name]
+            # check if it has the title at first row
+            if ws.cell(1, 1).value is None:
+                create_sheet_title_rx_freq_sweep(ws)
+
+            logger.debug('fill sensitivity')
+            fill_progress_rx_sweep(standard, ws, band, dl_ch, data,
+                                   power_selected)  # progress of filling sensitivity progress
+
+        wb.save(excel_path)
+        wb.close()
+
+        return excel_path
+
+
+def fill_values_rx(standard, data, band, dl_ch, power_selected, bw=None):
+    """
+        data format:[Tx Power, Sensitivity, PER]
+    """
+    if standard == 'LTE':
+        excel_path = f'Sweep_{bw}MHZ_LTE.xlsx' if ext_pmt.condition is None \
+            else f'Sweep_{bw}MHZ_LTE_{ext_pmt.condition}.xlsx'
+        if Path(excel_path).exists() is False:
+            create_excel_rx_lmh(standard, bw)
+            logger.debug('Create Excel')
+
+        wb = openpyxl.load_workbook(excel_path)
+        logger.debug('Open Excel')
+
+        if power_selected == 1:
+            logger.debug(f'start to fill Sensitivity and Tx Power and Desens')
+            ws = wb['Sensitivity_TxMax']
+            logger.debug('fill sensitivity')
+            fill_progress_rx(standard, ws, band, dl_ch, data, 1, power_selected, bw)  # fill sensitivity
+            ws = wb['PWR_TxMax']
+            logger.debug('fill power')
+            fill_progress_rx(standard, ws, band, dl_ch, data, 0, power_selected, bw)  # fill power
+
+        elif power_selected == 0:
+            logger.debug(f'start to fill Sensitivity and Tx Power and Desens')
+            ws = wb['Sensitivity_TxMin']
+            logger.debug('fill sensitivity')
+            fill_progress_rx(standard, ws, band, dl_ch, data, 1, power_selected, bw)  # fill sensitivity
+            ws = wb['PWR_TxMin']
+            logger.debug('fill power')
+            fill_progress_rx(standard, ws, band, dl_ch, data, 0, power_selected, bw)  # fill power
+
+        wb.save(excel_path)
+        wb.close()
+
+        return excel_path
+
+    elif standard == 'WCDMA':
+        excel_path = f'Sweep_WCDMA.xlsx' if ext_pmt.condition is None else f'Sweep_WCDMA_{ext_pmt.condition}.xlsx'
+        if Path(excel_path).exists() is False:
+            create_excel_rx_lmh(standard, bw)
+            logger.debug('Create Excel')
+
+        wb = openpyxl.load_workbook(excel_path)
+        logger.debug('Open Excel')
+
+        if power_selected == 1:
+            logger.debug(f'start to fill Sensitivity and Tx Power and Desens')
+            ws = wb['Sensitivity_TxMax']
+            logger.debug('fill sensitivity')
+            fill_progress_rx(standard, ws, band, dl_ch, data, 1, power_selected)  # fill sensitivity
+            ws = wb['PWR_TxMax']
+            logger.debug('fill power')
+            fill_progress_rx(standard, ws, band, dl_ch, data, 0, power_selected)  # fill power
+
+        elif power_selected == 0:
+            logger.debug(f'start to fill Sensitivity and Tx Power and Desens')
+            ws = wb['Sensitivity_TxMin']
+            logger.debug('fill sensitivity')
+            fill_progress_rx(standard, ws, band, dl_ch, data, 1, power_selected)  # fill sensitivity
+            ws = wb['PWR_TxMin']
+            logger.debug('fill power')
+            fill_progress_rx(standard, ws, band, dl_ch, data, 0, power_selected)  # fill power
+
+        wb.save(excel_path)
+        wb.close()
+
+        return excel_path
+
+
+def fill_values_tx(standard, data, band, dl_ch, chcoding, bw=None):
+    if standard == 'LTE':
+        """
+            LTE format:{Q1:[power], Q_P:[power, ACLR, EVM], ...} and ACLR format is [L, M, H] 
+        """
+        excel_path = f'results_{bw}MHZ_LTE.xlsx' if ext_pmt.condition is None \
+            else f'results_{bw}MHZ_LTE_{ext_pmt.condition}.xlsx'
+
+        if Path(excel_path).exists() is False:
+            create_excel_tx_lmh(standard, bw)
+            logger.debug('Create Excel')
+
+        wb = openpyxl.load_workbook(excel_path)
+        logger.debug('Open Excel')
+        for mod, test_items in data.items():
+
+            ws = wb[f'PWR_{mod}']  # POWER
+            logger.debug('start to fill Power')
+            fill_progress_tx(standard, ws, band, dl_ch, test_items, 0, bw)
+
+            if mod != 'Q_1':
+                ws = wb[f'ACLR_{mod}']  # ACLR
+                logger.debug('start to fill ACLR')
+                fill_progress_tx(standard, ws, band, dl_ch, test_items, 1, bw)
+
+                ws = wb[f'EVM_{mod}']  # EVM
+                logger.debug('start to fill EVM')
+                fill_progress_tx(standard, ws, band, dl_ch, test_items, 2, bw)
+
+        wb.save(excel_path)
+        wb.close()
+
+        return excel_path
+
+    elif standard == 'WCDMA':
+        """
+            WCDMA format:[power, ACLR, EVM], ...} and ACLR format is list format like [L, M, H]  
+        """
+        excel_path = f'results_WCDMA.xlsx' if ext_pmt.condition is None else f'results_WCDMA_{ext_pmt.condition}.xlsx'
+
+        if chcoding == 'REFMEASCH':  # this is WCDMA
+            if Path(excel_path).exists() is False:
+                create_excel_tx_lmh(standard)
+                logger.debug('Create Excel')
+
+            wb = openpyxl.load_workbook(excel_path)
+
+            logger.debug('Open Excel')
+
+            ws = wb[f'PWR']  # POWER
+            logger.debug('start to fill Power')
+            fill_progress_tx(standard, ws, band, dl_ch, data, 0)
+
+            ws = wb[f'ACLR']  # ACLR
+            logger.debug('start to fill ACLR')
+            fill_progress_tx(standard, ws, band, dl_ch, data, 1)
+
+            ws = wb[f'EVM']  # EVM
+            logger.debug('start to fill EVM')
+            fill_progress_tx(standard, ws, band, dl_ch, data, 2)
+
+            wb.save(excel_path)
+            wb.close()
+
+            return excel_path
+
+        elif chcoding == 'EDCHTEST':  # this is HSUPA
+            """
+                HSUPA format:{subtest_number: [power, ACLR], ...} and ACLR format is list format like [L, M, H]  
+            """
+            excel_path = f'results_HSUPA.xlsx' if ext_pmt.condition is None \
+                else f'results_HSUPA_{ext_pmt.condition}.xlsx'
+
+            if Path(excel_path).exists() is False:
+                create_excel_tx_lmh(standard, bw)
+                logger.debug('Create Excel')
+
+            wb = openpyxl.load_workbook(excel_path)
+            logger.debug('Open Excel')
+
+            for subtest, test_items in data.items():
+                logger.info(f'start to fill subtest{subtest}')
+
+                ws = wb[f'PWR']  # POWER
+                logger.debug('start to fill Power')
+                fill_progress_hspa_tx(standard, chcoding, ws, band, dl_ch, test_items, 0, subtest)
+
+                ws = wb[f'ACLR']  # ACLR
+                logger.debug('start to fill ACLR')
+                fill_progress_hspa_tx(standard, chcoding, ws, band, dl_ch, test_items, 1, subtest)
+
+                wb.save(excel_path)
+                wb.close()
+
+            return excel_path
+
+        elif chcoding == 'FIXREFCH':  # this is HSDPA
+            """
+                HSDPA format:{subtest_number: [power, ACLR], ...} and ACLR format is list format like [L, M, H]  
+                only subtest3 is for [power, ACLR, evm], evm to pickup the worst vaule from p0, p1, p2, p3
+            """
+            excel_path = f'results_HSDPA.xlsx' if ext_pmt.condition is None \
+                else f'results_HSDPA_{ext_pmt.condition}.xlsx'
+
+            if Path(excel_path).exists() is False:
+                create_excel_tx_lmh(standard, bw)
+                logger.debug('Create Excel')
+
+            wb = openpyxl.load_workbook(excel_path)
+            logger.debug('Open Excel')
+            for subtest, test_items in data.items():
+                logger.info(f'start to fill subtest{subtest}')
+
+                ws = wb[f'PWR']  # POWER
+                logger.debug('start to fill Power')
+                fill_progress_hspa_tx(standard, chcoding, ws, band, dl_ch, test_items, 0, subtest)
+
+                ws = wb[f'ACLR']  # ACLR
+                logger.debug('start to fill ACLR')
+                fill_progress_hspa_tx(standard, chcoding, ws, band, dl_ch, test_items, 1, subtest)
+
+                if subtest == 3:
+                    ws = wb[f'EVM']  # EVM
+                    logger.debug('start to fill EVM')
+                    fill_progress_hspa_tx(standard, chcoding, ws, band, dl_ch, test_items, 2, subtest)
+
+                wb.save(excel_path)
+                wb.close()
+
+            return excel_path
+
+
+def excel_plot_line(standard, chcoding, excel_path):
+    logger.debug('Start to plot line chart in Excel')
+    if standard == 'LTE':
+        try:
+            wb = openpyxl.load_workbook(excel_path)
+            for ws_name in wb.sheetnames:
+                ws = wb[ws_name]
+
+                if ws._charts != []:  # if there is charts, delete it
+                    del ws._charts[0]
+
+                if 'PWR' in ws_name or 'EVM' in ws_name:
+                    chart = LineChart()
+                    chart.title = f'{ws_name[:3]}'
+                    if 'PWR' in ws_name:
+                        chart.y_axis.title = f'{ws_name[:3]}(dBm)'
+                    elif 'EVM' in ws_name:
+                        chart.y_axis.title = f'{ws_name[:3]}%'
+
+                    chart.x_axis.title = 'Band'
+                    chart.x_axis.tickLblPos = 'low'
+
+                    chart.height = 20
+                    chart.width = 32
+
+                    y_data = Reference(ws, min_col=2, min_row=1, max_col=ws.max_column, max_row=ws.max_row)
+                    x_data = Reference(ws, min_col=1, min_row=2, max_col=1, max_row=ws.max_row)
+                    chart.add_data(y_data, titles_from_data=True)
+                    chart.set_categories(x_data)
+
+                    chart.series[0].graphicalProperties.line.dashStyle = 'dash'  # for L_ch
+                    chart.series[1].graphicalProperties.line.width = 50000  # for M_ch
+                    chart.series[2].marker.symbol = 'circle'  # for H_ch
+                    chart.series[2].marker.size = 10
+
+                    ws.add_chart(chart, "F1")
+
+                    wb.save(excel_path)
+                    wb.close()
+
+                elif 'Sensitivity' in ws_name or 'Desens' in ws_name:
+                    chart = LineChart()
+                    chart.title = f'{ws_name[:11]}'
+
+                    chart.y_axis.title = f'Sensitivity(dBm)'
+
+                    chart.x_axis.title = 'Band'
+                    chart.x_axis.tickLblPos = 'low'
+
+                    chart.height = 20
+                    chart.width = 32
+
+                    y_data = Reference(ws, min_col=2, min_row=1, max_col=ws.max_column, max_row=ws.max_row)
+                    x_data = Reference(ws, min_col=1, min_row=2, max_col=1, max_row=ws.max_row)
+                    chart.add_data(y_data, titles_from_data=True)
+                    chart.set_categories(x_data)
+
+                    chart.series[0].graphicalProperties.line.dashStyle = 'dash'  # for L_ch
+                    chart.series[1].graphicalProperties.line.width = 50000  # for M_ch
+                    chart.series[2].marker.symbol = 'circle'  # for H_ch
+                    chart.series[2].marker.size = 10
+
+                    ws.add_chart(chart, "F1")
+
+                    wb.save(excel_path)
+                    wb.close()
+
+                elif 'Sweep' in ws_name:
+                    chart_sens = LineChart()
+                    chart_sens.title = 'Sensitivity_Rx_Chan_Sweep'
+                    chart_sens.y_axis.title = f'{ws_name[:11]}'
+                    chart_sens.x_axis.title = 'Rx_chan'
+                    chart_sens.x_axis.tickLblPos = 'low'
+                    # chart_sens.y_axis.scaling.min = -60
+                    # chart_sens.y_axis.scaling.max = -20
+
+                    chart_sens.height = 20
+                    chart_sens.width = 40
+
+                    y_data_sens = Reference(ws, min_col=ws.max_column - 1, min_row=1, max_col=ws.max_column - 1,
+                                            max_row=ws.max_row)
+
+                    x_data = Reference(ws, min_col=1, min_row=2, max_col=2, max_row=ws.max_row)
+                    chart_sens.add_data(y_data_sens, titles_from_data=True)
+                    chart_sens.set_categories(x_data)
+
+                    # chart_sens.y_axis.majorGridlines = None
+
+                    chart_sens.series[0].marker.symbol = 'circle'  # for sensitivity
+                    chart_sens.series[0].marker.size = 3
+
+                    chart_pwr = LineChart()  # create a second chart
+
+                    y_data_pwr = Reference(ws, min_col=ws.max_column, min_row=1, max_col=ws.max_column,
+                                           max_row=ws.max_row)
+                    chart_pwr.add_data(y_data_pwr, titles_from_data=True)
+
+                    chart_pwr.series[0].graphicalProperties.line.dashStyle = 'dash'  # for power
+                    chart_pwr.y_axis.title = 'Power(dBm)'
+                    chart_pwr.y_axis.axId = 200
+                    chart_pwr.y_axis.majorGridlines = None
+
+                    chart_sens.y_axis.crosses = 'max'
+                    chart_sens += chart_pwr
+
+                    ws.add_chart(chart_sens, "J1")
+                    # ws.add_chart(chart_sens, "J42")
+
+                    wb.save(excel_path)
+                    wb.close()
+
+
+                elif 'ACLR' in ws_name:
+                    chart = LineChart()
+                    chart.title = 'ACLR'
+                    chart.y_axis.title = 'ACLR(dB)'
+                    chart.x_axis.title = 'Band'
+                    chart.x_axis.tickLblPos = 'low'
+                    chart.y_axis.scaling.min = -60
+                    chart.y_axis.scaling.max = -20
+
+                    chart.height = 20
+                    chart.width = 40
+
+                    y_data = Reference(ws, min_col=3, min_row=1, max_col=ws.max_column, max_row=ws.max_row)
+                    x_data = Reference(ws, min_col=1, min_row=2, max_col=2, max_row=ws.max_row)
+                    chart.add_data(y_data, titles_from_data=True)
+                    chart.set_categories(x_data)
+
+                    chart.series[0].marker.symbol = 'triangle'  # for EUTRA_-1
+                    chart.series[0].marker.size = 10
+                    chart.series[1].marker.symbol = 'circle'  # for EUTRA_+1
+                    chart.series[1].marker.size = 10
+                    chart.series[2].graphicalProperties.line.width = 50000  # for UTRA_-1
+                    chart.series[3].graphicalProperties.line.width = 50000  # for UTRA_+1
+                    chart.series[4].graphicalProperties.line.dashStyle = 'dash'  # for UTRA_-2
+                    chart.series[5].graphicalProperties.line.dashStyle = 'dash'  # for UTRA_+2
+
+                    ws.add_chart(chart, "J1")
+
+                    wb.save(excel_path)
+                    wb.close()
+        except TypeError as err:
+            logger.debug(err)
+            logger.info(f"This Band doesn't have this BW")
+
+    elif standard == 'WCDMA':
+        wb = openpyxl.load_workbook(excel_path)
+        for ws_name in wb.sheetnames:
+            ws = wb[ws_name]
+
+            if ws._charts != []:  # if there is charts, delete it
+                del ws._charts[0]
+
+            if 'PWR' in ws_name or 'EVM' in ws_name:
+                chart = LineChart()
+                chart.title = f'{ws_name[:3]}'
+                if 'PWR' in ws_name:
+                    chart.y_axis.title = f'{ws_name[:3]}(dBm)'
+                elif 'EVM' in ws_name:
+                    chart.y_axis.title = f'{ws_name[:3]}%'
+
+                chart.x_axis.title = 'Band'
+                chart.x_axis.tickLblPos = 'low'
+
+                chart.height = 20
+                chart.width = 32
+
+                if chcoding == 'REFMEASCH':  # this is WCDMA:
+                    y_data = Reference(ws, min_col=2, min_row=1, max_col=ws.max_column, max_row=ws.max_row)
+                    x_data = Reference(ws, min_col=1, min_row=2, max_col=1, max_row=ws.max_row)
+                    chart.add_data(y_data, titles_from_data=True)
+                    chart.set_categories(x_data)
+
+                else:  # HSUPA, HSDPA
+                    y_data = Reference(ws, min_col=2, min_row=1, max_col=ws.max_column - 1, max_row=ws.max_row)
+                    x_data = Reference(ws, min_col=1, min_row=2, max_col=1, max_row=ws.max_row)
+                    chart.add_data(y_data, titles_from_data=True)
+                    chart.set_categories(x_data)
+
+                chart.series[0].graphicalProperties.line.dashStyle = 'dash'  # for L_ch
+                chart.series[1].graphicalProperties.line.width = 50000  # for M_ch
+                chart.series[2].marker.symbol = 'circle'  # for H_ch
+                chart.series[2].marker.size = 10
+
+                ws.add_chart(chart, "F1")
+
+                wb.save(excel_path)
+                wb.close()
+
+            elif 'ACLR' in ws_name:
+                chart = LineChart()
+                chart.title = 'ACLR'
+                chart.y_axis.title = 'ACLR(dB)'
+                chart.x_axis.title = 'Band'
+                chart.x_axis.tickLblPos = 'low'
+                chart.y_axis.scaling.min = -60
+                chart.y_axis.scaling.max = -20
+
+                chart.height = 20
+                chart.width = 40
+
+                if chcoding == 'REFMEASCH':  # this is WCDMA:
+                    y_data = Reference(ws, min_col=3, min_row=1, max_col=ws.max_column, max_row=ws.max_row)
+                    x_data = Reference(ws, min_col=1, min_row=2, max_col=2, max_row=ws.max_row)
+                    chart.add_data(y_data, titles_from_data=True)
+                    chart.set_categories(x_data)
+
+                else:
+                    y_data = Reference(ws, min_col=3, min_row=1, max_col=ws.max_column - 1, max_row=ws.max_row)
+                    x_data = Reference(ws, min_col=1, min_row=2, max_col=2, max_row=ws.max_row)
+                    chart.add_data(y_data, titles_from_data=True)
+                    chart.set_categories(x_data)
+
+                chart.series[0].graphicalProperties.line.width = 50000  # for UTRA_-1
+                chart.series[1].graphicalProperties.line.width = 50000  # for UTRA_+1
+                chart.series[2].graphicalProperties.line.dashStyle = 'dash'  # for UTRA_-2
+                chart.series[3].graphicalProperties.line.dashStyle = 'dash'  # for UTRA_+2
+
+                ws.add_chart(chart, "J1")
+
+                wb.save(excel_path)
+                wb.close()
+
+            elif 'Sensitivity' in ws_name or 'Desens' in ws_name:
+                chart = LineChart()
+                chart.title = f'{ws_name[:11]}'
+
+                chart.y_axis.title = f'Sensitivity(dBm)'
+
+                chart.x_axis.title = 'Band'
+                chart.x_axis.tickLblPos = 'low'
+
+                chart.height = 20
+                chart.width = 32
+
+                y_data = Reference(ws, min_col=2, min_row=1, max_col=ws.max_column, max_row=ws.max_row)
+                x_data = Reference(ws, min_col=1, min_row=2, max_col=1, max_row=ws.max_row)
+                chart.add_data(y_data, titles_from_data=True)
+                chart.set_categories(x_data)
+
+                chart.series[0].graphicalProperties.line.dashStyle = 'dash'  # for L_ch
+                chart.series[1].graphicalProperties.line.width = 50000  # for M_ch
+                chart.series[2].marker.symbol = 'circle'  # for H_ch
+                chart.series[2].marker.size = 10
+
+                ws.add_chart(chart, "F1")
+
+                wb.save(excel_path)
+                wb.close()
+
+    elif standard == 'GSM':
+        pass
