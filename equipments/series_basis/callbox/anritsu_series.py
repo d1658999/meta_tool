@@ -714,6 +714,12 @@ class Anritsu:
         """
         self.anritsu_write(f'SUBTEST5_VER {ver}')
 
+    def set_ulmcs(self, num=21):
+        """
+        set mcs num
+        """
+        self.anritsu_write(f'ULIMCS {num}')
+
     def get_standard_query(self):
         """
         To check the standard in equipment
@@ -732,6 +738,18 @@ class Anritsu:
         Response the state of measuring
         """
         return self.anritsu_query('MSTAT?').strip()
+
+    def get_downlink_channel_query(self):
+        """
+        Resonpse the dl_chan for WCDMA
+        """
+        return self.anritsu_query('DLCHAN?').strip()
+
+    def get_tpc_pattern_query(self):
+        """
+        Resonpone the tpc pattern for WCDMA
+        """
+        self.anritsu_query('TPCPAT?').strip()
 
     def get_etfci_query(self):
         """
@@ -753,9 +771,16 @@ class Anritsu:
 
     def get_power_average_query(self):
         """
-        Get the average power
+        Get the average power for LTE
         """
         return self.anritsu_query('POWER? AVG').strip()
+
+    def get_avg_power_query(self):
+        """
+        Get the average power for WCDMA
+        """
+        return self.anritsu_query('AVG_POWER?').strip()
+
 
     def get_evm_query_lte(self):
         """

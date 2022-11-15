@@ -13,6 +13,10 @@ logger = log_set('Anritsu8820')
 class Anritsu8820(Anritsu):
     def __init__(self, equipments='Anristu8820'):
         super().__init__(equipments)
+        self.mod = None
+        self.evm = None
+        self.aclr = None
+        self.pwr = None
         self.aclr_ch = None
         self.dl_ch = None
         self.count = None
@@ -1336,7 +1340,7 @@ class Anritsu8820(Anritsu):
                     sensitivity = Decimal(self.get_output_level_query())
                     time.sleep(0.1)
                     per = self.get_ber_per_query_wcdma()
-                    power = Decimal(self.inst.query('AVG_POWER?').strip())
+                    power = Decimal(self.get_avg_power_query())
                     self.anritsu_query('*OPC?')
                     logger.info(f'Final: POWER: {power}, SENSITIVITY: {sensitivity}, PER:{per}')
                     return [power, sensitivity, per]
@@ -1347,8 +1351,8 @@ class Anritsu8820(Anritsu):
                     logger.info('Retest again and Reconnected')
                     touch = 0
                     start = -70
-                    dl_ch = int(self.inst.query('DLCHAN?'))
-                    tpc_status = self.inst.query('TPCPAT?').strip()
+                    dl_ch = int(self.get_downlink_channel_query())
+                    tpc_status = self.get_tpc_pattern_query()
                     self.set_init_before_calling(self.std, dl_ch)
                     self.set_registration_calling(self.std)
                     self.set_init_rx(self.std)
@@ -1366,8 +1370,8 @@ class Anritsu8820(Anritsu):
                     logger.info('Retest again and Reconnected')
                     touch = 0
                     start = -70
-                    dl_ch = int(self.inst.query('DLCHAN?'))
-                    tpc_status = self.inst.query('TPCPAT?').strip()
+                    dl_ch = int(self.get_downlink_channel_query())
+                    tpc_status = self.get_tpc_pattern_query()
                     self.set_init_before_calling(self.std, dl_ch)
                     self.set_registration_calling(self.std)
                     self.set_init_rx(self.std)
@@ -1427,13 +1431,13 @@ class Anritsu8820(Anritsu):
             and ACLR format is [EUTRA-1, EUTRA+1, UTRA-1, URTA+1, UTRA-2, URTA+2,]
         """
         want_mods = [
-            'TESTPRM TX_MAXPWR_Q_1',
-            'TESTPRM TX_MAXPWR_Q_P',
-            'TESTPRM TX_MAXPWR_Q_F',
-            'TESTPRM TX_MAXPWR_16_P',
-            'TESTPRM TX_MAXPWR_16_F',
-            'TESTPRM TX_MAXPWR_64_P',
-            'TESTPRM TX_MAXPWR_64_F',
+            'TX_MAXPWR_Q_1',
+            'TX_MAXPWR_Q_P',
+            'TX_MAXPWR_Q_F',
+            'TX_MAXPWR_16_P',
+            'TX_MAXPWR_16_F',
+            'TX_MAXPWR_64_P',
+            'TX_MAXPWR_64_F',
         ]
 
         validation_dict = {}
@@ -1449,43 +1453,44 @@ class Anritsu8820(Anritsu):
             self.mod = mod[18:]
             conn_state = int(self.get_calling_state_query())
             self.count = 5
-            while conn_state != cm_pmt_anritsu.ANRITSU_CONNECTED:  # this is for waiting connection before change modulation if there is connection problems
+            # this is for waiting connection before change modulation if there is connection problems
+            while conn_state != cm_pmt_anritsu.ANRITSU_CONNECTED:
                 logger.info('Call drops...')
                 if self.count == 0:
                     # equipment end call and start call
                     logger.info('End call and then start call')
                     self.flymode_circle()
                     time.sleep(5)
-                    self.inst.write('CALLSO')
-                    self.inst.query('*OPC?')
+                    self.set_end()
+                    self.anritsu_query('*OPC?')
                     time.sleep(1)
-                    self.inst.write('CALLSA')
+                    self.set_connecting()
                     time.sleep(10)
                     self.count = 6
-                    conn_state = int(self.inst.query("CALLSTAT?").strip())
+                    conn_state = int(self.get_calling_state_query())
 
                 else:
                     time.sleep(10)
                     self.count -= 1
                     logger.info('wait 10 seconds to connect')
                     logger.info(f'{6 - self.count} times to wait 10 second')
-                    conn_state = int(self.inst.query("CALLSTAT?").strip())
+                    conn_state = int(self.get_calling_state_query())
 
             validation_list = []
-            if mod == 'TESTPRM TX_MAXPWR_64_P':
-                self.inst.write('TESTPRM TX_MAXPWR_Q_P')
-                self.inst.write('ULRMC_64QAM ENABLED')
-                self.inst.write('ULIMCS 21')
-            elif mod == 'TESTPRM TX_MAXPWR_64_F':
-                self.inst.write('TESTPRM TX_MAXPWR_Q_F')
-                self.inst.write('ULRMC_64QAM ENABLED')
-                self.inst.write('ULIMCS 21')
+            if mod == 'TX_MAXPWR_64_P':
+                self.set_test_parameter('TX_MAXPWR_Q_P')
+                self.set_ulrmc_64QAM('64QAM ENABLED')
+                self.set_ulmcs(21)
+            elif mod == 'TX_MAXPWR_64_F':
+                self.set_test_parameter('TX_MAXPWR_Q_F')
+                self.set_ulrmc_64QAM('64QAM ENABLED')
+                self.set_ulmcs(21)
             else:
-                self.inst.write('ULRMC_64QAM DISABLED')
-                self.inst.write(mod)
+                self.set_ulrmc_64QAM('DISABLED')
+                self.set_test_parameter(mod)
 
             self.set_to_measure()
-            meas_status = int(self.inst.query('MSTAT?').strip())
+            meas_status = int(self.get_measure_state_query())
 
             while meas_status == cm_pmt_anritsu.MESUREMENT_BAD:  # this is for the reference signal is not found
                 logger.info('measuring status is bad(Reference signal not found)')
@@ -1515,7 +1520,7 @@ class Anritsu8820(Anritsu):
                 self.evm = self.get_uplink_evm('LTE')
                 validation_list.append(self.evm)
                 validation_dict[mod[18:]] = validation_list
-                self.inst.query('*OPC?')
+                self.anritsu_query('*OPC?')
         logger.debug(validation_dict)
         return validation_dict
 
@@ -1532,7 +1537,7 @@ class Anritsu8820(Anritsu):
         self.set_input_level(26)
         self.set_output_level(-93)
         self.set_tpc('ALL1')
-        self.inst.query('*OPC?')
+        self.anritsu_query('*OPC?')
 
         validation_list = []
         time.sleep(0.1)
@@ -1544,7 +1549,6 @@ class Anritsu8820(Anritsu):
         validation_list.append(self.aclr)
         self.evm = self.get_uplink_evm('WCDMA')
         validation_list.append(self.evm)
-        self.inst.query('*OPC?')
+        self.anritsu_query('*OPC?')
         logger.debug(validation_list)
         return validation_list
-
