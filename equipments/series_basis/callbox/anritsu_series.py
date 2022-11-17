@@ -565,7 +565,7 @@ class Anritsu:
     def set_channel_coding(self, mode):
         """
         Set [Channel Coding] to [<mode> RF Test]
-        <mode> FIXREFCH | EDCHTEST for HSDPA | HSUPA
+        <mode> REFMEASCH | FIXREFCH | EDCHTEST for WCDMA | HSDPA | HSUPA
         """
         self.anritsu_write(f'CHCODING {mode}')
 
@@ -847,6 +847,12 @@ class Anritsu:
         Query the output level
         """
         return self.anritsu_query('OLVL?').strip()
+
+    def get_channel_coding_query(self):
+        """
+        Query the chcoding to judge which type for WCDMA | HSUPA | HSDPA
+        """
+        self.anritsu_query('CHCODING?').strip()
 
 
 

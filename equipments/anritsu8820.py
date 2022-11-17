@@ -5,6 +5,8 @@ from equipments.series_basis.callbox.anritsu_series import Anritsu
 from utils.log_init import log_set
 from utils.loss_handler import read_loss_file
 import utils.parameters.common_parameters_anritsu as cm_pmt_anritsu
+import utils.parameters.external_paramters as ext_pmt
+from utils.excel_handler import excel_plot_line, fill_desens, fill_values_tx, fill_values_rx, fill_values_rx_sweep
 from utils.fly_mode import FlyMode
 
 logger = log_set('Anritsu8820')
@@ -13,6 +15,8 @@ logger = log_set('Anritsu8820')
 class Anritsu8820(Anritsu):
     def __init__(self, equipments='Anristu8820'):
         super().__init__(equipments)
+        self.excel_path = None
+        self.band_segment = None
         self.mod = None
         self.evm = None
         self.aclr = None
@@ -84,7 +88,7 @@ class Anritsu8820(Anritsu):
                 logger.info("Switch to LTE mode fail")
                 return 1
 
-    def switch_to_wcdma(self):
+    def set_switch_to_wcdma(self):
         """
         switch to WCDMA mode
         switch ok => return 0
@@ -108,7 +112,7 @@ class Anritsu8820(Anritsu):
                 logger.info("Switch to WCDMA mode fail")
                 return 1
 
-    def switch_to_gsm(self):
+    def set_switch_to_gsm(self):
         """
             switch to GSM mode
             switch ok => return 0
@@ -341,7 +345,7 @@ class Anritsu8820(Anritsu):
                     time.sleep(1)
                     conn_state = int(self.get_calling_state_query())
                 # logger.info('Start calling')
-                # conn_state = int(self.inst.query("CALLSTAT?").strip())
+                # conn_state = int(self.get_calling_state_query())
             # logger.info('START CALL')
             # self.inst.write('CALLSA')
             logger.info('Connected')
@@ -1534,3 +1538,306 @@ class Anritsu8820(Anritsu):
         self.anritsu_query('*OPC?')
         logger.debug(validation_list)
         return validation_list
+
+    def tx_core(self, standard, band, dl_ch, bw=None):
+        conn_state = int(self.get_calling_state_query())
+        self.dl_ch = dl_ch
+
+        # calling process
+        if standard == 'LTE':
+            if conn_state != cm_pmt_anritsu.ANRITSU_CONNECTED:
+                self.set_init_before_calling(standard, dl_ch, bw)
+                self.set_registration_calling(standard)
+        elif standard == 'WCDMA' and self.chcoding == 'REFMEASCH':  # this is WCDMA
+            if conn_state != cm_pmt_anritsu.ANRITSU_LOOP_MODE_1:
+                self.set_init_before_calling(standard, dl_ch, bw)
+                self.set_registration_calling(standard)
+        elif standard == 'WCDMA' and self.chcoding == 'EDCHTEST':  # this is HSUPA
+            if conn_state != cm_pmt_anritsu.ANRITSU_LOOP_MODE_1:
+                self.set_init_before_calling(standard, dl_ch, bw)
+                self.set_init_hspa()
+                self.set_registration_calling(standard)
+        elif standard == 'WCDMA' and self.chcoding == 'FIXREFCH':  # this is HSDPA
+            if conn_state != cm_pmt_anritsu.ANRITSU_LOOP_MODE_1:
+                self.set_init_before_calling(standard, dl_ch, bw)
+                self.set_init_hspa()
+                self.set_registration_calling(standard)
+
+        if standard == 'LTE':
+            logger.info(f'Start to measure B{band}, bandwidth: {bw} MHz, downlink_chan: {dl_ch}')
+        elif standard == 'WCDMA' and self.chcoding == 'REFMEASCH':  # this is WCDMA
+            logger.info(f'Start WCDMA to measure B{band}, downlink_chan: {dl_ch}')
+        elif standard == 'WCDMA' and self.chcoding == 'EDCHTEST':  # this is HSUPA
+            logger.info(f'Start HSUPA to measure B{band}, downlink_chan: {dl_ch}')
+        elif standard == 'WCDMA' and self.chcoding == 'FIXREFCH':  # this is HSDPA
+            logger.info(f'Start HSDPA to measure B{band}, downlink_chan: {dl_ch}')
+
+        self.set_handover(standard, dl_ch, bw)
+
+        # HSUPA and HSDPA need to setting some parameters
+        if standard == 'WCDMA' and (self.chcoding == 'EDCHTEST' or self.chcoding == 'FIXREFCH'):
+            self.set_registration_after_calling_hspa()
+
+        data = self.get_validation(standard)
+        self.excel_path = fill_values_tx(standard, data, band, dl_ch, bw)
+
+    def rx_core(self, standard, band, dl_ch, bw=None):
+        conn_state = int(self.get_calling_state_query())
+        if standard == 'LTE':
+            if conn_state != cm_pmt_anritsu.ANRITSU_CONNECTED:
+                self.set_init_before_calling(standard, dl_ch, bw)
+                self.set_registration_calling(standard)
+        elif standard == 'WCDMA':
+            if conn_state != cm_pmt_anritsu.ANRITSU_LOOP_MODE_1:
+                self.set_init_before_calling(standard, dl_ch, bw)
+                self.set_registration_calling(standard)
+
+        if standard == 'LTE':
+            logger.info(f'Start to sensitivity B{band}, bandwidth: {bw} MHz, downlink_chan: {dl_ch}')
+        elif standard == 'WCDMA':
+            logger.info(f'Start to sensitivity B{band}, downlink_chan: {dl_ch}')
+
+        self.set_init_rx(standard)
+
+        for power_selected in ext_pmt.tx_max_pwr_sensitivity:
+            self.set_rf_out_port(ext_pmt.rfout_anritsu)
+            if power_selected == 1:
+                self.set_tpc('ALL1')
+                self.set_input_level(30)
+                sens_list = self.get_sensitivity(standard, band, dl_ch, bw)
+                logger.debug(f'Sensitivity list:{sens_list}')
+                self.excel_path = fill_values_rx(sens_list, band, dl_ch, power_selected, bw)
+                self.set_output_level(-70)
+            elif power_selected == 0:
+                if standard == 'LTE':
+                    self.set_tpc('AUTO')
+                elif standard == 'WCDMA':
+                    self.set_tpc('ILPC')
+                self.set_input_level(-10)
+                sens_list = self.get_sensitivity(standard, band, dl_ch, bw)
+                logger.debug(f'Sensitivity list:{sens_list}')
+                self.excel_path = fill_values_rx(sens_list, band, dl_ch, power_selected, bw)
+                self.set_output_level(-70)
+            self.set_rf_out_port('MAIN')
+
+    def rx_sweep_core(self, standard, band, dl_ch, bw=None):
+        conn_state = int(self.get_calling_state_query())
+        if standard == 'LTE':
+            if conn_state != cm_pmt_anritsu.ANRITSU_CONNECTED:
+                self.set_init_before_calling(standard, dl_ch, bw)
+                self.set_registration_calling(standard)
+        elif standard == 'WCDMA':
+            if conn_state != cm_pmt_anritsu.ANRITSU_LOOP_MODE_1:
+                self.set_init_before_calling(standard, dl_ch, bw)
+                self.set_registration_calling(standard)
+
+        if standard == 'LTE':
+            logger.info(f'Start to sweep B{band}, bandwidth: {bw} MHz, downlink_chan: {dl_ch}')
+        elif standard == 'WCDMA':
+            logger.info(f'Start to sweep B{band}, downlink_chan: {dl_ch}')
+
+        self.set_init_rx(standard)
+
+        for power_selected in ext_pmt.tx_max_pwr_sensitivity:
+            if power_selected == 1:
+                self.set_tpc('ALL1')
+                self.set_input_level(30)
+                sens_list = self.get_sensitivity(standard, band, dl_ch, bw)
+                logger.debug(f'Sensitivity list:{sens_list}')
+                self.excel_path = fill_values_rx_sweep(sens_list, band, dl_ch, power_selected, bw)  # this is different
+                self.set_output_level(-70)
+            elif power_selected == 0:
+                if standard == 'LTE':
+                    self.set_tpc('AUTO')
+                elif standard == 'WCDMA':
+                    self.set_tpc('ILPC')
+                self.set_input_level(-10)
+                sens_list = self.get_sensitivity(standard, band, dl_ch, bw)
+                logger.debug(f'Sensitivity list:{sens_list}')
+                self.excel_path = fill_values_rx_sweep(sens_list, band, dl_ch, power_selected, bw)  # this is different
+                self.set_output_level(-70)
+
+    def run_tx(self):
+        for tech in ext_pmt.tech:
+            if tech == 'LTE' and ext_pmt.lte_bands != []:
+                standard = self.set_switch_to_lte()
+                self.anritsu_query('*OPC?')
+                logger.info(standard)
+                self.chcoding = None
+                for bw in ext_pmt.lte_bandwidths:
+                    for band in ext_pmt.lte_bands:
+                        if bw in cm_pmt_anritsu.bandwidths_selected(band):
+                            if band == 28:
+                                self.band_segment = ext_pmt.band_segment
+                            self.set_test_parameter_normal()
+                            ch_list = []
+                            for wt_ch in ext_pmt.channel:
+                                if wt_ch == 'L':
+                                    ch_list.append(cm_pmt_anritsu.dl_ch_selected(standard, band, bw)[0])
+                                elif wt_ch == 'M':
+                                    ch_list.append(cm_pmt_anritsu.dl_ch_selected(standard, band, bw)[1])
+                                elif wt_ch == 'H':
+                                    ch_list.append(cm_pmt_anritsu.dl_ch_selected(standard, band, bw)[2])
+                            logger.debug(f'Test Channel List: {band}, {bw}MHZ, downlink channel list:{ch_list}')
+                            for dl_ch in ch_list:
+                                self.tx_core(standard, band, dl_ch, bw)
+                        else:
+                            logger.info(f'B{band} do not have BW {bw}MHZ')
+                    excel_plot_line(standard, self.chcoding, self.excel_path)
+            elif (tech == 'WCDMA' or tech == 'HSUPA' or tech == 'HSDPA') and (
+                    ext_pmt.wcdma_bands != [] or ext_pmt.hsupa_bands != [] or ext_pmt.hsdpa_bands != []):
+                standard = self.set_switch_to_wcdma()
+                self.anritsu_query('*OPC?')
+                self.set_end()
+
+                if tech == 'WCDMA':
+                    self.set_channel_coding('REFMEASCH')
+                    logger.info('Set to WCDMA')
+                elif tech == 'HSUPA':
+                    self.set_channel_coding('EDCHTEST')
+                    logger.info('Set to HSUPA')
+                elif tech == 'HSDPA':
+                    self.set_channel_coding('FIXREFCH')
+                    logger.info('Set to HSDPA')
+
+                self.chcoding = self.get_channel_coding_query()
+                logger.info(f'CHCODING: {self.chcoding}')
+
+                if self.chcoding == 'REFMEASCH':  # this is WCDMA
+                    for band in ext_pmt.wcdma_bands:
+                        ch_list = []
+                        for wt_ch in ext_pmt.channel:
+                            if wt_ch == 'L':
+                                ch_list.append(cm_pmt_anritsu.dl_ch_selected(standard, band)[0])
+                            elif wt_ch == 'M':
+                                ch_list.append(cm_pmt_anritsu.dl_ch_selected(standard, band)[1])
+                            elif wt_ch == 'H':
+                                ch_list.append(cm_pmt_anritsu.dl_ch_selected(standard, band)[2])
+                        logger.debug(f'Test Channel List: {band}, downlink channel list:{ch_list}')
+                        for dl_ch in ch_list:
+                            self.tx_core(standard, band, dl_ch)
+
+                elif self.chcoding == 'EDCHTEST':  # this is HSUPA
+                    for band in ext_pmt.hsupa_bands:
+                        ch_list = []
+                        for wt_ch in ext_pmt.channel:
+                            if wt_ch == 'L':
+                                ch_list.append(cm_pmt_anritsu.dl_ch_selected(standard, band)[0])
+                            elif wt_ch == 'M':
+                                ch_list.append(cm_pmt_anritsu.dl_ch_selected(standard, band)[1])
+                            elif wt_ch == 'H':
+                                ch_list.append(cm_pmt_anritsu.dl_ch_selected(standard, band)[2])
+                        logger.debug(f'Test Channel List: {band}, downlink channel list:{ch_list}')
+                        for dl_ch in ch_list:
+                            self.tx_core(standard, band, dl_ch)
+                elif self.chcoding == 'FIXREFCH':  # this is HSDPA
+                    for band in ext_pmt.hsdpa_bands:
+                        ch_list = []
+                        for wt_ch in ext_pmt.channel:
+                            if wt_ch == 'L':
+                                ch_list.append(cm_pmt_anritsu.dl_ch_selected(standard, band)[0])
+                            elif wt_ch == 'M':
+                                ch_list.append(cm_pmt_anritsu.dl_ch_selected(standard, band)[1])
+                            elif wt_ch == 'H':
+                                ch_list.append(cm_pmt_anritsu.dl_ch_selected(standard, band)[2])
+                        logger.debug(f'Test Channel List: {band}, downlink channel list:{ch_list}')
+                        for dl_ch in ch_list:
+                            self.tx_core(standard, band, dl_ch)
+
+                excel_plot_line(standard, self.chcoding, self.excel_path)
+            elif tech == 'GSM' and ext_pmt.gsm_bands != []:
+                pass
+
+            else:
+                logger.info(f'Finished')
+
+    def run_rx(self):
+        self.set_rf_out_port('MAIN')
+        for tech in ext_pmt.tech:
+            if tech == 'LTE' and ext_pmt.lte_bands != []:
+                standard = self.set_switch_to_lte()
+                logger.info(standard)
+                self.chcoding = None
+                for bw in ext_pmt.lte_bandwidths:
+                    for band in ext_pmt.lte_bands:
+                        if bw in cm_pmt_anritsu.bandwidths_selected(band):
+                            if band == 28:
+                                self.band_segment = ext_pmt.band_segment
+                            self.set_test_parameter_normal()
+                            ch_list = []
+                            for wt_ch in ext_pmt.channel:
+                                if wt_ch == 'L':
+                                    ch_list.append(cm_pmt_anritsu.dl_ch_selected(standard, band, bw)[0])
+                                elif wt_ch == 'M':
+                                    ch_list.append(cm_pmt_anritsu.dl_ch_selected(standard, band, bw)[1])
+                                elif wt_ch == 'H':
+                                    ch_list.append(cm_pmt_anritsu.dl_ch_selected(standard, band, bw)[2])
+                            logger.debug(f'Test Channel List: {band}, {bw}MHZ, downlink channel list:{ch_list}')
+                            for dl_ch in ch_list:
+                                self.rx_core(standard, band, dl_ch, bw)
+                            time.sleep(1)
+                    fill_desens(self.excel_path)
+                    excel_plot_line(standard, self.chcoding, self.excel_path)
+
+            elif tech == 'WCDMA' and ext_pmt.wcdma_bands != []:
+                standard = self.set_switch_to_wcdma()
+                for band in ext_pmt.wcdma_bands:
+                    ch_list = []
+                    for wt_ch in ext_pmt.channel:
+                        if wt_ch == 'L':
+                            ch_list.append(cm_pmt_anritsu.dl_ch_selected(standard, band)[0])
+                        elif wt_ch == 'M':
+                            ch_list.append(cm_pmt_anritsu.dl_ch_selected(standard, band)[1])
+                        elif wt_ch == 'H':
+                            ch_list.append(cm_pmt_anritsu.dl_ch_selected(standard, band)[2])
+                    logger.debug(f'Test Channel List: {band}, downlink channel list:{ch_list}')
+                    for dl_ch in ch_list:
+                        self.rx_core(standard, band, dl_ch)
+                fill_desens(self.excel_path)
+                excel_plot_line(standard, self.chcoding, self.excel_path)
+            elif tech == ext_pmt.gsm_bands:
+                pass
+            else:
+                logger.info(f'Finished')
+
+    def run_rx_sweep_ch(self):
+        for tech in ext_pmt.tech:
+            if tech == 'LTE' and ext_pmt.lte_bands != []:
+                standard = self.set_switch_to_lte()
+                logger.info(standard)
+                self.chcoding = None
+                for bw in ext_pmt.lte_bandwidths:
+                    for band in ext_pmt.lte_bands:
+                        if bw in cm_pmt_anritsu.bandwidths_selected(band):
+                            logger.info(f'Sweep Channel List: {band}, {bw}MHZ')
+                            if band == 28:
+                                self.band_segment = ext_pmt.band_segment
+                            self.set_test_parameter_normal()
+                            lch = cm_pmt_anritsu.dl_ch_selected(standard, band, bw)[0]
+                            hch = cm_pmt_anritsu.dl_ch_selected(standard, band, bw)[2]
+                            step = cm_pmt_anritsu.SWEEP_STEP
+                            if cm_pmt_anritsu.CHAN_LIST:
+                                ch_list = cm_pmt_anritsu.CHAN_LIST
+                            else:
+                                ch_list = range(lch, hch + 1, step)
+                            for dl_ch in ch_list:
+                                self.rx_sweep_core(standard, band, dl_ch, bw)
+                        excel_plot_line(standard, self.chcoding, self.excel_path)
+            elif tech == 'WCDMA' and ext_pmt.wcdma_bands != []:
+                standard = self.set_switch_to_wcdma()
+                for band in ext_pmt.wcdma_bands:
+                    logger.info(f'Sweep Channel List: {band}')
+                    lch = cm_pmt_anritsu.dl_ch_selected(standard, band)[0]
+                    hch = cm_pmt_anritsu.dl_ch_selected(standard, band)[2]
+                    step = cm_pmt_anritsu.SWEEP_STEP
+                    if cm_pmt_anritsu.CHAN_LIST:
+                        ch_list = cm_pmt_anritsu.CHAN_LIST
+                    else:
+                        ch_list = range(lch, hch + 1, step)
+                    for dl_ch in ch_list:
+                        self.rx_sweep_core(standard, band, dl_ch)
+                    excel_plot_line(standard, self.chcoding, self.excel_path)
+            elif tech == ext_pmt.gsm_bands:
+                pass
+            else:
+                logger.info(f'Finished')
