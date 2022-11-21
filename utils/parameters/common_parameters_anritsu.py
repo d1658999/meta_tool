@@ -163,6 +163,24 @@ def special_uplink_config_sensitivity(band, bw):
             return int(bw) * 5, 0
 
 
+def aclr_ch_judge(standard, band, dl_ch, bw=None):
+    if standard == 'LTE':
+        if dl_ch < dl_ch_selected(standard, band, bw)[1]:
+            return 'ch01'
+        elif dl_ch == dl_ch_selected(standard, band, bw)[1]:
+            return 'ch02'
+        elif dl_ch > dl_ch_selected(standard, band, bw)[1]:
+            return 'ch03'
+
+    elif standard == 'WCDMA':
+        if dl_ch < dl_ch_selected(standard, band)[1]:
+            return 'ch01'
+        elif dl_ch == dl_ch_selected(standard, band)[1]:
+            return 'ch02'
+        elif dl_ch > dl_ch_selected(standard, band)[1]:
+            return 'ch03'
+    elif standard == 'GSM':
+        pass
 
 
 

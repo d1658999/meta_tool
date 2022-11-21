@@ -1366,7 +1366,7 @@ class Cmw100:
                 # self.tx_level = wt.tx_level if ue_power_bool == 1 else -10
                 self.band_wcdma = item[2]
                 self.search_sensitivity_lmh_progress_wcdma()
-                # self.rx_desense_process()
+                # self.rx_desense_process_ftm()
         self.rxs_relative_plot(self.filename, mode=1)  # mode=1: LMH mode
 
     def search_sensitivity_pipline_lte(self):
@@ -1601,9 +1601,9 @@ class Cmw100:
         #                                          self.rb_start_lte, self.rb_size_fr1, self.rb_start_fr1])
         #             self.set_test_end_fr1(delay=0.5)
         #             self.set_test_end_lte(delay=0.5)
-        #             self.rx_power_endc_test_export_excel(data)
-        #         self.rx_desense_endc_process()
-        # self.rxs_endc_plot('Sensitivty_ENDC.xlsx')
+        #             self.rx_power_endc_test_export_excel_ftm(data)
+        #         self.rx_desense_endc_process_ftm()
+        # self.rxs_endc_plot_ftm('Sensitivty_ENDC.xlsx')
 
     def search_sensitivity_pipline_fast_lte(
             self):  # this is for that RSRP and CINR without issue because this is calculated method
@@ -1625,7 +1625,7 @@ class Cmw100:
                                     self.search_sensitivity_lmh_fast_progress_lte()
                                 else:
                                     logger.info(f'B{self.band_lte} does not have BW {self.bw_lte}MHZ')
-                            # self.txp_aclr_evm_current_plot(self.filename, mode=1)  # mode=1: LMH mode
+                            # self.txp_aclr_evm_current_plot_ftm(self.filename, mode=1)  # mode=1: LMH mode
                         except TypeError as err:
                             logger.debug(err)
                             logger.info(f'there is no data to plot because the band does not have this BW ')
@@ -1916,7 +1916,7 @@ class Cmw100:
         wb.save(filename)
         wb.close()
 
-    def rx_power_relative_test_export_excel(self, data, band, bw, tx_freq_level,
+    def rx_power_relative_test_export_excel_ftm(self, data, band, bw, tx_freq_level,
                                             mode=0):  # mode general: 0,  mode LMH: 1
         """
         data is dict like:
@@ -4124,7 +4124,7 @@ class Cmw100:
 
         self.set_test_end_fr1()
         # if plot == True:
-        #     self.txp_aclr_evm_current_plot(self.filename, mode=1)  # mode=1: LMH mode
+        #     self.txp_aclr_evm_current_plot_ftm(self.filename, mode=1)  # mode=1: LMH mode
         # else:
         #     pass
 
@@ -4180,7 +4180,7 @@ class Cmw100:
 
         self.set_test_end_fr1()
         # if plot == True:
-        #     self.txp_aclr_evm_current_plot(self.filename, mode=1)  # mode=1: LMH mode
+        #     self.txp_aclr_evm_current_plot_ftm(self.filename, mode=1)  # mode=1: LMH mode
         # else:
         #     pass
 
@@ -6387,8 +6387,8 @@ def main():
     # cmw100.tx_level_sweep_pipeline_fr1()
 
     # cmw100.search_sensitivity_pipline_lte()
-    # cmw100.rx_desense_process()
-    # cmw100.rxs_relative_plot('Sensitivty_10MHZ_LTE_LMH.xlsx', mode=1)
+    # cmw100.rx_desense_process_ftm()
+    # cmw100.rxs_relative_plot_ftm('Sensitivty_10MHZ_LTE_LMH.xlsx', mode=1)
 
     # cmw100.search_sensitivity_pipline_lte()
     # cmw100.search_sensitivity_pipline_fr1()

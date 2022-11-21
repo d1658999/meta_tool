@@ -4,7 +4,7 @@ from utils.log_init import log_set
 import utils.parameters.external_paramters as ext_pmt
 import utils.parameters.common_parameters_ftm as cm_pmt_ftm
 from utils.loss_handler import get_loss
-from utils.excel_handler import tx_power_fcc_ce_export_excel
+from utils.excel_handler import tx_power_fcc_ce_export_excel_ftm
 import utils.parameters.rb_parameters as rb_pmt
 import utils.parameters.fcc as fcc
 import utils.parameters.ce as ce
@@ -103,7 +103,7 @@ class TxTestFccCe(AtCmd, CMW100):
                                 'mcs': self.mcs_fr1,
                                 'tx_path': self.tx_path,
                             }
-                            self.file_path = tx_power_fcc_ce_export_excel(data, parameters)
+                            self.file_path = tx_power_fcc_ce_export_excel_ftm(data, parameters)
                     except KeyError as err:
                         logger.debug(f'show error: {err}')
                         logger.info(
@@ -190,7 +190,7 @@ class TxTestFccCe(AtCmd, CMW100):
                                 'mcs': self.mcs_fr1,
                                 'tx_path': self.tx_path,
                             }
-                            self.file_path = tx_power_fcc_ce_export_excel(data, parameters)
+                            self.file_path = tx_power_fcc_ce_export_excel_ftm(data, parameters)
                     except KeyError as err:
                         logger.debug(f'show error: {err}')
                         logger.info(
