@@ -13,8 +13,8 @@ logger = log_set('Anritsu8820')
 
 
 class Anritsu8820(Anritsu):
-    def __init__(self, equipments='Anristu8820'):
-        super().__init__(equipments)
+    def __init__(self, equipment='Anristu8820'):
+        super().__init__(equipment)
         self.excel_path = None
         self.band_segment = None
         self.mod = None
@@ -237,8 +237,7 @@ class Anritsu8820(Anritsu):
         """
         the rest part of that tricky setting
         """
-        s = standard
-        if s == 'LTE':
+        if standard == 'LTE':
             self.set_rf_out_port('MAIN')
             self.set_rrc_update('PAGING')
             self.set_power_trigger_source('FRAME')
@@ -251,7 +250,7 @@ class Anritsu8820(Anritsu):
             self.set_ue_category(3)
             self.set_additional_spectrum_emission_ns('01')
 
-        elif s == 'WCDMA':
+        elif standard == 'WCDMA':
             self.set_rf_out_port('MAIN')
             self.set_band_indicator('AUTO')
             # self.inst.write('ATTFLAG OFF')
@@ -263,7 +262,7 @@ class Anritsu8820(Anritsu):
             self.set_domain_drmc('CS')
             self.set_register_mode('AUTO')
 
-        elif s == 'GSM':
+        elif standard == 'GSM':
             pass
 
     def set_path_loss(self, standard):
@@ -274,10 +273,9 @@ class Anritsu8820(Anritsu):
         loss_dict = read_loss_file()
         freq = sorted(loss_dict.keys())
         for f in freq:
-            self.set_loss_table(loss_title, f, loss_dict[f], loss_dict[f], loss_dict[f])
-        s = standard  # WCDMA|GSM|LTE
-        logger.debug("Current Format: " + s)
-        self.set_loss_common(s)
+            self.set_loss_table_8820(loss_title, f, loss_dict[f], loss_dict[f], loss_dict[f])
+        logger.debug("Current Format: " + standard)  # WCDMA|GSM|LTE
+        self.set_loss_common(standard)
 
     def set_handover(self, standard, dl_ch, bw=5):
         s = standard  # WCDMA|GSM|LTE

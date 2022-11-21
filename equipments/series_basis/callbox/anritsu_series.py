@@ -257,6 +257,38 @@ class Anritsu:
         """
         self.anritsu_write(f'RFOUT {port}')
 
+    def set_phone1_tx_out(self, tx_out=1, port='MAIN'):
+        """
+        set phone1 area TX<tx_out> on <port> of equipment(8821), that is same as the rx port level for DUT
+        <tx_out> 1 | 2 | 3 | 4
+        <port> MAIN | AUX
+        """
+        self.anritsu_write(f'TXOUT {tx_out}, {port}')
+
+    def set_phone2_tx_out(self, tx_out=1, port='MAIN'):
+        """
+        set phone2 area TX<tx_out> on <port> of equipment(8821), that is same as the rx port level for DUT
+        <tx_out> 1 | 2 | 3 | 4
+        <port> MAIN | AUX
+        """
+        self.anritsu_write(f'TXOUT_P2 {tx_out}, {port}')
+
+    def set_phone3_tx_out(self, tx_out=1, port='MAIN'):
+        """
+        set phone1 area TX<tx_out> on <port> of equipment(8821), that is same as the rx port level for DUT
+        <tx_out> 1 | 2 | 3 | 4
+        <port> MAIN | AUX
+        """
+        self.anritsu_write(f'TXOUT_P3 {tx_out}, {port}')
+
+    def set_phone4_tx_out(self, tx_out=1, port='MAIN'):
+        """
+        set phone4 area TX<tx_out> on <port> of equipment(8821), that is same as the rx port level for DUT
+        <tx_out> 1 | 2 | 3 | 4
+        <port> MAIN | AUX
+        """
+        self.anritsu_write(f'TXOUT_P4 {tx_out}, {port}')
+
     def set_rrc_update(self, mode='PAGING'):
         """
         Execute RRC Connection Reconfiguration:
@@ -383,12 +415,25 @@ class Anritsu:
         """
         self.anritsu_write(f'DELLOSSTBL')
 
-    def set_loss_table(self, loss_title, freq, loss_dl, loss_ul, loss_aux):
+    def set_loss_table_delete_phone2(self):
+        """
+        Delete the unknown loss table on 8821 another table in phone2
+        """
+        self.anritsu_write(f'DELLOSSTBL_P2')
+
+    def set_loss_table_8820(self, loss_title, freq, loss_dl, loss_ul, loss_aux):
         """
         This is only suitable for 8820
         """
         self.anritsu_write(f'{loss_title}, {freq}MHz, {loss_dl}, {loss_ul}, {loss_aux}')
-        logger.info(f'{loss_title}, {freq}MHz, {loss_dl}, {loss_ul}, {loss_aux}')
+        logger.info(f'{loss_title}, {freq}MHz, dl_loss: {loss_dl}, ul_loss: {loss_ul}, aux_loss: {loss_aux}')
+
+    def set_loss_table_8821(self, loss_title, freq, loss_dl, loss_ul, loss_aux):
+        """
+        This is only suitable for 8821
+        """
+        self.anritsu_write(f'{loss_title}, {freq}MHz, {loss_dl}, {loss_ul},,, {loss_aux},,,')
+        logger.info(f'{loss_title}, {freq}MHz, dl_loss: {loss_dl}, ul_loss: {loss_ul}, aux_loss: {loss_aux}')
 
     def set_loss_common(self, standard):
         """
@@ -720,6 +765,36 @@ class Anritsu:
         """
         self.anritsu_write(f'ULIMCS {num}')
 
+    def set_uplink_terminal_phone1(self, main_port=1):
+        """
+        Set to Main<main_port> at Phone1 UL terminal for 8821
+        """
+        self.anritsu_write(f'ULTPSEL {main_port}')
+
+    def set_downlink_terminal_phone1(self, main_port=1):
+        """
+        Set to Main<main_port> at Phone1 DL terminal for 8821
+        """
+        self.anritsu_write(f'DLTPSEL {main_port}')
+
+    def set_uplink_terminal_phone2(self, main_port=1):
+        """
+        Set to Main<main_port> at Phone1 UL terminal for 8821
+        """
+        self.anritsu_write(f'ULTPSEL_P2 {main_port}')
+
+    def set_downlink_terminal_phone2(self, main_port=1):
+        """
+        Set to Main<main_port> at Phone1 DL terminal for 8821
+        """
+        self.anritsu_write(f'DLTPSEL_P2 {main_port}')
+
+    def set_sem_additional_request_version(self, release=11):
+        """
+        I don't know what it is, it show up in 8821 command
+        """
+        self.anritsu_write(f'SEM_ADDREQ REL{release}')
+
     def get_standard_query(self):
         """
         To check the standard in equipment
@@ -854,6 +929,11 @@ class Anritsu:
         """
         self.anritsu_query('CHCODING?').strip()
 
+    def get_ue_cap_version_query(self):
+        """
+        I don't know what it is
+        """
+        self.anritsu_query(f'UE_CAP? REL')
 
 
 
