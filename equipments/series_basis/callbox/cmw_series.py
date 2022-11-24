@@ -1519,7 +1519,7 @@ class CMW:
         B200: 20 MHz
         *RST:  B200
         """
-        bw10 = f'0{bw * 10}' if bw < 10 else f'{bw * 10}'
+        bw10 = f'0{int(bw * 10)}' if bw < 10 else f'{bw * 10}'
         self.cmw_write(f'CONFigure:LTE:MEASurement:MEValuation:CBANdwidth B{bw10}')
 
     def set_spectrum_limit_fr1(self, area, bw10, start_freq, stop_freq, level, rbw):

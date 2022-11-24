@@ -3,7 +3,7 @@ IMSI = '001010123456789'
 ANRITSU_OFF = 0  # Call processing function set to Off
 ANRITSU_IDLE = 1  # Idle state
 ANRITSU_IDLE_REGIST = 2  # Idle( Regist ) Idle state (location registered)
-ANRITSU_REGIST = 3			# Under location registration
+ANRITSU_REGIST = 3  # Under location registration
 ANRITSU_CONNECTED = 6  # Under communication or connected for LTE
 ANRITSU_LOOP_MODE_1 = 7  # Loopback mode 1 for WCDMA
 ANRITSU_LOOP_MODE_1_OPEN = 8  # Loop mode(open)
@@ -23,15 +23,16 @@ HSUPA_ETFCI_SUBTEST5 = 81  # this is for old versionm before v8.7.0, now not use
 SWEEP_STEP = 2  # this is step when sensitivity all channel sweep
 CHAN_LIST = []  # if wanting to measure single channel when RX sweep by special resason, use it. Or let it empty
 
+
 # bandwidth index
 def bandwidths_selected(band):
     bandwidths = {
-        'B1': [5, 10 , 15, 20],
-        'B2': [1.4, 3, 5, 10 , 15, 20],
-        'B3': [1.4, 3, 5, 10 , 15, 20],
-        'B4': [1.4, 3, 5, 10 , 15, 20],
+        'B1': [5, 10, 15, 20],
+        'B2': [1.4, 3, 5, 10, 15, 20],
+        'B3': [1.4, 3, 5, 10, 15, 20],
+        'B4': [1.4, 3, 5, 10, 15, 20],
         'B5': [1.4, 3, 5, 10],
-        'B7': [5, 10 , 15, 20],
+        'B7': [5, 10, 15, 20],
         'B8': [1.4, 3, 5, 10],
         'B12': [1.4, 3, 5, 10],
         'B13': [5, 10],
@@ -39,7 +40,7 @@ def bandwidths_selected(band):
         'B17': [5, 10],
         'B18': [5, 10, 15],
         'B19': [5, 10, 15],
-        'B20': [5, 10 , 15, 20],
+        'B20': [5, 10, 15, 20],
         'B21': [5, 10, 15],
         'B25': [1.4, 3, 5, 10, 15, 20],
         'B26': [1.4, 3, 5, 10, 15],
@@ -54,7 +55,7 @@ def bandwidths_selected(band):
         'B42': [5, 10, 15, 20],
         'B46': [10, 20],
         'B48': [5, 10, 15, 20],
-        'B66': [1.4, 3, 5, 10 , 15, 20],
+        'B66': [1.4, 3, 5, 10, 15, 20],
         'B70': [5, 10, 15, 20],
         'B71': [5, 10, 15, 20],
         'B75': [5, 10, 15, 20],
@@ -62,11 +63,12 @@ def bandwidths_selected(band):
 
     return bandwidths[f'B{band}']
 
+
 # DL channel
 def dl_ch_selected(standard, band, bw=5):
     band_dl_ch_lte = {
         'B1': [int((0 + bw / 2 * 10)), 300, int(599 - (bw / 2) * 10 + 1)],
-        'B2': [int((600 + bw / 2 * 10)), 900, int(1199 - (bw / 2) * 10 + 1 )],
+        'B2': [int((600 + bw / 2 * 10)), 900, int(1199 - (bw / 2) * 10 + 1)],
         'B3': [int((1200 + bw / 2 * 10)), 1575, int(1949 - (bw / 2) * 10 + 1)],
         'B4': [int((1950 + bw / 2 * 10)), 2175, int(2399 - (bw / 2) * 10 + 1)],
         'B5': [int((2400 + bw / 2 * 10)), 2525, int(2649 - (bw / 2) * 10 + 1)],
@@ -115,7 +117,7 @@ def dl_ch_selected(standard, band, bw=5):
 
     if standard == 'LTE':
         if band == 28:
-            from want_test_band import band_segment
+            from utils.parameters.external_paramters import band_segment
             return band_dl_ch_lte[f'B{band}{band_segment}']
         else:
             return band_dl_ch_lte[f'B{band}']
@@ -126,27 +128,27 @@ def dl_ch_selected(standard, band, bw=5):
 
 
 def special_uplink_config_sensitivity(band, bw):
-    if (int(band) in [2,3,25]) and int(bw) == 15:
+    if (int(band) in [2, 3, 25]) and int(bw) == 15:
         return 50, 25
-    elif (int(band) in [2,3,25]) and int(bw) == 20:
+    elif (int(band) in [2, 3, 25]) and int(bw) == 20:
         return 50, 50
-    elif int(band) in [5,8,18,19,21,26,28,30]  and int(bw) == 10:
+    elif int(band) in [5, 8, 18, 19, 21, 26, 28, 30] and int(bw) == 10:
         return 25, 25
     elif int(band) == 7 and int(bw) == 20:
         return 75, 25
     elif int(band) == 7 and int(bw) == 20:
         return 75, 25
-    elif int(band) in [12,17] and int(bw) == 5:
+    elif int(band) in [12, 17] and int(bw) == 5:
         return 20, 5
     elif int(band) == 12 and int(bw) == 10:
         return 20, 30
-    elif int(band) == 13 and (int(bw) in [5,10]):
+    elif int(band) == 13 and (int(bw) in [5, 10]):
         return 20, 0
-    elif int(band) == 14 and (int(bw) in [5,10]):
+    elif int(band) == 14 and (int(bw) in [5, 10]):
         return 15, 0
     elif int(band) == 17 and int(bw) == 10:
         return 20, 30
-    elif (int(band) == 18 in [18,19,21,26,28]) and int(bw) == 15:
+    elif (int(band) == 18 in [18, 19, 21, 26, 28]) and int(bw) == 15:
         return 25, 50
     elif int(band) == 20 and int(bw) == 10:
         return 20, 0
@@ -183,7 +185,6 @@ def aclr_ch_judge(standard, band, dl_ch, bw=None):
         pass
 
 
-
 def main():
     """
     this main() function is used for testing some function
@@ -203,5 +204,5 @@ def main():
         print('others')
 
 
-if __name__ == "__main__" :
+if __name__ == "__main__":
     main()

@@ -610,7 +610,8 @@ class Anritsu8820(Anritsu):
         elif s == 'WCDMA':
             self.set_input_level(5)
             self.set_output_level(-70)
-            self.set_rx_sample(1000)  # this is should be ber_sample?
+            # self.set_rx_sample(1000)  # this is should be ber_sample?
+            self.ser_ber_sample(10000)
             self.set_throughput_early_on_off('OFF')
             self.set_init_power()
         elif s == 'GSM':
@@ -1473,7 +1474,9 @@ class Anritsu8820(Anritsu):
                 self.set_ulrmc_64QAM('DISABLED')
                 self.set_test_parameter(mod)
 
+            self.anritsu_query('*OPC?')
             self.set_to_measure()
+            self.anritsu_query('*OPC?')
             meas_status = int(self.get_measure_state_query())
 
             while meas_status == cm_pmt_anritsu.MESUREMENT_BAD:  # this is for the reference signal is not found

@@ -77,6 +77,13 @@ class Anritsu:
         """
         self.anritsu_write(f'ULRMC_64QAM {enable}')
 
+    def set_ulrmc_256QAM(self, enable='DISABLE'):
+        """
+         set ULRMC – 256QAM
+         <enable> ENABLE | DISABLE
+        """
+        self.anritsu_write(f'ULRMC_256QAM {enable}')
+
     def set_band_cal(self):
         """
         set the calibration for temp?
@@ -455,11 +462,12 @@ class Anritsu:
         """
         This might be calling ready and start?
         """
-        self.anritsu_write(f'CALLTHD {hold}')
+        self.anritsu_write(f'CALLTHLD  {hold}')
 
     def set_calling_clear(self):
         """
         To clear UE Report and call processing.
+        or to initialize the UE Report value
         """
         self.anritsu_write('CALLRFR')
 
@@ -631,7 +639,7 @@ class Anritsu:
         """
         Set number of sample for [WCDMA] and [GSM]
         """
-        self.anritsu_write(f'')
+        self.anritsu_write(f'BER_SAMPLE {sample}')
 
     def set_rx_sample(self, sample=1000):
         """
@@ -856,7 +864,6 @@ class Anritsu:
         """
         return self.anritsu_query('AVG_POWER?').strip()
 
-
     def get_evm_query_lte(self):
         """
         Response the average evm for LTE
@@ -873,24 +880,26 @@ class Anritsu:
         """
         Get the ACLR value for LTE
         """
-        aclr_list = []
-        aclr_list.append(round(self.anritsu_query('MODPWR? E_LOW1,AVG').strip(), 2))
-        aclr_list.append(round(self.anritsu_query('MODPWR? E_UP1,AVG').strip(), 2))
-        aclr_list.append(round(self.anritsu_query('MODPWR? LOW1,AVG').strip(), 2))
-        aclr_list.append(round(self.anritsu_query('MODPWR? UP1,AVG').strip(), 2))
-        aclr_list.append(round(self.anritsu_query('MODPWR? LOW2,AVG').strip(), 2))
-        aclr_list.append(round(self.anritsu_query('MODPWR? UP2,AVG').strip(), 2))
+        aclr_list = [
+            round(self.anritsu_query('MODPWR? E_LOW1,AVG').strip(), 2),
+            round(self.anritsu_query('MODPWR? E_UP1,AVG').strip(), 2),
+            round(self.anritsu_query('MODPWR? LOW1,AVG').strip(), 2),
+            round(self.anritsu_query('MODPWR? UP1,AVG').strip(), 2),
+            round(self.anritsu_query('MODPWR? LOW2,AVG').strip(), 2),
+            round(self.anritsu_query('MODPWR? UP2,AVG').strip(), 2),
+        ]
         return aclr_list
 
     def get_aclr_query_wcdma(self):
         """
         Get the ACLR value for WCDMA
         """
-        aclr_list = []
-        aclr_list.append(round(self.anritsu_query('AVG_MODPWR? LOW5').strip(), 2))
-        aclr_list.append(round(self.anritsu_query('AVG_MODPWR? UP5').strip(), 2))
-        aclr_list.append(round(self.anritsu_query('AVG_MODPWR? LOW10').strip(), 2))
-        aclr_list.append(round(self.anritsu_query('AVG_MODPWR? UP10').strip(), 2))
+        aclr_list = [
+            round(self.anritsu_query('AVG_MODPWR? LOW5').strip(), 2),
+            round(self.anritsu_query('AVG_MODPWR? UP5').strip(), 2),
+            round(self.anritsu_query('AVG_MODPWR? LOW10').strip(), 2),
+            round(self.anritsu_query('AVG_MODPWR? UP10').strip(), 2),
+        ]
         return aclr_list
 
     def get_ber_per_query_wcdma(self):
@@ -909,7 +918,6 @@ class Anritsu:
         query the throughput by percent(%) for LTE
         """
         return self.anritsu_query('TPUT? PER').strip()
-
 
     def get_throughput_pass_query(self):
         """
@@ -934,13 +942,3 @@ class Anritsu:
         I don't know what it is
         """
         self.anritsu_query(f'UE_CAP? REL')
-
-
-
-
-
-
-
-
-
-

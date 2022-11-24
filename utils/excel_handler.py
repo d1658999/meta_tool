@@ -173,13 +173,15 @@ def tx_power_relative_test_export_excel_ftm(data, parameters_dict):
             if tech == 'LTE':
                 # create dashboard
                 for _ in ['QPSK', 'Q16', 'Q64', 'Q256']:  # some cmw100 might not have licesnse of Q256
-                    wb.create_sheet(f'Dashboard_{_}_PRB')
-                    wb.create_sheet(f'Dashboard_{_}_FRB')
+                    wb.create_sheet(f'Dashboard_{_}')
+                    # wb.create_sheet(f'Dashboard_{_}_PRB')
+                    # wb.create_sheet(f'Dashboard_{_}_FRB')
 
                 # create the Raw data sheets
                 for _ in ['QPSK', 'Q16', 'Q64', 'Q256']:  # some cmw100 might not have licesnse of Q256
-                    wb.create_sheet(f'Raw_Data_{_}_PRB')
-                    wb.create_sheet(f'Raw_Data_{_}_FRB')
+                    wb.create_sheet(f'Raw_Data_{_}')
+                    # wb.create_sheet(f'Raw_Data_{_}_PRB')
+                    # wb.create_sheet(f'Raw_Data_{_}_FRB')
 
                 # create the title for every sheets
                 for sheetname in wb.sheetnames:
@@ -203,12 +205,13 @@ def tx_power_relative_test_export_excel_ftm(data, parameters_dict):
                         ws['P1'] = 'RB_start'
                         ws['Q1'] = 'MCS'
                         ws['R1'] = 'Tx_Path'
-                        ws['S1'] = 'Sync_Path'
-                        ws['T1'] = 'AS_Path'
-                        ws['U1'] = 'Current(mA)'
-                        ws['V1'] = 'Condition'
-                        ws['W1'] = 'Temp0'
-                        ws['X1'] = 'Temp1'
+                        ws['S1'] = 'RB_STATE'
+                        ws['T1'] = 'Sync_Path'
+                        ws['U1'] = 'AS_Path'
+                        ws['V1'] = 'Current(mA)'
+                        ws['W1'] = 'Condition'
+                        ws['X1'] = 'Temp0'
+                        ws['Y1'] = 'Temp1'
                     else:  # to pass the dashboard
                         pass
 
@@ -337,7 +340,7 @@ def tx_power_relative_test_export_excel_ftm(data, parameters_dict):
         wb = openpyxl.load_workbook(file_path)
         ws = None
         if tech == 'LTE':
-            ws = wb[f'Raw_Data_{mcs}_{rb_state}']
+            ws = wb[f'Raw_Data_{mcs}']
         elif tech == 'FR1':
             ws = wb[f'Raw_Data_{mcs}']
         elif tech == 'WCDMA':
@@ -369,10 +372,11 @@ def tx_power_relative_test_export_excel_ftm(data, parameters_dict):
                     ws.cell(row, 16).value = rb_start
                     ws.cell(row, 17).value = mcs
                     ws.cell(row, 18).value = tx_path
-                    ws.cell(row, 19).value = sync_path
-                    ws.cell(row, 20).value = asw_srs_path
-                    ws.cell(row, 21).value = measured_data[10]
-                    ws.cell(row, 22).value = ext_pmt.condition
+                    ws.cell(row, 19).value = rb_state
+                    ws.cell(row, 20).value = sync_path
+                    ws.cell(row, 21).value = asw_srs_path
+                    ws.cell(row, 22).value = measured_data[10]
+                    ws.cell(row, 23).value = ext_pmt.condition
                     row += 1
 
             elif tx_freq_level <= 100:  # 1rb_sweep, lmh, freq_sweep
@@ -396,12 +400,13 @@ def tx_power_relative_test_export_excel_ftm(data, parameters_dict):
                     ws.cell(row, 16).value = rb_start
                     ws.cell(row, 17).value = mcs
                     ws.cell(row, 18).value = tx_path
-                    ws.cell(row, 19).value = sync_path
-                    ws.cell(row, 20).value = asw_srs_path
-                    ws.cell(row, 21).value = measured_data[10] if test_item == 'lmh' else None
-                    ws.cell(row, 22).value = ext_pmt.condition if test_item == 'lmh' else None
-                    ws.cell(row, 23).value = measured_data[11] if test_item == 'lmh' else None
-                    ws.cell(row, 24).value = measured_data[12] if test_item == 'lmh' else None
+                    ws.cell(row, 19).value = rb_state
+                    ws.cell(row, 20).value = sync_path
+                    ws.cell(row, 21).value = asw_srs_path
+                    ws.cell(row, 22).value = measured_data[10] if test_item == 'lmh' else None
+                    ws.cell(row, 23).value = ext_pmt.condition if test_item == 'lmh' else None
+                    ws.cell(row, 24).value = measured_data[11] if test_item == 'lmh' else None
+                    ws.cell(row, 25).value = measured_data[12] if test_item == 'lmh' else None
                     row += 1
 
         elif tech == 'FR1':
@@ -1638,7 +1643,7 @@ def create_excel_rx_freq_sweep(standard, band, power_selected, bw=5):
 
     # save file
     excel_path = f'Rx_Freq_Sweep_{bw}MHZ_{standard}.xlsx' if ext_pmt.condition is None \
-        else f'Rx_Freq_Sweep_{bw}MHZ_standard_{ext_pmt.condition}.xlsx'
+        else f'Rx_Freq_Sweep_{bw}MHZ_{standard}_{ext_pmt.condition}.xlsx'
     wb.save(excel_path)
     wb.close()
 
@@ -1690,18 +1695,21 @@ def create_excel_tx_lmh(standard, bw=5, chcoding=None):
         wb.create_sheet('PWR_16_F')
         wb.create_sheet('PWR_64_P')
         wb.create_sheet('PWR_64_F')
+        wb.create_sheet('PWR_256_F')
         wb.create_sheet('ACLR_Q_P')
         wb.create_sheet('ACLR_Q_F')
         wb.create_sheet('ACLR_16_P')
         wb.create_sheet('ACLR_16_F')
         wb.create_sheet('ACLR_64_P')
         wb.create_sheet('ACLR_64_F')
+        wb.create_sheet('ACLR_256_F')
         wb.create_sheet('EVM_Q_P')
         wb.create_sheet('EVM_Q_F')
         wb.create_sheet('EVM_16_P')
         wb.create_sheet('EVM_16_F')
         wb.create_sheet('EVM_64_P')
         wb.create_sheet('EVM_64_F')
+        wb.create_sheet('EVM_256_F')
 
         for sheet in wb.sheetnames:
             if 'ACLR' in sheet:
@@ -2191,15 +2199,14 @@ def fill_progress_tx(standard, ws, band, dl_ch, test_items, test_items_selected,
                     continue
 
 
-def fill_values_rx_sweep(standard, data, band, dl_ch, power_selected, bw=None):
+def fill_values_rx_sweep(excel_path, standard, data, band, dl_ch, power_selected, bw=None):
     """
     data format:[Tx Power, Sensitivity, PER]
     """
     band = band
     bw = bw
+    excel_path = excel_path
     if standard == 'LTE':
-        excel_path = f'Sweep_{bw}MHZ_LTE.xlsx' if ext_pmt.condition is None \
-            else f'Sweep_{bw}MHZ_LTE_{ext_pmt.condition}.xlsx'
         if Path(excel_path).exists() is False:
             create_excel_rx_freq_sweep(standard, power_selected, bw)
             logger.debug('Create Excel')
@@ -2246,7 +2253,6 @@ def fill_values_rx_sweep(standard, data, band, dl_ch, power_selected, bw=None):
         return excel_path
 
     elif standard == 'WCDMA':
-        excel_path = f'Sweep_WCDMA.xlsx' if ext_pmt.condition is None else f'Sweep_WCDMA_{ext_pmt.condition}.xlsx'
         if Path(excel_path).exists() is False:
             create_excel_rx_freq_sweep(standard, power_selected, bw)
             logger.debug('Create Excel')
@@ -2292,13 +2298,12 @@ def fill_values_rx_sweep(standard, data, band, dl_ch, power_selected, bw=None):
         return excel_path
 
 
-def fill_values_rx(standard, data, band, dl_ch, power_selected, bw=None):
+def fill_values_rx(excel_path, standard, data, band, dl_ch, power_selected, bw=None):
     """
         data format:[Tx Power, Sensitivity, PER]
     """
+    excel_path = excel_path
     if standard == 'LTE':
-        excel_path = f'Sweep_{bw}MHZ_LTE.xlsx' if ext_pmt.condition is None \
-            else f'Sweep_{bw}MHZ_LTE_{ext_pmt.condition}.xlsx'
         if Path(excel_path).exists() is False:
             create_excel_rx_lmh(standard, bw)
             logger.debug('Create Excel')
@@ -2330,7 +2335,6 @@ def fill_values_rx(standard, data, band, dl_ch, power_selected, bw=None):
         return excel_path
 
     elif standard == 'WCDMA':
-        excel_path = f'Sweep_WCDMA.xlsx' if ext_pmt.condition is None else f'Sweep_WCDMA_{ext_pmt.condition}.xlsx'
         if Path(excel_path).exists() is False:
             create_excel_rx_lmh(standard, bw)
             logger.debug('Create Excel')
@@ -2362,14 +2366,12 @@ def fill_values_rx(standard, data, band, dl_ch, power_selected, bw=None):
         return excel_path
 
 
-def fill_values_tx(standard, data, band, dl_ch, chcoding, bw=None):
+def fill_values_tx(excel_path, standard, data, band, dl_ch, chcoding, bw=None):
+    excel_path = excel_path
     if standard == 'LTE':
         """
             LTE format:{Q1:[power], Q_P:[power, ACLR, EVM], ...} and ACLR format is [L, M, H] 
         """
-        excel_path = f'results_{bw}MHZ_LTE.xlsx' if ext_pmt.condition is None \
-            else f'results_{bw}MHZ_LTE_{ext_pmt.condition}.xlsx'
-
         if Path(excel_path).exists() is False:
             create_excel_tx_lmh(standard, bw)
             logger.debug('Create Excel')
@@ -2400,8 +2402,6 @@ def fill_values_tx(standard, data, band, dl_ch, chcoding, bw=None):
         """
             WCDMA format:[power, ACLR, EVM], ...} and ACLR format is list format like [L, M, H]  
         """
-        excel_path = f'results_WCDMA.xlsx' if ext_pmt.condition is None else f'results_WCDMA_{ext_pmt.condition}.xlsx'
-
         if chcoding == 'REFMEASCH':  # this is WCDMA
             if Path(excel_path).exists() is False:
                 create_excel_tx_lmh(standard)
@@ -2432,9 +2432,6 @@ def fill_values_tx(standard, data, band, dl_ch, chcoding, bw=None):
             """
                 HSUPA format:{subtest_number: [power, ACLR], ...} and ACLR format is list format like [L, M, H]  
             """
-            excel_path = f'results_HSUPA.xlsx' if ext_pmt.condition is None \
-                else f'results_HSUPA_{ext_pmt.condition}.xlsx'
-
             if Path(excel_path).exists() is False:
                 create_excel_tx_lmh(standard, bw)
                 logger.debug('Create Excel')
@@ -2463,9 +2460,6 @@ def fill_values_tx(standard, data, band, dl_ch, chcoding, bw=None):
                 HSDPA format:{subtest_number: [power, ACLR], ...} and ACLR format is list format like [L, M, H]  
                 only subtest3 is for [power, ACLR, evm], evm to pickup the worst vaule from p0, p1, p2, p3
             """
-            excel_path = f'results_HSDPA.xlsx' if ext_pmt.condition is None \
-                else f'results_HSDPA_{ext_pmt.condition}.xlsx'
-
             if Path(excel_path).exists() is False:
                 create_excel_tx_lmh(standard, bw)
                 logger.debug('Create Excel')
