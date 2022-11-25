@@ -705,7 +705,7 @@ class CMW:
         <AnalyzerFreq> numeric
         Default unit: Hz
         """
-        self.cmw_write(f'CONFigure:GPRF:MEASurement:RFSettings:FREQuency {tx_freq}KHz')
+        self.cmw_write(f'CONFigure:GPRF:MEASurement:RFSettings:FREQuency {int(tx_freq)}KHz')
 
     def set_rx_freq_gprf(self, rx_freq):  # this is KHz
         """
@@ -716,7 +716,7 @@ class CMW:
         <Frequency> numeric
         Default unit: Hz
         """
-        self.cmw_write(f'SOURce:GPRF:GENerator1:RFSettings:FREQuency {rx_freq}KHz')
+        self.cmw_write(f'SOURce:GPRF:GENerator1:RFSettings:FREQuency {int(rx_freq)}KHz')
 
     def set_measure_start_on_gprf(self):
         """
@@ -1311,7 +1311,7 @@ class CMW:
         <AnalyzerFreq> numeric
         Default unit: Hz
         """
-        self.cmw_write(f'CONFigure:NRSub:MEASurement:RFSettings:FREQuency {tx_freq}KHz')
+        self.cmw_write(f'CONFigure:NRSub:MEASurement:RFSettings:FREQuency {int(tx_freq)}KHz')
 
     def set_tx_freq_lte(self, tx_freq):  # this is KHz
         """
@@ -1332,7 +1332,7 @@ class CMW:
         Default unit: Hz
         CONFigure:LTE:MEAS<i>:RFSettings:CC<no>:FREQuency <AnalyzerFreq> for after 3.7.30
         """
-        self.cmw_write(f'CONFigure:LTE:MEASurement:RFSettings:FREQuency {tx_freq}KHz')
+        self.cmw_write(f'CONFigure:LTE:MEASurement:RFSettings:FREQuency {int(tx_freq)}KHz')
 
     def set_tx_freq_wcdma(self, tx_chan):  # this is CH
         """
@@ -1387,7 +1387,7 @@ class CMW:
         *RST:  903E+6 Hz
         Default unit: Hz
         """
-        self.cmw_write(f'CONFigure:GSM:MEASurement:RFSettings:FREQuency {tx_freq}KHz')
+        self.cmw_write(f'CONFigure:GSM:MEASurement:RFSettings:FREQuency {int(tx_freq)}KHz')
 
     def set_chan_gsm(self, rx_chan):  # this is channel
         """

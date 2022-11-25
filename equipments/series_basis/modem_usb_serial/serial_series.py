@@ -381,7 +381,7 @@ class AtCmd:
         logger.info('---------Tx Set----------')
         self.command(
             f'AT+TESTTX={self.band_tx_set_dict_gsm[self.band_gsm]},{self.mod_dict_gsm[self.mod_gsm]},'
-            f'{self.rx_chan_gsm},1,1')
+            f'{self.rx_chan_gsm},1,3')
         self.command(f'AT+TESTPWR=0,{self.pcl},{self.pcl},{self.pcl},{self.pcl}')
         logger.info(f'Band: {self.band_gsm}, Modulation: {self.mod_gsm}, Chan: {self.rx_chan_gsm}, PCL: {self.pcl}')
 

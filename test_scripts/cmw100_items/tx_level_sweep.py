@@ -438,10 +438,10 @@ class TxTestLevelSweep(AtCmd, CMW100):
                     for tx_level in range(tx_range_list[0], tx_range_list[1] + step, step):
                         self.tx_level = tx_level
                         logger.info(f'========Now Tx level = {self.tx_level} dBm========')
+                        self.tx_set_wcdma_level_use()
                         # self.tx_set_wcdma()
                         # self.antenna_switch_v2()
 
-                        self.tx_set_wcdma_level_use()
                         # self.command(f'AT+HTXPERSTART={self.tx_chan_wcdma}')
                         # self.command(f'AT+HSETMAXPOWER={self.tx_level * 10}')
                         #
@@ -541,7 +541,7 @@ class TxTestLevelSweep(AtCmd, CMW100):
                         'tech': self.tech,
                         'band': self.band_gsm,
                         'bw': 0,
-                        'tx_freq_level': self.rx_freq_gsm ,
+                        'tx_freq_level': self.rx_freq_gsm,
                         'mcs': None,
                         'tx_path': None,
                         'mod': self.mod_gsm,

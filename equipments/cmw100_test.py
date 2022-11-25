@@ -184,7 +184,7 @@ class CMW100(CMW):
         spectrum_results = self.get_aclr_average_query_wcdma()
         spectrum_results = spectrum_results.split(',')
         spectrum_results = [
-            round(eval(spectrum_results[1]), 2),
+            round(eval(spectrum_results[1]) + 0.254, 2),  # I dont' know why lassen RF test tool has more 0.254dB
             round(eval(spectrum_results[3]) - eval(spectrum_results[1]), 2),
             round(eval(spectrum_results[4]) - eval(spectrum_results[1]), 2),
             round(eval(spectrum_results[2]) - eval(spectrum_results[1]), 2),

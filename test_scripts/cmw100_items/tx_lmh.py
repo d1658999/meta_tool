@@ -264,7 +264,7 @@ class TxTestGenre(AtCmd, CMW100):
                     self.sync_wcdma()
                     self.tx_chan_wcdma = tx_rx_chan_wcdma[0]
                     self.tx_set_wcdma()
-                    self.antenna_switch_v2()
+                    # self.antenna_switch_v2()  # this still has issue on user ROM
                     aclr_mod_current_results = aclr_mod_results = self.tx_measure_wcdma()
                     logger.debug(aclr_mod_results)
                     aclr_mod_current_results.append(self.measure_current(self.band_wcdma))

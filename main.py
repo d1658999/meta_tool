@@ -1571,6 +1571,12 @@ class MainApp:
         logger.info(f'segment: {self.band_segment_fr1.get()}')
 
     def mod_gsm_select(self):
+        if self.mod_gsm.get() == 'GMSK':
+            self.pcl_lb.set(5)
+            self.pcl_mb.set(0)
+        elif self.mod_gsm.get() == 'EPSK':
+            self.pcl_lb.set(8)
+            self.pcl_mb.set(2)
         logger.info(f'GSM Modulation: {self.mod_gsm.get()}')
 
     def wanted_tx_rx_sweep(self):
