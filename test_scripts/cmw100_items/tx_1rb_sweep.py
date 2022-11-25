@@ -121,6 +121,7 @@ class TxTest1RbSweep(AtCmd, CMW100):
                                 'test_item': '1rb_sweep',
                             }
                             self.file_path = tx_power_relative_test_export_excel_ftm(data, self.parameters)
+        self.set_test_end_fr1()
 
     def run(self):
         for tech in ext_pmt.tech:

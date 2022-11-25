@@ -339,7 +339,7 @@ class TxTestGenre(AtCmd, CMW100):
                     'tech': self.tech,
                     'band': self.band_gsm,
                     'bw': 0,
-                    'tx_freq_level': self.tx_level,
+                    'tx_freq_level': self.pcl,
                     'mcs': None,
                     'tx_path': None,
                     'mod': self.mod_gsm,

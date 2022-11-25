@@ -2066,7 +2066,7 @@ class CMW:
         Relative CDE
         *RST:  OFF
         """
-        items_en = 'ON, ON, ON, ON, ON, ON, ON, ON, ON, ON'
+        items_en = 'ON, ON, ON, ON, ON, ON, ON, ON, ON, ON, ON, ON, ON, ON, ON, ON, ON, ON'
         self.cmw_write(f'CONFigure:WCDMa:MEASurement:MEValuation:RESult:ALL {items_en}')
 
     def set_measurements_enable_all_gsm(self):
@@ -3223,7 +3223,7 @@ class CMW:
         Q16: 16-QAM-modulated normal bursts
         *RST:  ANY
         """
-        mod_8 = ",".join([mod] * 8)
+        mod_8 = ", ".join([mod] * 8)
         self.cmw_write(f'CONFigure:GSM:MEASurement:MEValuation:MVIew {mod_8}')
 
     def set_measured_slot_gsm(self):
@@ -3290,20 +3290,11 @@ class CMW:
         """
         self.cmw_write(f'CONFigure:LTE:MEAS:MEV:RES:PMONitor {on_off}')
 
+
 def main():
     test = CMW('CMW100')
     test.cmw_query('SYSTem:BASE:OPTion:VERSion? "CMW_NRSub6G_Meas"')
 
+
 if __name__ == '__main__':
     main()
-
-
-
-
-
-
-
-
-
-
-

@@ -56,8 +56,6 @@ class AtCmd:
         self.rx_path_wcdma = None
         self.rx_path_gsm = None
         self.sync_mode = 0  # 0: MAIN , 1: 4RX, 2: 6RX
-        self.sync_wcdma = None
-        self.sync_gsm = None
         self.rx_chan_wcdma = None
         self.sa_nsa_mode = None
         self.ul_symbol = None
@@ -373,6 +371,12 @@ class AtCmd:
         self.command(f'AT+HSETMAXPOWER={self.tx_level * 10}')
         logger.info(f'Tx_chan: {self.tx_chan_wcdma}, Tx_level: {self.tx_level}')
 
+    def tx_set_wcdma_level_use(self):
+        logger.info('---------Tx Set----------')
+        self.command(f'AT+HTXPERSTART={self.tx_chan_wcdma}')
+        self.command(f'AT+HSETMAXPOWER={self.tx_level * 10}')
+        logger.info(f'Tx_chan: {self.tx_chan_wcdma}, Tx_level: {self.tx_level}')
+
     def tx_set_gsm(self):
         logger.info('---------Tx Set----------')
         self.command(
@@ -602,7 +606,7 @@ class AtCmd:
         return self.command('AT+GOOGTHERMISTOR=1,1')
 
     def set_level_fr1(self, tx_level):
-        self.command(f'AT+LTXPWRLVLSET={tx_level}')
+        self.command(f'AT+NTXPWRLVLSET={tx_level}')
 
     def set_level_lte(self, tx_level):
         self.command(f'AT+LTXPWRLVLSET={tx_level}')

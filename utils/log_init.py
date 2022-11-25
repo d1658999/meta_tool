@@ -19,21 +19,25 @@ def log_set(name=__name__):
     # create console handler and set level to debug
     handler_stream = logging.StreamHandler(stream=sys.stdout)
     handler_stream.setLevel(logging.INFO)
-    handler_console = logging.FileHandler('log.txt', mode='w')
-    handler_console.setLevel(logging.DEBUG)
+    handler_file = logging.FileHandler('log.txt', mode='a')
+    handler_file.setLevel(logging.DEBUG)
 
     # create formatter
-    formatter = logging.Formatter('[%(asctime)s %(name)-10s - %(levelname)-8s] %(message)s', datefmt='%Y%m%d %H:%M:%S')
+    formatter = logging.Formatter('[%(asctime)s %(name)-10s - %(levelname)-10s] %(message)s', datefmt='%Y%m%d %H:%M:%S')
 
     # add formatter to handlers
     handler_stream.setFormatter(formatter)
-    handler_console.setFormatter(formatter)
+    handler_file.setFormatter(formatter)
 
     # add handlers to logger
     logger.addHandler(handler_stream)
-    logger.addHandler(handler_console)
+    logger.addHandler(handler_file)
 
     return logger
+
+def log_clear():
+    f = open('log.txt', 'r+')
+    f.truncate(0)
 
 
 def main():

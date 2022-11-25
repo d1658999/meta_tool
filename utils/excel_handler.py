@@ -293,7 +293,8 @@ def tx_power_relative_test_export_excel_ftm(data, parameters_dict):
 
             elif tech == 'GSM':
                 # create dashboard
-                wb.create_sheet(f'Dashboard')
+                wb.create_sheet(f'Dashboard_GMSK')
+                wb.create_sheet(f'Dashboard_EPSK')
 
                 # create the Raw data sheets
                 wb.create_sheet(f'Raw_Data_GMSK')
@@ -495,7 +496,7 @@ def tx_power_relative_test_export_excel_ftm(data, parameters_dict):
                     ws.cell(row, 14).value = measured_data[8]
                     ws.cell(row, 15).value = tx_path
                     ws.cell(row, 16).value = asw_srs_path
-                    ws.cell(row, 17).value = measured_data[10]
+                    ws.cell(row, 17).value = measured_data[9]
                     ws.cell(row, 18).value = ext_pmt.condition
                     row += 1
 
@@ -531,7 +532,7 @@ def tx_power_relative_test_export_excel_ftm(data, parameters_dict):
                 for tx_pcl, measured_data in data.items():
                     chan = chan_judge_gsm(band, tx_freq_level)
                     ws.cell(row, 1).value = band
-                    ws.cell(row, 2).value = cm_pmt_ftm.transfer_freq2chan_gsm(band, tx_freq_level)
+                    ws.cell(row, 2).value = cm_pmt_ftm.transfer_freq2chan_gsm(band, tx_freq_level)  # channel
                     ws.cell(row, 3).value = chan  # LMH
                     ws.cell(row, 4).value = tx_freq_level  # this rx_freq_gsm
                     ws.cell(row, 5).value = tx_pcl
@@ -822,7 +823,7 @@ def txp_aclr_evm_current_plot_ftm(file_path, parameters_dict):
                 if 'Raw_Data' in ws_name:
                     logger.info(f'========={ws_name}==========')
                     ws = wb[ws_name]
-                    ws_dashboard = wb['Dashboard_' + ws_name[9:]]
+                    ws_dashboard = wb['Dashboard']
 
                     if ws_dashboard._charts:  # if there is charts, delete it
                         ws_dashboard._charts.clear()
@@ -917,101 +918,143 @@ def txp_aclr_evm_current_plot_ftm(file_path, parameters_dict):
             wb.close()
         elif tech == 'GSM':
             for ws_name in wb.sheetnames:
-                logger.info(f'========={ws_name}==========')
-                ws = wb[ws_name]
-                ws_dashboard = wb['Dashboard_' + ws_name[9:]]
+                if 'Raw_Data' in ws_name:
+                    logger.info(f'========={ws_name}==========')
+                    ws = wb[ws_name]
+                    ws_dashboard = wb['Dashboard_' + ws_name[9:]]
 
-                if ws_dashboard._charts:  # if there is charts, delete it
-                    ws_dashboard._charts.clear()
+                    if ws_dashboard._charts:  # if there is charts, delete it
+                        ws_dashboard._charts.clear()
 
-                logger.info('----------Power---------')
-                chart = LineChart()
-                chart.title = 'Power'
-                chart.y_axis.title = 'Power(dBm)'
-                chart.x_axis.title = 'Band'
-                chart.x_axis.tickLblPos = 'low'
-
-                chart.height = 20
-                chart.width = 32
-
-                y_data = Reference(ws, min_col=6, min_row=1, max_col=6, max_row=ws.max_row)
-                x_data = Reference(ws, min_col=1, min_row=2, max_col=2, max_row=ws.max_row)
-                chart.add_data(y_data, titles_from_data=True)
-                chart.set_categories(x_data)
-
-                chart.series[0].marker.symbol = 'circle'  # for EUTRA_+1
-                chart.series[0].marker.size = 10
-
-                ws_dashboard.add_chart(chart, "A1")
-
-                logger.info('----------ORFS_MOD---------')
-                chart = LineChart()
-                chart.title = 'ORFS_MOD'
-                chart.y_axis.title = 'ORFS_MOD(dB)'
-                chart.x_axis.title = 'Band'
-                chart.x_axis.tickLblPos = 'low'
-                chart.y_axis.scaling.min = -80
-                chart.y_axis.scaling.max = -20
-
-                chart.height = 20
-                chart.width = 32
-
-                y_data = Reference(ws, min_col=10, min_row=1, max_col=15, max_row=ws.max_row)
-                x_data = Reference(ws, min_col=1, min_row=2, max_col=2, max_row=ws.max_row)
-                chart.add_data(y_data, titles_from_data=True)
-                chart.set_categories(x_data)
-
-                chart.series[2].marker.symbol = 'triangle'  # for ORFS_-400
-                chart.series[2].marker.size = 10
-                chart.series[3].marker.symbol = 'circle'  # for ORFS_+400
-                chart.series[3].marker.size = 10
-                chart.series[0].graphicalProperties.line.width = 50000  # for ORFS_-200
-                chart.series[1].graphicalProperties.line.width = 50000  # for ORFS_+200
-                chart.series[4].graphicalProperties.line.dashStyle = 'dash'  # for ORFS_-600
-                chart.series[5].graphicalProperties.line.dashStyle = 'dash'  # for ORFS_+600
-
-                ws_dashboard.add_chart(chart, "A41")
-
-                logger.info('----------ORFS_SW---------')
-                chart = LineChart()
-                chart.title = 'ORFS_SW'
-                chart.y_axis.title = 'ORFS_SW(dBm)'
-                chart.x_axis.title = 'Band'
-                chart.x_axis.tickLblPos = 'low'
-                chart.y_axis.scaling.min = -80
-                chart.y_axis.scaling.max = -20
-
-                chart.height = 20
-                chart.width = 32
-
-                y_data = Reference(ws, min_col=16, min_row=1, max_col=21, max_row=ws.max_row)
-                x_data = Reference(ws, min_col=1, min_row=2, max_col=2, max_row=ws.max_row)
-                chart.add_data(y_data, titles_from_data=True)
-                chart.set_categories(x_data)
-
-                chart.series[2].marker.symbol = 'triangle'  # for ORFS_-400
-                chart.series[2].marker.size = 10
-                chart.series[3].marker.symbol = 'circle'  # for ORFS_+400
-                chart.series[3].marker.size = 10
-                chart.series[0].graphicalProperties.line.width = 50000  # for ORFS_-600
-                chart.series[1].graphicalProperties.line.width = 50000  # for ORFS_+600
-                chart.series[4].graphicalProperties.line.dashStyle = 'dash'  # for ORFS_-1200
-                chart.series[5].graphicalProperties.line.dashStyle = 'dash'  # for ORFS_+1200
-
-                ws_dashboard.add_chart(chart, "A81")
-
-                if 'GMSK' in ws_name:
-                    logger.info('----------PHASE_RMS---------')
+                    logger.info('----------Power---------')
                     chart = LineChart()
-                    chart.title = 'PHASE'
-                    chart.y_axis.title = 'PHASE(degree)'
+                    chart.title = 'Power'
+                    chart.y_axis.title = 'Power(dBm)'
                     chart.x_axis.title = 'Band'
                     chart.x_axis.tickLblPos = 'low'
 
                     chart.height = 20
                     chart.width = 32
 
-                    y_data = Reference(ws, min_col=7, min_row=1, max_col=7, max_row=ws.max_row)
+                    y_data = Reference(ws, min_col=6, min_row=1, max_col=6, max_row=ws.max_row)
+                    x_data = Reference(ws, min_col=1, min_row=2, max_col=2, max_row=ws.max_row)
+                    chart.add_data(y_data, titles_from_data=True)
+                    chart.set_categories(x_data)
+
+                    chart.series[0].marker.symbol = 'circle'  # for EUTRA_+1
+                    chart.series[0].marker.size = 10
+
+                    ws_dashboard.add_chart(chart, "A1")
+
+                    logger.info('----------ORFS_MOD---------')
+                    chart = LineChart()
+                    chart.title = 'ORFS_MOD'
+                    chart.y_axis.title = 'ORFS_MOD(dB)'
+                    chart.x_axis.title = 'Band'
+                    chart.x_axis.tickLblPos = 'low'
+                    chart.y_axis.scaling.min = -80
+                    chart.y_axis.scaling.max = -20
+
+                    chart.height = 20
+                    chart.width = 32
+
+                    y_data = Reference(ws, min_col=10, min_row=1, max_col=15, max_row=ws.max_row)
+                    x_data = Reference(ws, min_col=1, min_row=2, max_col=2, max_row=ws.max_row)
+                    chart.add_data(y_data, titles_from_data=True)
+                    chart.set_categories(x_data)
+
+                    chart.series[2].marker.symbol = 'triangle'  # for ORFS_-400
+                    chart.series[2].marker.size = 10
+                    chart.series[3].marker.symbol = 'circle'  # for ORFS_+400
+                    chart.series[3].marker.size = 10
+                    chart.series[0].graphicalProperties.line.width = 50000  # for ORFS_-200
+                    chart.series[1].graphicalProperties.line.width = 50000  # for ORFS_+200
+                    chart.series[4].graphicalProperties.line.dashStyle = 'dash'  # for ORFS_-600
+                    chart.series[5].graphicalProperties.line.dashStyle = 'dash'  # for ORFS_+600
+
+                    ws_dashboard.add_chart(chart, "A41")
+
+                    logger.info('----------ORFS_SW---------')
+                    chart = LineChart()
+                    chart.title = 'ORFS_SW'
+                    chart.y_axis.title = 'ORFS_SW(dBm)'
+                    chart.x_axis.title = 'Band'
+                    chart.x_axis.tickLblPos = 'low'
+                    chart.y_axis.scaling.min = -80
+                    chart.y_axis.scaling.max = -20
+
+                    chart.height = 20
+                    chart.width = 32
+
+                    y_data = Reference(ws, min_col=16, min_row=1, max_col=21, max_row=ws.max_row)
+                    x_data = Reference(ws, min_col=1, min_row=2, max_col=2, max_row=ws.max_row)
+                    chart.add_data(y_data, titles_from_data=True)
+                    chart.set_categories(x_data)
+
+                    chart.series[2].marker.symbol = 'triangle'  # for ORFS_-400
+                    chart.series[2].marker.size = 10
+                    chart.series[3].marker.symbol = 'circle'  # for ORFS_+400
+                    chart.series[3].marker.size = 10
+                    chart.series[0].graphicalProperties.line.width = 50000  # for ORFS_-600
+                    chart.series[1].graphicalProperties.line.width = 50000  # for ORFS_+600
+                    chart.series[4].graphicalProperties.line.dashStyle = 'dash'  # for ORFS_-1200
+                    chart.series[5].graphicalProperties.line.dashStyle = 'dash'  # for ORFS_+1200
+
+                    ws_dashboard.add_chart(chart, "A81")
+
+                    if 'GMSK' in ws_name:
+                        logger.info('----------PHASE_RMS---------')
+                        chart = LineChart()
+                        chart.title = 'PHASE'
+                        chart.y_axis.title = 'PHASE(degree)'
+                        chart.x_axis.title = 'Band'
+                        chart.x_axis.tickLblPos = 'low'
+
+                        chart.height = 20
+                        chart.width = 32
+
+                        y_data = Reference(ws, min_col=7, min_row=1, max_col=7, max_row=ws.max_row)
+                        x_data = Reference(ws, min_col=1, min_row=2, max_col=2, max_row=ws.max_row)
+                        chart.add_data(y_data, titles_from_data=True)
+                        chart.set_categories(x_data)
+
+                        chart.series[0].marker.symbol = 'circle'
+                        chart.series[0].marker.size = 10
+
+                        ws_dashboard.add_chart(chart, "A115")
+
+                    elif 'EPSK' in ws_name:
+                        logger.info('----------EVM_RMS---------')
+                        chart = LineChart()
+                        chart.title = 'EVM'
+                        chart.y_axis.title = 'EVM(%)'
+                        chart.x_axis.title = 'Band'
+                        chart.x_axis.tickLblPos = 'low'
+
+                        chart.height = 20
+                        chart.width = 32
+
+                        y_data = Reference(ws, min_col=8, min_row=1, max_col=8, max_row=ws.max_row)
+                        x_data = Reference(ws, min_col=1, min_row=2, max_col=2, max_row=ws.max_row)
+                        chart.add_data(y_data, titles_from_data=True)
+                        chart.set_categories(x_data)
+
+                        chart.series[0].marker.symbol = 'circle'
+                        chart.series[0].marker.size = 10
+
+                        ws_dashboard.add_chart(chart, "A121")
+
+                    logger.info('----------Current---------')
+                    chart = LineChart()
+                    chart.title = 'Current'
+                    chart.y_axis.title = 'Current(mA)'
+                    chart.x_axis.title = 'Band'
+                    chart.x_axis.tickLblPos = 'low'
+
+                    chart.height = 20
+                    chart.width = 32
+
+                    y_data = Reference(ws, min_col=23, min_row=1, max_col=23, max_row=ws.max_row)
                     x_data = Reference(ws, min_col=1, min_row=2, max_col=2, max_row=ws.max_row)
                     chart.add_data(y_data, titles_from_data=True)
                     chart.set_categories(x_data)
@@ -1019,48 +1062,7 @@ def txp_aclr_evm_current_plot_ftm(file_path, parameters_dict):
                     chart.series[0].marker.symbol = 'circle'
                     chart.series[0].marker.size = 10
 
-                    ws_dashboard.add_chart(chart, "A115")
-
-                elif 'EPSK' in ws_name:
-                    logger.info('----------EVM_RMS---------')
-                    chart = LineChart()
-                    chart.title = 'EVM'
-                    chart.y_axis.title = 'EVM(%)'
-                    chart.x_axis.title = 'Band'
-                    chart.x_axis.tickLblPos = 'low'
-
-                    chart.height = 20
-                    chart.width = 32
-
-                    y_data = Reference(ws, min_col=8, min_row=1, max_col=8, max_row=ws.max_row)
-                    x_data = Reference(ws, min_col=1, min_row=2, max_col=2, max_row=ws.max_row)
-                    chart.add_data(y_data, titles_from_data=True)
-                    chart.set_categories(x_data)
-
-                    chart.series[0].marker.symbol = 'circle'
-                    chart.series[0].marker.size = 10
-
-                    ws_dashboard.add_chart(chart, "A121")
-
-                logger.info('----------Current---------')
-                chart = LineChart()
-                chart.title = 'Current'
-                chart.y_axis.title = 'Current(mA)'
-                chart.x_axis.title = 'Band'
-                chart.x_axis.tickLblPos = 'low'
-
-                chart.height = 20
-                chart.width = 32
-
-                y_data = Reference(ws, min_col=23, min_row=1, max_col=23, max_row=ws.max_row)
-                x_data = Reference(ws, min_col=1, min_row=2, max_col=2, max_row=ws.max_row)
-                chart.add_data(y_data, titles_from_data=True)
-                chart.set_categories(x_data)
-
-                chart.series[0].marker.symbol = 'circle'
-                chart.series[0].marker.size = 10
-
-                ws_dashboard.add_chart(chart, "A161")
+                    ws_dashboard.add_chart(chart, "A161")
 
             wb.save(file_path)
             wb.close()

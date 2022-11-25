@@ -9,7 +9,7 @@ import signal
 import os
 import yaml
 
-from utils.log_init import log_set
+from utils.log_init import log_set, log_clear
 from utils.adb_handler import get_serial_devices
 from utils.excel_handler import excel_folder_create
 from equipments.power_supply import Psu
@@ -454,6 +454,7 @@ class MainApp:
         builder.connect_callbacks(self)
         # self.init_select()
         # self.import_ui_setting()
+        log_clear()
         self.import_ui_setting_yaml()
         # self.inst_to_tech()
 

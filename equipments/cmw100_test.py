@@ -669,7 +669,7 @@ class CMW100(CMW):
         self.set_spectrum_switching_count_gsm(5)
         self.set_scenario_activate_gsm('STAN')
         self.cmw_query('*OPC?')
-        self.set_rf_tx_port_wcdma(self.port_tx)
+        self.set_rf_tx_port_gsm(self.port_tx)
         self.set_rf_setting_external_tx_port_attenuation_gsm(self.loss_tx)
         self.set_rf_setting_user_margin_gsm(10.00)
         self.set_trigger_source_gsm('Power')

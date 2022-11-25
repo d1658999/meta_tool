@@ -25,7 +25,6 @@ class TxTestLevelSweep(AtCmd, CMW100):
         self.file_path = None
         self.srs_path_enable = ext_pmt.srs_path_enable
         self.chan = None
-        self.psu = Psu()
 
     def select_asw_srs_path(self):
         if self.srs_path_enable:
@@ -37,6 +36,7 @@ class TxTestLevelSweep(AtCmd, CMW100):
         if ext_pmt.odpm_enable:
             return get_odpm_current(n)
         elif ext_pmt.psu_enable:
+            self.psu = Psu()
             return self.psu.psu_current_average(n)
 
     def measure_current(self, band):
@@ -269,7 +269,7 @@ class TxTestLevelSweep(AtCmd, CMW100):
                                 'tech': self.tech,
                                 'band': self.band_fr1,
                                 'bw': self.bw_fr1,
-                                'tx_freq_level': self.tx_level,
+                                'tx_freq_level': self.tx_freq_fr1,
                                 'mcs': self.mcs_fr1,
                                 'tx_path': self.tx_path,
                                 'mod': None,
@@ -283,6 +283,7 @@ class TxTestLevelSweep(AtCmd, CMW100):
                                 'test_item': 'level_sweep',
                             }
                             self.file_path = tx_power_relative_test_export_excel_ftm(data, self.parameters)
+        self.set_test_end_fr1()
 
     def tx_level_sweep_process_lte(self):
         """
@@ -368,7 +369,7 @@ class TxTestLevelSweep(AtCmd, CMW100):
                                 'tech': self.tech,
                                 'band': self.band_lte,
                                 'bw': self.bw_lte,
-                                'tx_freq_level': self.tx_level,
+                                'tx_freq_level': self.tx_freq_lte,
                                 'mcs': self.mcs_lte,
                                 'tx_path': self.tx_path,
                                 'mod': None,
@@ -382,6 +383,7 @@ class TxTestLevelSweep(AtCmd, CMW100):
                                 'test_item': 'level_sweep',
                             }
                             self.file_path = tx_power_relative_test_export_excel_ftm(data, self.parameters)
+        self.set_test_end_lte()
 
     def tx_level_sweep_process_wcdma(self):
         """
@@ -422,7 +424,7 @@ class TxTestLevelSweep(AtCmd, CMW100):
                     self.sig_gen_wcdma()
                     self.sync_wcdma()
 
-                    # self.tx_power_relative_test_initial_wcdma()
+                    self.tx_power_relative_test_initial_wcdma()
 
                     tx_range_list = ext_pmt.tx_level_range_list  # [tx_level_1, tx_level_2]
 
@@ -436,11 +438,25 @@ class TxTestLevelSweep(AtCmd, CMW100):
                     for tx_level in range(tx_range_list[0], tx_range_list[1] + step, step):
                         self.tx_level = tx_level
                         logger.info(f'========Now Tx level = {self.tx_level} dBm========')
-                        self.tx_set_wcdma()
-                        self.antenna_switch_v2()
-                        spectrum_mod_current_results = spectrum_mod_results = self.tx_measure_wcdma()
-                        logger.debug(spectrum_mod_results)
+                        # self.tx_set_wcdma()
+                        # self.antenna_switch_v2()
+
+                        self.tx_set_wcdma_level_use()
+                        # self.command(f'AT+HTXPERSTART={self.tx_chan_wcdma}')
+                        # self.command(f'AT+HSETMAXPOWER={self.tx_level * 10}')
+                        #
+                        self.set_rf_setting_user_margin_wcdma(10.00)
+                        self.set_expect_power_wcdma(self.tx_level + 5)
+                        mod_results = self.get_modulation_avgerage_wcdma()
+                        self.set_measure_start_on_wcdma()
+                        self.cmw_query(f'*OPC?')
+                        spectrum_results = self.get_aclr_average_wcdma()
+                        self.set_measure_stop_wcdma()
+
+                        spectrum_mod_current_results = spectrum_results + mod_results
+                        logger.debug(spectrum_mod_current_results)
                         spectrum_mod_current_results.append(self.measure_current(self.band_wcdma))
+
                         data[tx_level] = spectrum_mod_current_results
                     logger.debug(data)
                     self.parameters = {
@@ -448,7 +464,7 @@ class TxTestLevelSweep(AtCmd, CMW100):
                         'tech': self.tech,
                         'band': self.band_wcdma,
                         'bw': 5,
-                        'tx_freq_level': self.tx_level,
+                        'tx_freq_level': self.tx_freq_wcdma,
                         'mcs': 'QPSK',
                         'tx_path': None,
                         'mod': None,
@@ -462,6 +478,7 @@ class TxTestLevelSweep(AtCmd, CMW100):
                         'test_item': 'level_sweep',
                     }
                     self.file_path = tx_power_relative_test_export_excel_ftm(data, self.parameters)
+        self.set_test_end_wcdma()
 
     def tx_level_sweep_process_gsm(self):
         """
@@ -524,7 +541,7 @@ class TxTestLevelSweep(AtCmd, CMW100):
                         'tech': self.tech,
                         'band': self.band_gsm,
                         'bw': 0,
-                        'tx_freq_level': self.tx_level,
+                        'tx_freq_level': self.rx_freq_gsm ,
                         'mcs': None,
                         'tx_path': None,
                         'mod': self.mod_gsm,
@@ -538,6 +555,7 @@ class TxTestLevelSweep(AtCmd, CMW100):
                         'test_item': 'level_sweep',
                     }
                     self.file_path = tx_power_relative_test_export_excel_ftm(data, self.parameters)
+        self.set_test_end_gsm()
 
     def tx_level_sweep_pipeline_fr1(self):
         self.rx_level = ext_pmt.init_rx_sync_level
