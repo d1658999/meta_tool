@@ -458,6 +458,7 @@ class RxTestGenre(AtCmd, CMW100):
         rx_freq_select_list = channel_freq_select(self.chan, rx_freq_list)
 
         for rx_path in ext_pmt.rx_paths:
+            self.rx_path_fr1 = rx_path
             data = {}
             for rx_freq in rx_freq_select_list:
                 self.rx_level = -70
@@ -508,6 +509,7 @@ class RxTestGenre(AtCmd, CMW100):
         rx_freq_select_list = channel_freq_select(self.chan, rx_freq_list)
 
         for rx_path in ext_pmt.rx_paths:
+            self.rx_path_lte = rx_path
             data = {}
             for rx_freq in rx_freq_select_list:
                 self.rx_level = -70
