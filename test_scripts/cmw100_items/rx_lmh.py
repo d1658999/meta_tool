@@ -708,6 +708,24 @@ class RxTestGenre(AtCmd, CMW100):
                 sum_sens += math.pow(10, abs(sens) / 10)
             sens_sum = round(-10 * math.log10(sum_sens), 1)
             return sens_sum
+        # """
+        #         if the list len is equal to 1, and then return directly
+        #         others are calculation of sensitivity to combine their value:
+        #         step1: to sum all the square of magnitude of individual sensitivity of Rx path
+        #         step2: to square root the step1
+        #         step3: to get the -10log10 of step2
+        #         """
+        # if len(real_sens_list) == 1:
+        #     return round(real_sens_list[0], 1)
+        # elif not real_sens_list:
+        #     return 0
+        # else:
+        #     sum_sens_square = 0
+        #     for sens in real_sens_list:
+        #         sum_sens_square += math.pow(math.pow(10, abs(sens) / 10), 2)
+        #     sum_sens_sqrt = math.sqrt(sum_sens_square)
+        #     sens_sum = round(-10 * math.log10(sum_sens_sqrt), 1)
+        #     return sens_sum
 
     def run(self):
         for tech in ext_pmt.tech:
