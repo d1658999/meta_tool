@@ -1,4 +1,5 @@
 from pathlib import Path
+import math
 
 from equipments.series_basis.modem_usb_serial.serial_series import AtCmd
 from equipments.cmw100_test import CMW100
@@ -8,7 +9,8 @@ import utils.parameters.common_parameters_ftm as cm_pmt_ftm
 import utils.parameters.rb_parameters as scrpt_set
 from utils.loss_handler import get_loss
 from utils.excel_handler import rxs_relative_plot_ftm, rxs_endc_plot_ftm, rx_power_endc_test_export_excel_ftm
-from utils.excel_handler import rx_power_relative_test_export_excel_ftm, rx_desense_process_ftm, rx_desense_endc_process_ftm
+from utils.excel_handler import rx_power_relative_test_export_excel_ftm, rx_desense_process_ftm, \
+    rx_desense_endc_process_ftm
 from utils.channel_handler import channel_freq_select
 
 logger = log_set('rx_lmh')
@@ -18,6 +20,7 @@ class RxTestGenre(AtCmd, CMW100):
     def __init__(self):
         AtCmd.__init__(self)
         CMW100.__init__(self)
+        self.rx_fast_test_enable = ext_pmt.rx_fast_test_enable
         self.tx_freq_wcdma = None
         self.file_path = None
         self.power_monitor_endc_lte = None
@@ -424,33 +427,6 @@ class RxTestGenre(AtCmd, CMW100):
         rx_desense_endc_process_ftm(file_path)
         rxs_endc_plot_ftm(file_path)
 
-    def search_sensitivity_pipline_fast_lte(self):  # this is not yet used
-        """
-        This is for that RSRP and CINR without issue because this is calculated method
-        """
-        self.tx_level = ext_pmt.tx_level
-        self.port_tx = ext_pmt.port_tx
-        self.chan = ext_pmt.channel
-        self.mcs_lte = 'QPSK'
-        for tech in ext_pmt.tech:
-            if tech == 'LTE' and ext_pmt.lte_bands != []:
-                self.tech = 'LTE'
-                for tx_path in ext_pmt.tx_paths:
-                    self.tx_path = tx_path
-                    for bw in ext_pmt.lte_bandwidths:
-                        self.bw_lte = bw
-                        try:
-                            for band in ext_pmt.lte_bands:
-                                self.band_lte = band
-                                if bw in cm_pmt_ftm.bandwidths_selected_lte(self.band_lte):
-                                    self.search_sensitivity_lmh_fast_process_lte()
-                                else:
-                                    logger.info(f'B{self.band_lte} does not have BW {self.bw_lte}MHZ')
-                            # self.txp_aclr_evm_current_plot_ftm(self.filename, mode=1)  # mode=1: LMH mode
-                        except TypeError as err:
-                            logger.debug(err)
-                            logger.info(f'there is no data to plot because the band does not have this BW ')
-
     def search_sensitivity_lmh_process_fr1(self):
         # [L_rx_freq, M_rx_ferq, H_rx_freq]
         rx_freq_list = cm_pmt_ftm.dl_freq_selected('FR1', self.band_fr1, self.bw_fr1)
@@ -461,7 +437,8 @@ class RxTestGenre(AtCmd, CMW100):
             self.rx_path_fr1 = rx_path
             data = {}
             for rx_freq in rx_freq_select_list:
-                self.rx_level = -70
+                # self.rx_level = -70
+                self.rx_level_select_fr1()  # this is determination of rx if fast test is enable
                 self.rx_freq_fr1 = rx_freq
                 self.tx_freq_fr1 = cm_pmt_ftm.transfer_freq_rx2tx_fr1(self.band_fr1, self.rx_freq_fr1)
                 self.loss_rx = get_loss(self.rx_freq_fr1)
@@ -483,8 +460,7 @@ class RxTestGenre(AtCmd, CMW100):
                 # aclr_results + mod_results  # U_-2, U_-1, E_-1, Pwr, E_+1, U_+1, U_+2, EVM, Freq_Err, IQ_OFFSET
                 aclr_mod_results = self.tx_measure_fr1()
                 # self.command_cmw100_query('*OPC?')
-                self.search_sensitivity_fr1()
-                self.query_rx_measure_fr1()
+                self.sensitivity_solution_select_fr1()
                 logger.info(f'Power: {aclr_mod_results[3]:.1f}, Sensitivity: {self.rx_level}')
                 # measured_power, measured_rx_level, rsrp_list, cinr_list, agc_list
                 data[self.tx_freq_fr1] = [aclr_mod_results[3], self.rx_level, self.rsrp_list, self.cinr_list,
@@ -512,7 +488,8 @@ class RxTestGenre(AtCmd, CMW100):
             self.rx_path_lte = rx_path
             data = {}
             for rx_freq in rx_freq_select_list:
-                self.rx_level = -70
+                # self.rx_level = -70
+                self.rx_level_select_lte()  # this is determination of rx if fast test is enable
                 self.rx_freq_lte = rx_freq
                 self.tx_freq_lte = cm_pmt_ftm.transfer_freq_rx2tx_lte(self.band_lte, self.rx_freq_lte)
                 self.loss_rx = get_loss(self.rx_freq_lte)
@@ -533,8 +510,9 @@ class RxTestGenre(AtCmd, CMW100):
                 aclr_mod_results = self.tx_measure_lte()  # aclr_results + mod_results  # U_-2, U_-1, E_-1, Pwr,
                 # E_+1, U_+1, U_+2, EVM, Freq_Err, IQ_OFFSET
                 # self.command_cmw100_query('*OPC?')
-                self.search_sensitivity_lte()
-                self.query_rx_measure_lte()
+                # self.search_sensitivity_lte()
+                # self.query_rx_measure_lte()
+                self.sensitivity_solution_select_lte()
                 logger.info(f'Power: {aclr_mod_results[3]:.1f}, Sensitivity: {self.rx_level}')
                 data[self.tx_freq_lte] = [aclr_mod_results[3], self.rx_level, self.rsrp_list, self.cinr_list,
                                           self.agc_list]  # measured_power, measured_rx_level, rsrp_list, cinr_list,
@@ -657,41 +635,79 @@ class RxTestGenre(AtCmd, CMW100):
             else:
                 logger.info(f"GSM doesn't have this RX path {self.rx_path_gsm_dict[self.rx_path_gsm]}")
 
-    def search_sensitivity_lmh_fast_process_lte(self):  # this is not yet used
-        rx_freq_list = cm_pmt_ftm.dl_freq_selected('LTE', self.band_lte,
-                                                   self.bw_lte)  # [L_rx_freq, M_rx_ferq, H_rx_freq]
-
-        rx_freq_select_list = channel_freq_select(self.chan, rx_freq_list)
-
-        for rx_freq in rx_freq_select_list:
+    def rx_level_select_fr1(self):
+        if not self.rx_fast_test_enable:
             self.rx_level = -70
-            self.rx_freq_lte = rx_freq
-            self.tx_freq_lte = cm_pmt_ftm.transfer_freq_rx2tx_lte(self.band_lte, self.rx_freq_lte)
-            self.loss_rx = get_loss(self.rx_freq_lte)
-            self.loss_tx = get_loss(self.tx_freq_lte)
-            logger.info('----------Test LMH progress---------')
-            self.preset_instrument()
-            self.set_test_end_lte()
-            self.antenna_switch_v2()
-            self.set_test_mode_lte()
-            self.cmw_query('*OPC?')
-            self.sig_gen_lte()
-            self.sync_lte()
-            self.rb_size_lte, self.rb_start_lte = cm_pmt_ftm.special_uplink_config_sensitivity_lte(self.band_lte,
-                                                                                                   self.bw_lte)
-            # for RB set
-            self.tx_set_lte()
-            self.tx_measure_lte()
-            aclr_mod_results = self.tx_measure_lte()  # aclr_results + mod_results  # U_-2, U_-1, E_-1, Pwr, E_+1,
-            # U_+1, U_+2, EVM, Freq_Err, IQ_OFFSET
-            self.rx_path_setting_lte()
-            self.query_rx_measure_lte()
-            logger.info(f'Power: {aclr_mod_results[3]:.1f}, Sensitivity: {self.esens_list}')
-            rsrp_max = max(self.rsrp_list)
-            rsrp_max_index = self.rsrp_list.index(rsrp_max)
-            rx_level = self.esens_list[rsrp_max_index]
-            self.filename = rx_power_relative_test_export_excel_ftm(data_freq, self.band_lte, self.bw_lte,
-                                                                    rx_level)
+        else:
+            if self.bw_fr1 in [5]:
+                self.rx_level = -100
+            else:
+                self.rx_level = -80
+
+    def rx_level_select_lte(self):
+        if not self.rx_fast_test_enable:
+            self.rx_level = -70
+        else:
+            if self.bw_lte in [10, 15, 20]:
+                self.rx_level = -80
+            elif self.bw_lte in [1.4, 3, 5]:
+                self.rx_level = -100
+
+    def sensitivity_solution_select_fr1(self):
+        try:
+            if not self.rx_fast_test_enable:
+                self.search_sensitivity_fr1()
+                self.query_rx_measure_fr1()
+            else:
+                self.query_rx_measure_fr1()
+                real_sens_list = [sens for sens in self.esens_list if -55 > sens > -150]
+                if not real_sens_list:  # if sometimes test error for rx measure, then test it again
+                    logger.info('========== repeat test ==========')
+                    self.query_rx_measure_fr1()
+                    real_sens_list = [sens for sens in self.esens_list if -55 > sens > -150]
+                self.rx_level = self.sens_calculation(real_sens_list)
+        except Exception as err:
+            logger.info(err)
+            logger.info('Need to check the environments')
+            self.rx_level = 0
+
+    def sensitivity_solution_select_lte(self):
+        try:
+            if not self.rx_fast_test_enable:
+                self.search_sensitivity_lte()
+                self.query_rx_measure_lte()
+            else:
+                self.query_rx_measure_lte()
+                real_sens_list = [sens for sens in self.esens_list if -55 > sens > -150]
+                if not real_sens_list:  # if sometimes test error for rx measure, then test it again
+                    logger.info('========== repeat test ==========')
+                    self.query_rx_measure_lte()
+                    real_sens_list = [sens for sens in self.esens_list if -55 > sens > -150]
+                self.rx_level = self.sens_calculation(real_sens_list)
+        except Exception as err:
+            logger.info(err)
+            logger.info('Need to check the environments')
+            self.rx_level = 0
+
+    @staticmethod
+    def sens_calculation(real_sens_list):
+        """
+        if the list len is equal to 1, and then return directly
+        others are calculation of sensitivity to combine their value:
+        step1: to sum all the magnitude of individual sensitivity of Rx path
+        step2: to get the -10log10 of step1
+        """
+        if len(real_sens_list) == 1:
+            return round(real_sens_list[0], 1)
+        elif not real_sens_list:
+            return 0
+        else:
+            sum_sens = 0
+            # sum_sens_square = 0
+            for sens in real_sens_list:
+                sum_sens += math.pow(10, abs(sens) / 10)
+            sens_sum = round(-10 * math.log10(sum_sens), 1)
+            return sens_sum
 
     def run(self):
         for tech in ext_pmt.tech:
