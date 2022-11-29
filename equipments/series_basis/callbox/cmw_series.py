@@ -318,14 +318,14 @@ class CMW:
 
     def set_generator_list_mode_gprf(self, on_off='OFF'):
         """
-        Enables or disables the list mode for the power measurement.
+        Enables or disables the list mode of the RF generator.
         Parameters:
-        <EnableListMode> OFF | ON
-        OFF: list mode off
-        ON: list mode on
+        <EnableListMode> ON | OFF
+        ON: List mode enabled
+        OFF: List mode disabled (constant-frequency generator)
         *RST:  OFF
         """
-        self.cmw_write(f'CONFigure:GPRF:GENerator1:LIST {on_off}')
+        self.cmw_write(f'SOURce:GPRF:GENerator1:LIST {on_off}')
 
     def set_trigger_source_gprf(self, source='Free Run'):
         """
@@ -709,7 +709,7 @@ class CMW:
         *RST:  0 dB
         Default unit: dB
         """
-        self.cmw_write(f'SOURce:GPRF:GENerator:RFSettings:EATTenuation {attenuation}')
+        self.cmw_write(f'SOURce:GPRF:GENerator1:RFSettings:EATTenuation {attenuation}')
 
     def set_tx_freq_gprf(self, tx_freq):  # this is KHz
         """
@@ -1438,7 +1438,8 @@ class CMW:
         *RST:  0
         origainl name: CONFigure:NRSub:MEAS<i>[:CC<no>]:PLCid
         """
-        self.cmw_write(f'CONFigure:NRSub:MEASurement:PLCid {plc_id}')
+        # self.cmw_write(f'CONFigure:NRSub:MEASurement:PLCid {plc_id}')  # V3.8.10
+        self.cmw_write(f'CONFigure:NRSub:MEASurement:MEValuation:PLCid {plc_id}')  # V3.7.10 / V3.7.40
 
     def set_plc_lte(self, plc_id=0):
         """

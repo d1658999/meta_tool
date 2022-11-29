@@ -536,7 +536,7 @@ class CMW100(CMW):
         self.set_repetition_fr1('SING')
         self.set_plc_fr1()
         self.set_channel_type_fr1()
-        self.set_uldl_periodicity_fr1('M25')
+        self.set_uldl_periodicity_fr1('MS25')
         self.set_uldl_pattern_fr1(self.scs)
         self.set_rf_setting_user_margin_fr1(10.00)
         self.set_expect_power_fr1(self.tx_level + 5)
