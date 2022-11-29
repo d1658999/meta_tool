@@ -14,6 +14,10 @@ class CMW:
         logger.info(f'TCPIP::>>{tcpip_response}')
         return tcpip_response
 
+    def cmw_query_2(self, command):
+        response = self.cmw.query_2(command)
+        return response
+
     def cmw_write(self, tcpip_command):
         self.cmw.write(tcpip_command)
         logger.info(f'TCPIP::<<{tcpip_command}')
@@ -311,6 +315,17 @@ class CMW:
         *RST:  OFF
         """
         self.cmw_write(f'CONFigure:GPRF:MEASurement:POWer:LIST {on_off}')
+
+    def set_generator_list_mode_gprf(self, on_off='OFF'):
+        """
+        Enables or disables the list mode for the power measurement.
+        Parameters:
+        <EnableListMode> OFF | ON
+        OFF: list mode off
+        ON: list mode on
+        *RST:  OFF
+        """
+        self.cmw_write(f'CONFigure:GPRF:GENerator1:LIST {on_off}')
 
     def set_trigger_source_gprf(self, source='Free Run'):
         """
@@ -3290,10 +3305,59 @@ class CMW:
         """
         self.cmw_write(f'CONFigure:LTE:MEAS:MEV:RES:PMONitor {on_off}')
 
+    def set_screenshot_format(self, f_format="PNG"):
+        """
+        HCOPy:DEVice:FORMat <format>
+
+        :param f_format: BMP | JPG | PNG
+        :return:
+        """
+        self.cmw_write(f'HCOPy:DEVice:FORMat {f_format}')
+        # if f_format in ["BMP", "JPG", "PNG"]:
+        #     cmd = f'HCOPy:DEVice:FORMat {f_format}'
+        #     self._Send(cmd)
+        # else:
+        #     self._logger.error(f'HCOPy:DEVice:FORMat {f_format}, parameter error')
+
+    def query_screenshot(self):
+        """
+        HCOPy:DATA? or HCOPy:INTerior:DATA?
+        Use low level commands to get bytes for screenshot raw data
+        Only support PNG format
+
+        :return: PNG block data of screenshot
+        """
+        return self.cmw_query_2("HCOPy:IMM?")
+
+    # self.handle.sendall("HCOPy:DATA?\r\n".encode('utf-8'))
+    # resp = None
+    # timeout_count = 0
+    # timeout_max = 30
+    # while True:
+    #     try:
+    #         resp_tmp = self.handle.recv(self.SOCKET_BUFFER_SIZE)
+    #         if resp is None:
+    #             resp = resp_tmp
+    #         else:
+    #             resp += resp_tmp
+    #         if len(resp_tmp) < self.SOCKET_BUFFER_SIZE:
+    #             break
+    #     except socket.timeout:
+    #         self._logger.error('Socket Timeout')
+    #         timeout_count += 1
+    #         if timeout_count > timeout_max:
+    #             self._logger.error('Socket Timeout exceeded max trys')
+    # return resp[resp.find(b'\x89PNG'):]
+
 
 def main():
     test = CMW('CMW100')
-    test.cmw_query('SYSTem:BASE:OPTion:VERSion? "CMW_NRSub6G_Meas"')
+    test.set_screenshot_format()
+    fileData = test.query_screenshot()
+
+    # newFile = open('test.png', "wb")
+    # newFile.write(fileData)
+    # newFile.close()
 
 
 if __name__ == '__main__':

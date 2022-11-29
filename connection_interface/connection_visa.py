@@ -1,3 +1,5 @@
+import time
+
 import pyvisa
 
 from utils.log_init import log_set
@@ -93,6 +95,10 @@ class VisaComport:
 
     def query(self, command):
         return self.inst.query(command)
+
+    def query_2(self, command):
+        return bytes(self.inst.query_binary_values(command, datatype='s'))
+
 
 def main():
     test = VisaComport('CMW100')
