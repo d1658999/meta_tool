@@ -75,7 +75,7 @@ class CMW100(CMW):
         self.set_power_count_gprf()
         self.set_repetition_gprf()
         self.set_power_list_mode_gprf()  # default is off listmode
-        self.set_trigger_source_gprf()
+        self.set_trigger_source_gprf('Free Run')
         self.set_trigger_slope_gprf()
         self.set_trigger_step_length_gprf(5.0e-3)
         # self.set_trigger_step_length_gprf(8.0e-3)

@@ -338,7 +338,7 @@ class CMW:
         'Free Run': free run (untriggered)
         *RST:  'Free Run'
         """
-        self.cmw_write(f'TRIGger:GPRF:MEASurement:POWer:SOURce {source}')
+        self.cmw_write(f'TRIGger:GPRF:MEASurement:POWer:SOURce "{source}"')
 
     def set_trigger_source_fr1(self, source='Free Run'):
         """
@@ -1070,7 +1070,7 @@ class CMW:
         Power value
         Default unit: dBm (SDEViation: dB)
         """
-        return self.cmw_query('FETCh:GPRF:MEASurement:POWer:AVER?')
+        return self.cmw_query('FETCh:GPRF:MEASurement:POWer:AVER?').split(',')
 
     def get_power_monitor_average_query_lte(self):
         """

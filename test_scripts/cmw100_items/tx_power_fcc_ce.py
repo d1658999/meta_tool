@@ -57,6 +57,7 @@ class TxTestFccCe(AtCmd, CMW100):
                                                    self.bw_fr1)  # [L_rx_freq, M_rx_ferq, H_rx_freq]
         self.rx_freq_fr1 = rx_freq_list[1]
         self.loss_rx = get_loss(rx_freq_list[1])
+        self.loss_tx = get_loss(cm_pmt_ftm.transfer_freq_rx2tx_fr1(self.band_fr1, self.rx_freq_fr1))
         logger.info('----------Test FCC LMH progress---------')
         self.preset_instrument()
         self.set_measurement_group_gprf()
@@ -99,6 +100,8 @@ class TxTestFccCe(AtCmd, CMW100):
                                 'tech': self.tech,
                                 'band': self.band_fr1,
                                 'bw': self.bw_fr1,
+                                'rb_size': self.rb_size_fr1,
+                                'rb_start': self.rb_start_fr1,
                                 'tx_level': self.tx_level,
                                 'mcs': self.mcs_fr1,
                                 'tx_path': self.tx_path,
@@ -141,16 +144,13 @@ class TxTestFccCe(AtCmd, CMW100):
                                                    self.bw_fr1)  # [L_rx_freq, M_rx_ferq, H_rx_freq]
         self.rx_freq_fr1 = rx_freq_list[1]
         self.loss_rx = get_loss(rx_freq_list[1])
+        self.loss_tx = get_loss(cm_pmt_ftm.transfer_freq_rx2tx_fr1(self.band_fr1, self.rx_freq_fr1))
         logger.info('----------Test CE LMH progress---------')
         self.preset_instrument()
         self.set_measurement_group_gprf()
         self.set_test_end_fr1()
         self.set_test_mode_fr1()
-        if self.srs_path_enable:
-            self.srs_switch()
-        else:
-            self.antenna_switch_v2()
-        self.cmw_query('*OPC?')
+        self.select_asw_srs_path()
 
         tx_freq_select_list = []
         try:
@@ -186,6 +186,8 @@ class TxTestFccCe(AtCmd, CMW100):
                                 'tech': self.tech,
                                 'band': self.band_fr1,
                                 'bw': self.bw_fr1,
+                                'rb_size': self.rb_size_fr1,
+                                'rb_start': self.rb_start_fr1,
                                 'tx_level': self.tx_level,
                                 'mcs': self.mcs_fr1,
                                 'tx_path': self.tx_path,

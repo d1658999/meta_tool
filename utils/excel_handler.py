@@ -82,6 +82,8 @@ def tx_power_fcc_ce_export_excel_ftm(data, parameters_dict):
     tech = parameters_dict['tech']
     band = parameters_dict['band']
     bw = parameters_dict['bw']
+    rb_size = parameters_dict['rb_size']
+    rb_start = parameters_dict['rb_start']
     tx_level = parameters_dict['tx_level']
     mcs = parameters_dict['mcs']
     tx_path = parameters_dict['tx_path']
@@ -112,8 +114,6 @@ def tx_power_fcc_ce_export_excel_ftm(data, parameters_dict):
     logger.info('----------file exist----------')
     wb = openpyxl.load_workbook(file_path)
     ws = wb[script]
-    rb_size = None
-    rb_start = None
 
     for tx_freq, measured_data in data.items():
         max_row = ws.max_row
