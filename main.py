@@ -2531,25 +2531,31 @@ class MainApp:
                     if script == 'GENERAL':
                         inst = TxTestGenre()
                         inst.run()
+                        inst.ser.com_close()
                     elif script in ['FCC', 'CE']:
                         inst = TxTestFccCe()
                         inst.run(script)
+                        inst.ser.com_close()
 
             if self.wanted_test['rx']:
                 inst = RxTestGenre()
                 inst.run()
+                inst.ser.com_close()
 
             if self.wanted_test['tx_level_sweep']:
                 inst = TxTestLevelSweep()
                 inst.run()
+                inst.ser.com_close()
 
             if self.wanted_test['tx_freq_sweep']:
                 inst = TxTestFreqSweep()
                 inst.run()
+                inst.ser.com_close()
 
             if self.wanted_test['tx_1rb_sweep']:
                 inst = TxTest1RbSweep()
                 inst.run()
+                inst.ser.com_close()
 
         for button_run in self.button_run_list:
             button_run['state'] = tkinter.NORMAL
