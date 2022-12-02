@@ -4,7 +4,7 @@ from utils.log_init import log_set
 import utils.parameters.external_paramters as ext_pmt
 import utils.parameters.common_parameters_ftm as cm_pmt_ftm
 from utils.loss_handler import get_loss
-from utils.adb_handler import get_odpm_current
+from utils.adb_handler import get_odpm_current, record_current
 from equipments.power_supply import Psu
 from utils.excel_handler import txp_aclr_evm_current_plot_ftm, tx_power_relative_test_export_excel_ftm
 from utils.channel_handler import channel_freq_select
@@ -32,30 +32,33 @@ class TxTestLevelSweep(AtCmd, CMW100):
         else:
             self.antenna_switch_v2()
 
-    def pre_measure_current(self, n=1):
-        if ext_pmt.odpm_enable:
+    def measure_current_select(self, n=1):
+        if ext_pmt.record_current_enable:
+            return record_current(n)
+        elif ext_pmt.odpm_enable:
             return get_odpm_current(n)
         elif ext_pmt.psu_enable:
             self.psu = Psu()
             return self.psu.psu_current_average(n)
 
     def measure_current(self, band):
-        if not ext_pmt.odpm_enable and not ext_pmt.psu_enable:
+        count = ext_pmt.current_count
+        if not ext_pmt.odpm_enable and not ext_pmt.psu_enable and not ext_pmt.record_current_enable:
             return None
 
         elif self.tech == 'GSM':
             current_list = []
-            for n in range(20):
-                current_list.append(self.pre_measure_current())
+            for n in range(10):  # addtional average again
+                current_list.append(self.measure_current_select())
             avg_sample = sum(current_list) / len(current_list)
             logger.info(f'Average of above current for GSM: {avg_sample}')
             return avg_sample
         else:
-            if band in [34, 38, 39, 40, 41, 42, 48, 77, 78, 79] and self.tx_level > 15:
-                n = 10
-            else:
+            if band in [34, 38, 39, 40, 41, 42, 48, 77, 78, 79] and self.tx_level < 15:
                 n = 1
-            return self.pre_measure_current(n)
+            else:
+                n = count
+            return self.measure_current_select(n)
 
     def tx_power_relative_test_initial_gsm(self):
         logger.info('----------Relatvie test initial----------')

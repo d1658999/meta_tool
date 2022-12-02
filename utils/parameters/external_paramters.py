@@ -37,10 +37,12 @@ rfout_anritsu = 'MAIN'
 
 asw_path = 0
 srs_path = 0
-odpm_enable = True
+odpm_enable = False
+record_current_enable = False
 psu_enable = True
 psu_voltage = 4.0
 psu_current = 5.0
+current_count = 1
 temp = 25
 srs_path_enable = False
 sync_path = 'Main'  # 'Main', 'CA#1', 'CA#2', 'CA#3'
@@ -59,7 +61,7 @@ rb_ftm_lte = ['FRB']  # 'PRB' | 'FRB'
 rb_ftm_fr1 = ['OUTER_FULL']  #  'INNER_FULL' | 'OUTER_FULL' | 'INNER_1RB_LEFT' | 'INNER_1RB_RIGHT' | 'EDGE_1RB_LEFT' | 'EDGE_1RB_RIGHT' | 'EDGE_FULL_LEFT' | 'EDGE_FULL_RIGHT'
 scs = [1]  # 0: 15KHz | 1: 30KHz | 2: 60KHz
 
-tx_level_range_list = [-20, 26]  # tx_level_1, tx_level_2
+tx_level_range_list = [20, 26]  # tx_level_1, tx_level_2
 tx_pcl_range_list_lb = [19, 5]  # tx_pcl_1, tx_pcl_2; GMSK_LB: 5 ~ 19, EPSK_LB: 8~19
 tx_pcl_range_list_mb = [15, 0]  # tx_pcl_1, tx_pcl_2; GMSK_MB: 0 ~ 15, EPSK_MB: 2~15
 

@@ -18,7 +18,7 @@ from equipments.temp_chamber import TempChamber
 logger = log_set('GUI')
 
 PROJECT_PATH = pathlib.Path(__file__).parent
-PROJECT_UI =  PROJECT_PATH / pathlib.Path('gui') /"main_v2_6.ui"
+PROJECT_UI =  PROJECT_PATH / pathlib.Path('gui') /"main_v2_7.ui"
 
 
 class MainApp:
@@ -244,6 +244,8 @@ class MainApp:
         self.lv = None
         self.psu = None
         self.odpm_enable = None
+        self.record_current_enable = None
+        self.count = None
         builder.import_variables(
             self,
             [
@@ -448,6 +450,8 @@ class MainApp:
                 "nv",
                 "lv",
                 "odpm_enable",
+                "record_current_enable",
+                "count",
             ],
         )
 
@@ -478,7 +482,7 @@ class MainApp:
             'LT': -10,
         }
         volts_dict = {
-            'HV': 4.2,
+            'HV': 4.4,
             'NV': 3.85,
             'LV': 3.6,
         }
@@ -542,9 +546,11 @@ class MainApp:
         self.pcl_mb.set(ui_init['power']['mb_gsm_pcl'])
         self.mod_gsm.set(ui_init['mcs']['modulaiton_gsm'])
         self.tx_level.set(ui_init['power']['tx_level'])
+        self.count.set(ui_init['external_inst']['count'])
         self.tempcham_enable.set(ui_init['external_inst']['tempchb'])
         self.psu_enable.set(ui_init['external_inst']['psu'])
         self.odpm_enable.set(ui_init['external_inst']['odpm'])
+        self.record_current_enable.set(ui_init['external_inst']['record_current'])
         self.hthv.set(ui_init['condition']['hthv'])
         self.htlv.set(ui_init['condition']['htlv'])
         self.ntnv.set(ui_init['condition']['ntnv'])
@@ -961,6 +967,7 @@ class MainApp:
         pcl_lb_gsm = self.pcl_lb.get()
         pcl_mb_gsm = self.pcl_mb.get()
         tx_level = self.tx_level.get()
+        count = self.count.get()
         mod_gsm = self.mod_gsm.get()
         port_tx = self.port_tx.get()
         port_tx_lte = self.port_tx_lte.get()
@@ -978,6 +985,7 @@ class MainApp:
         tpchb_enable = self.tempcham_enable.get()
         psu_enable = self.psu_enable.get()
         odpm_enable = self.odpm_enable.get()
+        record_current_enable = self.record_current_enable.get()
         hthv = self.hthv.get()
         htlv = self.htlv.get()
         ntnv = self.ntnv.get()
@@ -1062,6 +1070,8 @@ class MainApp:
                 'tempchb': tpchb_enable,
                 'psu': psu_enable,
                 'odpm': odpm_enable,
+                'record_current': record_current_enable,
+                'count': count,
             },
             'condition': {
                 'hthv': hthv,
@@ -1095,6 +1105,12 @@ class MainApp:
             logger.info('=====Enable ODPM=====')
         else:
             logger.info('=====Disable ODPM=====')
+
+    def record_current_enable_status(self):
+        if self.odpm_enable.get():
+            logger.info('=====Enable Record Current=====')
+        else:
+            logger.info('=====Disable Record Current=====')
 
     def off_all_reset_GSM(self):
         self.GSM_all.set(False)
@@ -2298,6 +2314,9 @@ class MainApp:
     def select_tx_level(self, option):
         logger.info(f'select TX Level {self.tx_level.get()}')
 
+    def count_select(self, option):
+        logger.info(f'select Count Number: {self.count.get()}')
+
     def srs_enable(self):
         # logger.info(f'SRS status: {self.srs_path_enable.get()}')
         if self.srs_path_enable.get():
@@ -2459,8 +2478,10 @@ class MainApp:
         ext_pmt.tx_pcl_lb = self.pcl_lb.get()
         ext_pmt.tx_pcl_mb = self.pcl_mb.get()
         ext_pmt.tx_level = self.tx_level.get()
+        ext_pmt.current_count = self.count.get()
         ext_pmt.psu_enable = self.psu_enable.get()
         ext_pmt.odpm_enable = self.odpm_enable.get()
+        ext_pmt.record_current_enable = self.record_current_enable.get()
         ext_pmt.condition = self.condition
 
         if self.instrument.get() == 'Anritsu8820':

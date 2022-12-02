@@ -48,8 +48,7 @@ class Psu:
 
     def psu_current_average(self, n):
         logger.debug('calculation for currnet average')
-        _n = n + 4
-        current_list = self.get_psu_current(_n)  # _n >= 5
+        current_list = self.get_psu_current(n)  # _n >= 5
         average = round(sum(current_list) / len(current_list), 2)
         logger.info(f'Average current: {average} mA')
         return average
