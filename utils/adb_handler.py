@@ -138,6 +138,7 @@ def get_odpm_current(count=1):
         if eval(temp) > current:
             current = eval(temp)
         n += 1
+        sleep(0.1)
     print(f'Get the ODPM current: {current} mA')
     return round(current, 2)
 
