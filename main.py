@@ -1107,7 +1107,7 @@ class MainApp:
             logger.info('=====Disable ODPM=====')
 
     def record_current_enable_status(self):
-        if self.odpm_enable.get():
+        if self.record_current_enable.get():
             logger.info('=====Enable Record Current=====')
         else:
             logger.info('=====Disable Record Current=====')
