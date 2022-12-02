@@ -1,6 +1,9 @@
+import time
+
 from connection_interface.connection_visa import VisaComport
 from utils.log_init import log_set
 import utils.parameters.external_paramters as ext_pmt
+
 
 logger = log_set('PSU')
 
