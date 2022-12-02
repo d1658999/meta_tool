@@ -11,7 +11,7 @@ class TempChamber:
     def __init__(self):
         self.tpchb = VisaComport('temp_chamber')
 
-    def tpchb_init(self, target_temp=ext_pmt.temp, wait=120):
+    def tpchb_init(self, target_temp=ext_pmt.temp, wait=300):
         logger.info('----------Init Temp----------')
         logger.info(self.tpchb.query("*IDN?").strip())
         logger.info(f'Start to go to temp {target_temp} C')

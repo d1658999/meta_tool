@@ -203,8 +203,8 @@ class RxTestGenre(AtCmd, CMW100):
             for tech in ext_pmt.tech
             for tx_path in ext_pmt.tx_paths
             for bw in ext_pmt.fr1_bandwidths
-            for ue_power_bool in ext_pmt.tx_max_pwr_sensitivity
             for band in ext_pmt.fr1_bands
+            for ue_power_bool in ext_pmt.tx_max_pwr_sensitivity
         ]
         for item in items:
             if item[0] == 'FR1' and ext_pmt.fr1_bands != []:
@@ -252,8 +252,8 @@ class RxTestGenre(AtCmd, CMW100):
             for tech in ext_pmt.tech
             for tx_path in ext_pmt.tx_paths
             for bw in ext_pmt.lte_bandwidths
-            for ue_power_bool in ext_pmt.tx_max_pwr_sensitivity
             for band in ext_pmt.lte_bands
+            for ue_power_bool in ext_pmt.tx_max_pwr_sensitivity
         ]
         for item in items:
             if item[0] == 'LTE' and ext_pmt.lte_bands != []:
