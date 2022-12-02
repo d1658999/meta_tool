@@ -43,12 +43,12 @@ class Psu:
             logger.debug(current)
             current_measure.append(current)
             count += 1
-            # time.sleep(0.1)
+            time.sleep(0.1)
         return current_measure
 
     def psu_current_average(self, n):
         logger.debug('calculation for currnet average')
-        current_list = self.get_psu_current(n)  # _n >= 5
+        current_list = self.get_psu_current(n)
         average = round(sum(current_list) / len(current_list), 2)
         logger.info(f'Average current: {average} mA')
         return average
