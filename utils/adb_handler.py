@@ -30,7 +30,7 @@ def record_current(count=10):
         for i in range(0, avg_count):
             get_pwr = sp.run(SHL + CAT + CD + PMIC, capture_output=True).stdout.decode()
             uwatta = re.split(', |\r\n|t=', get_pwr)
-            sleep(1)
+            sleep(0.1)
             get_pwr = sp.run(SHL + CAT + CD + PMIC, capture_output=True).stdout.decode()
             uwattb = re.split(', |\r\n|t=', get_pwr)
 

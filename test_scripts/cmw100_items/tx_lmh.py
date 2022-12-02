@@ -66,17 +66,18 @@ class TxTestGenre(AtCmd, CMW100):
 
         elif self.tech == 'GSM':
             current_list = []
-            for n in range(10):  # addtional average again
-                current_list.append(self.measure_current_select())
+            for _ in range(5):  # addtional average again
+                current_list.append(self.measure_current_select(count))
             avg_sample = sum(current_list) / len(current_list)
             logger.info(f'Average of above current for GSM: {avg_sample}')
             return avg_sample
         else:
-            if band in [34, 38, 39, 40, 41, 42, 48, 77, 78, 79] and self.tx_level < 15:
-                n = 1
-            else:
-                n = count
-            return self.measure_current_select(n)
+            # if band in [34, 38, 39, 40, 41, 42, 48, 77, 78, 79]:
+            #     n = count
+            # else:
+            #     n = 2
+            # return self.measure_current_select(n)
+            return self.measure_current_select(count)
 
     def select_asw_srs_path(self):
         if self.srs_path_enable:
