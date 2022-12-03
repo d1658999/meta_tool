@@ -1132,10 +1132,10 @@ def rx_power_relative_test_export_excel_ftm(data, parameters_dict):
                         ws['T1'] = 'TX_Path'
                         ws['U1'] = 'BW'
                         ws['V1'] = 'RB_num_UL'
-                        ws['X1'] = 'RB_start_UL'
-                        ws['Y1'] = 'Condition'
-                        ws['Z1'] = 'Temp0'
-                        ws['AA1'] = 'Temp1'
+                        ws['W1'] = 'RB_start_UL'
+                        ws['X1'] = 'Condition'
+                        ws['Y1'] = 'Temp0'
+                        ws['Z1'] = 'Temp1'
                     else:
                         pass
 
@@ -1177,10 +1177,10 @@ def rx_power_relative_test_export_excel_ftm(data, parameters_dict):
                         ws['T1'] = 'TX_Path'
                         ws['U1'] = 'BW'
                         ws['V1'] = 'RB_num_UL'
-                        ws['X1'] = 'RB_start_UL'
-                        ws['Y1'] = 'Condition'
-                        ws['Z1'] = 'Temp0'
-                        ws['AA1'] = 'Temp1'
+                        ws['W1'] = 'RB_start_UL'
+                        ws['X1'] = 'Condition'
+                        ws['Y1'] = 'Temp0'
+                        ws['Z1'] = 'Temp1'
                     else:
                         pass
 
