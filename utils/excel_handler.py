@@ -1088,7 +1088,7 @@ def rx_power_relative_test_export_excel_ftm(data, parameters_dict):
     tx_path = parameters_dict['tx_path']
     rx_path = parameters_dict['rx_path']
     rb_size = parameters_dict['rb_size']
-    rb_start = parmeters_dict['rb_start']
+    rb_start = parameters_dict['rb_start']
 
     logger.info('----------save to excel----------')
     if script == 'GENERAL':
