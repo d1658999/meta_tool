@@ -1087,6 +1087,9 @@ def rx_power_relative_test_export_excel_ftm(data, parameters_dict):
     mcs = parameters_dict['mcs']
     tx_path = parameters_dict['tx_path']
     rx_path = parameters_dict['rx_path']
+    rb_size = parameters_dict['rb_size']
+    rb_start = parmeters_dict['rb_start']
+    condition = parameters_dict['condition']
     logger.info('----------save to excel----------')
     if script == 'GENERAL':
         filename = f'Sensitivty_{bw}MHZ_{tech}_LMH.xlsx'
@@ -1127,6 +1130,12 @@ def rx_power_relative_test_export_excel_ftm(data, parameters_dict):
                         ws['R1'] = 'AGC_RX2'
                         ws['S1'] = 'AGC_RX3'
                         ws['T1'] = 'TX_Path'
+                        ws['U1'] = 'BW'
+                        ws['V1'] = 'RB_num_UL'
+                        ws['X1'] = 'RB_start_UL'
+                        ws['Y1'] = 'Condition'
+                        ws['Z1'] = 'Temp0'
+                        ws['AA1'] = 'Temp1'
                     else:
                         pass
 
@@ -1166,6 +1175,12 @@ def rx_power_relative_test_export_excel_ftm(data, parameters_dict):
                         ws['R1'] = 'AGC_RX2'
                         ws['S1'] = 'AGC_RX3'
                         ws['T1'] = 'TX_Path'
+                        ws['U1'] = 'BW'
+                        ws['V1'] = 'RB_num_UL'
+                        ws['X1'] = 'RB_start_UL'
+                        ws['Y1'] = 'Condition'
+                        ws['Z1'] = 'Temp0'
+                        ws['AA1'] = 'Temp1'
                     else:
                         pass
 
@@ -1258,6 +1273,13 @@ def rx_power_relative_test_export_excel_ftm(data, parameters_dict):
                 ws.cell(row, 18).value = measured_data[4][2]  # AGC_RX2
                 ws.cell(row, 19).value = measured_data[4][3]  # AGC_RX3
                 ws.cell(row, 20).value = tx_path
+                ws.cell(row, 21).value = bw
+                ws.cell(row, 22).value = rb_size
+                ws.cell(row, 23).value = rb_start
+                ws.cell(row, 24).value = ext_pmt.condition
+                ws.cell(row, 25).value = measured_data[5][0]  # thermister 0
+                ws.cell(row, 26).value = measured_data[5][1]  # thermister 1
+
                 row += 1
 
         elif tech == 'FR1':
@@ -1285,6 +1307,13 @@ def rx_power_relative_test_export_excel_ftm(data, parameters_dict):
                 ws.cell(row, 18).value = measured_data[4][2]  # AGC_RX2
                 ws.cell(row, 19).value = measured_data[4][3]  # AGC_RX3
                 ws.cell(row, 20).value = tx_path
+                ws.cell(row, 21).value = bw
+                ws.cell(row, 22).value = rb_size
+                ws.cell(row, 23).value = rb_start
+                ws.cell(row, 24).value = ext_pmt.condition
+                ws.cell(row, 25).value = measured_data[5][0]  # thermister 0
+                ws.cell(row, 26).value = measured_data[5][1]  # thermister 1
+
                 row += 1
 
         elif tech == 'WCDMA':

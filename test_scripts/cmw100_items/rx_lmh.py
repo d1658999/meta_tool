@@ -37,6 +37,29 @@ class RxTestGenre(AtCmd, CMW100):
         self.chan = None
         self.resolution = None
 
+    def get_temperature(self):
+        """
+        for P22, AT+GOOGTHERMISTOR=1,1 for MHB LPAMid/ MHB Rx1 LFEM, AT+GOOGTHERMISTOR=0,1
+        for LB LPAMid, MHB ENDC LPAMid, UHB(n77/n79 LPAF)
+        :return:
+        """
+        res0 = self.query_thermister0()
+        res1 = self.query_thermister1()
+        res_list = [res0, res1]
+        therm_list = []
+        for res in res_list:
+            for r in res:
+                if 'TEMPERATURE' in r.decode().strip():
+                    try:
+                        temp = eval(r.decode().strip().split(':')[1]) / 1000
+                        therm_list.append(temp)
+                    except Exception as err:
+                        logger.debug(err)
+                        therm_list.append(None)
+        logger.info(f'thermistor0 get temp: {therm_list[0]}')
+        logger.info(f'thermistor1 get temp: {therm_list[1]}')
+        return therm_list
+
     # def query_rx_measure_wcdma(self):
     #     self.query_rsrp_cinr_wcdma()
     #     self.query_agc_wcdma()
@@ -462,9 +485,9 @@ class RxTestGenre(AtCmd, CMW100):
                 # self.command_cmw100_query('*OPC?')
                 self.sensitivity_solution_select_fr1()
                 logger.info(f'Power: {aclr_mod_results[3]:.1f}, Sensitivity: {self.rx_level}')
-                # measured_power, measured_rx_level, rsrp_list, cinr_list, agc_list
+                # measured_power, measured_rx_level, rsrp_list, cinr_list, agc_list, thermistor_list
                 data[self.tx_freq_fr1] = [aclr_mod_results[3], self.rx_level, self.rsrp_list, self.cinr_list,
-                                          self.agc_list]
+                                          self.agc_list, self.get_temperature()]
                 self.set_test_end_fr1()
             parameters = {
                 'script': self.script,
@@ -475,6 +498,8 @@ class RxTestGenre(AtCmd, CMW100):
                 'mcs': self.mcs_fr1,
                 'tx_path': self.tx_path,
                 'rx_path': rx_path,
+                'rb_size': self.rb_size_fr1,
+                'rb_start': self.rb_start_fr1,
             }
             self.file_path = rx_power_relative_test_export_excel_ftm(data, parameters)
 
@@ -514,9 +539,9 @@ class RxTestGenre(AtCmd, CMW100):
                 # self.query_rx_measure_lte()
                 self.sensitivity_solution_select_lte()
                 logger.info(f'Power: {aclr_mod_results[3]:.1f}, Sensitivity: {self.rx_level}')
+                # measured_power, measured_rx_level, rsrp_list, cinr_list, agc_list, thermistor_list
                 data[self.tx_freq_lte] = [aclr_mod_results[3], self.rx_level, self.rsrp_list, self.cinr_list,
-                                          self.agc_list]  # measured_power, measured_rx_level, rsrp_list, cinr_list,
-                # agc_list
+                                          self.agc_list, self.get_temperature()]
                 self.set_test_end_lte()
             parameters = {
                 'script': self.script,
@@ -527,6 +552,8 @@ class RxTestGenre(AtCmd, CMW100):
                 'mcs': self.mcs_lte,
                 'tx_path': self.tx_path,
                 'rx_path': rx_path,
+                'rb_size': self.rb_size_lte,
+                'rb_start': self.rb_start_lte,
             }
             self.file_path = rx_power_relative_test_export_excel_ftm(data, parameters)
 
