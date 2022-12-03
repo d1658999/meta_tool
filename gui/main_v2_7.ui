@@ -752,6 +752,21 @@ Disable</property>
                             </layout>
                           </object>
                         </child>
+                        <child>
+                          <object class="ttk.Checkbutton" id="checkbutton47">
+                            <property name="command" type="command" cbtype="simple">rx_quick_select</property>
+                            <property name="text" translatable="yes">quick</property>
+                            <property name="variable">boolean:rx_quick_enable</property>
+                            <bind sequence="&lt;1&gt;" handler="rx_auto_check_ue_pwr" add="" />
+                            <layout manager="grid">
+                              <property name="column">0</property>
+                              <property name="padx">5</property>
+                              <property name="pady">5</property>
+                              <property name="row">1</property>
+                              <property name="sticky">ne</property>
+                            </layout>
+                          </object>
+                        </child>
                       </object>
                     </child>
                   </object>

@@ -246,6 +246,7 @@ class MainApp:
         self.odpm_enable = None
         self.record_current_enable = None
         self.count = None
+        self.rx_quick_enable = None
         builder.import_variables(
             self,
             [
@@ -452,6 +453,7 @@ class MainApp:
                 "odpm_enable",
                 "record_current_enable",
                 "count",
+                "rx_quick_enable",
             ],
         )
 
@@ -540,6 +542,7 @@ class MainApp:
         self.asw_path.set(ui_init['path']['asw_path'])
         self.srs_path.set(ui_init['path']['srs_path'])
         self.srs_path_enable.set(ui_init['path']['srs_path_enable'])
+        self.rx_quick_enable.set(ui_init['test_items']['rx_quick_enable'])
         self.sync_path.set(ui_init['path']['sync_path'])
         self.sa_nsa.set(ui_init['path']['sa_nsa'])
         self.pcl_lb.set(ui_init['power']['lb_gsm_pcl'])
@@ -976,6 +979,7 @@ class MainApp:
         asw_path = self.asw_path.get()
         srs_path = self.srs_path.get()
         srs_path_enable = self.srs_path_enable.get()
+        rx_quick_enable = self.rx_quick_enable.get()
         sync_path = self.sync_path.get()
         rfout_anritsu = self.rfout_anritsu.get()
         band_segment = self.band_segment.get()
@@ -1017,6 +1021,7 @@ class MainApp:
             'test_items': {
                 'tx': tx,
                 'rx': rx,
+                'rx_quick_enable': rx_quick_enable,
                 'rx_sweep': rx_sweep,
                 'tx_level_sweep': tx_level_sweep,
                 'tx_freq_sweep': tx_freq_sweep,
@@ -2317,6 +2322,9 @@ class MainApp:
     def count_select(self, option):
         logger.info(f'select Count Number: {self.count.get()}')
 
+    def rx_quick_select(self):
+        logger.info(f'Rx quick setting enable: {self.rx_quick_enable.get()}')
+
     def srs_enable(self):
         # logger.info(f'SRS status: {self.srs_path_enable.get()}')
         if self.srs_path_enable.get():
@@ -2472,6 +2480,7 @@ class MainApp:
         ext_pmt.asw_path = self.asw_path.get()
         ext_pmt.srs_path = self.srs_path.get()
         ext_pmt.srs_path_enable = self.srs_path_enable.get()
+        ext_pmt.rx_fast_test_enable = self.rx_quick_enable.get()
         ext_pmt.sync_path = self.sync_path.get()
         ext_pmt.sa_nsa = self.sa_nsa.get()
         ext_pmt.mod_gsm = self.mod_gsm.get()

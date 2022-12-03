@@ -36,8 +36,7 @@ mcs:
   modulaiton_gsm: GMSK
 path:
   asw_path: 0
-  rx_paths:
-  - 2
+  rx_paths: []
   sa_nsa: 0
   srs_path: 0
   srs_path_enable: false
@@ -64,6 +63,7 @@ tech:
   tech: []
 test_items:
   rx: false
+  rx_quick_enable: false
   rx_sweep: false
   tx: false
   tx_1rb_sweep: false
