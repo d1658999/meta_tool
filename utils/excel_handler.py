@@ -188,30 +188,31 @@ def tx_power_relative_test_export_excel_ftm(data, parameters_dict):
                     if 'Raw_Data' in sheetname:
                         ws = wb[sheetname]
                         ws['A1'] = 'Band'
-                        ws['B1'] = 'Tx_Freq'
-                        ws['C1'] = 'Chan'
-                        ws['D1'] = 'Tx_level'
-                        ws['E1'] = 'Measured_Power'
-                        ws['F1'] = 'E_-1'
-                        ws['G1'] = 'E_+1'
-                        ws['H1'] = 'U_-1'
-                        ws['I1'] = 'U_+1'
-                        ws['J1'] = 'U_-2'
-                        ws['K1'] = 'U_+2'
-                        ws['L1'] = 'EVM'
-                        ws['M1'] = 'Freq_Err'
-                        ws['N1'] = 'IQ_OFFSET'
-                        ws['O1'] = 'RB_num'
-                        ws['P1'] = 'RB_start'
-                        ws['Q1'] = 'MCS'
-                        ws['R1'] = 'Tx_Path'
-                        ws['S1'] = 'RB_STATE'
-                        ws['T1'] = 'Sync_Path'
-                        ws['U1'] = 'AS_Path'
-                        ws['V1'] = 'Current(mA)'
-                        ws['W1'] = 'Condition'
-                        ws['X1'] = 'Temp0'
-                        ws['Y1'] = 'Temp1'
+                        ws['B1'] = 'BW'
+                        ws['C1'] = 'Tx_Freq'
+                        ws['D1'] = 'Chan'
+                        ws['E1'] = 'Tx_level'
+                        ws['F1'] = 'Measured_Power'
+                        ws['G1'] = 'E_-1'
+                        ws['H1'] = 'E_+1'
+                        ws['I1'] = 'U_-1'
+                        ws['J1'] = 'U_+1'
+                        ws['K1'] = 'U_-2'
+                        ws['L1'] = 'U_+2'
+                        ws['M1'] = 'EVM'
+                        ws['N1'] = 'Freq_Err'
+                        ws['O1'] = 'IQ_OFFSET'
+                        ws['P1'] = 'RB_num'
+                        ws['Q1'] = 'RB_start'
+                        ws['R1'] = 'MCS'
+                        ws['S1'] = 'Tx_Path'
+                        ws['T1'] = 'RB_STATE'
+                        ws['U1'] = 'Sync_Path'
+                        ws['V1'] = 'AS_Path'
+                        ws['W1'] = 'Current(mA)'
+                        ws['X1'] = 'Condition'
+                        ws['Y1'] = 'Temp0'
+                        ws['Z1'] = 'Temp1'
                     else:  # to pass the dashboard
                         pass
 
@@ -229,31 +230,32 @@ def tx_power_relative_test_export_excel_ftm(data, parameters_dict):
                     if 'Raw_Data' in sheetname:
                         ws = wb[sheetname]
                         ws['A1'] = 'Band'
-                        ws['B1'] = 'Tx_Freq'
-                        ws['C1'] = 'Chan'
-                        ws['D1'] = 'Tx_level'
-                        ws['E1'] = 'Measured_Power'
-                        ws['F1'] = 'E_-1'
-                        ws['G1'] = 'E_+1'
-                        ws['H1'] = 'U_-1'
-                        ws['I1'] = 'U_+1'
-                        ws['J1'] = 'U_-2'
-                        ws['K1'] = 'U_+2'
-                        ws['L1'] = 'EVM'
-                        ws['M1'] = 'Freq_Err'
-                        ws['N1'] = 'IQ_OFFSET'
-                        ws['O1'] = 'RB_num'
-                        ws['P1'] = 'RB_start'
-                        ws['Q1'] = 'Type'
-                        ws['R1'] = 'Tx_Path'
-                        ws['S1'] = 'SCS(KHz)'
-                        ws['T1'] = 'RB_STATE'
-                        ws['U1'] = 'Sync_Path'
-                        ws['V1'] = 'AS_SRS_Path'
-                        ws['W1'] = 'Current(mA)'
-                        ws['X1'] = 'Condition'
-                        ws['Y1'] = 'Temp0'
-                        ws['Z1'] = 'Temp1'
+                        ws['B1'] = 'BW'
+                        ws['C1'] = 'Tx_Freq'
+                        ws['D1'] = 'Chan'
+                        ws['E1'] = 'Tx_level'
+                        ws['F1'] = 'Measured_Power'
+                        ws['G1'] = 'E_-1'
+                        ws['H1'] = 'E_+1'
+                        ws['I1'] = 'U_-1'
+                        ws['J1'] = 'U_+1'
+                        ws['K1'] = 'U_-2'
+                        ws['L1'] = 'U_+2'
+                        ws['M1'] = 'EVM'
+                        ws['N1'] = 'Freq_Err'
+                        ws['O1'] = 'IQ_OFFSET'
+                        ws['P1'] = 'RB_num'
+                        ws['Q1'] = 'RB_start'
+                        ws['R1'] = 'Type'
+                        ws['S1'] = 'Tx_Path'
+                        ws['T1'] = 'SCS(KHz)'
+                        ws['U1'] = 'RB_STATE'
+                        ws['V1'] = 'Sync_Path'
+                        ws['W1'] = 'AS_SRS_Path'
+                        ws['X1'] = 'Current(mA)'
+                        ws['Y1'] = 'Condition'
+                        ws['Z1'] = 'Temp0'
+                        ws['AA1'] = 'Temp1'
                     else:  # to pass the dashboard
                         pass
 
@@ -356,85 +358,24 @@ def tx_power_relative_test_export_excel_ftm(data, parameters_dict):
                 for tx_level, measured_data in data.items():
                     chan = chan_judge_lte(band, bw, tx_freq_level)
                     ws.cell(row, 1).value = band
-                    ws.cell(row, 2).value = tx_freq_level  # this freq_lte
-                    ws.cell(row, 3).value = chan  # LMH
-                    ws.cell(row, 4).value = tx_level
-                    ws.cell(row, 5).value = measured_data[3]
-                    ws.cell(row, 6).value = measured_data[2]
-                    ws.cell(row, 7).value = measured_data[4]
-                    ws.cell(row, 8).value = measured_data[1]
-                    ws.cell(row, 9).value = measured_data[5]
-                    ws.cell(row, 10).value = measured_data[0]
-                    ws.cell(row, 11).value = measured_data[6]
-                    ws.cell(row, 12).value = measured_data[7]
-                    ws.cell(row, 13).value = measured_data[8]
-                    ws.cell(row, 14).value = measured_data[9]
-                    ws.cell(row, 15).value = rb_size
-                    ws.cell(row, 16).value = rb_start
-                    ws.cell(row, 17).value = mcs
-                    ws.cell(row, 18).value = tx_path
-                    ws.cell(row, 19).value = rb_state
-                    ws.cell(row, 20).value = sync_path
-                    ws.cell(row, 21).value = asw_srs_path
-                    ws.cell(row, 22).value = measured_data[10]
-                    ws.cell(row, 23).value = ext_pmt.condition
-                    row += 1
-
-            elif tx_freq_level <= 100:  # 1rb_sweep, lmh, freq_sweep
-                for tx_freq, measured_data in data.items():
-                    chan = chan_judge_lte(band, bw, tx_freq) if test_item != 'freq_sweep' else None
-                    ws.cell(row, 1).value = band
-                    ws.cell(row, 2).value = tx_freq
-                    ws.cell(row, 3).value = chan  # LMH
-                    ws.cell(row, 4).value = tx_freq_level  # this tx_level
-                    ws.cell(row, 5).value = measured_data[3]
-                    ws.cell(row, 6).value = measured_data[2]
-                    ws.cell(row, 7).value = measured_data[4]
-                    ws.cell(row, 8).value = measured_data[1]
-                    ws.cell(row, 9).value = measured_data[5]
-                    ws.cell(row, 10).value = measured_data[0]
-                    ws.cell(row, 11).value = measured_data[6]
-                    ws.cell(row, 12).value = measured_data[7]
-                    ws.cell(row, 13).value = measured_data[8]
-                    ws.cell(row, 14).value = measured_data[9]
-                    ws.cell(row, 15).value = rb_size
-                    ws.cell(row, 16).value = rb_start
-                    ws.cell(row, 17).value = mcs
-                    ws.cell(row, 18).value = tx_path
-                    ws.cell(row, 19).value = rb_state
-                    ws.cell(row, 20).value = sync_path
-                    ws.cell(row, 21).value = asw_srs_path
-                    ws.cell(row, 22).value = measured_data[10] if test_item == 'lmh' else None
-                    ws.cell(row, 23).value = ext_pmt.condition if test_item == 'lmh' else None
-                    ws.cell(row, 24).value = measured_data[11] if test_item == 'lmh' else None
-                    ws.cell(row, 25).value = measured_data[12] if test_item == 'lmh' else None
-                    row += 1
-
-        elif tech == 'FR1':
-            max_row = ws.max_row
-            row = max_row + 1
-            if tx_freq_level >= 100:  # level_sweep
-                for tx_level, measured_data in data.items():
-                    chan = chan_judge_fr1(band, bw, tx_freq_level)
-                    ws.cell(row, 1).value = band
-                    ws.cell(row, 2).value = tx_freq_level  # this freq_fr1
-                    ws.cell(row, 3).value = chan  # LMH
-                    ws.cell(row, 4).value = tx_level
-                    ws.cell(row, 5).value = measured_data[3]
-                    ws.cell(row, 6).value = measured_data[2]
-                    ws.cell(row, 7).value = measured_data[4]
-                    ws.cell(row, 8).value = measured_data[1]
-                    ws.cell(row, 9).value = measured_data[5]
-                    ws.cell(row, 10).value = measured_data[0]
-                    ws.cell(row, 11).value = measured_data[6]
-                    ws.cell(row, 12).value = measured_data[7]
-                    ws.cell(row, 13).value = measured_data[8]
-                    ws.cell(row, 14).value = measured_data[9]
-                    ws.cell(row, 15).value = rb_size
-                    ws.cell(row, 16).value = rb_start
-                    ws.cell(row, 17).value = type_
-                    ws.cell(row, 18).value = tx_path
-                    ws.cell(row, 19).value = scs
+                    ws.cell(row, 2).value = bw
+                    ws.cell(row, 3).value = tx_freq_level  # this freq_lte
+                    ws.cell(row, 4).value = chan  # LMH
+                    ws.cell(row, 5).value = tx_level
+                    ws.cell(row, 6).value = measured_data[3]
+                    ws.cell(row, 7).value = measured_data[2]
+                    ws.cell(row, 8).value = measured_data[4]
+                    ws.cell(row, 9).value = measured_data[1]
+                    ws.cell(row, 10).value = measured_data[5]
+                    ws.cell(row, 11).value = measured_data[0]
+                    ws.cell(row, 12).value = measured_data[6]
+                    ws.cell(row, 13).value = measured_data[7]
+                    ws.cell(row, 14).value = measured_data[8]
+                    ws.cell(row, 15).value = measured_data[9]
+                    ws.cell(row, 16).value = rb_size
+                    ws.cell(row, 17).value = rb_start
+                    ws.cell(row, 18).value = mcs
+                    ws.cell(row, 19).value = tx_path
                     ws.cell(row, 20).value = rb_state
                     ws.cell(row, 21).value = sync_path
                     ws.cell(row, 22).value = asw_srs_path
@@ -444,26 +385,26 @@ def tx_power_relative_test_export_excel_ftm(data, parameters_dict):
 
             elif tx_freq_level <= 100:  # 1rb_sweep, lmh, freq_sweep
                 for tx_freq, measured_data in data.items():
-                    chan = chan_judge_fr1(band, bw, tx_freq) if test_item != 'freq_sweep' else None
+                    chan = chan_judge_lte(band, bw, tx_freq) if test_item != 'freq_sweep' else None
                     ws.cell(row, 1).value = band
-                    ws.cell(row, 2).value = tx_freq
-                    ws.cell(row, 3).value = chan  # LMH
-                    ws.cell(row, 4).value = tx_freq_level  # this tx_level
-                    ws.cell(row, 5).value = measured_data[3]
-                    ws.cell(row, 6).value = measured_data[2]
-                    ws.cell(row, 7).value = measured_data[4]
-                    ws.cell(row, 8).value = measured_data[1]
-                    ws.cell(row, 9).value = measured_data[5]
-                    ws.cell(row, 10).value = measured_data[0]
-                    ws.cell(row, 11).value = measured_data[6]
-                    ws.cell(row, 12).value = measured_data[7]
-                    ws.cell(row, 13).value = measured_data[8]
-                    ws.cell(row, 14).value = measured_data[9]
-                    ws.cell(row, 15).value = rb_size
-                    ws.cell(row, 16).value = rb_start
-                    ws.cell(row, 17).value = type_
-                    ws.cell(row, 18).value = tx_path
-                    ws.cell(row, 19).value = scs
+                    ws.cell(row, 2).value = bw
+                    ws.cell(row, 3).value = tx_freq
+                    ws.cell(row, 4).value = chan  # LMH
+                    ws.cell(row, 5).value = tx_freq_level  # this tx_level
+                    ws.cell(row, 6).value = measured_data[3]
+                    ws.cell(row, 7).value = measured_data[2]
+                    ws.cell(row, 8).value = measured_data[4]
+                    ws.cell(row, 9).value = measured_data[1]
+                    ws.cell(row, 10).value = measured_data[5]
+                    ws.cell(row, 11).value = measured_data[0]
+                    ws.cell(row, 12).value = measured_data[6]
+                    ws.cell(row, 13).value = measured_data[7]
+                    ws.cell(row, 14).value = measured_data[8]
+                    ws.cell(row, 15).value = measured_data[9]
+                    ws.cell(row, 16).value = rb_size
+                    ws.cell(row, 17).value = rb_start
+                    ws.cell(row, 18).value = mcs
+                    ws.cell(row, 19).value = tx_path
                     ws.cell(row, 20).value = rb_state
                     ws.cell(row, 21).value = sync_path
                     ws.cell(row, 22).value = asw_srs_path
@@ -471,6 +412,71 @@ def tx_power_relative_test_export_excel_ftm(data, parameters_dict):
                     ws.cell(row, 24).value = ext_pmt.condition if test_item == 'lmh' else None
                     ws.cell(row, 25).value = measured_data[11] if test_item == 'lmh' else None
                     ws.cell(row, 26).value = measured_data[12] if test_item == 'lmh' else None
+                    row += 1
+
+        elif tech == 'FR1':
+            max_row = ws.max_row
+            row = max_row + 1
+            if tx_freq_level >= 100:  # level_sweep
+                for tx_level, measured_data in data.items():
+                    chan = chan_judge_fr1(band, bw, tx_freq_level)
+                    ws.cell(row, 1).value = band
+                    ws.cell(row, 2).value = bw
+                    ws.cell(row, 3).value = tx_freq_level  # this freq_fr1
+                    ws.cell(row, 4).value = chan  # LMH
+                    ws.cell(row, 5).value = tx_level
+                    ws.cell(row, 6).value = measured_data[3]
+                    ws.cell(row, 7).value = measured_data[2]
+                    ws.cell(row, 8).value = measured_data[4]
+                    ws.cell(row, 9).value = measured_data[1]
+                    ws.cell(row, 10).value = measured_data[5]
+                    ws.cell(row, 11).value = measured_data[0]
+                    ws.cell(row, 12).value = measured_data[6]
+                    ws.cell(row, 13).value = measured_data[7]
+                    ws.cell(row, 14).value = measured_data[8]
+                    ws.cell(row, 15).value = measured_data[9]
+                    ws.cell(row, 16).value = rb_size
+                    ws.cell(row, 17).value = rb_start
+                    ws.cell(row, 18).value = type_
+                    ws.cell(row, 19).value = tx_path
+                    ws.cell(row, 20).value = scs
+                    ws.cell(row, 21).value = rb_state
+                    ws.cell(row, 22).value = sync_path
+                    ws.cell(row, 23).value = asw_srs_path
+                    ws.cell(row, 24).value = measured_data[10]
+                    ws.cell(row, 25).value = ext_pmt.condition
+                    row += 1
+
+            elif tx_freq_level <= 100:  # 1rb_sweep, lmh, freq_sweep
+                for tx_freq, measured_data in data.items():
+                    chan = chan_judge_fr1(band, bw, tx_freq) if test_item != 'freq_sweep' else None
+                    ws.cell(row, 1).value = band
+                    ws.cell(row, 2).value = bw
+                    ws.cell(row, 3).value = tx_freq
+                    ws.cell(row, 4).value = chan  # LMH
+                    ws.cell(row, 5).value = tx_freq_level  # this tx_level
+                    ws.cell(row, 6).value = measured_data[3]
+                    ws.cell(row, 7).value = measured_data[2]
+                    ws.cell(row, 8).value = measured_data[4]
+                    ws.cell(row, 9).value = measured_data[1]
+                    ws.cell(row, 10).value = measured_data[5]
+                    ws.cell(row, 11).value = measured_data[0]
+                    ws.cell(row, 12).value = measured_data[6]
+                    ws.cell(row, 13).value = measured_data[7]
+                    ws.cell(row, 14).value = measured_data[8]
+                    ws.cell(row, 15).value = measured_data[9]
+                    ws.cell(row, 16).value = rb_size
+                    ws.cell(row, 17).value = rb_start
+                    ws.cell(row, 18).value = type_
+                    ws.cell(row, 19).value = tx_path
+                    ws.cell(row, 20).value = scs
+                    ws.cell(row, 21).value = rb_state
+                    ws.cell(row, 22).value = sync_path
+                    ws.cell(row, 23).value = asw_srs_path
+                    ws.cell(row, 24).value = measured_data[10] if test_item == 'lmh' else None
+                    ws.cell(row, 25).value = ext_pmt.condition if test_item == 'lmh' else None
+                    ws.cell(row, 26).value = measured_data[11] if test_item == 'lmh' else None
+                    ws.cell(row, 27).value = measured_data[12] if test_item == 'lmh' else None
                     row += 1
 
         elif tech == 'WCDMA':
@@ -634,8 +640,8 @@ def txp_aclr_evm_current_plot_ftm(file_path, parameters_dict):
                     chart.height = 20
                     chart.width = 32
 
-                    y_data = Reference(ws, min_col=5, min_row=1, max_col=5, max_row=ws.max_row)
-                    x_data = Reference(ws, min_col=1, min_row=2, max_col=2, max_row=ws.max_row)
+                    y_data = Reference(ws, min_col=6, min_row=1, max_col=6, max_row=ws.max_row)
+                    x_data = Reference(ws, min_col=1, min_row=2, max_col=3, max_row=ws.max_row)
                     chart.add_data(y_data, titles_from_data=True)
                     chart.set_categories(x_data)
 
@@ -656,8 +662,8 @@ def txp_aclr_evm_current_plot_ftm(file_path, parameters_dict):
                     chart.height = 20
                     chart.width = 32
 
-                    y_data = Reference(ws, min_col=6, min_row=1, max_col=11, max_row=ws.max_row)
-                    x_data = Reference(ws, min_col=1, min_row=2, max_col=2, max_row=ws.max_row)
+                    y_data = Reference(ws, min_col=7, min_row=1, max_col=12, max_row=ws.max_row)
+                    x_data = Reference(ws, min_col=1, min_row=2, max_col=3, max_row=ws.max_row)
                     chart.add_data(y_data, titles_from_data=True)
                     chart.set_categories(x_data)
 
@@ -682,8 +688,8 @@ def txp_aclr_evm_current_plot_ftm(file_path, parameters_dict):
                     chart.height = 20
                     chart.width = 32
 
-                    y_data = Reference(ws, min_col=12, min_row=1, max_col=12, max_row=ws.max_row)
-                    x_data = Reference(ws, min_col=1, min_row=2, max_col=2, max_row=ws.max_row)
+                    y_data = Reference(ws, min_col=13, min_row=1, max_col=13, max_row=ws.max_row)
+                    x_data = Reference(ws, min_col=1, min_row=2, max_col=3, max_row=ws.max_row)
                     chart.add_data(y_data, titles_from_data=True)
                     chart.set_categories(x_data)
 
@@ -702,8 +708,8 @@ def txp_aclr_evm_current_plot_ftm(file_path, parameters_dict):
                     chart.height = 20
                     chart.width = 32
 
-                    y_data = Reference(ws, min_col=22, min_row=1, max_col=22, max_row=ws.max_row)
-                    x_data = Reference(ws, min_col=1, min_row=2, max_col=2, max_row=ws.max_row)
+                    y_data = Reference(ws, min_col=23, min_row=1, max_col=23, max_row=ws.max_row)
+                    x_data = Reference(ws, min_col=1, min_row=2, max_col=3, max_row=ws.max_row)
                     chart.add_data(y_data, titles_from_data=True)
                     chart.set_categories(x_data)
 
@@ -737,8 +743,8 @@ def txp_aclr_evm_current_plot_ftm(file_path, parameters_dict):
                     chart.height = 20
                     chart.width = 32
 
-                    y_data = Reference(ws, min_col=5, min_row=1, max_col=5, max_row=ws.max_row)
-                    x_data = Reference(ws, min_col=1, min_row=2, max_col=2, max_row=ws.max_row)
+                    y_data = Reference(ws, min_col=6, min_row=1, max_col=6, max_row=ws.max_row)
+                    x_data = Reference(ws, min_col=1, min_row=2, max_col=3, max_row=ws.max_row)
                     chart.add_data(y_data, titles_from_data=True)
                     chart.set_categories(x_data)
 
@@ -759,8 +765,8 @@ def txp_aclr_evm_current_plot_ftm(file_path, parameters_dict):
                     chart.height = 20
                     chart.width = 32
 
-                    y_data = Reference(ws, min_col=6, min_row=1, max_col=11, max_row=ws.max_row)
-                    x_data = Reference(ws, min_col=1, min_row=2, max_col=2, max_row=ws.max_row)
+                    y_data = Reference(ws, min_col=7, min_row=1, max_col=12, max_row=ws.max_row)
+                    x_data = Reference(ws, min_col=1, min_row=2, max_col=3, max_row=ws.max_row)
                     chart.add_data(y_data, titles_from_data=True)
                     chart.set_categories(x_data)
 
@@ -785,8 +791,8 @@ def txp_aclr_evm_current_plot_ftm(file_path, parameters_dict):
                     chart.height = 20
                     chart.width = 32
 
-                    y_data = Reference(ws, min_col=12, min_row=1, max_col=12, max_row=ws.max_row)
-                    x_data = Reference(ws, min_col=1, min_row=2, max_col=2, max_row=ws.max_row)
+                    y_data = Reference(ws, min_col=13, min_row=1, max_col=13, max_row=ws.max_row)
+                    x_data = Reference(ws, min_col=1, min_row=2, max_col=3, max_row=ws.max_row)
                     chart.add_data(y_data, titles_from_data=True)
                     chart.set_categories(x_data)
 
@@ -805,8 +811,8 @@ def txp_aclr_evm_current_plot_ftm(file_path, parameters_dict):
                     chart.height = 20
                     chart.width = 32
 
-                    y_data = Reference(ws, min_col=23, min_row=1, max_col=23, max_row=ws.max_row)
-                    x_data = Reference(ws, min_col=1, min_row=2, max_col=2, max_row=ws.max_row)
+                    y_data = Reference(ws, min_col=24, min_row=1, max_col=24, max_row=ws.max_row)
+                    x_data = Reference(ws, min_col=1, min_row=2, max_col=3, max_row=ws.max_row)
                     chart.add_data(y_data, titles_from_data=True)
                     chart.set_categories(x_data)
 
