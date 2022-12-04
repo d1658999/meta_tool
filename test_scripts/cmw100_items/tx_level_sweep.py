@@ -444,7 +444,7 @@ class TxTestLevelSweep(AtCmd, CMW100):
                         logger.info(f'========Now Tx level = {self.tx_level} dBm========')
                         self.tx_set_wcdma_level_use()
                         # self.tx_set_wcdma()
-                        # self.antenna_switch_v2()
+                        self.antenna_switch_v2()
 
                         # self.command(f'AT+HTXPERSTART={self.tx_chan_wcdma}')
                         # self.command(f'AT+HSETMAXPOWER={self.tx_level * 10}')

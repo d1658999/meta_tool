@@ -205,7 +205,7 @@ class TxTestFreqSweep(AtCmd, CMW100):
                     self.sync_wcdma()
                     # self.antenna_switch_v2()
                     self.tx_set_wcdma()
-                    # self.antenna_switch_v2()  this still has issue on user ROM
+                    self.antenna_switch_v2()
                     aclr_mod_results = self.tx_measure_wcdma()
                     logger.debug(aclr_mod_results)
                     data[self.tx_freq_wcdma] = aclr_mod_results

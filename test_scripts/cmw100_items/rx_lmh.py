@@ -586,7 +586,7 @@ class RxTestGenre(AtCmd, CMW100):
                     self.rx_path_setting_wcdma()
                     self.sig_gen_wcdma()
                     self.sync_wcdma()
-                    # self.antenna_switch_v2()
+                    self.antenna_switch_v2()
                     # self.tx_chan_wcdma = tx_rx_chan_wcdma[0]
                     # self.tx_set_wcdma()
                     # aclr_mod_results = self.tx_measure_wcdma()
