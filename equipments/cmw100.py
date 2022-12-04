@@ -133,11 +133,13 @@ class CMW100(CMW):
         return mod_results
 
     def get_modulation_avgerage_wcdma(self):
-        mod_results = self.get_modulation_average_query_wcdma()  # P[1] is EVM, P[9] is Ferr, P[7] is IQ Offset
+        # P[1] is EVM, P[9] is Ferr, P[7] is IQ Offset, P[11] is power
+        mod_results = self.get_modulation_average_query_wcdma()
         mod_results = mod_results.split(',')
-        mod_results = [mod_results[1], mod_results[9], mod_results[7]]
+        mod_results = [mod_results[11], mod_results[1], mod_results[9], mod_results[7]]
         mod_results = [eval(m) for m in mod_results]
-        logger.info(f'EVM: {mod_results[0]:.2f}, FREQ_ERR: {mod_results[1]:.2f}, IQ_OFFSET: {mod_results[2]:.2f}')
+        logger.info(f'POWER: {mod_results[0]:.1f}, EVM: {mod_results[1]:.2f}, FREQ_ERR: {mod_results[2]:.2f}, '
+                    f'IQ_OFFSET: {mod_results[3]:.2f}')
         return mod_results
 
     def get_modulation_average_gsm(self):
@@ -184,7 +186,7 @@ class CMW100(CMW):
         spectrum_results = self.get_aclr_average_query_wcdma()
         spectrum_results = spectrum_results.split(',')
         spectrum_results = [
-            round(eval(spectrum_results[1]) + 0.254, 2),  # I dont' know why lassen RF test tool has more 0.254dB
+            # round(eval(spectrum_results[1]) + 0.254, 2),  carrier power is smaller than we want about 0.254 dB
             round(eval(spectrum_results[3]) - eval(spectrum_results[1]), 2),
             round(eval(spectrum_results[4]) - eval(spectrum_results[1]), 2),
             round(eval(spectrum_results[2]) - eval(spectrum_results[1]), 2),
@@ -628,7 +630,7 @@ class CMW100(CMW):
         self.set_measure_stop_lte()
         self.cmw_query('*OPC?')
         logger.debug(aclr_results + mod_results)
-        return aclr_results + mod_results  # U_-2, U_-1, E_-1, Pwr, E_+1, U_+1, U_+2, EVM, Freq_Err, IQ_OFFSET
+        return aclr_results + mod_results  # U_-2, U_-1, E_-1, E_+1, U_+1, U_+2, Power,EVM, Freq_Err, IQ_OFFSET
 
     def tx_measure_wcdma(self):
         logger.info('---------Tx Measure----------')
@@ -659,7 +661,7 @@ class CMW100(CMW):
         spectrum_results = self.get_aclr_average_wcdma()
         self.set_measure_stop_wcdma()
         self.cmw_query('*OPC?')
-        return spectrum_results + mod_results  # Pwr, U_-2, U_-1, U_+1, U_+2, OBW, EVM, Freq_Err, IQ_OFFSE
+        return spectrum_results + mod_results  # U_-2, U_-1, U_+1, U_+2, Pwr, OBW, EVM, Freq_Err, IQ_OFFSE
 
     def tx_measure_gsm(self):
         logger.info('---------Tx Measure----------')
