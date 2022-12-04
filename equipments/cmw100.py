@@ -194,9 +194,9 @@ class CMW100(CMW):
             round(eval(spectrum_results[6]) / 1000000, 2)
         ]  # P1: Power, P2: ACLR_-2, P3: ACLR_-1, P4:ACLR_+1, P5:ACLR_+2, P6:OBW
         logger.info(
-            f'Power: {spectrum_results[0]:.2f}, ACLR_-1: {spectrum_results[2]:.2f}, ACLR_1: {spectrum_results[3]:.2f}, '
-            f'ACLR_-2: {spectrum_results[1]:.2f}, ACLR_+2: {spectrum_results[4]:.2f}, '
-            f'OBW: {spectrum_results[5]:.2f}MHz')
+            f'ACLR_-1: {spectrum_results[1]:.2f}, ACLR_1: {spectrum_results[2]:.2f}, '
+            f'ACLR_-2: {spectrum_results[0]:.2f}, ACLR_+2: {spectrum_results[3]:.2f}, '
+            f'OBW: {spectrum_results[4]:.2f}MHz')
         return spectrum_results
 
     def get_orfs_average_gsm(self):
