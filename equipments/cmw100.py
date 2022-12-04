@@ -661,7 +661,7 @@ class CMW100(CMW):
         spectrum_results = self.get_aclr_average_wcdma()
         self.set_measure_stop_wcdma()
         self.cmw_query('*OPC?')
-        return spectrum_results + mod_results  # U_-2, U_-1, U_+1, U_+2, Pwr, OBW, EVM, Freq_Err, IQ_OFFSE
+        return spectrum_results + mod_results  # U_-2, U_-1, U_+1, U_+2, OBW, PWR, EVM, Freq_Err, IQ_OFFSE
 
     def tx_measure_gsm(self):
         logger.info('---------Tx Measure----------')
