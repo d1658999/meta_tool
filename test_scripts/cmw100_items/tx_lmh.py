@@ -1,6 +1,6 @@
 from pathlib import Path
 from equipments.series_basis.modem_usb_serial.serial_series import AtCmd
-from equipments.cmw100_test import CMW100
+from equipments.cmw100 import CMW100
 from utils.log_init import log_set
 import utils.parameters.external_paramters as ext_pmt
 import utils.parameters.common_parameters_ftm as cm_pmt_ftm
@@ -49,7 +49,7 @@ class TxTestGenre(AtCmd, CMW100):
         logger.info(f'thermistor0 get temp: {therm_list[0]}')
         logger.info(f'thermistor1 get temp: {therm_list[1]}')
         return therm_list
-    
+
     def measure_current_select(self, n=1):
         if ext_pmt.record_current_enable:
             return record_current(n)

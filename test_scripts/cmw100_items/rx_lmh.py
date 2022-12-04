@@ -2,7 +2,7 @@ from pathlib import Path
 import math
 
 from equipments.series_basis.modem_usb_serial.serial_series import AtCmd
-from equipments.cmw100_test import CMW100
+from equipments.cmw100 import CMW100
 from utils.log_init import log_set
 import utils.parameters.external_paramters as ext_pmt
 import utils.parameters.common_parameters_ftm as cm_pmt_ftm
