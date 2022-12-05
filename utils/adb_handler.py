@@ -130,17 +130,26 @@ def get_odpm_current(count=1):
     :return:
     """
     print('----------Get Current from ODPM----------')
+    # n = 0
+    # current = 0
+    # while n < count:
+    #     temp = sp.run(r'adb shell pmic s2mpg14 getcurrent 36 | grep mA',
+    #                   capture_output=True).stdout.decode().strip().split('=')[1]
+    #     if eval(temp) > current:
+    #         current = eval(temp)
+    #     n += 1
+    #     sleep(0.1)
+    odpm_list = []
     n = 0
-    current = 0
     while n < count:
-        temp = sp.run(r'adb shell pmic s2mpg14 getcurrent 36 | grep mA',
+        odpm_current = sp.run(r'adb shell pmic s2mpg14 getcurrent 36 | grep mA',
                       capture_output=True).stdout.decode().strip().split('=')[1]
-        if eval(temp) > current:
-            current = eval(temp)
-        n += 1
+        odpm_list.append(eval(odpm_current))
         sleep(0.1)
-    print(f'Get the ODPM current: {current} mA')
-    return round(current, 2)
+        n += 1
+    current_average = sum(odpm_list) / len(odpm_list)
+    print(f'Get the ODPM average current: {current_average} mA')
+    return round(current_average, 2)
 
 
 def main():
