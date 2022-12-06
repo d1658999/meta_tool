@@ -559,7 +559,7 @@ def tx_power_relative_test_export_excel_ftm(data, parameters_dict):
                     ws.cell(row, 20).value = measured_data[14]
                     ws.cell(row, 21).value = measured_data[15]
                     ws.cell(row, 22).value = asw_srs_path
-                    ws.cell(row, 23).value = measured_data[10]
+                    ws.cell(row, 23).value = measured_data[16]
                     ws.cell(row, 24).value = ext_pmt.condition
 
                     row += 1
