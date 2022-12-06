@@ -138,7 +138,7 @@ class Anritsu8821(Anritsu):
 
     def set_test_parameter_normal(self):
         self.set_test_parameter('NORMAL')
-        self.set_ulrmc_64QAM('DISABLE')
+        self.set_ulrmc_64QAM('DISABLED')
 
     def set_authentication_all(self, standard):
         """

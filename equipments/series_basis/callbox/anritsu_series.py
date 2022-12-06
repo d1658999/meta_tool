@@ -70,17 +70,17 @@ class Anritsu:
         """
         self.anritsu_write(f'TESTPRM {prm}')
 
-    def set_ulrmc_64QAM(self, enable='DISABLE'):
+    def set_ulrmc_64QAM(self, enable='DISABLED'):
         """
          set ULRMC – 64QAM
-         <enable> ENABLE | DISABLE
+         <enable> ENABLE | DISABLED
         """
         self.anritsu_write(f'ULRMC_64QAM {enable}')
 
-    def set_ulrmc_256QAM(self, enable='DISABLE'):
+    def set_ulrmc_256QAM(self, enable='DISABLED'):
         """
          set ULRMC – 256QAM
-         <enable> ENABLE | DISABLE
+         <enable> ENABLE | DISABLED
         """
         self.anritsu_write(f'ULRMC_256QAM {enable}')
 
@@ -426,7 +426,7 @@ class Anritsu:
         """
         This is only suitable for 8820
         """
-        self.anritsu_write(f'{loss_title}, {freq}MHz, {loss_dl}, {loss_ul}, {loss_aux}')
+        self.anritsu_write(f'{loss_title} {freq}MHz, {loss_dl}, {loss_ul}, {loss_aux}')
         logger.info(f'{loss_title}, {freq}MHz, dl_loss: {loss_dl}, ul_loss: {loss_ul}, aux_loss: {loss_aux}')
 
     def set_loss_table_8821(self, loss_title, freq, loss_dl, loss_ul, loss_aux):
@@ -829,7 +829,7 @@ class Anritsu:
         """
         Resonpse the dl_chan for WCDMA
         """
-        return self.anritsu_query('DLCHAN?').strip()
+        return int(self.anritsu_query('DLCHAN?').strip())
 
     def get_tpc_pattern_query(self):
         """
@@ -859,37 +859,37 @@ class Anritsu:
         """
         Get the average power for LTE
         """
-        return self.anritsu_query('POWER? AVG').strip()
+        return float(self.anritsu_query('POWER? AVG').strip())
 
     def get_avg_power_query(self):
         """
         Get the average power for WCDMA
         """
-        return self.anritsu_query('AVG_POWER?').strip()
+        return float(self.anritsu_query('AVG_POWER?').strip())
 
     def get_evm_query_lte(self):
         """
         Response the average evm for LTE
         """
-        return self.anritsu_query('EVM? AVG').strip()
+        return float(self.anritsu_query('EVM? AVG').strip())
 
     def get_evm_query_wcdma(self):
         """
         Response the average evm for WCDMA
         """
-        return self.anritsu_query('AVG_EVM?').strip()
+        return float(self.anritsu_query('AVG_EVM?').strip())
 
     def get_aclr_query_lte(self):
         """
         Get the ACLR value for LTE
         """
         aclr_list = [
-            round(self.anritsu_query('MODPWR? E_LOW1,AVG').strip(), 2),
-            round(self.anritsu_query('MODPWR? E_UP1,AVG').strip(), 2),
-            round(self.anritsu_query('MODPWR? LOW1,AVG').strip(), 2),
-            round(self.anritsu_query('MODPWR? UP1,AVG').strip(), 2),
-            round(self.anritsu_query('MODPWR? LOW2,AVG').strip(), 2),
-            round(self.anritsu_query('MODPWR? UP2,AVG').strip(), 2),
+            round(float(self.anritsu_query('MODPWR? E_LOW1,AVG').strip()), 2),
+            round(float(self.anritsu_query('MODPWR? E_UP1,AVG').strip()), 2),
+            round(float(self.anritsu_query('MODPWR? LOW1,AVG').strip()), 2),
+            round(float(self.anritsu_query('MODPWR? UP1,AVG').strip()), 2),
+            round(float(self.anritsu_query('MODPWR? LOW2,AVG').strip()), 2),
+            round(float(self.anritsu_query('MODPWR? UP2,AVG').strip()), 2),
         ]
         return aclr_list
 
@@ -898,10 +898,10 @@ class Anritsu:
         Get the ACLR value for WCDMA
         """
         aclr_list = [
-            round(self.anritsu_query('AVG_MODPWR? LOW5').strip(), 2),
-            round(self.anritsu_query('AVG_MODPWR? UP5').strip(), 2),
-            round(self.anritsu_query('AVG_MODPWR? LOW10').strip(), 2),
-            round(self.anritsu_query('AVG_MODPWR? UP10').strip(), 2),
+            round(float(self.anritsu_query('AVG_MODPWR? LOW5').strip()), 2),
+            round(float(self.anritsu_query('AVG_MODPWR? UP5').strip()), 2),
+            round(float(self.anritsu_query('AVG_MODPWR? LOW10').strip()), 2),
+            round(float(self.anritsu_query('AVG_MODPWR? UP10').strip()), 2),
         ]
         return aclr_list
 
@@ -910,7 +910,7 @@ class Anritsu:
         write (BER? PER) and we can get the x % and the x will lower than 0.1 for WCDMA
         :return: PASS or FAIL
         """
-        ber = self.anritsu_query('BER? PER').strip()
+        ber = float(self.anritsu_query('BER? PER').strip())
         if ber >= 0.1:
             return 'FAIL'
         else:
@@ -920,7 +920,7 @@ class Anritsu:
         """
         query the throughput by percent(%) for LTE
         """
-        return self.anritsu_query('TPUT? PER').strip()
+        return float(self.anritsu_query('TPUT? PER').strip())
 
     def get_throughput_pass_query(self):
         """
@@ -932,7 +932,7 @@ class Anritsu:
         """
         Query the output level
         """
-        return self.anritsu_query('OLVL?').strip()
+        return float(self.anritsu_query('OLVL?').strip())
 
     def get_channel_coding_query(self):
         """
@@ -950,13 +950,13 @@ class Anritsu:
         """
         Query RB size or RB numbers
         """
-        return self.anritsu_query(f'ULRMC_RB?')
+        return int(self.anritsu_query(f'ULRMC_RB?'))
 
     def get_ul_rb_start_query(self):
         """
         Query RB start or RB offset
         """
-        return self.anritsu_query(f'ULRB_START?')
+        return int(self.anritsu_query(f'ULRB_START?'))
 
     def get_ul_freq_query(self):
         """
@@ -964,4 +964,4 @@ class Anritsu:
         Query: freq Hz
         Return: freq khz
         """
-        return int(self.anritsu_query(f'ULFREQ?') / 1000)
+        return int(eval(self.anritsu_query(f'ULFREQ?'))) / 1000

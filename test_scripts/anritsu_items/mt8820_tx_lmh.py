@@ -11,6 +11,7 @@ logger = log_set('8820TxSig')
 class TxTestGenre(AtCmd, Anritsu8820):
     def __init__(self):
         AtCmd.__init__(self)
+        self.ser.com_close()
         Anritsu8820.__init__(self)
 
     def get_temperature(self):
@@ -19,6 +20,7 @@ class TxTestGenre(AtCmd, Anritsu8820):
         for LB LPAMid, MHB ENDC LPAMid, UHB(n77/n79 LPAF)
         :return:
         """
+        self.ser.com_open()
         res0 = self.query_thermister0()
         res1 = self.query_thermister1()
         res_list = [res0, res1]
@@ -34,6 +36,7 @@ class TxTestGenre(AtCmd, Anritsu8820):
                         therm_list.append(None)
         logger.info(f'thermistor0 get temp: {therm_list[0]}')
         logger.info(f'thermistor1 get temp: {therm_list[1]}')
+        self.ser.com_close()
         return therm_list
 
     def tx_core(self, standard, band, dl_ch, bw=None):
@@ -78,14 +81,14 @@ class TxTestGenre(AtCmd, Anritsu8820):
 
         data = self.get_validation(standard)
 
-        if srandard == 'LTE':
+        if standard == 'LTE':
             self.parameters = {
                 'standard': standard,
                 'band': band,
                 'dl_ch': dl_ch,
                 'bw': bw,
                 'chcoding': self.chcoding,
-                'temperature': self.get_temperature(),  # this is list-data
+                'thermal': self.get_temperature(),  # this is list-data
                 'tx_freq': self.get_ul_freq_query(),  # get UL freq kHz
             }
 
@@ -96,7 +99,7 @@ class TxTestGenre(AtCmd, Anritsu8820):
                 'dl_ch': dl_ch,
                 'bw': 5,
                 'chcoding': self.chcoding,
-                'temperature': self.get_temperature(),  # this is list-data
+                'thermal': self.get_temperature(),  # this is list-data
                 'tx_freq': self.get_ul_freq_query(),  # get UL freq kHz
             }
 

@@ -17,10 +17,10 @@ class FlyMode:
         self.ser = ModemComport()
 
     def com_open(self):
-        self.ser.open()
+        self.ser.com_open()
 
     def com_close(self):
-        self.ser.close()
+        self.ser.com_close()
 
     def fly_on(self):
         self.ser.write(self.off.encode())

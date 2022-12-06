@@ -39,7 +39,7 @@ class Anritsu8820(Anritsu):
     @staticmethod
     def flymode_circle():
         flymode = FlyMode()
-        flymode.com_open()
+        # flymode.com_open()
         flymode.fly_on()
         time.sleep(3)
         flymode.fly_off()
@@ -137,7 +137,7 @@ class Anritsu8820(Anritsu):
 
     def set_test_parameter_normal(self):
         self.set_test_parameter('NORMAL')
-        self.set_ulrmc_64QAM('DISABLE')
+        self.set_ulrmc_64QAM('DISABLED')
 
     def set_authentication_all(self, standard):
         """
@@ -1441,11 +1441,11 @@ class Anritsu8820(Anritsu):
             validation_list = []
             if mod == 'TX_MAXPWR_64_P':
                 self.set_test_parameter('TX_MAXPWR_Q_P')
-                self.set_ulrmc_64QAM('64QAM ENABLED')
+                self.set_ulrmc_64QAM('ENABLED')
                 self.set_ulmcs(21)
             elif mod == 'TX_MAXPWR_64_F':
                 self.set_test_parameter('TX_MAXPWR_Q_F')
-                self.set_ulrmc_64QAM('64QAM ENABLED')
+                self.set_ulrmc_64QAM('ENABLED')
                 self.set_ulmcs(21)
             else:
                 self.set_ulrmc_64QAM('DISABLED')
@@ -1473,7 +1473,7 @@ class Anritsu8820(Anritsu):
                 validation_list.append(self.get_uplink_power('LTE'))
                 validation_list.append((self.get_ul_rb_size_query(), self.get_ul_rb_start_query()))
                 validation_dict[mod[10:]] = validation_list
-                self.inst.query('*OPC?')
+                self.anritsu_query('*OPC?')
             else:  # mod[10:] -> Q_P, Q_F, 16_P, 16_F, 64_F
                 logger.info(mod)
                 self.pwr = self.get_uplink_power('LTE')
