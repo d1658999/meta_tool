@@ -683,6 +683,7 @@ Disable</property>
                         <child>
                           <object class="ttk.Checkbutton" id="checkbutton_tx_lmh_ftm">
                             <property name="command" type="command" cbtype="simple">wanted_tx_rx_sweep</property>
+                            <property name="takefocus">false</property>
                             <property name="text" translatable="yes">Tx_LMH</property>
                             <property name="variable">boolean:tx</property>
                             <layout manager="grid">
@@ -9457,7 +9458,7 @@ Disable</property>
                           <object class="ttk.Checkbutton" id="checkbutton_rx_sweep">
                             <property name="command" type="command" cbtype="simple">wanted_tx_rx_sweep</property>
                             <property name="text" translatable="yes">RxS_freq</property>
-                            <property name="variable">boolean:rx_sweep</property>
+                            <property name="variable">boolean:rx_freq_sweep</property>
                             <bind sequence="&lt;1&gt;" handler="sweep_auto_check_ue_pwr" add="" />
                             <layout manager="grid">
                               <property name="column">0</property>

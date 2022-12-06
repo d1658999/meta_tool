@@ -215,7 +215,7 @@ class MainApp:
         self.B28_N78 = None
         self.B5_N77 = None
         self.B13_N5 = None
-        self.rx_sweep = None
+        self.rx_freq_sweep = None
         self.U1 = None
         self.U2 = None
         self.HSUPA_all = None
@@ -423,7 +423,7 @@ class MainApp:
                 "B28_N78",
                 "B5_N77",
                 "B13_N5",
-                "rx_sweep",
+                "rx_freq_sweep",
                 "U1",
                 "U2",
                 "HSUPA_all",
@@ -531,7 +531,7 @@ class MainApp:
         self.band_segment_fr1.set(ui_init['band']['band_segment_fr1'])
         self.tx.set(ui_init['test_items']['tx'])
         self.rx.set(ui_init['test_items']['rx'])
-        self.rx_sweep.set(ui_init['test_items']['rx_sweep'])
+        self.rx_freq_sweep.set(ui_init['test_items']['rx_freq_sweep'])
         self.tx_level_sweep.set(ui_init['test_items']['tx_level_sweep'])
         self.tx_freq_sweep.set(ui_init['test_items']['tx_freq_sweep'])
         self.tx_1rb_sweep.set(ui_init['test_items']['tx_1rb_sweep'])
@@ -985,7 +985,7 @@ class MainApp:
         band_segment = self.band_segment.get()
         band_segment_fr1 = self.band_segment_fr1.get()
         chan = self.wanted_chan()
-        tx, rx, rx_sweep, tx_level_sweep, tx_freq_sweep, tx_1rb_sweep = self.wanted_tx_rx_sweep()
+        tx, rx, rx_freq_sweep, tx_level_sweep, tx_freq_sweep, tx_1rb_sweep = self.wanted_tx_rx_sweep()
         tpchb_enable = self.tempcham_enable.get()
         psu_enable = self.psu_enable.get()
         odpm_enable = self.odpm_enable.get()
@@ -1022,7 +1022,7 @@ class MainApp:
                 'tx': tx,
                 'rx': rx,
                 'rx_quick_enable': rx_quick_enable,
-                'rx_sweep': rx_sweep,
+                'rx_freq_sweep': rx_freq_sweep,
                 'tx_level_sweep': tx_level_sweep,
                 'tx_freq_sweep': tx_freq_sweep,
                 'tx_1rb_sweep': tx_1rb_sweep,
@@ -1604,7 +1604,7 @@ class MainApp:
         self.wanted_test = {}
         self.wanted_test.setdefault('tx', False)
         self.wanted_test.setdefault('rx', False)
-        self.wanted_test.setdefault('rx_sweep', False)
+        self.wanted_test.setdefault('rx_freq_sweep', False)
         self.wanted_test.setdefault('tx_level_sweep', False)
         self.wanted_test.setdefault('tx_freq_sweep', False)
         self.wanted_test.setdefault('tx_1rb_sweep', False)
@@ -1629,15 +1629,15 @@ class MainApp:
             logger.debug(self.rx.get())
             self.wanted_test['rx'] = self.rx.get()
 
-        if self.rx_sweep.get():
-            logger.debug(self.rx_sweep.get())
-            self.wanted_test['rx_sweep'] = self.rx_sweep.get()
+        if self.rx_freq_sweep.get():
+            logger.debug(self.rx_freq_sweep.get())
+            self.wanted_test['rx_freq_sweep'] = self.rx_freq_sweep.get()
 
         if self.wanted_test == {}:
             logger.debug('Nothing to select for test items')
 
         logger.info(self.wanted_test)
-        return self.tx.get(), self.rx.get(), self.rx_sweep.get(), self.tx_level_sweep.get(), self.tx_freq_sweep.get(), self.tx_1rb_sweep.get()
+        return self.tx.get(), self.rx.get(), self.rx_freq_sweep.get(), self.tx_level_sweep.get(), self.tx_freq_sweep.get(), self.tx_1rb_sweep.get()
 
     def wanted_ue_pwr(self):
         self.ue_power = []
@@ -2391,7 +2391,7 @@ class MainApp:
     def rx_auto_check_ue_pwr(self, event=None):
         self.TxMax.set(True)
         self.TxLow.set(True)
-        self.rx_sweep.set(False)
+        self.rx_freq_sweep.set(False)
         self.wanted_ue_pwr()
 
     def sweep_auto_check_ue_pwr(self, event=None):
@@ -2427,8 +2427,8 @@ class MainApp:
             if self.wanted_test['rx']:
                 inst.run()
 
-            if self.wanted_test['rx_sweep']:
-                inst.run_rx_sweep_ch()
+            if self.wanted_test['rx_freq_sweep']:
+                inst.run()
 
         elif inst.__class__.__name__ == 'Anritsu8821':
             if self.wanted_test['tx']:
@@ -2437,8 +2437,8 @@ class MainApp:
             if self.wanted_test['rx']:
                 inst.run()
 
-            if self.wanted_test['rx_sweep']:
-                inst.run_rx_sweep_ch()
+            if self.wanted_test['rx_freq_sweep']:
+                inst.run()
 
     def measure(self):
         import utils.parameters.external_paramters as ext_pmt
@@ -2494,54 +2494,43 @@ class MainApp:
         ext_pmt.condition = self.condition
 
         if self.instrument.get() == 'Anritsu8820':
-            from anritsu8820 import Anritsu8820
-            # import want_test_band as wt
-            #
-            # wt.tech = self.wanted_tech()
-            # wt.fr1_bands =self.wanted_band_FR1()
-            # wt.lte_bands = self.wanted_band_LTE()
-            # wt.wcdma_bands = self.wanted_band_WCDMA()
-            # wt.gsm_bands = self.wanted_band_GSM()
-            # wt.hsupa_bands = self.wanted_band_HSUPA()
-            # wt.hsdpa_bands = self.wanted_band_HSDPA()
-            # wt.lte_bandwidths = self.wanted_bw()
-            # wt.channel = self.wanted_chan()
-            # wt.tx_max_pwr_sensitivity = self.wanted_ue_pwr()
-            # wt.band_segmment = self.band_segment.get()
-            # wt.band_segment_fr1 = self.band_segment_fr1.get()
-            self.test_pipeline(Anritsu8820)
-            # anritsu = Anritsu8820()
-            #
-            # if self.wanted_test['tx']:
-            #     anritsu.run()
-            #
-            # if self.wanted_test['rx']:
-            #     anritsu.run()
-            #
-            # if self.wanted_test['rx_sweep']:
-            #     anritsu.run_rx_sweep_ch()
+            from test_scripts.anritsu_items.mt8820_tx_lmh import TxTestGenre
+            from test_scripts.anritsu_items.mt8820_rx import RxTestGenre
+            from test_scripts.anritsu_items.mt8820_rx_freq_sweep import RxTestFreqSweep
+
+            excel_folder_create()
+            if self.wanted_test['tx']:
+                inst = TxTestGenre()
+                inst.run()
+
+            elif self.wanted_test['rx']:
+                inst = RxTestGenre()
+                inst.run()
+                inst.ser.com_close()
+
+            elif self.wanted_test['rx_freq_sweep']:
+                inst = RxTestFreqSweep()
+                inst.run()
+
 
         elif self.instrument.get() == 'Anritsu8821':
-            from anritsu8821 import Anritsu8821
-            # import want_test_band as wt
-            #
-            # wt.tech = self.wanted_tech()
-            # wt.lte_bands = self.wanted_band_LTE()
-            # wt.lte_bandwidths = self.wanted_bw()
-            # wt.channel = self.wanted_chan()
-            # wt.tx_max_pwr_sensitivity = self.wanted_ue_pwr()
-            # wt.band_segmment = self.band_segment.get()
-            self.test_pipeline(Anritsu8821)
-            # anritsu = Anritsu8821()
-            #
-            # if self.wanted_test['tx']:
-            #     anritsu.run()
-            #
-            # if self.wanted_test['rx']:
-            #     anritsu.run()
-            #
-            # if self.wanted_test['rx_sweep']:
-            #     anritsu.run_rx_sweep_ch()
+            from test_scripts.anritsu_items.mt8821_tx_lmh import TxTestGenre
+            from test_scripts.anritsu_items.mt8821_rx import RxTestGenre
+            from test_scripts.anritsu_items.mt8821_rx_freq_sweep import RxTestFreqSweep
+
+            excel_folder_create()
+            if self.wanted_test['tx']:
+                inst = TxTestGenre()
+                inst.run()
+
+            elif self.wanted_test['rx']:
+                inst = RxTestGenre()
+                inst.run()
+                inst.ser.com_close()  # because this might have multiple Rx controller by AT command to choose Rx path
+
+            elif self.wanted_test['rx_freq_sweep']:
+                inst = RxTestFreqSweep()
+                inst.run()
 
         elif self.instrument.get() == 'Agilent8960':
             pass

@@ -30,12 +30,12 @@ class VisaComport:
             for gpib in self.get_gpib_usb():  # this is to search GPIB for 8820/8821
                 inst = pyvisa.ResourceManager().open_resource(gpib)
                 inst_res = inst.query('*IDN?').strip()
-                if '8820' in inst or '8821' in inst_res:
+                if '8820' in inst_res or '8821' in inst_res:
                     gpib_wanted = gpib
                     break
 
-            logger.info(f"Connect to {self.inst.query('*IDN?').strip()}")
             self.inst = pyvisa.ResourceManager().open_resource(gpib_wanted)  # to build object of 'inst'
+            logger.info(f"Connect to {self.inst.query('*IDN?').strip()}")
 
         elif equipment_name in ['psu', 'PSU']:
             psu_list = ['E3631A', 'E3642A', 'E36313A']

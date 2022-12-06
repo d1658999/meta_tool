@@ -187,12 +187,6 @@ class Anritsu:
         """
         self.anritsu_write(f'OPC_ALL {num}')
 
-    def set_ul_rb_start(self, pos='MIN'):
-        """
-        set the UL RB position
-        <pos> MIN | MID | MAX
-        """
-        self.anritsu_write(f'ULRB_POS {pos}')
 
     def set_bandwidth(self, bw=5):
         """
@@ -217,12 +211,12 @@ class Anritsu:
 
     def set_uplink_channel(self, standard, ul_ch):
         """
-            Use this function only in FDD test mode.
-            For Anritsu8820C, it could be used in link mode
+        Use this function only in FDD test mode.
+        For Anritsu8820C, it could be used in link mode
         """
         s = standard
         if s == 'LTE' or s == 'WCDMA':
-            return self.anritsu_write(f'ULCHAN {str(ul_ch)}')
+            return self.set_ul_chan(ul_ch)
 
         elif s == 'GSM':
             pass
@@ -234,7 +228,7 @@ class Anritsu:
         """
         s = standard
         if s == 'LTE' or s == 'WCDMA':
-            return self.anritsu_write(f'DLCHAN {str(dl_ch)}')
+            return self.set_dl_chan(dl_ch)
         elif s == 'GSM':
             pass
 
@@ -475,7 +469,9 @@ class Anritsu:
         """
         Anritsu8820 use 'SWP' to measure no matter what the test items are
         """
+        self.anritsu_query('*OPC?')
         self.anritsu_write('SWP')
+        self.anritsu_query('*OPC?')
 
     def set_ber_measure_on_off(self, switch='ON'):
         """
@@ -597,17 +593,17 @@ class Anritsu:
         """
         self.anritsu_write(f'PWRTEMP_AVG {count}')
 
-    def set_dlchan(self, dl_ch):
+    def set_dl_chan(self, dl_ch):
         """
         Set downlink chan for LTE and WCDMA
         """
         self.anritsu_write(f'DLCHAN {dl_ch}')
 
-    def set_ulchan(self, ul_ch):
+    def set_ul_chan(self, ul_ch):
         """
         Set uplink chan for LTE and WCDMA
         """
-        self.anritsu_write(f'ULCHAN {ul_ch}')
+        self.anritsu_write(f'ULCHAN {str(ul_ch)}')
 
     def set_power_wdr_count(self, count=1):
         """
@@ -685,17 +681,24 @@ class Anritsu:
         """
         self.anritsu_write(f'HSHSET {setting}')
 
-    def set_rb_size(self, size):
+    def set_ul_rb_size(self, size):
         """
         Set RB size or RB numbers
         """
         self.anritsu_write(f'ULRMC_RB {size}')
 
-    def set_rb_start(self, start):
+    def set_ul_rb_start(self, start):
         """
-        Set RB start or RN offset
+        Set RB start or RB offset
         """
-        self.anritsu_write(f'ULRMC_START {start}')
+        self.anritsu_write(f'ULRB_START {start}')
+
+    def set_ul_rb_position(self, pos='MIN'):
+        """
+        set the UL RB position
+        <pos> MIN | MID | MAX
+        """
+        self.anritsu_write(f'ULRB_POS {pos}')
 
     def set_delta_cqi(self, delta=8):
         """
@@ -942,3 +945,23 @@ class Anritsu:
         I don't know what it is
         """
         self.anritsu_query(f'UE_CAP? REL')
+
+    def get_ul_rb_size_query(self):
+        """
+        Query RB size or RB numbers
+        """
+        return self.anritsu_query(f'ULRMC_RB?')
+
+    def get_ul_rb_start_query(self):
+        """
+        Query RB start or RB offset
+        """
+        return self.anritsu_query(f'ULRB_START?')
+
+    def get_ul_freq_query(self):
+        """
+        Query uplink frequency
+        Query: freq Hz
+        Return: freq khz
+        """
+        return int(self.anritsu_query(f'ULFREQ?') / 1000)

@@ -211,7 +211,7 @@ class Anritsu8821(Anritsu):
         self.set_path_loss('LTE')
         self.set_init_level('LTE')
         self.set_handover('LTE', dl_ch, bw)
-        self.set_ul_rb_start('MIN')
+        self.set_ul_rb_position('MIN')
         self.anritsu_query('*OPC?')
 
     def set_init_level(self, standard):
@@ -502,29 +502,6 @@ class Anritsu8821(Anritsu):
         self.set_throughput_sample_hsupa(15)
         self.set_ehich_pattern('ACK')
 
-    def set_uplink_channel(self, standard, ul_ch):
-        """
-            Use this function only in FDD test mode.
-            For Anritsu8820C, it could be used in link mode
-        """
-        s = standard
-        if s == 'LTE' or s == 'WCDMA':
-            return self.set_ulchan(ul_ch)
-
-        elif s == 'GSM':
-            pass
-
-    def set_downlink_channel(self, standard, dl_ch):
-        """
-        Use this function only in FDD test mode
-        For Anritsu8820C, it could be used in link mode
-        """
-        s = standard
-        if s == 'LTE' or s == 'WCDMA':
-            return self.set_dlchan(dl_ch)
-        elif s == 'GSM':
-            pass
-
     def set_init_power(self, count=1):
         self.set_power_measure_on_off('ON')  # Set [Power Measurement] to [On]
         self.set_power_count(count)  # Set [Average Count] to [count] times
@@ -628,8 +605,8 @@ class Anritsu8821(Anritsu):
 
     def set_rb_location(self, band, bw):
         rb_num, rb_location = cm_pmt_anritsu.special_uplink_config_sensitivity(band, bw)
-        self.set_rb_size(rb_num)
-        self.set_rb_start(rb_location)
+        self.set_ul_rb_size(rb_num)
+        self.set_ul_rb_start(rb_location)
 
     def preset_subtest1(self):
         if self.chcoding == 'EDCHTEST':  # this is HSUPA

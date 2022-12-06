@@ -23,7 +23,7 @@ def log_set(name=__name__):
     handler_file.setLevel(logging.DEBUG)
 
     # create formatter
-    formatter = logging.Formatter('[%(asctime)s %(name)-10s - %(levelname)-10s] %(message)s', datefmt='%Y%m%d %H:%M:%S')
+    formatter = logging.Formatter('[%(asctime)s %(name)-20s - %(levelname)-10s] %(message)s', datefmt='%Y%m%d %H:%M:%S')
 
     # add formatter to handlers
     handler_stream.setFormatter(formatter)
