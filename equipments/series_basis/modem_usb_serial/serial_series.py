@@ -427,7 +427,7 @@ class AtCmd:
         elif self.asw_on_off == 1:
             logger.info('Antenna Switch ON')
 
-    def antenna_switch_v2(self):
+    def antenna_switch_v2(self, asw_en=ext_pmt.asw_path_enable):
         """
         this is to place on the first to activate
         AT+ANTSWSEL=P0,P1	//Set Tx DPDT switch
@@ -437,12 +437,15 @@ class AtCmd:
         tech:
         ant_path:
         """
-        self.asw_tech = self.tech
-        logger.info('---------Antenna Switch----------')
-        self.command(f'AT+ANTSWSEL={self.asw_tech_dict[self.asw_tech]},{self.asw_path}')
-        logger.info(f'RAT: {self.asw_tech}, ANT_PATH: {self.asw_path}')
-        self.asw_srs_path = self.asw_path
-        # self.command_cmw100_query('*OPC?')
+        if asw_en:
+            self.asw_tech = self.tech
+            logger.info('---------Antenna Switch----------')
+            self.command(f'AT+ANTSWSEL={self.asw_tech_dict[self.asw_tech]},{self.asw_path}')
+            logger.info(f'RAT: {self.asw_tech}, ANT_PATH: {self.asw_path}')
+            self.asw_srs_path = self.asw_path
+            # self.command_cmw100_query('*OPC?')
+        else:
+            self.asw_srs_path = self.asw_path = None
 
     def srs_switch(self):
         logger.info('---------SRS Switch----------')
