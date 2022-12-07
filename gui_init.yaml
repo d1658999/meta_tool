@@ -2,26 +2,17 @@ band:
   band_segment: A
   band_segment_fr1: A
   bands_endc: []
-  bands_fr1:
-  - 1
-  - 2
-  - 3
-  - 66
-  - 38
-  - 41
+  bands_fr1: []
   bands_gsm: []
   bands_hsdpa: []
   bands_hsupa: []
-  bands_lte:
-  - 1
+  bands_lte: []
   bands_wcdma: []
 bw:
-  bw_fr1:
-  - 10
-  bw_lte:
-  - 10
+  bw_fr1: []
+  bw_lte: []
 channel:
-  chan: M
+  chan: ''
 condition:
   hthv: false
   htlv: false
@@ -29,7 +20,7 @@ condition:
   lthv: false
   ltlv: false
   lv: false
-  mv: true
+  mv: false
   ntnv: false
 external_inst:
   count: 10
@@ -37,23 +28,22 @@ external_inst:
   psu: false
   record_current: false
   tempchb: false
+  wait_time: 300
 instrument:
   instrument: Anritsu8820
 mcs:
-  mcs_fr1:
-  - QPSK
-  mcs_lte:
-  - QPSK
+  mcs_fr1: []
+  mcs_lte: []
   modulaiton_gsm: GMSK
 path:
   asw_path: 0
+  asw_path_enable: false
   rx_paths: []
   sa_nsa: 0
   srs_path: 0
   srs_path_enable: false
   sync_path: Main
-  tx_paths:
-  - TX2
+  tx_paths: []
 port:
   port_tx: 1
   port_tx_fr1: 1
@@ -64,29 +54,22 @@ power:
   mb_gsm_pcl: 0
   tx_level: 26
 rb_set:
-  rb_ftm_fr1:
-  - INNER_FULL
-  rb_ftm_lte:
-  - PRB
+  rb_ftm_fr1: []
+  rb_ftm_lte: []
 rx_set:
-  ue_power:
-  - 1
-  - 0
+  ue_power: []
 scripts:
   scripts:
   - GENERAL
 tech:
-  tech:
-  - FR1
-  - LTE
+  tech: []
 test_items:
   rx: false
   rx_freq_sweep: false
   rx_quick_enable: false
-  tx: true
+  tx: false
   tx_1rb_sweep: false
   tx_freq_sweep: false
-  tx_level_sweep: true
+  tx_level_sweep: false
 type:
-  type_fr1:
-  - DFTS
+  type_fr1: []

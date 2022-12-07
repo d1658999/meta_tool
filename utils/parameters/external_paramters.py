@@ -27,6 +27,7 @@ tx_pcl_mb = 0  # GMSK_MB: 0 ~ 15, EPSK_MB 2~15:
 sa_nsa = 0
 duty_cycle = 100  # 100 for NR TDD PC3, 50: for NR TDD PC2
 init_rx_sync_level = -70
+wait_time = 300
 
 port_tx = 1
 port_tx_lte = 1  # 1 ~ 8 default is  1
@@ -45,6 +46,7 @@ psu_current = 5.0
 current_count = 1
 temp = 25
 srs_path_enable = False
+asw_path_enable = False
 sync_path = 'Main'  # 'Main', 'CA#1', 'CA#2', 'CA#3'
 tx_paths = ['TX1']   # 'TX1' | 'TX2' | 'MIMO
 rx_paths = [15]  #  0: default(free run) | 1: DRX_ONLY | 2: PRX ONLY | 3: PRX+DRX | 4: 4RX_PRX(RX2) ONLY | 8: 4RX_DRX(RX3) ONLY | 12: 4RX_PRX(RX2) + 4RX_DRX(RX3) | 15: ALL PATH

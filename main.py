@@ -18,7 +18,7 @@ from equipments.temp_chamber import TempChamber
 logger = log_set('GUI')
 
 PROJECT_PATH = pathlib.Path(__file__).parent
-PROJECT_UI =  PROJECT_PATH / pathlib.Path('gui') /"main_v2_7.ui"
+PROJECT_UI = PROJECT_PATH / pathlib.Path('gui') /"main_v2_8.ui"
 
 
 class MainApp:
@@ -52,6 +52,7 @@ class MainApp:
         self.sync_path = None
         self.asw_path = None
         self.srs_path_enable = None
+        self.asw_path_enable = None
         self.srs_path = None
         self.tx_level = None
         self.tx1 = None
@@ -247,6 +248,7 @@ class MainApp:
         self.record_current_enable = None
         self.count = None
         self.rx_quick_enable = None
+        self.wait_time = None
         builder.import_variables(
             self,
             [
@@ -261,6 +263,7 @@ class MainApp:
                 "tx_level",
                 "asw_path",
                 "srs_path_enable",
+                "asw_path_enable",
                 "srs_path",
                 "tx1",
                 "tx2",
@@ -454,6 +457,7 @@ class MainApp:
                 "record_current_enable",
                 "count",
                 "rx_quick_enable",
+                "wait_time",
             ],
         )
 
@@ -542,6 +546,7 @@ class MainApp:
         self.asw_path.set(ui_init['path']['asw_path'])
         self.srs_path.set(ui_init['path']['srs_path'])
         self.srs_path_enable.set(ui_init['path']['srs_path_enable'])
+        self.asw_path_enable.set(ui_init['path']['asw_path_enable'])
         self.rx_quick_enable.set(ui_init['test_items']['rx_quick_enable'])
         self.sync_path.set(ui_init['path']['sync_path'])
         self.sa_nsa.set(ui_init['path']['sa_nsa'])
@@ -549,6 +554,7 @@ class MainApp:
         self.pcl_mb.set(ui_init['power']['mb_gsm_pcl'])
         self.mod_gsm.set(ui_init['mcs']['modulaiton_gsm'])
         self.tx_level.set(ui_init['power']['tx_level'])
+        self.wait_time.set(ui_init['external_inst']['wait_time'])
         self.count.set(ui_init['external_inst']['count'])
         self.tempcham_enable.set(ui_init['external_inst']['tempchb'])
         self.psu_enable.set(ui_init['external_inst']['psu'])
@@ -970,6 +976,7 @@ class MainApp:
         pcl_lb_gsm = self.pcl_lb.get()
         pcl_mb_gsm = self.pcl_mb.get()
         tx_level = self.tx_level.get()
+        wait_time = self.wait_time.get()
         count = self.count.get()
         mod_gsm = self.mod_gsm.get()
         port_tx = self.port_tx.get()
@@ -979,6 +986,7 @@ class MainApp:
         asw_path = self.asw_path.get()
         srs_path = self.srs_path.get()
         srs_path_enable = self.srs_path_enable.get()
+        asw_path_enable = self.asw_path_enable.get()
         rx_quick_enable = self.rx_quick_enable.get()
         sync_path = self.sync_path.get()
         rfout_anritsu = self.rfout_anritsu.get()
@@ -1011,6 +1019,7 @@ class MainApp:
                 'asw_path': asw_path,
                 'srs_path': srs_path,
                 'srs_path_enable': srs_path_enable,
+                'asw_path_enable': asw_path_enable,
                 'sync_path': sync_path,
                 'tx_paths': tx_paths,
                 'rx_paths': rx_paths,
@@ -1077,6 +1086,7 @@ class MainApp:
                 'odpm': odpm_enable,
                 'record_current': record_current_enable,
                 'count': count,
+                'wait_time': wait_time,
             },
             'condition': {
                 'hthv': hthv,
@@ -2319,6 +2329,9 @@ class MainApp:
     def select_tx_level(self, option):
         logger.info(f'select TX Level {self.tx_level.get()}')
 
+    def select_wait_time(self, option):
+        logger.info(f'select Wait time {self.wait_time.get()}')
+
     def count_select(self, option):
         logger.info(f'select Count Number: {self.count.get()}')
 
@@ -2331,6 +2344,13 @@ class MainApp:
             logger.info('SRS is enabled')
         else:
             logger.info('SRS is disabled')
+
+    def asw_enable(self):
+        # logger.info(f'AS status: {self.asw_path_enable.get()}')
+        if self.asw_path_enable.get():
+            logger.info('AS is enabled')
+        else:
+            logger.info('AS is disabled')
 
     def wanted_ftm_rb_lte(self):
         self.ftm_rb_lte = []
@@ -2480,6 +2500,7 @@ class MainApp:
         ext_pmt.asw_path = self.asw_path.get()
         ext_pmt.srs_path = self.srs_path.get()
         ext_pmt.srs_path_enable = self.srs_path_enable.get()
+        ext_pmt.asw_path_enable = self.asw_path_enable.get()
         ext_pmt.rx_fast_test_enable = self.rx_quick_enable.get()
         ext_pmt.sync_path = self.sync_path.get()
         ext_pmt.sa_nsa = self.sa_nsa.get()
@@ -2487,6 +2508,7 @@ class MainApp:
         ext_pmt.tx_pcl_lb = self.pcl_lb.get()
         ext_pmt.tx_pcl_mb = self.pcl_mb.get()
         ext_pmt.tx_level = self.tx_level.get()
+        ext_pmt.wait_time = self.wait_time.get()
         ext_pmt.current_count = self.count.get()
         ext_pmt.psu_enable = self.psu_enable.get()
         ext_pmt.odpm_enable = self.odpm_enable.get()
