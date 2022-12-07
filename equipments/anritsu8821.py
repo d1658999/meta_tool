@@ -1003,7 +1003,7 @@ class Anritsu8821(Anritsu):
 
             elif self.chcoding == 'FIXREFCH':  # this is HSDPA
                 if subtest is not None:
-                    if len(subtest) == 4:
+                    if len(subtest) == 4:  # subtest 3
                         power, aclr, evm, subtest_number = subtest
                         data[subtest_number] = [power, aclr, evm]
                     else:
@@ -1021,13 +1021,13 @@ class Anritsu8821(Anritsu):
         logger.debug("Current Format: " + s)
         if s == 'LTE':
             # power = Decimal(self.inst.query('POWER? AVG').strip())
-            power = round(self.get_power_average_query(), 1)
+            power = round(self.get_power_average_query('LTE'), 1)
             self.anritsu_query('*OPC?')
             logger.info(f'POWER: {power}')
             return power
         elif s == 'WCDMA':
             # power = Decimal(self.inst.query('AVG_POWER?').strip())
-            power = round(self.get_power_average_query(), 1)
+            power = round(self.get_power_average_query('WCDMA'), 1)
             self.anritsu_query('*OPC?')
             logger.info(f'POWER: {power}')
             return power
@@ -1176,7 +1176,7 @@ class Anritsu8821(Anritsu):
                     sensitivity = Decimal(self.get_output_level_query())
                     time.sleep(0.1)
                     per = self.get_throughput_per_query()
-                    power = round(self.get_power_average_query(), 1)
+                    power = round(self.get_power_average_query('LTE'), 1)
                     self.anritsu_query('*OPC?')
                     logger.info(f'Final: POWER: {power}, SENSITIVITY: {sensitivity}, PER:{per}')
                     return [power, sensitivity, per]
@@ -1311,7 +1311,7 @@ class Anritsu8821(Anritsu):
                     sensitivity = Decimal(self.get_output_level_query())
                     time.sleep(0.1)
                     per = self.get_ber_per_query_wcdma()
-                    power = Decimal(self.get_avg_power_query())
+                    power = Decimal(self.get_power_average_query('WCDMA'))
                     self.anritsu_query('*OPC?')
                     logger.info(f'Final: POWER: {power}, SENSITIVITY: {sensitivity}, PER:{per}')
                     return [power, sensitivity, per]

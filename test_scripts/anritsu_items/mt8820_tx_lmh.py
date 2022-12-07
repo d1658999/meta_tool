@@ -149,19 +149,25 @@ class TxTestGenre(AtCmd, Anritsu8820):
                 bands = None
                 if self.chcoding == 'REFMEASCH':  # this is WCDMA
                     bands = ext_pmt.wcdma_bands
+                    logger.info(f'WCDMA Bands select: {bands}')
                 elif self.chcoding == 'EDCHTEST':  # this is HSUPA
                     bands = ext_pmt.hsupa_bands
+                    logger.info(f'HSUPA Bands select: {bands}')
                 elif self.chcoding == 'FIXREFCH':  # this is HSDPA
                     bands = ext_pmt.hsdpa_bands
+                    logger.info(f'HSDPA Bands select: {bands}')
 
-                for band in bands:
-                    dl_chan_list = cm_pmt_anritsu.dl_ch_selected(standard, band)
-                    ch_list = channel_freq_select(ext_pmt.channel, dl_chan_list)
-                    logger.debug(f'Test Channel List: {band}, downlink channel list:{ch_list}')
-                    for dl_ch in ch_list:
-                        self.tx_core(standard, band, dl_ch)
+                if bands:
+                    for band in bands:
+                        dl_chan_list = cm_pmt_anritsu.dl_ch_selected(standard, band)
+                        ch_list = channel_freq_select(ext_pmt.channel, dl_chan_list)
+                        logger.debug(f'Test Channel List: {band}, downlink channel list:{ch_list}')
+                        for dl_ch in ch_list:
+                            self.tx_core(standard, band, dl_ch)
 
-                txp_aclr_evm_current_plot_sig(standard, self.excel_path)
+                    txp_aclr_evm_current_plot_sig(standard, self.excel_path)
+                else:
+                    logger.info(f'==========Please check RATs select and related to bands==========')
 
             elif tech == 'GSM' and ext_pmt.gsm_bands != []:
                 pass

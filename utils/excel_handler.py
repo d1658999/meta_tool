@@ -2118,7 +2118,7 @@ def fill_progress_rx(standard, ws, band, dl_ch, data, items_selected, power_sele
 
 
 def fill_progress_hspa_tx(standard, chcoding, ws, band, dl_ch, test_items, test_items_selected, subtest):
-    aclr_ch = cm_pmt_anritsu.aclr_ch_judge(standard, band, dl_ch)  # this is for ACLR fill in ACLR_TAB
+    aclr_ch = cm_pmt_anritsu.sig_ch_judge(standard, band, dl_ch)  # this is for ACLR fill in ACLR_TAB
 
     logger.debug(f'capture band: {band}, {aclr_ch}')
 
@@ -2181,7 +2181,7 @@ def fill_progress_hspa_tx(standard, chcoding, ws, band, dl_ch, test_items, test_
 
 def fill_progress_tx(standard, ws, band, dl_ch, test_items, test_items_selected,
                      bw=None):  # items_selected: 0 = POWER, 1 = ACLR, 2 = EVM
-    aclr_ch = cm_pmt_anritsu.aclr_ch_judge(standard, band, dl_ch, bw)  # this is for ACLR fill in ACLR_TAB
+    aclr_ch = cm_pmt_anritsu.sig_ch_judge(standard, band, dl_ch, bw)  # this is for ACLR fill in ACLR_TAB
 
     if standard == 'LTE':
         logger.debug(f'capture band: {band}, {bw}MHZ, {aclr_ch}')
@@ -2444,10 +2444,10 @@ def tx_power_relative_test_export_excel_sig(data, parameters_dict):
     # type_ = parameters_dict['type']
     # test_item = parameters_dict['test_item']
     thermal = parameters_dict['thermal']
-    # chcoding = parameters_dict['chcoding']
+    chcoding = parameters_dict['chcoding']
     logger.info('----------save to excel----------')
 
-    filename = select_file_name_genre_tx_sig(bw, tech)
+    filename = select_file_name_genre_tx_sig(bw, tech, chcoding)
 
     file_path = Path(excel_folder_path()) / Path(filename)
 
@@ -2533,6 +2533,7 @@ def tx_power_relative_test_export_excel_sig(data, parameters_dict):
                     ws['R1'] = 'Condition'
                     ws['S1'] = 'Temp0'
                     ws['T1'] = 'Temp1'
+                    ws['U1'] = 'Subtest'
                 else:  # to pass the dashboard
                     pass
 
@@ -2612,7 +2613,7 @@ def tx_power_relative_test_export_excel_sig(data, parameters_dict):
             max_row = ws.max_row
             row = max_row + 1
 
-            chan = cm_pmt_anritsu.aclr_ch_judge(tech, band, dl_ch, bw)
+            chan = cm_pmt_anritsu.sig_ch_judge(tech, band, dl_ch, bw)
             ws.cell(row, 1).value = band
             ws.cell(row, 2).value = bw
             ws.cell(row, 3).value = tx_freq  # this freq_lte
@@ -2642,24 +2643,24 @@ def tx_power_relative_test_export_excel_sig(data, parameters_dict):
             row += 1
 
     elif tech == 'WCDMA':
-        for measured_items in data:  # to seperate the data to mcs and sub-data
+        if chcoding == 'REFMEASCH':
             ws = wb[f'Raw_Data']
             max_row = ws.max_row
             row = max_row + 1
 
-            chan = cm_pmt_anritsu.aclr_ch_judge(tech, band, dl_ch)
+            chan = cm_pmt_anritsu.sig_ch_judge(tech, band, dl_ch)
             ws.cell(row, 1).value = band
             ws.cell(row, 2).value = cm_pmt_ftm.transfer_chan_rx2tx_wcdma(band, dl_ch)  # this channel
             ws.cell(row, 3).value = chan  # LMH
             ws.cell(row, 4).value = tx_freq
             ws.cell(row, 5).value = ext_pmt.tx_level  # this tx_level
-            ws.cell(row, 6).value = measured_items[0]  # 'Measured_Power'
-            ws.cell(row, 7).value = measured_items[1][0]  # U_-1
-            ws.cell(row, 8).value = measured_items[1][1]  # U_+1
-            ws.cell(row, 9).value = measured_items[1][2]  # U_-2
-            ws.cell(row, 10).value = measured_items[1][3]  # U_+2
+            ws.cell(row, 6).value = data[0]  # 'Measured_Power'
+            ws.cell(row, 7).value = data[1][0]  # U_-1
+            ws.cell(row, 8).value = data[1][1]  # U_+1
+            ws.cell(row, 9).value = data[1][2]  # U_-2
+            ws.cell(row, 10).value = data[1][3]  # U_+2
             ws.cell(row, 11).value = None  # 'OBW'
-            ws.cell(row, 12).value = measured_items[2]  # 'EVM'
+            ws.cell(row, 12).value = data[2]  # 'EVM'
             ws.cell(row, 13).value = None  # 'Freq_Err'
             ws.cell(row, 14).value = None  # 'IQ_OFFSET'
             ws.cell(row, 15).value = None  # 'Tx_Path'
@@ -2668,7 +2669,37 @@ def tx_power_relative_test_export_excel_sig(data, parameters_dict):
             ws.cell(row, 18).value = ext_pmt.condition  # 'Condition'
             ws.cell(row, 19).value = thermal[0]  # 'Temp0'
             ws.cell(row, 20).value = thermal[1]  # 'Temp1'
+            ws.cell(row, 21).value = None  # subtest
             row += 1
+        else:
+            for subtest, data in data.items():
+                ws = wb[f'Raw_Data']
+                max_row = ws.max_row
+                row = max_row + 1
+
+                chan = cm_pmt_anritsu.sig_ch_judge(tech, band, dl_ch)
+                ws.cell(row, 1).value = band
+                ws.cell(row, 2).value = cm_pmt_ftm.transfer_chan_rx2tx_wcdma(band, dl_ch)  # this channel
+                ws.cell(row, 3).value = chan  # LMH
+                ws.cell(row, 4).value = tx_freq
+                ws.cell(row, 5).value = ext_pmt.tx_level  # this tx_level
+                ws.cell(row, 6).value = data[0]  # 'Measured_Power'
+                ws.cell(row, 7).value = data[1][0]  # U_-1
+                ws.cell(row, 8).value = data[1][1]  # U_+1
+                ws.cell(row, 9).value = data[1][2]  # U_-2
+                ws.cell(row, 10).value = data[1][3]  # U_+2
+                ws.cell(row, 11).value = None  # 'OBW'
+                ws.cell(row, 12).value = data[2] if chcoding != 'EDCHTEST' and subtest == 3 else None  # 'EVM'
+                ws.cell(row, 13).value = None  # 'Freq_Err'
+                ws.cell(row, 14).value = None  # 'IQ_OFFSET'
+                ws.cell(row, 15).value = None  # 'Tx_Path'
+                ws.cell(row, 16).value = None  # 'AS_Path'
+                ws.cell(row, 17).value = None  # 'Current(mA)'
+                ws.cell(row, 18).value = ext_pmt.condition  # 'Condition'
+                ws.cell(row, 19).value = thermal[0]  # 'Temp0'
+                ws.cell(row, 20).value = thermal[1]  # 'Temp1'
+                ws.cell(row, 21).value = subtest  # subtest
+                row += 1
 
     elif tech == 'GSM':  # this is template, not verify and not implement
         for mcs, measured_items in data:  # to seperate the data to mcs and sub-data
@@ -2691,7 +2722,7 @@ def tx_power_relative_test_export_excel_sig(data, parameters_dict):
             max_row = ws.max_row
             row = max_row + 1
 
-            chan = cm_pmt_anritsu.aclr_ch_judge(tech, band, dl_ch)
+            chan = cm_pmt_anritsu.sig_ch_judge(tech, band, dl_ch)
             ws.cell(row, 1).value = band
             ws.cell(row, 2).value = cm_pmt_ftm.transfer_chan_rx2tx_wcdma(band, dl_ch)  # this channel
             ws.cell(row, 3).value = chan  # LMH

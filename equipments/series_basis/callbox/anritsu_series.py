@@ -855,17 +855,17 @@ class Anritsu:
         """
         return self.anritsu_query('POINT_PHASEDISC? ALL').strip().split(',')  # theta0, theta1
 
-    def get_power_average_query(self):
-        """
-        Get the average power for LTE
-        """
-        return float(self.anritsu_query('POWER? AVG').strip())
-
-    def get_avg_power_query(self):
-        """
-        Get the average power for WCDMA
-        """
-        return float(self.anritsu_query('AVG_POWER?').strip())
+    def get_power_average_query(self, standard='LTE'):
+        if standard == 'LTE':
+            """
+            Get the average power for LTE
+            """
+            return float(self.anritsu_query('POWER? AVG').strip())
+        elif standard == 'WCDMA':
+            """
+            Get the average power for WCDMA
+            """
+            return float(self.anritsu_query('AVG_POWER?').strip())
 
     def get_evm_query_lte(self):
         """
@@ -938,13 +938,13 @@ class Anritsu:
         """
         Query the chcoding to judge which type for WCDMA | HSUPA | HSDPA
         """
-        self.anritsu_query('CHCODING?').strip()
+        return self.anritsu_query('CHCODING?').strip()
 
     def get_ue_cap_version_query(self):
         """
         I don't know what it is
         """
-        self.anritsu_query(f'UE_CAP? REL')
+        return self.anritsu_query(f'UE_CAP? REL')
 
     def get_ul_rb_size_query(self):
         """
