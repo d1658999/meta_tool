@@ -1139,7 +1139,7 @@ class Anritsu8820(Anritsu):
                                     self.set_output_level(start)
                                     self.set_to_measure()
                                     status = self.get_throughput_pass_query()
-                                    output_level = self.get_output_level_query('LTE')
+                                    output_level = self.get_output_level_query()
                                     logger.info(f'reconnedted level {output_level}: {status}')
                                     start -= fine
                             else:
@@ -1149,7 +1149,7 @@ class Anritsu8820(Anritsu):
                         elif status == 'PASS':
                             while count > 0:
                                 self.set_to_measure()
-                                output_level = self.get_output_level_query('LTE')
+                                output_level = self.get_output_level_query()
                                 status = self.get_throughput_pass_query()
                                 if status == 'FAIL':
                                     logger.info(f'{4 - count} times fail')
@@ -1163,7 +1163,7 @@ class Anritsu8820(Anritsu):
                                 continue
                             else:
                                 break
-                    sensitivity = Decimal(self.get_output_level_query('LTE'))
+                    sensitivity = Decimal(self.get_output_level_query())
                     time.sleep(0.1)
                     per = self.get_throughput_per_query()
                     power = round(self.get_power_average_query('LTE'), 1)
