@@ -1,5 +1,12 @@
 from equipments.anritsu8820 import Anritsu8820
 from equipments.series_basis.modem_usb_serial.serial_series import AtCmd
+import utils.parameters.external_paramters as ext_pmt
+import utils.parameters.common_parameters_anritsu as cm_pmt_anritsu
+from utils.channel_handler import channel_freq_select
+from utils.excel_handler import tx_power_relative_test_export_excel_sig, txp_aclr_evm_current_plot_sig
+from utils.log_init import log_set
+
+logger = log_set('8820RxFreqSweepSig')
 
 
 class RxTestFreqSweep(AtCmd, Anritsu8820):

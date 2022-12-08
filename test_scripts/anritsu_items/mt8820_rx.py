@@ -1,5 +1,13 @@
 from equipments.anritsu8820 import Anritsu8820
 from equipments.series_basis.modem_usb_serial.serial_series import AtCmd
+import utils.parameters.external_paramters as ext_pmt
+import utils.parameters.common_parameters_anritsu as cm_pmt_anritsu
+from utils.channel_handler import channel_freq_select
+from utils.excel_handler import rx_power_relative_test_export_excel_sig, txp_aclr_evm_current_plot_sig
+from utils.excel_handler import rx_desense_process_sig, rxs_relative_plot_sig
+from utils.log_init import log_set
+
+logger = log_set('8820RxSig')
 
 
 class RxTestGenre(AtCmd, Anritsu8820):
@@ -32,7 +40,7 @@ class RxTestGenre(AtCmd, Anritsu8820):
                 self.set_input_level(30)
                 sens_list = self.get_sensitivity(standard, band, dl_ch, bw)
                 logger.debug(f'Sensitivity list:{sens_list}')
-                self.excel_path = fill_values_rx(sens_list, band, dl_ch, power_selected, bw)
+                self.excel_path = rx_power_relative_test_export_excel_sig(sens_list, band, dl_ch, power_selected, bw)
                 self.set_output_level(-70)
             elif power_selected == 0:
                 if standard == 'LTE':
@@ -42,7 +50,7 @@ class RxTestGenre(AtCmd, Anritsu8820):
                 self.set_input_level(-10)
                 sens_list = self.get_sensitivity(standard, band, dl_ch, bw)
                 logger.debug(f'Sensitivity list:{sens_list}')
-                self.excel_path = fill_values_rx(sens_list, band, dl_ch, power_selected, bw)
+                self.excel_path = rx_power_relative_test_export_excel_sig(sens_list, band, dl_ch, power_selected, bw)
                 self.set_output_level(-70)
             self.set_rf_out_port('MAIN')
 
@@ -71,8 +79,8 @@ class RxTestGenre(AtCmd, Anritsu8820):
                             for dl_ch in ch_list:
                                 self.rx_core(standard, band, dl_ch, bw)
                             time.sleep(1)
-                    fill_desens(self.excel_path)
-                    excel_plot_line(standard, self.chcoding, self.excel_path)
+                    rx_desense_process_sig(standard, self.excel_path)
+                    rxs_relative_plot_sig(standard, self.chcoding, self.excel_path)
 
             elif tech == 'WCDMA' and ext_pmt.wcdma_bands != []:
                 standard = self.set_switch_to_wcdma()
@@ -88,8 +96,8 @@ class RxTestGenre(AtCmd, Anritsu8820):
                     logger.debug(f'Test Channel List: {band}, downlink channel list:{ch_list}')
                     for dl_ch in ch_list:
                         self.rx_core(standard, band, dl_ch)
-                fill_desens(self.excel_path)
-                excel_plot_line(standard, self.chcoding, self.excel_path)
+                rx_desense_process_sig(standard, self.excel_path)
+                rxs_relative_plot_sig(standard, self.chcoding, self.excel_path)
             elif tech == ext_pmt.gsm_bands:
                 pass
             else:

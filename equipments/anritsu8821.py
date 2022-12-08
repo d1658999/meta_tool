@@ -1610,7 +1610,7 @@ class Anritsu8821(Anritsu):
                 self.set_input_level(30)
                 sens_list = self.get_sensitivity(standard, band, dl_ch, bw)
                 logger.debug(f'Sensitivity list:{sens_list}')
-                self.excel_path = fill_values_rx(sens_list, band, dl_ch, power_selected, bw)
+                self.excel_path = rx_power_relative_test_export_excel_sig(sens_list, band, dl_ch, power_selected, bw)
                 self.set_output_level(-70)
             elif power_selected == 0:
                 if standard == 'LTE':
@@ -1620,7 +1620,7 @@ class Anritsu8821(Anritsu):
                 self.set_input_level(-10)
                 sens_list = self.get_sensitivity(standard, band, dl_ch, bw)
                 logger.debug(f'Sensitivity list:{sens_list}')
-                self.excel_path = fill_values_rx(sens_list, band, dl_ch, power_selected, bw)
+                self.excel_path = rx_power_relative_test_export_excel_sig(sens_list, band, dl_ch, power_selected, bw)
                 self.set_output_level(-70)
             self.set_phone1_tx_out(1, 'MAIN')
 
