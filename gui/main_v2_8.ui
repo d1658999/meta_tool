@@ -9606,6 +9606,127 @@ Disable</property>
                         </child>
                       </object>
                     </child>
+                    <child>
+                      <object class="ttk.Frame" id="frame8">
+                        <property name="height">200</property>
+                        <property name="width">200</property>
+                        <layout manager="grid">
+                          <property name="column">1</property>
+                          <property name="row">0</property>
+                          <property name="rowspan">2</property>
+                        </layout>
+                        <child>
+                          <object class="ttk.Label" id="label30">
+                            <property name="text" translatable="yes">Rx Path</property>
+                            <layout manager="grid">
+                              <property name="column">0</property>
+                              <property name="padx">5</property>
+                              <property name="pady">6</property>
+                              <property name="row">0</property>
+                              <property name="sticky">nw</property>
+                            </layout>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="ttk.Checkbutton" id="checkbutton352">
+                            <property name="command" type="command" cbtype="simple">wanted_rx_path</property>
+                            <property name="text" translatable="yes">RX0</property>
+                            <property name="variable">boolean:rx0</property>
+                            <layout manager="grid">
+                              <property name="column">0</property>
+                              <property name="padx">5</property>
+                              <property name="pady">5</property>
+                              <property name="row">1</property>
+                              <property name="sticky">nw</property>
+                            </layout>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="ttk.Checkbutton" id="checkbutton353">
+                            <property name="command" type="command" cbtype="simple">wanted_rx_path</property>
+                            <property name="text" translatable="yes">RX1</property>
+                            <property name="variable">boolean:rx1</property>
+                            <layout manager="grid">
+                              <property name="column">0</property>
+                              <property name="padx">5</property>
+                              <property name="pady">5</property>
+                              <property name="row">2</property>
+                              <property name="sticky">nw</property>
+                            </layout>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="ttk.Checkbutton" id="checkbutton354">
+                            <property name="command" type="command" cbtype="simple">wanted_rx_path</property>
+                            <property name="text" translatable="yes">RX2</property>
+                            <property name="variable">boolean:rx2</property>
+                            <layout manager="grid">
+                              <property name="column">0</property>
+                              <property name="padx">5</property>
+                              <property name="pady">5</property>
+                              <property name="row">3</property>
+                              <property name="sticky">nw</property>
+                            </layout>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="ttk.Checkbutton" id="checkbutton355">
+                            <property name="command" type="command" cbtype="simple">wanted_rx_path</property>
+                            <property name="text" translatable="yes">RX3</property>
+                            <property name="variable">boolean:rx3</property>
+                            <layout manager="grid">
+                              <property name="column">0</property>
+                              <property name="padx">5</property>
+                              <property name="pady">5</property>
+                              <property name="row">4</property>
+                              <property name="sticky">nw</property>
+                            </layout>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="ttk.Checkbutton" id="checkbutton357">
+                            <property name="command" type="command" cbtype="simple">wanted_rx_path</property>
+                            <property name="text" translatable="yes">RX0+RX1</property>
+                            <property name="variable">boolean:rx0_rx1</property>
+                            <layout manager="grid">
+                              <property name="column">0</property>
+                              <property name="padx">5</property>
+                              <property name="pady">5</property>
+                              <property name="row">5</property>
+                              <property name="sticky">nw</property>
+                            </layout>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="ttk.Checkbutton" id="checkbutton358">
+                            <property name="command" type="command" cbtype="simple">wanted_rx_path</property>
+                            <property name="text" translatable="yes">RX2+RX3</property>
+                            <property name="variable">boolean:rx2_rx3</property>
+                            <layout manager="grid">
+                              <property name="column">0</property>
+                              <property name="padx">5</property>
+                              <property name="pady">5</property>
+                              <property name="row">6</property>
+                              <property name="sticky">nw</property>
+                            </layout>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="ttk.Checkbutton" id="checkbutton359">
+                            <property name="command" type="command" cbtype="simple">wanted_rx_path</property>
+                            <property name="text" translatable="yes">ALL PATH</property>
+                            <property name="variable">boolean:rx_all_path</property>
+                            <layout manager="grid">
+                              <property name="column">0</property>
+                              <property name="padx">5</property>
+                              <property name="pady">5</property>
+                              <property name="row">7</property>
+                              <property name="sticky">nw</property>
+                            </layout>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
                   </object>
                 </child>
                 <child>
