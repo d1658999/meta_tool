@@ -498,6 +498,59 @@ class AtCmd:
         self.command(f'AT+ERXSEL={rx_path_gsm}')
         # self.command_cmw100_query('*OPC?')
 
+    def rx_path_setting_sig_lte(self):
+        """
+        original FTM:
+        2: PRX, 1: DRX, 4: RX2, 8:RX3, 3: PRX+DRX, 12: RX2+RX3, 15: ALL PATH
+        signaling:
+        1: PRX, 2: DRX, 4: RX2, 8:RX3, 3: PRX+DRX, 12: RX2+RX3, 15: ALL PATH
+        """
+        if self.rx_path_lte is None:
+            self.rx_path_lte = 15
+        logger.info('----------Rx path setting----------')
+        logger.info(f'----------Now is {self.rx_path_lte_dict[self.rx_path_lte]}---------')
+        if self.rx_path_lte == 2:
+            rx_path_lte = 1
+        elif self.rx_path_lte == 1:
+            rx_path_lte = 2
+        else:
+            rx_path_lte = self.rx_path_lte
+
+        self.command(f'AT+LRXMODESET={rx_path_lte}')
+        # self.command_cmw100_query('*OPC?')
+
+    def rx_path_setting_sig_wcdma(self):
+        """
+        original FTM:
+        2: PRX, 1: DRX, 3: PRX+DRX 15: ALL PATH
+        signaling:
+        1: PRX, 2: DRX, 3: PRX+DRX 15: ALL PATH
+        """
+        logger.info('----------Rx path setting----------')
+        logger.info(f'----------Now is {self.rx_path_wcdma_dict[self.rx_path_wcdma]}---------')
+        if self.rx_path_wcdma == 2:
+            rx_path_wcdma = 1
+        elif self.rx_path_lte == 1:
+            rx_path_wcdma = 2
+        else:
+            rx_path_wcdma = self.rx_path_wcdma
+        self.command(f'AT+HRXMODESET={rx_path_wcdma}')
+        # self.command_cmw100_query('*OPC?')
+
+    def rx_path_setting_sig_gsm(self):
+        """
+        0: PRX, 1: DRX
+        """
+        logger.info('----------Rx path setting----------')
+        logger.info(f'---------Now is {self.rx_path_gsm_dict[self.rx_path_gsm]}---------')
+        rx_path_gsm = None
+        if self.rx_path_gsm == 2:
+            rx_path_gsm = 0
+        elif self.rx_path_gsm == 1:
+            rx_path_gsm = 1
+        self.command(f'AT+ERXSEL={rx_path_gsm}')
+        # self.command_cmw100_query('*OPC?')
+
     def query_rsrp_cinr_fr1(self):
         res = self.command(f'AT+NRXMEAS={self.rx_path_fr1},20')
         for line in res:

@@ -15,6 +15,31 @@ class RxTestGenre(AtCmd, Anritsu8820):
         AtCmd.__init__(self)
         Anritsu8820.__init__(self)
 
+    def get_temperature(self):
+        """
+        for P22, AT+GOOGTHERMISTOR=1,1 for MHB LPAMid/ MHB Rx1 LFEM, AT+GOOGTHERMISTOR=0,1
+        for LB LPAMid, MHB ENDC LPAMid, UHB(n77/n79 LPAF)
+        :return:
+        """
+        self.ser.com_open()
+        res0 = self.query_thermister0()
+        res1 = self.query_thermister1()
+        res_list = [res0, res1]
+        therm_list = []
+        for res in res_list:
+            for r in res:
+                if 'TEMPERATURE' in r.decode().strip():
+                    try:
+                        temp = eval(r.decode().strip().split(':')[1]) / 1000
+                        therm_list.append(temp)
+                    except Exception as err:
+                        logger.debug(err)
+                        therm_list.append(None)
+        logger.info(f'thermistor0 get temp: {therm_list[0]}')
+        logger.info(f'thermistor1 get temp: {therm_list[1]}')
+        self.ser.com_close()
+        return therm_list
+
     def rx_core(self, standard, band, dl_ch, bw=None):
         conn_state = int(self.get_calling_state_query())
         if standard == 'LTE':
@@ -37,10 +62,22 @@ class RxTestGenre(AtCmd, Anritsu8820):
             self.set_rf_out_port(ext_pmt.rfout_anritsu)
             if power_selected == 1:
                 self.set_tpc('ALL1')
-                self.set_input_level(30)
-                sens_list = self.get_sensitivity(standard, band, dl_ch, bw)
+                self.set_input_level(ext_pmt.tx_level)
+                sens_list = self.get_sensitivity(standard, band, dl_ch, bw)  # sens_list = [power, sensitivity, per]
                 logger.debug(f'Sensitivity list:{sens_list}')
-                self.excel_path = rx_power_relative_test_export_excel_sig(sens_list, band, dl_ch, power_selected, bw)
+                self.parameters_dict = {
+                    'tech': standard,
+                    'bw': bw,
+                    'band': band,
+                    'dl_ch': dl_ch,
+                    'tx_level': ext_pmt.tx_level,
+                    'rx_path': self.rx_path,
+                    'rb_size': self.get_ul_rb_size_query(),
+                    'rb_start': self.get_ul_rb_start_query(),
+                    'thermal': self.get_temperature(),
+
+                }
+                self.excel_path = rx_power_relative_test_export_excel_sig(sens_list, parameters_dict)
                 self.set_output_level(-70)
             elif power_selected == 0:
                 if standard == 'LTE':
@@ -50,7 +87,14 @@ class RxTestGenre(AtCmd, Anritsu8820):
                 self.set_input_level(-10)
                 sens_list = self.get_sensitivity(standard, band, dl_ch, bw)
                 logger.debug(f'Sensitivity list:{sens_list}')
-                self.excel_path = rx_power_relative_test_export_excel_sig(sens_list, band, dl_ch, power_selected, bw)
+                self.parameters_dict = {
+                    'tech': standard,
+                    'bw': bw,
+                    'band': band,
+                    'dl_ch': dl_ch,
+                    'tx_level': -10,
+                }
+                self.excel_path = rx_power_relative_test_export_excel_sig(sens_list, parameters_dict)
                 self.set_output_level(-70)
             self.set_rf_out_port('MAIN')
 
@@ -63,41 +107,45 @@ class RxTestGenre(AtCmd, Anritsu8820):
                 self.chcoding = None
                 for bw in ext_pmt.lte_bandwidths:
                     for band in ext_pmt.lte_bands:
-                        if bw in cm_pmt_anritsu.bandwidths_selected(band):
-                            if band == 28:
-                                self.band_segment = ext_pmt.band_segment
-                            self.set_test_parameter_normal()
-                            ch_list = []
-                            for wt_ch in ext_pmt.channel:
-                                if wt_ch == 'L':
-                                    ch_list.append(cm_pmt_anritsu.dl_ch_selected(standard, band, bw)[0])
-                                elif wt_ch == 'M':
-                                    ch_list.append(cm_pmt_anritsu.dl_ch_selected(standard, band, bw)[1])
-                                elif wt_ch == 'H':
-                                    ch_list.append(cm_pmt_anritsu.dl_ch_selected(standard, band, bw)[2])
-                            logger.debug(f'Test Channel List: {band}, {bw}MHZ, downlink channel list:{ch_list}')
-                            for dl_ch in ch_list:
-                                self.rx_core(standard, band, dl_ch, bw)
-                            time.sleep(1)
+                        for rx_path in ext_pmt.rx_paths:
+                            self.rx_path = rx_path
+                            if bw in cm_pmt_anritsu.bandwidths_selected(band):
+                                if band == 28:
+                                    self.band_segment = ext_pmt.band_segment
+                                self.set_test_parameter_normal()
+                                ch_list = []
+                                for wt_ch in ext_pmt.channel:
+                                    if wt_ch == 'L':
+                                        ch_list.append(cm_pmt_anritsu.dl_ch_selected(standard, band, bw)[0])
+                                    elif wt_ch == 'M':
+                                        ch_list.append(cm_pmt_anritsu.dl_ch_selected(standard, band, bw)[1])
+                                    elif wt_ch == 'H':
+                                        ch_list.append(cm_pmt_anritsu.dl_ch_selected(standard, band, bw)[2])
+                                logger.debug(f'Test Channel List: {band}, {bw}MHZ, downlink channel list:{ch_list}')
+                                for dl_ch in ch_list:
+                                    self.rx_core(standard, band, dl_ch, bw)
+                                time.sleep(1)
                     rx_desense_process_sig(standard, self.excel_path)
-                    rxs_relative_plot_sig(standard, self.chcoding, self.excel_path)
+                    rxs_relative_plot_sig(standard, self.parameters_dict)
 
             elif tech == 'WCDMA' and ext_pmt.wcdma_bands != []:
                 standard = self.set_switch_to_wcdma()
                 for band in ext_pmt.wcdma_bands:
-                    ch_list = []
-                    for wt_ch in ext_pmt.channel:
-                        if wt_ch == 'L':
-                            ch_list.append(cm_pmt_anritsu.dl_ch_selected(standard, band)[0])
-                        elif wt_ch == 'M':
-                            ch_list.append(cm_pmt_anritsu.dl_ch_selected(standard, band)[1])
-                        elif wt_ch == 'H':
-                            ch_list.append(cm_pmt_anritsu.dl_ch_selected(standard, band)[2])
-                    logger.debug(f'Test Channel List: {band}, downlink channel list:{ch_list}')
-                    for dl_ch in ch_list:
-                        self.rx_core(standard, band, dl_ch)
+                    for rx_path in ext_pmt.rx_paths:
+                        self.rx_path = rx_path
+                        ch_list = []
+                        for wt_ch in ext_pmt.channel:
+                            if wt_ch == 'L':
+                                ch_list.append(cm_pmt_anritsu.dl_ch_selected(standard, band)[0])
+                            elif wt_ch == 'M':
+                                ch_list.append(cm_pmt_anritsu.dl_ch_selected(standard, band)[1])
+                            elif wt_ch == 'H':
+                                ch_list.append(cm_pmt_anritsu.dl_ch_selected(standard, band)[2])
+                        logger.debug(f'Test Channel List: {band}, downlink channel list:{ch_list}')
+                        for dl_ch in ch_list:
+                            self.rx_core(standard, band, dl_ch)
                 rx_desense_process_sig(standard, self.excel_path)
-                rxs_relative_plot_sig(standard, self.chcoding, self.excel_path)
+                rxs_relative_plot_sig(standard, self.parameters_dict)
             elif tech == ext_pmt.gsm_bands:
                 pass
             else:

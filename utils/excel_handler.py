@@ -2377,9 +2377,9 @@ def rx_desense_process_sig(tech, file_path, mcs='QPSK'):
 
 def rx_power_relative_test_export_excel_sig(data, parameters_dict):
     """
+    data = sens_list = [power, sensitivity, per]
 
     """
-    script = parameters_dict['script']
     tech = parameters_dict['tech']
     band = parameters_dict['band']
     bw = parameters_dict['bw']
