@@ -505,19 +505,22 @@ class AtCmd:
         signaling:
         1: PRX, 2: DRX, 4: RX2, 8:RX3, 3: PRX+DRX, 12: RX2+RX3, 15: ALL PATH
         """
-        if self.rx_path_lte is None:
-            self.rx_path_lte = 15
+        self.ser.com_open()
+        if self.rx_path is None:
+            self.rx_path = 0
         logger.info('----------Rx path setting----------')
-        logger.info(f'----------Now is {self.rx_path_lte_dict[self.rx_path_lte]}---------')
-        if self.rx_path_lte == 2:
-            rx_path_lte = 1
+        rx_path_lte = self.rx_path_lte_dict[self.rx_path]
+        logger.info(f'----------Now is {rx_path_lte}---------')
+        if self.rx_path == 2:
+            rx_path = 1
         elif self.rx_path_lte == 1:
-            rx_path_lte = 2
+            rx_path = 2
         else:
-            rx_path_lte = self.rx_path_lte
+            rx_path = self.rx_path
 
-        self.command(f'AT+LRXMODESET={rx_path_lte}')
+        self.command(f'AT+LRXMODESET={rx_path}')
         # self.command_cmw100_query('*OPC?')
+        self.ser.com_close()
 
     def rx_path_setting_sig_wcdma(self):
         """
@@ -526,30 +529,42 @@ class AtCmd:
         signaling:
         1: PRX, 2: DRX, 3: PRX+DRX 15: ALL PATH
         """
+        self.ser.com_open()
+        if self.rx_path is None:
+            self.rx_path = 0
         logger.info('----------Rx path setting----------')
-        logger.info(f'----------Now is {self.rx_path_wcdma_dict[self.rx_path_wcdma]}---------')
-        if self.rx_path_wcdma == 2:
-            rx_path_wcdma = 1
-        elif self.rx_path_lte == 1:
-            rx_path_wcdma = 2
+        rx_path_wcdma = self.rx_path_wcdma_dict[self.rx_path]
+        logger.info(f'----------Now is {rx_path_wcdma}---------')
+        if self.rx_path == 2:
+            rx_path = 1
+        elif self.rx_path == 1:
+            rx_path = 2
         else:
-            rx_path_wcdma = self.rx_path_wcdma
-        self.command(f'AT+HRXMODESET={rx_path_wcdma}')
+            rx_path = self.rx_path_wcdma
+        self.command(f'AT+HRXMODESET={rx_path}')
         # self.command_cmw100_query('*OPC?')
+        self.ser.com_close()
+
 
     def rx_path_setting_sig_gsm(self):
         """
         0: PRX, 1: DRX
         """
+        self.ser.com_open()
+        if self.rx_path is None:
+            self.rx_path = 0
         logger.info('----------Rx path setting----------')
-        logger.info(f'---------Now is {self.rx_path_gsm_dict[self.rx_path_gsm]}---------')
-        rx_path_gsm = None
+        rx_path_gsm = self.rx_path_gsm_dict[self.rx_path_gsm]
+        logger.info(f'---------Now is {rx_path_gsm}---------')
         if self.rx_path_gsm == 2:
-            rx_path_gsm = 0
+            rx_path = 1
         elif self.rx_path_gsm == 1:
-            rx_path_gsm = 1
-        self.command(f'AT+ERXSEL={rx_path_gsm}')
+            rx_path = 2
+        else:
+            rx_path = self.rx_path
+        self.command(f'AT+ERXPATHSET={rx_path}')
         # self.command_cmw100_query('*OPC?')
+        self.ser.com_close()
 
     def query_rsrp_cinr_fr1(self):
         res = self.command(f'AT+NRXMEAS={self.rx_path_fr1},20')

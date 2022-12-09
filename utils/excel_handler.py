@@ -2368,7 +2368,9 @@ def rx_desense_process_sig(tech, file_path, mcs='QPSK'):
         ws_desens.cell(row, 1).value = ws_txmax.cell(row, 1).value
         ws_desens.cell(row, 2).value = ws_txmax.cell(row, 2).value
         ws_desens.cell(row, 3).value = ws_txmax.cell(row, 3).value
-        ws_desens.cell(row, 4).value = ws_txmax.cell(row, 7).value - ws_txmin.cell(row, 7).value
+        sens_Txmax = ws_txmax.cell(row, 7).value if ws_txmax.cell(row, 7).value is not None else 0
+        sens_Txmin = ws_txmin.cell(row, 7).value if ws_txmin.cell(row, 7).value is not None else 0
+        ws_desens.cell(row, 4).value = sens_Txmax - sens_Txmin
         ws_desens.cell(row, 5).value = ws_txmax.cell(row, 20).value
 
     wb.save(file_path)
@@ -2385,10 +2387,13 @@ def rx_power_relative_test_export_excel_sig(data, parameters_dict):
     bw = parameters_dict['bw']
     tx_level = parameters_dict['tx_level']
     mcs = parameters_dict['mcs']
-    tx_path = parameters_dict['tx_path']
+    # tx_path = parameters_dict['tx_path']
     rx_path = parameters_dict['rx_path']
     rb_size = parameters_dict['rb_size']
     rb_start = parameters_dict['rb_start']
+    thermal = parameters_dict['thermal']
+    dl_ch = parameters_dict['dl_ch']
+    tx_freq = parameters_dict['tx_freq']
 
     logger.info('----------save to excel----------')
     filename = f'Sensitivty_sig_{bw}MHZ_{tech}_LMH.xlsx'
@@ -2418,11 +2423,11 @@ def rx_power_relative_test_export_excel_sig(data, parameters_dict):
                     ws['G1'] = 'Rx level'
                     ws['H1'] = 'TX_Path'
                     ws['I1'] = 'BW'
-                    ws['K1'] = 'RB_num_UL'
+                    ws['J1'] = 'RB_num_UL'
                     ws['K1'] = 'RB_start_UL'
                     ws['L1'] = 'Condition'
                     ws['M1'] = 'Temp0'
-                    ws['R1'] = 'Temp1'
+                    ws['N1'] = 'Temp1'
 
                 else:  # to skip dashboard
                     pass
@@ -2484,30 +2489,30 @@ def rx_power_relative_test_export_excel_sig(data, parameters_dict):
     if tech == 'LTE':
         max_row = ws.max_row
         row = max_row + 1  # skip title
-        for tx_freq, measured_data in data.items():
-            chan = chan_judge_lte(band, bw, tx_freq)
-            ws.cell(row, 1).value = band
-            ws.cell(row, 2).value = rx_path_lte_dict[rx_path]
-            ws.cell(row, 3).value = chan  # LMH
-            ws.cell(row, 4).value = tx_freq
-            ws.cell(row, 5).value = tx_level  # this tx level
-            ws.cell(row, 6).value = measured_data[0]  # measured power
-            ws.cell(row, 7).value = measured_data[1]  # RX level
-            ws.cell(row, 8).value = tx_path
-            ws.cell(row, 9).value = bw
-            ws.cell(row, 10).value = rb_size
-            ws.cell(row, 11).value = rb_start
-            ws.cell(row, 12).value = ext_pmt.condition
-            ws.cell(row, 13).value = measured_data[5][0]  # thermister 0
-            ws.cell(row, 14).value = measured_data[5][1]  # thermister 1
 
-            row += 1
+        chan = cm_pmt_anritsu.sig_ch_judge(band, bw, dl_ch)
+        ws.cell(row, 1).value = band
+        ws.cell(row, 2).value = rx_path_lte_dict[rx_path]
+        ws.cell(row, 3).value = chan  # LMH
+        ws.cell(row, 4).value = tx_freq
+        ws.cell(row, 5).value = tx_level  # this tx level
+        ws.cell(row, 6).value = data[0]  # measured power
+        ws.cell(row, 7).value = data[1]  # RX level
+        ws.cell(row, 8).value = None  # tx_path
+        ws.cell(row, 9).value = bw
+        ws.cell(row, 10).value = rb_size
+        ws.cell(row, 11).value = rb_start
+        ws.cell(row, 12).value = ext_pmt.condition
+        ws.cell(row, 13).value = thermal[0]  # thermister 0
+        ws.cell(row, 14).value = thermal[1]  # thermister 1
+
+        row += 1
 
     elif tech == 'WCDMA' or tech == 'GSM':
         max_row = ws.max_row
         row = max_row + 1  # skip title
         for tx_chan, rx_level in data.items():
-            chan = chan_judge_wcdma(band, cm_pmt_ftm.transfer_chan2freq_wcdma(band, tx_chan))
+            chan = cm_pmt_anritsu.sig_ch_judge(band, cm_pmt_ftm.transfer_chan2freq_wcdma(band, tx_chan))
             ws.cell(row, 1).value = band
             ws.cell(row, 2).value = rx_path_wcdma_dict[rx_path]
             ws.cell(row, 3).value = chan  # LMH
@@ -3524,152 +3529,151 @@ def txp_aclr_evm_current_plot_sig(standard, file_path):
         wb.close()
 
 
-def rxs_relative_plot_sig(file_path, parameters_dict):
+def rxs_relative_plot_sig(standard, file_path, parameters_dict):
     logger.info('----------Plot Chart---------')
     # tech ='LTE'
     # mcs_lte = 'QPSK'
-    script = parameters_dict['script']
+    # script = parameters_dict['script']
     tech = parameters_dict['tech']
     mcs = parameters_dict['mcs']
 
     wb = openpyxl.load_workbook(file_path)
-    if script == 'GENERAL':
-        if tech == 'LTE':
-            ws_dashboard = wb[f'Dashboard']
-            ws_desens = wb[f'Desens_{mcs}']
-            ws_txmax = wb[f'Raw_Data_{mcs}_TxMax']
-            ws_txmin = wb[f'Raw_Data_{mcs}_-10dBm']
+    if tech == 'LTE':
+        ws_dashboard = wb[f'Dashboard']
+        ws_desens = wb[f'Desens_{mcs}']
+        ws_txmax = wb[f'Raw_Data_{mcs}_TxMax']
+        ws_txmin = wb[f'Raw_Data_{mcs}_-10dBm']
 
-            if ws_dashboard._charts:  # if there is charts, delete it
-                ws_dashboard._charts.clear()
+        if ws_dashboard._charts:  # if there is charts, delete it
+            ws_dashboard._charts.clear()
 
-            chart1 = LineChart()
-            chart1.title = 'Sensitivity'
-            chart1.y_axis.title = 'Rx_Level(dBm)'
-            chart1.x_axis.title = 'Band'
-            chart1.x_axis.tickLblPos = 'low'
-            chart1.height = 20
-            chart1.width = 32
-            y_data_txmax = Reference(ws_txmax, min_col=7, min_row=2, max_col=7, max_row=ws_txmax.max_row)
-            y_data_txmin = Reference(ws_txmin, min_col=7, min_row=2, max_col=7, max_row=ws_txmin.max_row)
-            y_data_desens = Reference(ws_desens, min_col=4, min_row=1, max_col=4, max_row=ws_desens.max_row)
-            x_data = Reference(ws_desens, min_col=1, min_row=2, max_col=3, max_row=ws_desens.max_row)
+        chart1 = LineChart()
+        chart1.title = 'Sensitivity'
+        chart1.y_axis.title = 'Rx_Level(dBm)'
+        chart1.x_axis.title = 'Band'
+        chart1.x_axis.tickLblPos = 'low'
+        chart1.height = 20
+        chart1.width = 32
+        y_data_txmax = Reference(ws_txmax, min_col=7, min_row=2, max_col=7, max_row=ws_txmax.max_row)
+        y_data_txmin = Reference(ws_txmin, min_col=7, min_row=2, max_col=7, max_row=ws_txmin.max_row)
+        y_data_desens = Reference(ws_desens, min_col=4, min_row=1, max_col=4, max_row=ws_desens.max_row)
+        x_data = Reference(ws_desens, min_col=1, min_row=2, max_col=3, max_row=ws_desens.max_row)
 
-            series_txmax = Series(y_data_txmax, title="Tx_Max")
-            series_txmin = Series(y_data_txmin, title="Tx_-10dBm")
+        series_txmax = Series(y_data_txmax, title="Tx_Max")
+        series_txmin = Series(y_data_txmin, title="Tx_-10dBm")
 
-            chart1.append(series_txmax)
-            chart1.append(series_txmin)
-            chart1.set_categories(x_data)
-            chart1.y_axis.majorGridlines = None
+        chart1.append(series_txmax)
+        chart1.append(series_txmin)
+        chart1.set_categories(x_data)
+        chart1.y_axis.majorGridlines = None
 
-            chart2 = BarChart()
-            chart2.add_data(y_data_desens, titles_from_data=True)
-            chart2.y_axis.axId = 200
-            chart2.y_axis.title = 'Diff(dB)'
+        chart2 = BarChart()
+        chart2.add_data(y_data_desens, titles_from_data=True)
+        chart2.y_axis.axId = 200
+        chart2.y_axis.title = 'Diff(dB)'
 
-            chart1.y_axis.crosses = "max"
-            chart1 += chart2
-            # save at dashboard sheet
-            ws_dashboard.add_chart(chart1, "A1")
+        chart1.y_axis.crosses = "max"
+        chart1 += chart2
+        # save at dashboard sheet
+        ws_dashboard.add_chart(chart1, "A1")
 
-            wb.save(file_path)
-            wb.close()
+        wb.save(file_path)
+        wb.close()
 
-        elif tech == 'FR1':
-            ws_dashboard = wb[f'Dashboard']
-            ws_desens = wb[f'Desens_{mcs}']
-            ws_txmax = wb[f'Raw_Data_{mcs}_TxMax']
-            ws_txmin = wb[f'Raw_Data_{mcs}_-10dBm']
+    elif tech == 'FR1':
+        ws_dashboard = wb[f'Dashboard']
+        ws_desens = wb[f'Desens_{mcs}']
+        ws_txmax = wb[f'Raw_Data_{mcs}_TxMax']
+        ws_txmin = wb[f'Raw_Data_{mcs}_-10dBm']
 
-            if ws_dashboard._charts:  # if there is charts, delete it
-                ws_dashboard._charts.clear()
+        if ws_dashboard._charts:  # if there is charts, delete it
+            ws_dashboard._charts.clear()
 
-            chart1 = LineChart()
-            chart1.title = 'Sensitivity'
-            chart1.y_axis.title = 'Rx_Level(dBm)'
-            chart1.x_axis.title = 'Band'
-            chart1.x_axis.tickLblPos = 'low'
-            chart1.height = 20
-            chart1.width = 32
-            y_data_txmax = Reference(ws_txmax, min_col=7, min_row=2, max_col=7, max_row=ws_txmax.max_row)
-            y_data_txmin = Reference(ws_txmin, min_col=7, min_row=2, max_col=7, max_row=ws_txmin.max_row)
-            y_data_desens = Reference(ws_desens, min_col=4, min_row=1, max_col=4, max_row=ws_desens.max_row)
-            x_data = Reference(ws_desens, min_col=1, min_row=2, max_col=3, max_row=ws_desens.max_row)
+        chart1 = LineChart()
+        chart1.title = 'Sensitivity'
+        chart1.y_axis.title = 'Rx_Level(dBm)'
+        chart1.x_axis.title = 'Band'
+        chart1.x_axis.tickLblPos = 'low'
+        chart1.height = 20
+        chart1.width = 32
+        y_data_txmax = Reference(ws_txmax, min_col=7, min_row=2, max_col=7, max_row=ws_txmax.max_row)
+        y_data_txmin = Reference(ws_txmin, min_col=7, min_row=2, max_col=7, max_row=ws_txmin.max_row)
+        y_data_desens = Reference(ws_desens, min_col=4, min_row=1, max_col=4, max_row=ws_desens.max_row)
+        x_data = Reference(ws_desens, min_col=1, min_row=2, max_col=3, max_row=ws_desens.max_row)
 
-            series_txmax = Series(y_data_txmax, title="Tx_Max")
-            series_txmin = Series(y_data_txmin, title="Tx_-10dBm")
+        series_txmax = Series(y_data_txmax, title="Tx_Max")
+        series_txmin = Series(y_data_txmin, title="Tx_-10dBm")
 
-            chart1.append(series_txmax)
-            chart1.append(series_txmin)
-            chart1.set_categories(x_data)
-            chart1.y_axis.majorGridlines = None
+        chart1.append(series_txmax)
+        chart1.append(series_txmin)
+        chart1.set_categories(x_data)
+        chart1.y_axis.majorGridlines = None
 
-            chart2 = BarChart()
-            chart2.add_data(y_data_desens, titles_from_data=True)
-            chart2.y_axis.axId = 200
-            chart2.y_axis.title = 'Diff(dB)'
+        chart2 = BarChart()
+        chart2.add_data(y_data_desens, titles_from_data=True)
+        chart2.y_axis.axId = 200
+        chart2.y_axis.title = 'Diff(dB)'
 
-            chart1.y_axis.crosses = "max"
-            chart1 += chart2
-            # save at dashboard sheet
-            ws_dashboard.add_chart(chart1, "A1")
+        chart1.y_axis.crosses = "max"
+        chart1 += chart2
+        # save at dashboard sheet
+        ws_dashboard.add_chart(chart1, "A1")
 
-            wb.save(file_path)
-            wb.close()
+        wb.save(file_path)
+        wb.close()
 
-        elif tech == 'WCDMA':
-            ws_dashboard = wb[f'Dashboard']
-            ws = wb[f'Raw_Data']
+    elif tech == 'WCDMA':
+        ws_dashboard = wb[f'Dashboard']
+        ws = wb[f'Raw_Data']
 
-            if ws_dashboard._charts:  # if there is charts, delete it
-                ws_dashboard._charts.clear()
+        if ws_dashboard._charts:  # if there is charts, delete it
+            ws_dashboard._charts.clear()
 
-            chart1 = LineChart()
-            chart1.title = 'Sensitivity'
-            chart1.y_axis.title = 'Rx_Level(dBm)'
-            chart1.x_axis.title = 'Band'
-            chart1.x_axis.tickLblPos = 'low'
-            chart1.height = 20
-            chart1.width = 32
-            y_data = Reference(ws, min_col=6, min_row=2, max_col=6, max_row=ws.max_row)
-            x_data = Reference(ws, min_col=1, min_row=2, max_col=3, max_row=ws.max_row)
-            # save at dashboard sheet
-            series_pure_sens = Series(y_data, title="Pure_Sensititvity_FTM")
+        chart1 = LineChart()
+        chart1.title = 'Sensitivity'
+        chart1.y_axis.title = 'Rx_Level(dBm)'
+        chart1.x_axis.title = 'Band'
+        chart1.x_axis.tickLblPos = 'low'
+        chart1.height = 20
+        chart1.width = 32
+        y_data = Reference(ws, min_col=6, min_row=2, max_col=6, max_row=ws.max_row)
+        x_data = Reference(ws, min_col=1, min_row=2, max_col=3, max_row=ws.max_row)
+        # save at dashboard sheet
+        series_pure_sens = Series(y_data, title="Pure_Sensititvity_FTM")
 
-            chart1.append(series_pure_sens)
-            chart1.set_categories(x_data)
+        chart1.append(series_pure_sens)
+        chart1.set_categories(x_data)
 
-            ws_dashboard.add_chart(chart1, "A1")
+        ws_dashboard.add_chart(chart1, "A1")
 
-            wb.save(file_path)
-            wb.close()
+        wb.save(file_path)
+        wb.close()
 
-        elif tech == 'GSM':
-            ws_dashboard = wb[f'Dashboard']
-            ws = wb[f'Raw_Data']
+    elif tech == 'GSM':
+        ws_dashboard = wb[f'Dashboard']
+        ws = wb[f'Raw_Data']
 
-            if ws_dashboard._charts:  # if there is charts, delete it
-                ws_dashboard._charts.clear()
+        if ws_dashboard._charts:  # if there is charts, delete it
+            ws_dashboard._charts.clear()
 
-            chart1 = LineChart()
-            chart1.title = 'Sensitivity'
-            chart1.y_axis.title = 'Rx_Level(dBm)'
-            chart1.x_axis.title = 'Band'
-            chart1.x_axis.tickLblPos = 'low'
-            chart1.height = 20
-            chart1.width = 32
-            y_data = Reference(ws, min_col=6, min_row=1, max_col=7, max_row=ws.max_row)
-            x_data = Reference(ws, min_col=1, min_row=2, max_col=3, max_row=ws.max_row)
+        chart1 = LineChart()
+        chart1.title = 'Sensitivity'
+        chart1.y_axis.title = 'Rx_Level(dBm)'
+        chart1.x_axis.title = 'Band'
+        chart1.x_axis.tickLblPos = 'low'
+        chart1.height = 20
+        chart1.width = 32
+        y_data = Reference(ws, min_col=6, min_row=1, max_col=7, max_row=ws.max_row)
+        x_data = Reference(ws, min_col=1, min_row=2, max_col=3, max_row=ws.max_row)
 
-            chart1.add_data(y_data, titles_from_data=True)
+        chart1.add_data(y_data, titles_from_data=True)
 
-            chart1.set_categories(x_data)
-            # save at dashboard sheet
-            ws_dashboard.add_chart(chart1, "A1")
+        chart1.set_categories(x_data)
+        # save at dashboard sheet
+        ws_dashboard.add_chart(chart1, "A1")
 
-            wb.save(file_path)
-            wb.close()
+        wb.save(file_path)
+        wb.close()
 
 
 # def excel_plot_line(standard, chcoding, excel_path):

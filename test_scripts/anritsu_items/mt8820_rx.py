@@ -1,3 +1,5 @@
+import time
+
 from equipments.anritsu8820 import Anritsu8820
 from equipments.series_basis.modem_usb_serial.serial_series import AtCmd
 import utils.parameters.external_paramters as ext_pmt
@@ -13,6 +15,7 @@ logger = log_set('8820RxSig')
 class RxTestGenre(AtCmd, Anritsu8820):
     def __init__(self):
         AtCmd.__init__(self)
+        self.ser.com_close()
         Anritsu8820.__init__(self)
 
     def get_temperature(self):
@@ -47,6 +50,7 @@ class RxTestGenre(AtCmd, Anritsu8820):
                 self.set_init_before_calling(standard, dl_ch, bw)
                 self.set_registration_calling(standard)
         elif standard == 'WCDMA':
+            self.chcoding = 'REFMEASCH'
             if conn_state != cm_pmt_anritsu.ANRITSU_LOOP_MODE_1:
                 self.set_init_before_calling(standard, dl_ch, bw)
                 self.set_registration_calling(standard)
@@ -63,6 +67,10 @@ class RxTestGenre(AtCmd, Anritsu8820):
             if power_selected == 1:
                 self.set_tpc('ALL1')
                 self.set_input_level(ext_pmt.tx_level)
+                if standard == 'LTE':
+                    self.rx_path_setting_sig_lte()
+                elif standard == 'WCDMA':
+                    self.rx_path_setting_sig_wcdma()
                 sens_list = self.get_sensitivity(standard, band, dl_ch, bw)  # sens_list = [power, sensitivity, per]
                 logger.debug(f'Sensitivity list:{sens_list}')
                 self.parameters_dict = {
@@ -75,16 +83,22 @@ class RxTestGenre(AtCmd, Anritsu8820):
                     'rb_size': self.get_ul_rb_size_query(),
                     'rb_start': self.get_ul_rb_start_query(),
                     'thermal': self.get_temperature(),
+                    'mcs': 'QPSK',
+                    'tx_freq': self.get_ul_freq_query(),
 
                 }
-                self.excel_path = rx_power_relative_test_export_excel_sig(sens_list, parameters_dict)
+                self.excel_path = rx_power_relative_test_export_excel_sig(sens_list, self.parameters_dict)
                 self.set_output_level(-70)
+
             elif power_selected == 0:
                 if standard == 'LTE':
                     self.set_tpc('AUTO')
+                    self.rx_path_setting_sig_lte()
                 elif standard == 'WCDMA':
                     self.set_tpc('ILPC')
+                    self.rx_path_setting_sig_wcdma()
                 self.set_input_level(-10)
+
                 sens_list = self.get_sensitivity(standard, band, dl_ch, bw)
                 logger.debug(f'Sensitivity list:{sens_list}')
                 self.parameters_dict = {
@@ -93,8 +107,14 @@ class RxTestGenre(AtCmd, Anritsu8820):
                     'band': band,
                     'dl_ch': dl_ch,
                     'tx_level': -10,
+                    'rx_path': self.rx_path,
+                    'rb_size': self.get_ul_rb_size_query(),
+                    'rb_start': self.get_ul_rb_start_query(),
+                    'thermal': self.get_temperature(),
+                    'mcs': 'QPSK',
+                    'tx_freq': self.get_ul_freq_query(),
                 }
-                self.excel_path = rx_power_relative_test_export_excel_sig(sens_list, parameters_dict)
+                self.excel_path = rx_power_relative_test_export_excel_sig(sens_list, self.parameters_dict)
                 self.set_output_level(-70)
             self.set_rf_out_port('MAIN')
 
@@ -126,7 +146,7 @@ class RxTestGenre(AtCmd, Anritsu8820):
                                     self.rx_core(standard, band, dl_ch, bw)
                                 time.sleep(1)
                     rx_desense_process_sig(standard, self.excel_path)
-                    rxs_relative_plot_sig(standard, self.parameters_dict)
+                    rxs_relative_plot_sig(standard, self.excel_path, self.parameters_dict)
 
             elif tech == 'WCDMA' and ext_pmt.wcdma_bands != []:
                 standard = self.set_switch_to_wcdma()
