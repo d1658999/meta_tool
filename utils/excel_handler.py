@@ -2453,11 +2453,12 @@ def rx_power_relative_test_export_excel_sig(data, parameters_dict):
                     ws['B1'] = 'RX_Path'
                     ws['C1'] = 'Chan'
                     ws['D1'] = 'Channel'
-                    ws['E1'] = 'Tx_Freq'
-                    ws['F1'] = 'Rx_Level'
-                    ws['G1'] = 'Condition'
-                    ws['H1'] = 'Temp0'
-                    ws['I1'] = 'Temp1'
+                    ws['E1'] = 'Tx_level'
+                    ws['F1'] = 'Measured Power'
+                    ws['G1'] = 'Rx level'
+                    ws['H1'] = 'Condition'
+                    ws['I1'] = 'Temp0'
+                    ws['J1'] = 'Temp1'
                 else:  # to skip dashboard
                     pass
 
@@ -2490,7 +2491,7 @@ def rx_power_relative_test_export_excel_sig(data, parameters_dict):
         max_row = ws.max_row
         row = max_row + 1  # skip title
 
-        chan = cm_pmt_anritsu.sig_ch_judge(band, bw, dl_ch)
+        chan = cm_pmt_anritsu.sig_ch_judge(tech, band, dl_ch, bw)
         ws.cell(row, 1).value = band
         ws.cell(row, 2).value = rx_path_lte_dict[rx_path]
         ws.cell(row, 3).value = chan  # LMH
@@ -2509,20 +2510,23 @@ def rx_power_relative_test_export_excel_sig(data, parameters_dict):
         row += 1
 
     elif tech == 'WCDMA' or tech == 'GSM':
+        tx_chan = cm_pmt_ftm.transfer_chan_rx2tx_wcdma(band, dl_ch)
+
         max_row = ws.max_row
         row = max_row + 1  # skip title
-        for tx_chan, rx_level in data.items():
-            chan = cm_pmt_anritsu.sig_ch_judge(band, cm_pmt_ftm.transfer_chan2freq_wcdma(band, tx_chan))
-            ws.cell(row, 1).value = band
-            ws.cell(row, 2).value = rx_path_wcdma_dict[rx_path]
-            ws.cell(row, 3).value = chan  # LMH
-            ws.cell(row, 4).value = tx_chan  # channel
-            ws.cell(row, 5).value = cm_pmt_ftm.transfer_chan2freq_wcdma(band, tx_chan, 'tx')  # freq_tx
-            ws.cell(row, 6).value = rx_level
-            ws.cell(row, 7).value = ext_pmt.condition
-            ws.cell(row, 8).value = measured_data[5][0]  # thermister 0
-            ws.cell(row, 9).value = measured_data[5][1]  # thermister 1
-            row += 1
+
+        chan = cm_pmt_anritsu.sig_ch_judge(tech, band, dl_ch)
+        ws.cell(row, 1).value = band
+        ws.cell(row, 2).value = rx_path_wcdma_dict[rx_path]
+        ws.cell(row, 3).value = chan  # LMH
+        ws.cell(row, 4).value = tx_chan  # channel
+        ws.cell(row, 5).value = tx_level  # freq_tx
+        ws.cell(row, 6).value = data[0]  # measured Power
+        ws.cell(row, 7).value = data[1]  # Rx level
+        ws.cell(row, 8).value = ext_pmt.condition
+        ws.cell(row, 9).value = thermal[0]  # thermister 0
+        ws.cell(row, 10).value = thermal[1]  # thermister 1
+        row += 1
 
     wb.save(file_path)
     wb.close()
@@ -3624,7 +3628,9 @@ def rxs_relative_plot_sig(standard, file_path, parameters_dict):
 
     elif tech == 'WCDMA':
         ws_dashboard = wb[f'Dashboard']
-        ws = wb[f'Raw_Data']
+        ws_desens = wb[f'Desens']
+        ws_txmax = wb[f'Raw_Data_TxMax']
+        ws_txmin = wb[f'Raw_Data_-10dBm']
 
         if ws_dashboard._charts:  # if there is charts, delete it
             ws_dashboard._charts.clear()
@@ -3636,14 +3642,27 @@ def rxs_relative_plot_sig(standard, file_path, parameters_dict):
         chart1.x_axis.tickLblPos = 'low'
         chart1.height = 20
         chart1.width = 32
-        y_data = Reference(ws, min_col=6, min_row=2, max_col=6, max_row=ws.max_row)
-        x_data = Reference(ws, min_col=1, min_row=2, max_col=3, max_row=ws.max_row)
-        # save at dashboard sheet
-        series_pure_sens = Series(y_data, title="Pure_Sensititvity_FTM")
+        y_data_txmax = Reference(ws_txmax, min_col=7, min_row=2, max_col=7, max_row=ws_txmax.max_row)
+        y_data_txmin = Reference(ws_txmin, min_col=7, min_row=2, max_col=7, max_row=ws_txmin.max_row)
+        y_data_desens = Reference(ws_desens, min_col=4, min_row=1, max_col=4, max_row=ws_desens.max_row)
+        x_data = Reference(ws_desens, min_col=1, min_row=2, max_col=3, max_row=ws_desens.max_row)
 
-        chart1.append(series_pure_sens)
+        series_txmax = Series(y_data_txmax, title="Tx_Max")
+        series_txmin = Series(y_data_txmin, title="Tx_-10dBm")
+
+        chart1.append(series_txmax)
+        chart1.append(series_txmin)
         chart1.set_categories(x_data)
+        chart1.y_axis.majorGridlines = None
 
+        chart2 = BarChart()
+        chart2.add_data(y_data_desens, titles_from_data=True)
+        chart2.y_axis.axId = 200
+        chart2.y_axis.title = 'Diff(dB)'
+
+        chart1.y_axis.crosses = "max"
+        chart1 += chart2
+        # save at dashboard sheet
         ws_dashboard.add_chart(chart1, "A1")
 
         wb.save(file_path)

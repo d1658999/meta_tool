@@ -243,13 +243,13 @@ class Anritsu:
         """
         set the input level of equipment, that is same as the tx_power level for DUT
         """
-        self.anritsu_write(f'ILVL {input_level}')
+        self.anritsu_query(f'ILVL {input_level};*OPC?;*ESR?')
 
     def set_output_level(self, output_level=-60.0):
         """
         set the output level of equipment, that is same as the rx_power level for DUT
         """
-        self.anritsu_write(f'OLVL {output_level}')
+        self.anritsu_query(f'OLVL {output_level};*OPC?;*ESR?')
 
     def set_rf_out_port(self, port='MAIN'):
         """
@@ -477,7 +477,7 @@ class Anritsu:
         """
         Set [BER Measurement] to [On]
         """
-        self.anritsu_write(f'PWR_MEAS {switch}')
+        self.anritsu_write(f'BER_MEAS {switch}')
 
     def set_power_measure_on_off(self, switch='ON'):
         """
@@ -905,16 +905,23 @@ class Anritsu:
         ]
         return aclr_list
 
+    def get_ber_per_state_query_wcdma(self):
+        """
+        write (BER? PER) and we can get the x % and the x will lower than 0.1 for WCDMA
+        :return: PASS or FAIL
+        """
+        ber = float(self.get_ber_per_query_wcdma())
+        if ber >= 0.1:
+            return 'FAIL'
+        else:
+            return 'PASS'
+
     def get_ber_per_query_wcdma(self):
         """
         write (BER? PER) and we can get the x % and the x will lower than 0.1 for WCDMA
         :return: PASS or FAIL
         """
-        ber = float(self.anritsu_query('BER? PER').strip())
-        if ber >= 0.1:
-            return 'FAIL'
-        else:
-            return 'PASS'
+        return float(self.anritsu_query('BER? PER').strip())
 
     def get_throughput_per_query(self):
         """
@@ -934,6 +941,12 @@ class Anritsu:
         """
         return float(self.anritsu_query('OLVL?').strip())
 
+    def get_input_level_query(self):
+        """
+        Query the input level
+        """
+        return float(self.anritsu_query('ILVL?').strip())
+
     def get_channel_coding_query(self):
         """
         Query the chcoding to judge which type for WCDMA | HSUPA | HSDPA
@@ -946,17 +959,23 @@ class Anritsu:
         """
         return self.anritsu_query(f'UE_CAP? REL')
 
-    def get_ul_rb_size_query(self):
+    def get_ul_rb_size_query(self, standard):
         """
         Query RB size or RB numbers
         """
-        return int(self.anritsu_query(f'ULRMC_RB?'))
+        if standard == 'LTE':
+            return int(self.anritsu_query(f'ULRMC_RB?'))
+        else:
+            return None
 
-    def get_ul_rb_start_query(self):
+    def get_ul_rb_start_query(self, standard):
         """
         Query RB start or RB offset
         """
-        return int(self.anritsu_query(f'ULRB_START?'))
+        if standard == 'LTE':
+            return int(self.anritsu_query(f'ULRB_START?'))
+        else:
+            return None
 
     def get_ul_freq_query(self):
         """

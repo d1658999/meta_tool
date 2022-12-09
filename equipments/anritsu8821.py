@@ -1211,7 +1211,7 @@ class Anritsu8821(Anritsu):
                 time.sleep(0.1)
                 conn_state = int(self.get_calling_state_query())
                 self.set_to_measure()
-                status = self.get_ber_per_query_wcdma()
+                status = self.get_ber_per_state_query_wcdma()
                 mstate = int(self.get_measure_state_query())
                 logger.debug(f'measuring statuse: {mstate}')
 
@@ -1223,9 +1223,9 @@ class Anritsu8821(Anritsu):
                 elif mstate == cm_pmt_anritsu.MESUREMENT_GOOD and conn_state == cm_pmt_anritsu.ANRITSU_LOOP_MODE_1 \
                         and status == 'PASS' and touch == 1:  # by fine
                     start -= fine
-                    status = self.get_ber_per_query_wcdma()
+                    status = self.get_ber_per_state_query_wcdma()
                     while count > 1 and status == 'PASS':
-                        status = self.get_ber_per_query_wcdma()
+                        status = self.get_ber_per_state_query_wcdma()
                         count -= 1
                     count = 3
 
@@ -1234,7 +1234,7 @@ class Anritsu8821(Anritsu):
                     while count > 0 and status == 'FAIL':  # retest 3 time to judge if it is real sensitivity
                         self.set_to_measure()
                         time.sleep(0.1)
-                        status = self.get_ber_per_query_wcdma()
+                        status = self.get_ber_per_state_query_wcdma()
                         logger.info(f'{status}')
                         count -= 1
                     if count != 0:  # if it meets some sudden noise from environment
@@ -1253,7 +1253,7 @@ class Anritsu8821(Anritsu):
                             start = round(start, 1)
                             self.set_output_level(start)
                             self.set_to_measure()
-                            status = self.get_ber_per_query_wcdma()
+                            status = self.get_ber_per_state_query_wcdma()
                             output_level = self.get_output_level_query()
                             logger.info(f'level {output_level}, {status}')
                             mstate = int(self.get_measure_state_query())
@@ -1277,11 +1277,11 @@ class Anritsu8821(Anritsu):
                                 self.set_input_level(30)
                                 start -= fine
                                 self.set_to_measure()
-                                status = self.get_ber_per_query_wcdma()
+                                status = self.get_ber_per_state_query_wcdma()
                                 while status == 'PASS':
                                     self.set_output_level(start)
                                     self.set_to_measure()
-                                    status = self.get_ber_per_query_wcdma()
+                                    status = self.get_ber_per_state_query_wcdma()
                                     output_level = self.get_output_level_query()
                                     logger.info(f'reconnedted level {output_level}: {status}')
                                     start -= fine
@@ -1294,7 +1294,7 @@ class Anritsu8821(Anritsu):
                             while count > 0:
                                 self.set_to_measure()
                                 output_level = self.get_output_level_query()
-                                status = self.get_ber_per_query_wcdma()
+                                status = self.get_ber_per_state_query_wcdma()
                                 if status == 'FAIL':
                                     logger.info(f'{4 - count} times fail')
                                     break
@@ -1310,7 +1310,7 @@ class Anritsu8821(Anritsu):
                                 break
                     sensitivity = Decimal(self.get_output_level_query())
                     time.sleep(0.1)
-                    per = self.get_ber_per_query_wcdma()
+                    per = self.get_ber_per_state_query_wcdma()
                     power = Decimal(self.get_power_average_query('WCDMA'))
                     self.anritsu_query('*OPC?')
                     logger.info(f'Final: POWER: {power}, SENSITIVITY: {sensitivity}, PER:{per}')

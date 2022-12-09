@@ -540,7 +540,7 @@ class AtCmd:
         elif self.rx_path == 1:
             rx_path = 2
         else:
-            rx_path = self.rx_path_wcdma
+            rx_path = self.rx_path
         self.command(f'AT+HRXMODESET={rx_path}')
         # self.command_cmw100_query('*OPC?')
         self.ser.com_close()

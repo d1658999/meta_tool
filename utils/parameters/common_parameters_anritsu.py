@@ -148,7 +148,7 @@ def special_uplink_config_sensitivity(band, bw):
         return 15, 0
     elif int(band) == 17 and int(bw) == 10:
         return 20, 30
-    elif (int(band) == 18 in [18, 19, 21, 26, 28]) and int(bw) == 15:
+    elif (int(band) in [18, 19, 21, 26, 28]) and int(bw) == 15:
         return 25, 50
     elif int(band) == 20 and int(bw) == 10:
         return 20, 0
@@ -198,10 +198,7 @@ def main():
     #     else:
     #         continue
 
-    if CHAN_LIST:
-        print(CHAN_LIST)
-    else:
-        print('others')
+    print(special_uplink_config_sensitivity(26, 15))
 
 
 if __name__ == "__main__":

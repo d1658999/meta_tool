@@ -80,8 +80,8 @@ class RxTestGenre(AtCmd, Anritsu8820):
                     'dl_ch': dl_ch,
                     'tx_level': ext_pmt.tx_level,
                     'rx_path': self.rx_path,
-                    'rb_size': self.get_ul_rb_size_query(),
-                    'rb_start': self.get_ul_rb_start_query(),
+                    'rb_size': self.get_ul_rb_size_query(standard),
+                    'rb_start': self.get_ul_rb_start_query(standard),
                     'thermal': self.get_temperature(),
                     'mcs': 'QPSK',
                     'tx_freq': self.get_ul_freq_query(),
@@ -108,8 +108,8 @@ class RxTestGenre(AtCmd, Anritsu8820):
                     'dl_ch': dl_ch,
                     'tx_level': -10,
                     'rx_path': self.rx_path,
-                    'rb_size': self.get_ul_rb_size_query(),
-                    'rb_start': self.get_ul_rb_start_query(),
+                    'rb_size': self.get_ul_rb_size_query('WCDMA'),
+                    'rb_start': self.get_ul_rb_start_query('WCDMA'),
                     'thermal': self.get_temperature(),
                     'mcs': 'QPSK',
                     'tx_freq': self.get_ul_freq_query(),
@@ -125,47 +125,54 @@ class RxTestGenre(AtCmd, Anritsu8820):
                 standard = self.set_switch_to_lte()
                 logger.info(standard)
                 self.chcoding = None
-                for bw in ext_pmt.lte_bandwidths:
-                    for band in ext_pmt.lte_bands:
-                        for rx_path in ext_pmt.rx_paths:
-                            self.rx_path = rx_path
-                            if bw in cm_pmt_anritsu.bandwidths_selected(band):
-                                if band == 28:
-                                    self.band_segment = ext_pmt.band_segment
-                                self.set_test_parameter_normal()
-                                ch_list = []
-                                for wt_ch in ext_pmt.channel:
-                                    if wt_ch == 'L':
-                                        ch_list.append(cm_pmt_anritsu.dl_ch_selected(standard, band, bw)[0])
-                                    elif wt_ch == 'M':
-                                        ch_list.append(cm_pmt_anritsu.dl_ch_selected(standard, band, bw)[1])
-                                    elif wt_ch == 'H':
-                                        ch_list.append(cm_pmt_anritsu.dl_ch_selected(standard, band, bw)[2])
-                                logger.debug(f'Test Channel List: {band}, {bw}MHZ, downlink channel list:{ch_list}')
-                                for dl_ch in ch_list:
-                                    self.rx_core(standard, band, dl_ch, bw)
-                                time.sleep(1)
-                    rx_desense_process_sig(standard, self.excel_path)
-                    rxs_relative_plot_sig(standard, self.excel_path, self.parameters_dict)
-
+                try:
+                    for bw in ext_pmt.lte_bandwidths:
+                        for band in ext_pmt.lte_bands:
+                            for rx_path in ext_pmt.rx_paths:
+                                self.rx_path = rx_path
+                                if bw in cm_pmt_anritsu.bandwidths_selected(band):
+                                    if band == 28:
+                                        self.band_segment = ext_pmt.band_segment
+                                    self.set_test_parameter_normal()
+                                    ch_list = []
+                                    for wt_ch in ext_pmt.channel:
+                                        if wt_ch == 'L':
+                                            ch_list.append(cm_pmt_anritsu.dl_ch_selected(standard, band, bw)[0])
+                                        elif wt_ch == 'M':
+                                            ch_list.append(cm_pmt_anritsu.dl_ch_selected(standard, band, bw)[1])
+                                        elif wt_ch == 'H':
+                                            ch_list.append(cm_pmt_anritsu.dl_ch_selected(standard, band, bw)[2])
+                                    logger.debug(f'Test Channel List: {band}, {bw}MHZ, downlink channel list:{ch_list}')
+                                    for dl_ch in ch_list:
+                                        self.rx_core(standard, band, dl_ch, bw)
+                                    time.sleep(1)
+                        rx_desense_process_sig(standard, self.excel_path)
+                        rxs_relative_plot_sig(standard, self.excel_path, self.parameters_dict)
+                except Exception as err:
+                    logger.debug(err)
+                    logger.info('It might forget to choose Rx path or Band or Channel or BW or others')
             elif tech == 'WCDMA' and ext_pmt.wcdma_bands != []:
                 standard = self.set_switch_to_wcdma()
-                for band in ext_pmt.wcdma_bands:
-                    for rx_path in ext_pmt.rx_paths:
-                        self.rx_path = rx_path
-                        ch_list = []
-                        for wt_ch in ext_pmt.channel:
-                            if wt_ch == 'L':
-                                ch_list.append(cm_pmt_anritsu.dl_ch_selected(standard, band)[0])
-                            elif wt_ch == 'M':
-                                ch_list.append(cm_pmt_anritsu.dl_ch_selected(standard, band)[1])
-                            elif wt_ch == 'H':
-                                ch_list.append(cm_pmt_anritsu.dl_ch_selected(standard, band)[2])
-                        logger.debug(f'Test Channel List: {band}, downlink channel list:{ch_list}')
-                        for dl_ch in ch_list:
-                            self.rx_core(standard, band, dl_ch)
-                rx_desense_process_sig(standard, self.excel_path)
-                rxs_relative_plot_sig(standard, self.parameters_dict)
+                try:
+                    for band in ext_pmt.wcdma_bands:
+                        for rx_path in ext_pmt.rx_paths:
+                            self.rx_path = rx_path
+                            ch_list = []
+                            for wt_ch in ext_pmt.channel:
+                                if wt_ch == 'L':
+                                    ch_list.append(cm_pmt_anritsu.dl_ch_selected(standard, band)[0])
+                                elif wt_ch == 'M':
+                                    ch_list.append(cm_pmt_anritsu.dl_ch_selected(standard, band)[1])
+                                elif wt_ch == 'H':
+                                    ch_list.append(cm_pmt_anritsu.dl_ch_selected(standard, band)[2])
+                            logger.debug(f'Test Channel List: {band}, downlink channel list:{ch_list}')
+                            for dl_ch in ch_list:
+                                self.rx_core(standard, band, dl_ch, 5)
+                    rx_desense_process_sig(standard, self.excel_path)
+                    rxs_relative_plot_sig(standard, self.excel_path, self.parameters_dict)
+                except Exception as err:
+                    logger.debug(err)
+                    logger.info('It might forget to choose Rx path or Band or Channel or others')
             elif tech == ext_pmt.gsm_bands:
                 pass
             else:
