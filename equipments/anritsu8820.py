@@ -1255,7 +1255,7 @@ class Anritsu8820(Anritsu):
                             logger.info('Retest again from output level -70dBm')
                             start = -70
                             self.set_output_level(start)
-                            self.set_input_level()
+                            # self.set_input_level(self.tx_level)
                             self.set_end()
                             time.sleep(2)
                             self.set_connecting()
@@ -1265,7 +1265,7 @@ class Anritsu8820(Anritsu):
                             time.sleep(10)
                             conn_state = int(self.get_calling_state_query())
                             if conn_state == cm_pmt_anritsu.ANRITSU_LOOP_MODE_1:
-                                self.set_input_level(30)
+                                # self.set_input_level(self.tx_level)
                                 start -= fine
                                 self.set_to_measure()
                                 status = self.get_ber_per_state_query_wcdma()
@@ -1300,7 +1300,7 @@ class Anritsu8820(Anritsu):
                             else:
                                 break
                     sensitivity = round(self.get_output_level_query(), 1)
-                    time.sleep(0.3)
+                    time.sleep(0.1)
                     per = self.get_ber_per_query_wcdma()
                     power = round(self.get_power_average_query('WCDMA'), 1)
                     self.anritsu_query('*OPC?')
@@ -1320,10 +1320,10 @@ class Anritsu8820(Anritsu):
                     self.set_init_rx(self.std)
                     tpc_status = self.get_tpc_pattern_query()
                     self.set_tpc(tpc_status)
-                    if tpc_status == 'ALL1':
-                        self.set_input_level(30)
-                    elif tpc_status == 'ILPC':
-                        self.set_input_level(-10)
+                    # if tpc_status == 'ALL1':
+                    #     self.set_input_level(30)
+                    # elif tpc_status == 'ILPC':
+                    #     self.set_input_level(-10)
 
                     self.set_ber_measure_on_off('ON')
                     self.set_power_measure_on_off('ON')

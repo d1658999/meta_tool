@@ -959,7 +959,7 @@ class Anritsu:
         """
         return self.anritsu_query(f'UE_CAP? REL')
 
-    def get_ul_rb_size_query(self, standard):
+    def get_ul_rb_size_query(self, standard='LTE'):
         """
         Query RB size or RB numbers
         """
@@ -968,7 +968,7 @@ class Anritsu:
         else:
             return None
 
-    def get_ul_rb_start_query(self, standard):
+    def get_ul_rb_start_query(self, standard='LTE'):
         """
         Query RB start or RB offset
         """

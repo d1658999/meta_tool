@@ -2493,7 +2493,7 @@ def rx_power_relative_test_export_excel_sig(data, parameters_dict):
 
         chan = cm_pmt_anritsu.sig_ch_judge(tech, band, dl_ch, bw)
         ws.cell(row, 1).value = band
-        ws.cell(row, 2).value = rx_path_lte_dict[rx_path]
+        ws.cell(row, 2).value = rx_path_lte_dict[rx_path] if isinstance(rx_path, int) else rx_path
         ws.cell(row, 3).value = chan  # LMH
         ws.cell(row, 4).value = tx_freq
         ws.cell(row, 5).value = tx_level  # this tx level
@@ -2517,7 +2517,7 @@ def rx_power_relative_test_export_excel_sig(data, parameters_dict):
 
         chan = cm_pmt_anritsu.sig_ch_judge(tech, band, dl_ch)
         ws.cell(row, 1).value = band
-        ws.cell(row, 2).value = rx_path_wcdma_dict[rx_path]
+        ws.cell(row, 2).value = rx_path_wcdma_dict[rx_path] if isinstance(rx_path, int) else rx_path
         ws.cell(row, 3).value = chan  # LMH
         ws.cell(row, 4).value = tx_chan  # channel
         ws.cell(row, 5).value = tx_level  # freq_tx

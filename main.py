@@ -27,6 +27,7 @@ class MainApp:
         builder.add_resource_path(PROJECT_PATH)
         builder.add_from_file(PROJECT_UI)
         self.mainwindow = builder.get_object("toplevel1", master)
+        self.notebook = builder.get_object("notebook1")
         button_run_ftm = builder.get_object("button_run_ftm", master)
         button_run_ftm_fcc = builder.get_object("button_run_ftm_fcc", master)
         button_run_ftm_ce = builder.get_object("button_run_ftm_ce", master)
@@ -529,6 +530,9 @@ class MainApp:
         with open('gui_init.yaml', 'r') as s:
             ui_init = yaml.safe_load(s)
 
+        # set the previous tab
+        self.notebook.select(ui_init['tab'])
+
         # non list-like
         self.instrument.set(ui_init['instrument']['instrument'])
         self.band_segment.set(ui_init['band']['band_segment'])
@@ -950,6 +954,9 @@ class MainApp:
     def export_ui_setting_yaml(self):
         logger.info('Export ui setting')
         yaml_file = 'gui_init.yaml'
+        # tab index
+        tab_index = self.notebook.index(self.notebook.select())
+
         # thses are list like
         tech = self.wanted_tech()
         bw_lte = self.wanted_bw()
@@ -1008,6 +1015,7 @@ class MainApp:
         lv = self.lv.get()
 
         content = {
+            'tab': tab_index,
             'port': {
                 'port_tx': port_tx,
                 'port_tx_lte': port_tx_lte,
@@ -2525,12 +2533,12 @@ class MainApp:
                 inst = TxTestGenre()
                 inst.run()
 
-            elif self.wanted_test['rx']:
+            if self.wanted_test['rx']:
                 inst = RxTestGenre()
                 inst.run()
                 inst.ser.com_close()
 
-            elif self.wanted_test['rx_freq_sweep']:
+            if self.wanted_test['rx_freq_sweep']:
                 inst = RxTestFreqSweep()
                 inst.run()
 
@@ -2545,12 +2553,12 @@ class MainApp:
                 inst = TxTestGenre()
                 inst.run()
 
-            elif self.wanted_test['rx']:
+            if self.wanted_test['rx']:
                 inst = RxTestGenre()
                 inst.run()
                 inst.ser.com_close()  # because this might have multiple Rx controller by AT command to choose Rx path
 
-            elif self.wanted_test['rx_freq_sweep']:
+            if self.wanted_test['rx_freq_sweep']:
                 inst = RxTestFreqSweep()
                 inst.run()
 

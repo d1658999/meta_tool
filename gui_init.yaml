@@ -6,13 +6,21 @@ band:
   bands_gsm: []
   bands_hsdpa: []
   bands_hsupa: []
-  bands_lte: []
-  bands_wcdma: []
+  bands_lte:
+  - 1
+  - 2
+  - 3
+  - 4
+  bands_wcdma:
+  - 1
+  - 2
+  - 4
 bw:
   bw_fr1: []
-  bw_lte: []
+  bw_lte:
+  - 10
 channel:
-  chan: ''
+  chan: LMH
 condition:
   hthv: false
   htlv: false
@@ -52,22 +60,27 @@ port:
 power:
   lb_gsm_pcl: 5
   mb_gsm_pcl: 0
-  tx_level: 26
+  tx_level: 25
 rb_set:
   rb_ftm_fr1: []
   rb_ftm_lte: []
 rx_set:
-  ue_power: []
+  ue_power:
+  - 1
+  - 0
 scripts:
   scripts:
   - GENERAL
+tab: 1
 tech:
-  tech: []
+  tech:
+  - LTE
+  - WCDMA
 test_items:
-  rx: false
+  rx: true
   rx_freq_sweep: false
   rx_quick_enable: false
-  tx: false
+  tx: true
   tx_1rb_sweep: false
   tx_freq_sweep: false
   tx_level_sweep: false
