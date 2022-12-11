@@ -5,7 +5,7 @@ from equipments.series_basis.modem_usb_serial.serial_series import AtCmd
 import utils.parameters.external_paramters as ext_pmt
 import utils.parameters.common_parameters_anritsu as cm_pmt_anritsu
 from utils.channel_handler import channel_freq_select
-from utils.excel_handler import rx_power_relative_test_export_excel_sig, txp_aclr_evm_current_plot_sig
+from utils.excel_handler import rx_power_relative_test_export_excel_sig
 from utils.excel_handler import rx_desense_process_sig, rxs_relative_plot_sig
 from utils.log_init import log_set
 
@@ -66,7 +66,7 @@ class RxTestGenre(AtCmd, Anritsu8820):
             if power_selected == 1:
                 self.tx_level = ext_pmt.tx_level
                 self.set_tpc('ALL1')
-                self.set_input_level(self.tx_level)
+                self.set_input_level(self.tx_level + 3)
 
                 # if rx_path is used by checking box methoc, or it is used by rf out
                 if isinstance(self.rx_path, int):
@@ -173,7 +173,7 @@ class RxTestGenre(AtCmd, Anritsu8820):
 
                 else:
                     rx_desense_process_sig(standard, self.excel_path)
-                    rxs_relative_plot_sig(standard, self.excel_path, self.parameters_dict)
+                    rxs_relative_plot_sig(self.excel_path, self.parameters_dict)
 
             elif tech == 'WCDMA' and ext_pmt.wcdma_bands != []:
                 standard = self.set_switch_to_wcdma()
@@ -203,7 +203,7 @@ class RxTestGenre(AtCmd, Anritsu8820):
 
                 else:
                     rx_desense_process_sig(standard, self.excel_path)
-                    rxs_relative_plot_sig(standard, self.excel_path, self.parameters_dict)
+                    rxs_relative_plot_sig(self.excel_path, self.parameters_dict)
 
             elif tech == ext_pmt.gsm_bands:
                 pass

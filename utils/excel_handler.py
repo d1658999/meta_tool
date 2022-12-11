@@ -2534,6 +2534,162 @@ def rx_power_relative_test_export_excel_sig(data, parameters_dict):
     return file_path
 
 
+def rx_freq_sweep_power_relative_test_export_excel_sig(data, parameters_dict):
+    """
+    data = sens_list = [power, sensitivity, per]
+
+    """
+    tech = parameters_dict['tech']
+    band = parameters_dict['band']
+    bw = parameters_dict['bw']
+    tx_level = parameters_dict['tx_level']
+    mcs = parameters_dict['mcs']
+    # tx_path = parameters_dict['tx_path']
+    rx_path = parameters_dict['rx_path']
+    rb_size = parameters_dict['rb_size']
+    rb_start = parameters_dict['rb_start']
+    thermal = parameters_dict['thermal']
+    dl_ch = parameters_dict['dl_ch']
+    tx_freq = parameters_dict['tx_freq']
+
+    logger.info('----------save to excel----------')
+    filename = f'Sensitivty_Freq_Sweep_sig_{bw}MHZ_{tech}_LMH.xlsx'
+    file_path = Path(excel_folder_path()) / Path(filename)
+
+    if Path(file_path).exists() is False:  # if the file does not exist
+        logger.info('----------file does not exist----------')
+        wb = openpyxl.Workbook()
+        wb.remove(wb['Sheet'])
+        # create dashboard
+        wb.create_sheet(f'Dashboard')
+
+        # to create sheet
+        if tech == 'LTE':
+            # create the title and sheet for TxManx and -10dBm
+            wb.create_sheet(f'Raw_Data_{mcs}_TxMax')
+            wb.create_sheet(f'Raw_Data_{mcs}_-10dBm')
+            for sheetname in wb.sheetnames:
+                if 'Raw_Data' in sheetname:
+                    ws = wb[sheetname]
+                    ws['A1'] = 'Band'
+                    ws['B1'] = 'RX_Path'
+                    ws['C1'] = 'Chan'
+                    ws['D1'] = 'Tx_Freq'
+                    ws['E1'] = 'Tx_level'
+                    ws['F1'] = 'Measured Power'
+                    ws['G1'] = 'Rx level'
+                    ws['H1'] = 'TX_Path'
+                    ws['I1'] = 'BW'
+                    ws['J1'] = 'RB_num_UL'
+                    ws['K1'] = 'RB_start_UL'
+                    ws['L1'] = 'Condition'
+                    ws['M1'] = 'Temp0'
+                    ws['N1'] = 'Temp1'
+
+                else:  # to skip dashboard
+                    pass
+
+            # create the title and sheet for Desense
+            wb.create_sheet(f'Desens_{mcs}')
+            ws = wb[f'Desens_{mcs}']
+            ws['A1'] = 'Band'
+            ws['B1'] = 'Rx_Path'
+            ws['C1'] = 'Chan'
+            ws['D1'] = 'Diff'
+            ws['E1'] = 'TX_Path'
+
+        elif tech == 'WCDMA' or tech == 'GSM':
+            # create the title and sheet for TxManx and -10dBm
+            wb.create_sheet(f'Raw_Data_TxMax')
+            wb.create_sheet(f'Raw_Data_-10dBm')
+
+            for sheetname in wb.sheetnames:
+                if 'Raw_Data' in sheetname:
+                    ws = wb[sheetname]
+                    ws['A1'] = 'Band'
+                    ws['B1'] = 'RX_Path'
+                    ws['C1'] = 'Chan'
+                    ws['D1'] = 'Channel'
+                    ws['E1'] = 'Tx_level'
+                    ws['F1'] = 'Measured Power'
+                    ws['G1'] = 'Rx level'
+                    ws['H1'] = 'Condition'
+                    ws['I1'] = 'Temp0'
+                    ws['J1'] = 'Temp1'
+                else:  # to skip dashboard
+                    pass
+
+            # create the title and sheet for Desense
+            wb.create_sheet(f'Desens')
+            ws = wb[f'Desens']
+            ws['A1'] = 'Band'
+            ws['B1'] = 'Rx_Path'
+            ws['C1'] = 'Chan'
+            ws['D1'] = 'Diff'
+            ws['E1'] = 'TX_Path'
+
+        # save and close file
+        wb.save(file_path)
+        wb.close()
+
+    # if the file exist
+    logger.info('----------file exist----------')
+    wb = openpyxl.load_workbook(file_path)
+    ws = None
+    # to fetch the sheet name
+    if tech == 'LTE':
+        sheetname = f'Raw_Data_{mcs}_TxMax' if tx_level > 0 else f'Raw_Data_{mcs}_-10dBm'
+        ws = wb[sheetname]
+    elif tech == 'WCDMA' or tech == 'GSM':
+        sheetname = f'Raw_Data_TxMax' if tx_level > 0 else f'Raw_Data_-10dBm'
+        ws = wb[sheetname]
+
+    if tech == 'LTE':
+        max_row = ws.max_row
+        row = max_row + 1  # skip title
+
+        # chan = cm_pmt_anritsu.sig_ch_judge(tech, band, dl_ch, bw)
+        ws.cell(row, 1).value = band
+        ws.cell(row, 2).value = rx_path_lte_dict[rx_path] if isinstance(rx_path, int) else rx_path
+        ws.cell(row, 3).value = None  # LMH
+        ws.cell(row, 4).value = tx_freq
+        ws.cell(row, 5).value = tx_level  # this tx level
+        ws.cell(row, 6).value = data[0]  # measured power
+        ws.cell(row, 7).value = data[1]  # RX level
+        ws.cell(row, 8).value = None  # tx_path
+        ws.cell(row, 9).value = bw
+        ws.cell(row, 10).value = rb_size
+        ws.cell(row, 11).value = rb_start
+        ws.cell(row, 12).value = ext_pmt.condition
+        ws.cell(row, 13).value = thermal[0]  # thermister 0
+        ws.cell(row, 14).value = thermal[1]  # thermister 1
+
+        row += 1
+
+    elif tech == 'WCDMA' or tech == 'GSM':
+        tx_chan = cm_pmt_ftm.transfer_chan_rx2tx_wcdma(band, dl_ch)
+
+        max_row = ws.max_row
+        row = max_row + 1  # skip title
+
+        # chan = cm_pmt_anritsu.sig_ch_judge(tech, band, dl_ch)
+        ws.cell(row, 1).value = band
+        ws.cell(row, 2).value = rx_path_wcdma_dict[rx_path] if isinstance(rx_path, int) else rx_path
+        ws.cell(row, 3).value = None # LMH
+        ws.cell(row, 4).value = tx_chan  # channel
+        ws.cell(row, 5).value = tx_level  # freq_tx
+        ws.cell(row, 6).value = data[0]  # measured Power
+        ws.cell(row, 7).value = data[1]  # Rx level
+        ws.cell(row, 8).value = ext_pmt.condition
+        ws.cell(row, 9).value = thermal[0]  # thermister 0
+        ws.cell(row, 10).value = thermal[1]  # thermister 1
+        row += 1
+
+    wb.save(file_path)
+    wb.close()
+
+    return file_path
+
 # def fill_values_rx(excel_path, standard, data, band, dl_ch, power_selected, bw=None):
 #     """
 #         data format:[Tx Power, Sensitivity, PER]
@@ -3533,7 +3689,7 @@ def txp_aclr_evm_current_plot_sig(standard, file_path):
         wb.close()
 
 
-def rxs_relative_plot_sig(standard, file_path, parameters_dict):
+def rxs_relative_plot_sig(file_path, parameters_dict):
     logger.info('----------Plot Chart---------')
     # tech ='LTE'
     # mcs_lte = 'QPSK'
@@ -3584,7 +3740,7 @@ def rxs_relative_plot_sig(standard, file_path, parameters_dict):
         wb.save(file_path)
         wb.close()
 
-    elif tech == 'FR1':
+    elif tech == 'FR1':  # not yet have this function
         ws_dashboard = wb[f'Dashboard']
         ws_desens = wb[f'Desens_{mcs}']
         ws_txmax = wb[f'Raw_Data_{mcs}_TxMax']
@@ -3669,6 +3825,194 @@ def rxs_relative_plot_sig(standard, file_path, parameters_dict):
         wb.close()
 
     elif tech == 'GSM':
+        ws_dashboard = wb[f'Dashboard']
+        ws = wb[f'Raw_Data']
+
+        if ws_dashboard._charts:  # if there is charts, delete it
+            ws_dashboard._charts.clear()
+
+        chart1 = LineChart()
+        chart1.title = 'Sensitivity'
+        chart1.y_axis.title = 'Rx_Level(dBm)'
+        chart1.x_axis.title = 'Band'
+        chart1.x_axis.tickLblPos = 'low'
+        chart1.height = 20
+        chart1.width = 32
+        y_data = Reference(ws, min_col=6, min_row=1, max_col=7, max_row=ws.max_row)
+        x_data = Reference(ws, min_col=1, min_row=2, max_col=3, max_row=ws.max_row)
+
+        chart1.add_data(y_data, titles_from_data=True)
+
+        chart1.set_categories(x_data)
+        # save at dashboard sheet
+        ws_dashboard.add_chart(chart1, "A1")
+
+        wb.save(file_path)
+        wb.close()
+
+
+def rxs_freq_relative_plot_sig(file_path, parameters_dict):
+    logger.info('----------Plot Chart---------')
+    # tech ='LTE'
+    # mcs_lte = 'QPSK'
+    # script = parameters_dict['script']
+    tech = parameters_dict['tech']
+    mcs = parameters_dict['mcs']
+
+    wb = openpyxl.load_workbook(file_path)
+    if tech == 'LTE':
+        ws_dashboard = wb[f'Dashboard']
+        ws_desens = wb[f'Desens_{mcs}']
+        ws_txmax = wb[f'Raw_Data_{mcs}_TxMax']
+        ws_txmin = wb[f'Raw_Data_{mcs}_-10dBm']
+
+        if ws_dashboard._charts:  # if there is charts, delete it
+            ws_dashboard._charts.clear()
+
+        for i, ws in enumerate([ws_txmax, ws_txmin]):
+            chart_sens = LineChart()
+            chart_sens.title = 'Rx_Freq_Chan_Sweep_TxMax' if i == 0 else 'Rx_Freq_Chan_Sweep_Sweep_-10dBm'
+            chart_sens.y_axis.title = 'Sensitivity'
+            chart_sens.x_axis.title = 'Rx_chan'
+            chart_sens.x_axis.tickLblPos = 'low'
+            # chart_sens.y_axis.scaling.min = -60
+            # chart_sens.y_axis.scaling.max = -20
+
+            chart_sens.height = 20
+            chart_sens.width = 40
+
+            y_data_sens = Reference(ws, min_col=7, min_row=1, max_col=7,
+                                    max_row=ws.max_row)  # colume 7 is snesitivity
+
+            x_data = Reference(ws, min_col=1, min_row=2, max_col=4, max_row=ws.max_row)
+            chart_sens.add_data(y_data_sens, titles_from_data=True)
+            chart_sens.set_categories(x_data)
+
+            # chart_sens.y_axis.majorGridlines = None
+
+            chart_sens.series[0].marker.symbol = 'circle'  # for sensitivity
+            chart_sens.series[0].marker.size = 3
+
+            chart_pwr = LineChart()  # create a second chart
+
+            y_data_pwr = Reference(ws, min_col=6, min_row=1, max_col=6,
+                                   max_row=ws.max_row)
+            chart_pwr.add_data(y_data_pwr, titles_from_data=True)
+
+            chart_pwr.series[0].graphicalProperties.line.dashStyle = 'dash'  # for power
+            chart_pwr.y_axis.title = 'Power(dBm)'
+            chart_pwr.y_axis.axId = 200
+            chart_pwr.y_axis.majorGridlines = None
+
+            chart_sens.y_axis.crosses = 'max'
+            chart_sens += chart_pwr
+
+            if i == 0:
+                ws_dashboard.add_chart(chart_sens, "A1")
+            elif i == 1:
+                ws_dashboard.add_chart(chart_sens, "A42")
+
+        wb.save(file_path)
+        wb.close()
+
+    elif tech == 'FR1':  # not yet has this function
+        ws_dashboard = wb[f'Dashboard']
+        ws_desens = wb[f'Desens_{mcs}']
+        ws_txmax = wb[f'Raw_Data_{mcs}_TxMax']
+        ws_txmin = wb[f'Raw_Data_{mcs}_-10dBm']
+
+        if ws_dashboard._charts:  # if there is charts, delete it
+            ws_dashboard._charts.clear()
+
+        chart1 = LineChart()
+        chart1.title = 'Sensitivity'
+        chart1.y_axis.title = 'Rx_Level(dBm)'
+        chart1.x_axis.title = 'Band'
+        chart1.x_axis.tickLblPos = 'low'
+        chart1.height = 20
+        chart1.width = 32
+        y_data_txmax = Reference(ws_txmax, min_col=7, min_row=2, max_col=7, max_row=ws_txmax.max_row)
+        y_data_txmin = Reference(ws_txmin, min_col=7, min_row=2, max_col=7, max_row=ws_txmin.max_row)
+        y_data_desens = Reference(ws_desens, min_col=4, min_row=1, max_col=4, max_row=ws_desens.max_row)
+        x_data = Reference(ws_desens, min_col=1, min_row=2, max_col=3, max_row=ws_desens.max_row)
+
+        series_txmax = Series(y_data_txmax, title="Tx_Max")
+        series_txmin = Series(y_data_txmin, title="Tx_-10dBm")
+
+        chart1.append(series_txmax)
+        chart1.append(series_txmin)
+        chart1.set_categories(x_data)
+        chart1.y_axis.majorGridlines = None
+
+        chart2 = BarChart()
+        chart2.add_data(y_data_desens, titles_from_data=True)
+        chart2.y_axis.axId = 200
+        chart2.y_axis.title = 'Diff(dB)'
+
+        chart1.y_axis.crosses = "max"
+        chart1 += chart2
+        # save at dashboard sheet
+        ws_dashboard.add_chart(chart1, "A1")
+
+        wb.save(file_path)
+        wb.close()
+
+    elif tech == 'WCDMA':
+        ws_dashboard = wb[f'Dashboard']
+        ws_desens = wb[f'Desens']
+        ws_txmax = wb[f'Raw_Data_TxMax']
+        ws_txmin = wb[f'Raw_Data_-10dBm']
+
+        if ws_dashboard._charts:  # if there is charts, delete it
+            ws_dashboard._charts.clear()
+
+        for i, ws in enumerate([ws_txmax, ws_txmin]):
+            chart_sens = LineChart()
+            chart_sens.title = 'Rx_Freq_Chan_Sweep_TxMax' if i == 0 else 'Rx_Freq_Chan_Sweep_Sweep_-10dBm'
+            chart_sens.y_axis.title = 'Sensitivity'
+            chart_sens.x_axis.title = 'Rx_chan'
+            chart_sens.x_axis.tickLblPos = 'low'
+            # chart_sens.y_axis.scaling.min = -60
+            # chart_sens.y_axis.scaling.max = -20
+
+            chart_sens.height = 20
+            chart_sens.width = 40
+
+            y_data_sens = Reference(ws, min_col=7, min_row=1, max_col=7,
+                                    max_row=ws.max_row)  # colume 7 is snesitivity
+
+            x_data = Reference(ws, min_col=1, min_row=2, max_col=4, max_row=ws.max_row)
+            chart_sens.add_data(y_data_sens, titles_from_data=True)
+            chart_sens.set_categories(x_data)
+
+            # chart_sens.y_axis.majorGridlines = None
+
+            chart_sens.series[0].marker.symbol = 'circle'  # for sensitivity
+            chart_sens.series[0].marker.size = 3
+
+            chart_pwr = LineChart()  # create a second chart
+
+            y_data_pwr = Reference(ws, min_col=6, min_row=1, max_col=6,
+                                   max_row=ws.max_row)
+            chart_pwr.add_data(y_data_pwr, titles_from_data=True)
+
+            chart_pwr.series[0].graphicalProperties.line.dashStyle = 'dash'  # for power
+            chart_pwr.y_axis.title = 'Power(dBm)'
+            chart_pwr.y_axis.axId = 200
+            chart_pwr.y_axis.majorGridlines = None
+
+            chart_sens.y_axis.crosses = 'max'
+            chart_sens += chart_pwr
+
+            if i == 0:
+                ws_dashboard.add_chart(chart_sens, "A1")
+            elif i == 1:
+                ws_dashboard.add_chart(chart_sens, "A42")
+
+        wb.save(file_path)
+        wb.close()
+
+    elif tech == 'GSM':  # not yet has this function
         ws_dashboard = wb[f'Dashboard']
         ws = wb[f'Raw_Data']
 

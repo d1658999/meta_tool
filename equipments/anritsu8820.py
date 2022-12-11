@@ -1320,10 +1320,10 @@ class Anritsu8820(Anritsu):
                     self.set_init_rx(self.std)
                     tpc_status = self.get_tpc_pattern_query()
                     self.set_tpc(tpc_status)
-                    # if tpc_status == 'ALL1':
-                    #     self.set_input_level(30)
-                    # elif tpc_status == 'ILPC':
-                    #     self.set_input_level(-10)
+                    if tpc_status == 'ALL1':
+                        self.set_input_level(ext_pmt.tx_level + 3)
+                    elif tpc_status == 'ILPC':
+                        self.set_input_level(-10)
 
                     self.set_ber_measure_on_off('ON')
                     self.set_power_measure_on_off('ON')
@@ -1340,7 +1340,7 @@ class Anritsu8820(Anritsu):
                     self.set_init_rx(self.std)
                     self.set_tpc(tpc_status)
                     if tpc_status == 'ALL1':
-                        self.set_input_level(30)
+                        self.set_input_level(ext_pmt.tx_level + 3)
                     elif tpc_status == 'ILPC':
                         self.set_input_level(-10)
 
