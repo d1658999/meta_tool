@@ -1,4 +1,4 @@
-from equipments.anritsu8820 import Anritsu8820
+from equipments.anritsu8821 import Anritsu8821
 from equipments.series_basis.modem_usb_serial.serial_series import AtCmd
 import utils.parameters.external_paramters as ext_pmt
 import utils.parameters.common_parameters_anritsu as cm_pmt_anritsu
@@ -6,13 +6,13 @@ from utils.channel_handler import channel_freq_select
 from utils.excel_handler import tx_power_relative_test_export_excel_sig, txp_aclr_evm_current_plot_sig
 from utils.log_init import log_set
 
-logger = log_set('8820TxSig')
+logger = log_set('8821TxSig')
 
-class TxTestGenre(AtCmd, Anritsu8820):
+class TxTestGenre(AtCmd, Anritsu8821):
     def __init__(self):
         AtCmd.__init__(self)
         self.ser.com_close()
-        Anritsu8820.__init__(self)
+        Anritsu8821.__init__(self)
 
     def get_temperature(self):
         """
@@ -117,13 +117,13 @@ class TxTestGenre(AtCmd, Anritsu8820):
                         if bw in cm_pmt_anritsu.bandwidths_selected(band):
                             if band == 28:
                                 self.band_segment = ext_pmt.band_segment
-                            self.set_test_parameter_normal()
+                            self.set_test_parameter('NORMAL')
                             dl_chan_list = cm_pmt_anritsu.dl_ch_selected(standard, band, bw)
                             ch_list = channel_freq_select(ext_pmt.channel, dl_chan_list)
                             logger.debug(f'Test Channel List: {band}, {bw}MHZ, downlink channel list:{ch_list}')
                             for dl_ch in ch_list:
                                 self.tx_core(standard, band, dl_ch, bw)
-                                self.set_test_parameter_normal()
+                                self.set_test_parameter('NORMAL')
                         else:
                             logger.info(f'B{band} do not have BW {bw}MHZ')
                     txp_aclr_evm_current_plot_sig(standard, self.excel_path)

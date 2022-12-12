@@ -433,7 +433,7 @@ class Anritsu:
         """
         This is only suitable for 8821
         """
-        self.anritsu_write(f'{loss_title}, {freq}MHz, {loss_dl}, {loss_ul},,, {loss_aux},,,')
+        self.anritsu_write(f'{loss_title} {freq}MHz, {loss_dl}, {loss_ul},,, {loss_aux},,,')
         logger.info(f'{loss_title}, {freq}MHz, dl_loss: {loss_dl}, ul_loss: {loss_ul}, aux_loss: {loss_aux}')
 
     def set_loss_common(self, standard):

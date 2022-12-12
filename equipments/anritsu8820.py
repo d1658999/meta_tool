@@ -1519,3 +1519,19 @@ class Anritsu8820(Anritsu):
         self.anritsu_query('*OPC?')
         logger.debug(validation_list)
         return validation_list
+
+
+def main():
+    pass
+    # start = datetime.datetime.now()
+
+    # anritsu = Anritsu8821()
+    # anritsu.create_excel_rx('LTE', 5)
+    # anritsu.run_rx()
+
+    # stop = datetime.datetime.now()
+    # logger.info(f'Timer: {stop - start}')
+
+
+if __name__ == '__main__':
+    main()

@@ -6,21 +6,13 @@ band:
   bands_gsm: []
   bands_hsdpa: []
   bands_hsupa: []
-  bands_lte:
-  - 1
-  - 2
-  - 3
-  - 4
-  bands_wcdma:
-  - 1
-  - 2
-  - 4
+  bands_lte: []
+  bands_wcdma: []
 bw:
   bw_fr1: []
-  bw_lte:
-  - 10
+  bw_lte: []
 channel:
-  chan: LMH
+  chan: ''
 condition:
   hthv: false
   htlv: false
@@ -38,7 +30,7 @@ external_inst:
   tempchb: false
   wait_time: 300
 instrument:
-  instrument: Anritsu8820
+  instrument: Anritsu8821
 mcs:
   mcs_fr1: []
   mcs_lte: []
@@ -60,27 +52,23 @@ port:
 power:
   lb_gsm_pcl: 5
   mb_gsm_pcl: 0
-  tx_level: 25
+  tx_level: 26
 rb_set:
   rb_ftm_fr1: []
   rb_ftm_lte: []
 rx_set:
-  ue_power:
-  - 1
-  - 0
+  ue_power: []
 scripts:
   scripts:
   - GENERAL
-tab: 1
+tab: 0
 tech:
-  tech:
-  - LTE
-  - WCDMA
+  tech: []
 test_items:
-  rx: true
+  rx: false
   rx_freq_sweep: false
   rx_quick_enable: false
-  tx: true
+  tx: false
   tx_1rb_sweep: false
   tx_freq_sweep: false
   tx_level_sweep: false
