@@ -126,10 +126,10 @@ class RxTestGenre(AtCmd, Anritsu8821):
                 }
                 self.excel_path = rx_power_relative_test_export_excel_sig(sens_list, self.parameters_dict)
                 self.set_output_level(-70)
-            self.set_phone1_tx_out(1, ext_pmt.rfout_anritsu)
+            self.set_phone1_tx_out(1, 'MAIN')
 
     def run(self):
-        self.set_phone1_tx_out(1, ext_pmt.rfout_anritsu)
+        self.set_phone1_tx_out(1, 'MAIN')
         for tech in ext_pmt.tech:
             if tech == 'LTE' and ext_pmt.lte_bands != []:
                 standard = self.set_switch_to_lte()
