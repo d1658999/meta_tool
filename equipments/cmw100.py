@@ -298,7 +298,7 @@ class CMW100(CMW):
         self.set_arb_file_gprf(waveform_path)
 
     def set_waveform_lte(self, bw):
-        if self.band_lte in [34, 38, 39, 40, 41, 42, 48]:
+        if self.band_lte in [34, 38, 39, 40, 41, 42, 48, 46]:
             waveform_path = f'C:\\CMW100_WV\\SMU_Channel_CC0_RxAnt0_RF_Verification_10M_SIMO_01.wv'
         else:
             bw = '1p4' if bw == 1.4 else f'0{bw}' if bw <= 5 else bw
@@ -502,7 +502,7 @@ class CMW100(CMW):
                 self.set_duplexer_mode_fr1('FDD')
                 logger.debug('========== Set FDD ==========')
         elif self.tech == 'LTE':
-            if band in [34, 38, 39, 40, 41, 42, 48, ]:
+            if band in [34, 38, 39, 40, 41, 42, 48, 46]:
                 self.set_duplexer_mode_lte('TDD')
                 logger.debug('========== Set TDD ==========')
             else:

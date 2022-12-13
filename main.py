@@ -2428,46 +2428,6 @@ class MainApp:
         self.rx.set(False)
         self.wanted_ue_pwr()
 
-
-
-    def test_pipeline(self, inst_class_dict):
-        inst = inst_class_dict()
-        if inst.__class__.__name__ == 'Cmw100':
-            if self.wanted_test['tx']:
-                inst.run()
-
-            if self.wanted_test['rx']:
-                inst.run()
-
-            if self.wanted_test['tx_level_sweep']:
-                inst.run()
-
-            if self.wanted_test['tx_freq_sweep']:
-                inst.run()
-
-            if self.wanted_test['tx_1rb_sweep']:
-                inst.run()
-
-        elif inst.__class__.__name__ == 'Anritsu8820':
-            if self.wanted_test['tx']:
-                inst.run()
-
-            if self.wanted_test['rx']:
-                inst.run()
-
-            if self.wanted_test['rx_freq_sweep']:
-                inst.run()
-
-        elif inst.__class__.__name__ == 'Anritsu8821':
-            if self.wanted_test['tx']:
-                inst.run()
-
-            if self.wanted_test['rx']:
-                inst.run()
-
-            if self.wanted_test['rx_freq_sweep']:
-                inst.run()
-
     def measure(self):
         import utils.parameters.external_paramters as ext_pmt
 
@@ -2575,7 +2535,7 @@ class MainApp:
 
             excel_folder_create()
             # self.test_pipeline(inst_class_dict)
-            if self.wanted_test['tx']:
+            if self.wanted_test['tx'] and ext_pmt.sa_nsa == 0:
                 for script in ext_pmt.scripts:
                     if script == 'GENERAL':
                         inst = TxTestGenre()
@@ -2591,17 +2551,17 @@ class MainApp:
                 inst.run()
                 inst.ser.com_close()
 
-            if self.wanted_test['tx_level_sweep']:
+            if self.wanted_test['tx_level_sweep'] and ext_pmt.sa_nsa == 0:
                 inst = TxTestLevelSweep()
                 inst.run()
                 inst.ser.com_close()
 
-            if self.wanted_test['tx_freq_sweep']:
+            if self.wanted_test['tx_freq_sweep'] and ext_pmt.sa_nsa == 0:
                 inst = TxTestFreqSweep()
                 inst.run()
                 inst.ser.com_close()
 
-            if self.wanted_test['tx_1rb_sweep']:
+            if self.wanted_test['tx_1rb_sweep'] and ext_pmt.sa_nsa == 0:
                 inst = TxTest1RbSweep()
                 inst.run()
                 inst.ser.com_close()

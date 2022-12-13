@@ -20,6 +20,7 @@ class RxTestGenre(AtCmd, CMW100):
     def __init__(self):
         AtCmd.__init__(self)
         CMW100.__init__(self)
+        self.sa_nsa_mode = ext_pmt.sa_nsa
         self.rx_fast_test_enable = ext_pmt.rx_fast_test_enable
         self.tx_freq_wcdma = None
         self.file_path = None
@@ -218,7 +219,6 @@ class RxTestGenre(AtCmd, CMW100):
         self.port_tx = ext_pmt.port_tx
         self.chan = ext_pmt.channel
         self.type_fr1 = 'DFTS'
-        self.sa_nsa_mode = ext_pmt.sa_nsa
         self.script = 'GENERAL'
         self.mcs_fr1 = 'QPSK'
         items = [
@@ -370,7 +370,6 @@ class RxTestGenre(AtCmd, CMW100):
         self.tx_level_endc_fr1 = ext_pmt.tx_level_endc_fr1
         self.port_tx_lte = ext_pmt.port_tx_lte
         self.port_tx_fr1 = ext_pmt.port_tx_fr1
-        self.sa_nsa_mode = ext_pmt.sa_nsa
         self.type_fr1 = 'DFTS'
         self.mcs_lte = self.mcs_fr1 = 'QPSK'
         self.tx_path = 'TX1'
@@ -393,7 +392,9 @@ class RxTestGenre(AtCmd, CMW100):
             self.bw_fr1 = item[3]
             self.chan_rb = item[4]
             self.ue_power_bool = item[5]
-            [self.band_lte, self.band_fr1] = self.band_combo.split('_')
+            [band_lte_str, band_fr1_str] = self.band_combo.split('_')
+            self.band_lte = int(band_lte_str)
+            self.band_fr1 = int(band_fr1_str)
             (self.tx_freq_lte, self.tx_freq_fr1) = self.chan_rb[0]
             (self.rb_size_lte, self.rb_start_lte) = self.chan_rb[1]
             (self.rb_size_fr1, self.rb_start_fr1) = self.chan_rb[2]
@@ -479,7 +480,8 @@ class RxTestGenre(AtCmd, CMW100):
                     self.scs,
                     self.bw_fr1)  # for RB set(including special tx setting)
                 self.antenna_switch_v2()
-                self.tx_set_fr1()
+                if self.band_fr1 not in [29, ]:
+                    self.tx_set_fr1()
                 # aclr_results + mod_results  # U_-2, U_-1, E_-1, Pwr, E_+1, U_+1, U_+2, EVM, Freq_Err, IQ_OFFSET
                 aclr_mod_results = self.tx_measure_fr1()
                 # self.command_cmw100_query('*OPC?')
@@ -531,7 +533,8 @@ class RxTestGenre(AtCmd, CMW100):
                     self.band_lte,
                     self.bw_lte)  # for RB set
                 self.antenna_switch_v2()
-                self.tx_set_lte()
+                if self.band_lte not in [29, 32, 46]:
+                    self.tx_set_lte()
                 aclr_mod_results = self.tx_measure_lte()  # aclr_results + mod_results  # U_-2, U_-1, E_-1, Pwr,
                 # E_+1, U_+1, U_+2, EVM, Freq_Err, IQ_OFFSET
                 # self.command_cmw100_query('*OPC?')
@@ -760,9 +763,9 @@ class RxTestGenre(AtCmd, CMW100):
                 self.search_sensitivity_pipline_lte()
             elif tech == 'FR1':
                 for script in ext_pmt.scripts:
-                    if script == 'GENERAL':
+                    if script == 'GENERAL' and self.sa_nsa_mode == 0:
                         self.search_sensitivity_pipline_fr1()
-                    elif script == 'ENDC' and ext_pmt.sa_nsa == 1:
+                    elif script == 'ENDC' and self.sa_nsa_mode == 1:
                         self.search_sensitivity_pipline_endc()
             elif tech == 'WCDMA':
                 self.search_sensitivity_pipline_wcdma()

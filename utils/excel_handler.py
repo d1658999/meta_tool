@@ -1624,7 +1624,7 @@ def rxs_relative_plot_ftm(file_path, parameters_dict):
 def rxs_endc_plot_ftm(file_path):
     logger.info('----------Plot Chart---------')
     wb = openpyxl.load_workbook(file_path)
-    ws_dashboard = wb[f'dashboard']
+    ws_dashboard = wb[f'Dashboard']
     ws_desens = wb[f'Desens_ENDC']
     ws_txmax = wb[f'Raw_Data_ENDC_FR1_TxMax']
     ws_txmin = wb[f'Raw_Data_ENDC_FR1_-10dBm']

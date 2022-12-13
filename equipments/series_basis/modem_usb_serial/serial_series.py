@@ -57,7 +57,7 @@ class AtCmd:
         self.rx_path_gsm = None
         self.sync_mode = 0  # 0: MAIN , 1: 4RX, 2: 6RX
         self.rx_chan_wcdma = None
-        self.sa_nsa_mode = None
+        self.sa_nsa_mode = ext_pmt.sa_nsa
         self.ul_symbol = None
         self.ul_slot = None
         self.dl_symbol = None
