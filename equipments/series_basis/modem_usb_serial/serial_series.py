@@ -407,7 +407,7 @@ class AtCmd:
                          f'{self.ul_slot}, {self.ul_symbol}')
 
     def tx_set_no_sync_fr1(self):
-        logger.info('---------Tx No Set----------')
+        logger.info('---------Tx No Sync----------')
         self.scs = 30 if self.band_fr1 in [34, 38, 39, 40, 41, 42, 48, 75, 76, 77, 78, 79] else 15
         self.command(
             f'AT+NRFACTREQ={self.tx_path_dict[self.tx_path]},{self.tx_freq_fr1},{self.bw_fr1_dict[self.bw_fr1]},'
