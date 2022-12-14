@@ -11207,7 +11207,7 @@ Disable</property>
                 <child>
                   <object class="ttk.Labelframe" id="labelframe5">
                     <property name="height">200</property>
-                    <property name="text" translatable="yes">Recored Current(Eddie)</property>
+                    <property name="text" translatable="yes">Record Current(Eddie)</property>
                     <property name="width">200</property>
                     <layout manager="grid">
                       <property name="column">3</property>
