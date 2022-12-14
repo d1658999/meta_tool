@@ -179,7 +179,7 @@ def dl_freq_selected(standard, band, bw=5):
 
     if standard == 'LTE':
         if band == 28:
-            from external_paramters import band_segment
+            from utils.parameters.external_paramters import band_segment
             return [int(freq * 1000) for freq in band_dl_freq_lte[f'B{band}{band_segment}']]
         else:
             return [int(freq * 1000) for freq in band_dl_freq_lte[f'B{band}']]
@@ -189,7 +189,7 @@ def dl_freq_selected(standard, band, bw=5):
         return [int(freq * 1000) for freq in band_dl_freq_gsm[band]]
     elif standard == 'FR1':
         if band == 28:
-            from external_paramters import band_segment_fr1
+            from utils.parameters.external_paramters import band_segment_fr1
             return [int(freq * 1000) for freq in band_dl_freq_fr1[f'N{band}{band_segment_fr1}']]
         else:
             return [int(freq * 1000) for freq in band_dl_freq_fr1[f'N{band}']]
