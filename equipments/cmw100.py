@@ -117,19 +117,22 @@ class CMW100(CMW):
         while f_state != 'RDY':
             f_state = self.get_power_state_query_fr1()
             self.cmw_query('*OPC?')
-        mod_results = self.get_modulation_average_query_fr1()  # P[3] is EVM, P[15] is Ferr, P[14] is IQ Offset
+        # P[3] is EVM, P[15] is Ferr, P[14] is IQ Offset, P[17] is equipment power
+        mod_results = self.get_modulation_average_query_fr1()
         mod_results = mod_results.split(',')
-        mod_results = [mod_results[3], mod_results[15], mod_results[14]]
+        mod_results = [mod_results[3], mod_results[15], mod_results[14], mod_results[17]]
         mod_results = [eval(m) for m in mod_results]
-        logger.info(f'EVM: {mod_results[0]:.2f}, FREQ_ERR: {mod_results[1]:.2f}, IQ_OFFSET: {mod_results[2]:.2f}')
+        logger.info(f'Power: {mod_results[3]}, EVM: {mod_results[0]:.2f}, FREQ_ERR: {mod_results[1]:.2f}, '
+                    f'IQ_OFFSET: {mod_results[2]:.2f}')
         return mod_results
 
     def get_modulation_avgerage_lte(self):
-        mod_results = self.get_modulation_average_query_lte()  # P[3] is EVM, P[15] is Ferr, P[14] is IQ Offset
+        # P[3] is EVM, P[15] is Ferr, P[14] is IQ Offset, P[17] is equipment power
+        mod_results = self.get_modulation_average_query_lte()
         mod_results = mod_results.split(',')
-        mod_results = [mod_results[3], mod_results[15], mod_results[14]]
+        mod_results = [mod_results[3], mod_results[15], mod_results[14], mod_results[17]]
         mod_results = [eval(m) for m in mod_results]
-        logger.info(f'EVM: {mod_results[0]:.2f}, FREQ_ERR: {mod_results[1]:.2f}, IQ_OFFSET: {mod_results[2]:.2f}')
+        logger.info(f'Power: {mod_results[3]}, EVM: {mod_results[0]:.2f}, FREQ_ERR: {mod_results[1]:.2f}, IQ_OFFSET: {mod_results[2]:.2f}')
         return mod_results
 
     def get_modulation_avgerage_wcdma(self):
@@ -565,6 +568,8 @@ class CMW100(CMW):
         self.cmw_query(f'*OPC?')
         mod_results = self.get_modulation_avgerage_fr1()
         aclr_results = self.get_aclr_average_fr1()
+        aclr_results[3] = mod_results[-1]  # real measured power, not carrier power
+        mod_results.pop()
         self.get_in_band_emissions_fr1()
         self.get_flatness_extreme_fr1()
         # time.sleep(0.2)
@@ -623,6 +628,8 @@ class CMW100(CMW):
         self.set_measure_start_on_lte()
         self.cmw_query('*OPC?')
         aclr_results = self.get_aclr_average_lte()
+        aclr_results[3] = mod_results[-1]
+        mod_results.pop()
         self.get_in_band_emissions_lte()
         self.get_flatness_extreme_lte()
         time.sleep(0.2)
