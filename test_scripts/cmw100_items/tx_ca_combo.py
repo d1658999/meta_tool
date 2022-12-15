@@ -47,7 +47,6 @@ class TxTestCa(AtCmd, CMW100):
 
     def tx_power_aclr_ca_process_lte(self):
         self.select_mode_fdd_tdd(self.band_lte)
-        self.set_rf_setting_external_tx_port_attenuation_lte(self.loss_tx)
         self.set_ca_mode('INTRaband')
         self.set_band_lte(self.band_lte)
         self.set_cc_bw_lte_cmw(1, self.bw_cc1)
@@ -57,7 +56,6 @@ class TxTestCa(AtCmd, CMW100):
         self.get_cc2_freq_query()
         self.get_ca_freq_low_query()
         self.tx_freq_lte = self.get_ca_freq_center_query()
-        # self.rx_freq_lte = cm_pmt_ftm.transfer_freq_tx2rx_lte(self.band_lte, self.tx_freq_lte)
         self.loss_tx = get_loss(self.tx_freq_lte)
         self.set_rf_setting_external_tx_port_attenuation_lte(self.loss_tx)
         self.get_ca_freq_high_query()
