@@ -160,7 +160,7 @@ class CMW100(CMW):
         aclr_results = aclr_results.split(',')[1:]
         aclr_results = [eval(aclr) * -1 if eval(aclr) > 30 else eval(aclr) for aclr in
                         aclr_results]  # UTRA2(-), UTRA1(-), NR(-), TxP, NR(+), UTRA1(+), UTRA2(+)
-        logger.info(f'Power: {aclr_results[3]:.2f}, '
+        logger.info(f'Carrier Power: {aclr_results[3]:.2f}, '
                     f'E-UTRA: [{aclr_results[2]:.2f}, {aclr_results[4]:.2f}], '
                     f'UTRA_1: [{aclr_results[1]:.2f}, {aclr_results[5]:.2f}], '
                     f'UTRA_2: [{aclr_results[0]:.2f}, {aclr_results[6]:.2f}]')
@@ -175,7 +175,7 @@ class CMW100(CMW):
         aclr_results = aclr_results.split(',')[1:]
         aclr_results = [eval(aclr) * -1 if eval(aclr) > 30 else eval(aclr) for aclr in
                         aclr_results]  # U_-2, U_-1, E_-1, Pwr, E_+1, U_+1, U_+2
-        logger.info(f'Power: {aclr_results[3]:.2f}, '
+        logger.info(f'Carrier Power: {aclr_results[3]:.2f}, '
                     f'E-UTRA: [{aclr_results[2]:.2f}, {aclr_results[4]:.2f}], '
                     f'UTRA_1: [{aclr_results[1]:.2f}, {aclr_results[5]:.2f}], '
                     f'UTRA_2: [{aclr_results[0]:.2f}, {aclr_results[6]:.2f}]')
