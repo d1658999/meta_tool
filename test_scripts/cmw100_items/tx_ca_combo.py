@@ -45,7 +45,7 @@ class TxTestCa(AtCmd, CMW100):
         self.rb_start_cc1_lte = 0
         self.rb_start_cc2_lte = 0
 
-    def tx_power_aclr_ca_process_lte(self):
+    def tx_set_ca_lte(self):
         self.select_mode_fdd_tdd(self.band_lte)
         self.set_ca_mode('INTRaband')
         self.set_band_lte(self.band_lte)
@@ -55,23 +55,22 @@ class TxTestCa(AtCmd, CMW100):
         self.set_ca_spacing()
         self.get_cc2_freq_query()
         self.get_ca_freq_low_query()
+        self.get_ca_freq_high_query()
         self.tx_freq_lte = self.get_ca_freq_center_query()
         self.loss_tx = get_loss(self.tx_freq_lte)
-        self.set_rf_setting_external_tx_port_attenuation_lte(self.loss_tx)
-        self.get_ca_freq_high_query()
-        self.set_expect_power_lte(self.tx_level)
-        self.set_rf_setting_user_margin_lte(10)
-        self.set_ca_no_sync_lte()  # this is at command
-        self.set_select_carrier('CC1')
-        self.get_modulation_avgerage_lte()
-        self.set_select_carrier('CC2')
-        self.get_modulation_avgerage_lte()
-        self.set_measure_start_on_lte()
-        self.cmw_query('*OPC?')
-        self.get_aclr_average_lte()
+        self.set_ca_combo_lte()  # this is at command
+
+    def tx_power_aclr_ca_process_lte(self):
+        self.set_test_mode_lte()  # modem open by band
+        self.sig_gen_lte()
+        self.sync_lte()
+        self.tx_set_ca_lte()
+        self.tx_measure_ca_lte()
         self.set_test_end_lte()
 
     def tx_power_aclr_ca_pipline_lte(self):
+        self.preset_instrument()
+        self.set_test_end_lte()
         self.port_tx = ext_pmt.port_tx
         self.chan = ext_pmt.channel
         self.rx_level = -70
@@ -114,9 +113,6 @@ class TxTestCa(AtCmd, CMW100):
                                         self.set_rb_location(d[2], d[3])  # for set rb_size_cc1/cc2_lte
                                         self.band_cc1_channel_lte = d[4]
                                         self.bw_combo_lte = f'{int(d[2] / 5)}+{int(d[3] / 5)}'
-                                        self.set_test_mode_lte()  # modem open by band
-                                        self.sig_gen_lte()
-                                        self.sync_lte()
                                         self.tx_power_aclr_ca_process_lte()
                                     else:
                                         continue

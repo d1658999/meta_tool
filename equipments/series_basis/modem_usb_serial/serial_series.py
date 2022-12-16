@@ -692,7 +692,7 @@ class AtCmd:
     def set_chan_request_lte(self):
         self.command(f'AT+LTXCHNSDREQ')
 
-    def set_ca_no_sync_lte(self):
+    def set_ca_combo_lte(self):
         bw_ca_index = {
             '20+5': 6,
             '20+10': 7,
