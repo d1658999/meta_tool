@@ -1654,7 +1654,7 @@ Disable</property>
                           <property name="column">1</property>
                           <property name="padx">5</property>
                           <property name="pady">5</property>
-                          <property name="row">6</property>
+                          <property name="row">7</property>
                           <property name="sticky">nw</property>
                         </layout>
                       </object>
@@ -1701,6 +1701,22 @@ Disable</property>
                           <property name="padx">5</property>
                           <property name="pady">5</property>
                           <property name="row">2</property>
+                          <property name="sticky">nw</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Checkbutton" id="checkbutton46">
+                        <property name="command" type="command" cbtype="simple">wanted_band_LTE</property>
+                        <property name="onvalue">24</property>
+                        <property name="text" translatable="yes">B24</property>
+                        <property name="variable">int:B24</property>
+                        <bind sequence="&lt;1&gt;" handler="off_all_none_LB" add="" />
+                        <layout manager="grid">
+                          <property name="column">1</property>
+                          <property name="padx">5</property>
+                          <property name="pady">5</property>
+                          <property name="row">6</property>
                           <property name="sticky">nw</property>
                         </layout>
                       </object>
@@ -10035,7 +10051,7 @@ Disable</property>
                           <property name="column">1</property>
                           <property name="padx">5</property>
                           <property name="pady">5</property>
-                          <property name="row">6</property>
+                          <property name="row">7</property>
                           <property name="sticky">nw</property>
                         </layout>
                       </object>
@@ -10082,6 +10098,22 @@ Disable</property>
                           <property name="padx">5</property>
                           <property name="pady">5</property>
                           <property name="row">2</property>
+                          <property name="sticky">nw</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Checkbutton" id="checkbutton202">
+                        <property name="command" type="command" cbtype="simple">wanted_band_LTE</property>
+                        <property name="onvalue">24</property>
+                        <property name="text" translatable="yes">B24</property>
+                        <property name="variable">int:B24</property>
+                        <bind sequence="&lt;1&gt;" handler="off_all_none_LB" add="" />
+                        <layout manager="grid">
+                          <property name="column">1</property>
+                          <property name="padx">5</property>
+                          <property name="pady">5</property>
+                          <property name="row">6</property>
                           <property name="sticky">nw</property>
                         </layout>
                       </object>
