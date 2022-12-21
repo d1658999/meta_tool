@@ -138,6 +138,7 @@ class MainApp:
         self.B71 = None
         self.LB_all = None
         self.B21 = None
+        self.B24 = None
         self.band_segment = None
         self.B1 = None
         self.B2 = None
@@ -348,6 +349,7 @@ class MainApp:
                 "B71",
                 "LB_all",
                 "B21",
+                "B24",
                 "band_segment",
                 "B1",
                 "B2",
@@ -708,6 +710,8 @@ class MainApp:
                 self.B20.set(band_lte)
             elif band_lte == 21:
                 self.B21.set(band_lte)
+            elif band_lte == 24:
+                self.B24.set(band_lte)
             elif band_lte == 25:
                 self.B25.set(band_lte)
             elif band_lte == 26:
@@ -1442,6 +1446,9 @@ class MainApp:
         if self.B21.get() == 21:
             logger.debug(self.B21.get())
             self.band_lte.append(self.B21.get())
+        if self.B24.get() == 24:
+            logger.debug(self.B24.get())
+            self.band_lte.append(self.B24.get())
         if self.B26.get() == 26:
             logger.debug(self.B26.get())
             self.band_lte.append(self.B26.get())
@@ -1812,6 +1819,7 @@ class MainApp:
             self.B19.set(19)
             self.B20.set(20)
             self.B21.set(21)
+            self.B24.set(24)
             self.B26.set(26)
             self.B28.set(28)
             self.B29.set(29)
@@ -1830,6 +1838,7 @@ class MainApp:
             self.B19.set(0)
             self.B20.set(0)
             self.B21.set(0)
+            self.B24.set(0)
             self.B26.set(0)
             self.B28.set(0)
             self.B29.set(0)
