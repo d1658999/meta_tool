@@ -2502,7 +2502,6 @@ class MainApp:
                 inst = RxTestFreqSweep()
                 inst.run()
 
-
         elif self.instrument.get() == 'Anritsu8821':
             from test_scripts.anritsu_items.mt8821_tx_lmh import TxTestGenre
             from test_scripts.anritsu_items.mt8821_rx import RxTestGenre
