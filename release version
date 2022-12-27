@@ -1,1 +1,4 @@
+release v2.9:
+add PN and freq_sweep_step and modify relative files for nonsignaling
+and correct the at command of DRX on LTE for signaling
 release v2.8
