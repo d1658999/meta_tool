@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from equipments.series_basis.modem_usb_serial.serial_series import AtCmd
 from equipments.cmw100 import CMW100
 from utils.log_init import log_set
@@ -5,6 +7,7 @@ import utils.parameters.external_paramters as ext_pmt
 import utils.parameters.common_parameters_ftm as cm_pmt_ftm
 from utils.loss_handler import get_loss
 from utils.excel_handler import txp_aclr_evm_current_plot_ftm, tx_power_relative_test_export_excel_ftm
+from utils.excel_handler import select_file_name_genre_tx_ftm
 import utils.parameters.rb_parameters as rb_pmt
 
 logger = log_set('freq_sweep')
@@ -54,7 +57,7 @@ class TxTestFreqSweep(AtCmd, CMW100):
         self.sig_gen_fr1()
         self.sync_fr1()
 
-        freq_range_list = [tx_freq_list[0], tx_freq_list[2], 1000]
+        freq_range_list = [tx_freq_list[0], tx_freq_list[2], ext_pmt.freq_sweep_step]
         step = freq_range_list[2]
 
         for mcs in ext_pmt.mcs_fr1:
@@ -323,8 +326,9 @@ class TxTestFreqSweep(AtCmd, CMW100):
                     logger.info(f'B{self.band_fr1} does not have BW {self.bw_fr1}MHZ')
         for bw in ext_pmt.fr1_bandwidths:
             try:
-                # self.filename = f'Freq_sweep_{bw}MHZ_{self.tech}.xlsx'
-                txp_aclr_evm_current_plot_ftm(self.file_path, self.parameters)
+                file_name = select_file_name_genre_tx_ftm(bw, self.tech, 'freq_sweep')
+                file_path = Path(self.file_path).parent / Path(file_name)
+                txp_aclr_evm_current_plot_ftm(file_path, self.parameters)
             except TypeError:
                 logger.info(f'there is no data to plot because the band does not have this BW ')
             except FileNotFoundError:
@@ -355,8 +359,9 @@ class TxTestFreqSweep(AtCmd, CMW100):
 
         for bw in ext_pmt.lte_bandwidths:
             try:
-                # self.filename = f'Freq_sweep_{bw}MHZ_{self.tech}.xlsx'
-                txp_aclr_evm_current_plot_ftm(self.file_path, self.parameters)
+                file_name = select_file_name_genre_tx_ftm(bw, self.tech, 'freq_sweep')
+                file_path = Path(self.file_path).parent / Path(file_name)
+                txp_aclr_evm_current_plot_ftm(file_path, self.parameters)
             except TypeError:
                 logger.info(f'there is no data to plot because the band does not have this BW ')
             except FileNotFoundError:

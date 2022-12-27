@@ -18,7 +18,7 @@ from equipments.temp_chamber import TempChamber
 logger = log_set('GUI')
 
 PROJECT_PATH = pathlib.Path(__file__).parent
-PROJECT_UI = PROJECT_PATH / pathlib.Path('gui') /"main_v2_8.ui"
+PROJECT_UI = PROJECT_PATH / pathlib.Path('gui') /"main_v2_9.ui"
 
 
 class MainApp:
@@ -251,6 +251,8 @@ class MainApp:
         self.count = None
         self.rx_quick_enable = None
         self.wait_time = None
+        self.part_number = None
+        self.freq_sweep_step = None
         builder.import_variables(
             self,
             [
@@ -461,6 +463,8 @@ class MainApp:
                 "count",
                 "rx_quick_enable",
                 "wait_time",
+                "part_number",
+                "freq_sweep_step",
             ],
         )
 
@@ -2491,6 +2495,8 @@ class MainApp:
         ext_pmt.odpm_enable = self.odpm_enable.get()
         ext_pmt.record_current_enable = self.record_current_enable.get()
         ext_pmt.condition = self.condition
+        ext_pmt.part_number = self.part_number.get()
+        ext_pmt.freq_sweep_step = self.freq_sweep_step.get()
 
         if self.instrument.get() == 'Anritsu8820':
             from test_scripts.anritsu_items.mt8820_tx_lmh import TxTestGenre

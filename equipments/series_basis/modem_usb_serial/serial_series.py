@@ -513,7 +513,7 @@ class AtCmd:
         logger.info(f'----------Now is {rx_path_lte}---------')
         if self.rx_path == 2:
             rx_path = 1
-        elif self.rx_path_lte == 1:
+        elif self.rx_path == 1:
             rx_path = 2
         else:
             rx_path = self.rx_path

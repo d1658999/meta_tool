@@ -21,7 +21,7 @@ tx_max_pwr_sensitivity = [1, 0]  # 1: Txmax power, 0: -10dBm
 
 tx_level = 26
 tx_level_endc_lte = 26
-tx_level_endc_fr1 = 0
+tx_level_endc_fr1 = 10
 tx_pcl_lb = 5  # GMSK_MB: 0 ~ 15, EPSK_MB 2~15:
 tx_pcl_mb = 0  # GMSK_MB: 0 ~ 15, EPSK_MB 2~15:
 sa_nsa = 0
@@ -66,6 +66,8 @@ scs = [1]  # 0: 15KHz | 1: 30KHz | 2: 60KHz
 tx_level_range_list = [-20, 26]  # tx_level_1, tx_level_2
 tx_pcl_range_list_lb = [19, 5]  # tx_pcl_1, tx_pcl_2; GMSK_LB: 5 ~ 19, EPSK_LB: 8~19
 tx_pcl_range_list_mb = [15, 0]  # tx_pcl_1, tx_pcl_2; GMSK_MB: 0 ~ 15, EPSK_MB: 2~15
+part_number = 'ttt'
+freq_sweep_step = 1000
 
 
 def main():

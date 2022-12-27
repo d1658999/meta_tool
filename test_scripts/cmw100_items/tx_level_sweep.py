@@ -1,3 +1,4 @@
+from pathlib import Path
 from equipments.series_basis.modem_usb_serial.serial_series import AtCmd
 from equipments.cmw100 import CMW100
 from utils.log_init import log_set
@@ -7,6 +8,7 @@ from utils.loss_handler import get_loss
 from utils.adb_handler import get_odpm_current, record_current
 from equipments.power_supply import Psu
 from utils.excel_handler import txp_aclr_evm_current_plot_ftm, tx_power_relative_test_export_excel_ftm
+from utils.excel_handler import select_file_name_genre_tx_ftm
 from utils.channel_handler import channel_freq_select
 import utils.parameters.rb_parameters as rb_pmt
 import time
@@ -593,8 +595,9 @@ class TxTestLevelSweep(AtCmd, CMW100):
                     logger.info(f'B{self.band_fr1} does not have BW {self.bw_fr1}MHZ')
         for bw in ext_pmt.fr1_bandwidths:
             try:
-                # self.filename = f'Tx_level_sweep_{bw}MHZ_{self.tech}.xlsx'
-                txp_aclr_evm_current_plot_ftm(self.file_path, self.parameters)
+                file_name = select_file_name_genre_tx_ftm(bw, self.tech, 'level_sweep')
+                file_path = Path(self.file_path).parent / Path(file_name)
+                txp_aclr_evm_current_plot_ftm(file_path, self.parameters)
             except TypeError:
                 logger.info(f'there is no data to plot because the band does not have this BW ')
             except FileNotFoundError:
@@ -625,8 +628,9 @@ class TxTestLevelSweep(AtCmd, CMW100):
                     logger.info(f'B{self.band_lte} does not have BW {self.bw_lte}MHZ')
         for bw in ext_pmt.lte_bandwidths:
             try:
-                # self.filename = f'Tx_level_sweep_{bw}MHZ_{self.tech}.xlsx'
-                txp_aclr_evm_current_plot_ftm(self.file_path, self.parameters)
+                file_name = select_file_name_genre_tx_ftm(bw, self.tech, 'level_sweep')
+                file_path = Path(self.file_path).parent / Path(file_name)
+                txp_aclr_evm_current_plot_ftm(file_path, self.parameters)
             except TypeError:
                 logger.info(f'there is no data to plot because the band does not have this BW ')
             except FileNotFoundError:
