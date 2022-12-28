@@ -63,7 +63,7 @@ class VisaComport:
         elif equipment_name == 'temp_chamber':
             gpib_wanted = None
             try:
-                for gpib in self.get_gpib_usb():  # this is to search GPIB for PSU
+                for gpib in self.get_gpib_usb():  # this is to search GPIB for tempchamber
                     inst = pyvisa.ResourceManager().open_resource(gpib)
                     inst = inst.query('*IDN?').strip()
                     logger.info('----------Search temp chamber we are using----------')
@@ -78,6 +78,25 @@ class VisaComport:
             else:
                 logger.info(f'Connect to temp_chamber successfully')
                 self.inst = pyvisa.ResourceManager().open_resource(gpib_wanted)  # to build object of 'inst'
+
+        elif 'FSW' in equipment_name or 'fsw' in equipment_name:
+            try:
+                gpib_usb_wanted = None
+                for gpib_usb in self.get_gpib_usb():  # this is to search GPIB for FSW
+                    inst = pyvisa.ResourceManager().open_resource(gpib_usb)
+                    inst_res = inst.query('*IDN?').strip()
+                    logger.info('----------Search FSW we are using----------')
+                    if '8820' in inst_res or '8821' in inst_res:
+                        gpib_usb_wanted = gpib_usb
+                        break
+
+            except Exception as err:
+                logger.info(err)
+                logger.info('Please check if connecting to FSW')
+
+            else:
+                logger.info(f'Connect to FSW successfully')
+                self.inst = pyvisa.ResourceManager().open_resource(gpib_usb_wanted)  # to build object of 'inst'
 
         self.inst.timeout = 5000  # set the default timeout
 
