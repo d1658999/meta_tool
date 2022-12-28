@@ -36,6 +36,49 @@ class FSW:
         """
         self.fsw_write(f'SYSTem:PRESet')
 
+    def set_input_attenuation_state(self, on_off='ON'):
+        """
+        INPut<ip>:EATT:STATe
+        This command turns the electronic attenuator on and off.
+        Suffix:
+        <ip> 1 | 2
+        irrelevant
+        Parameters:
+        <State> ON | OFF | 0 | 1
+        OFF | 0
+        Switches the function off
+        ON | 1
+        Switches the function on
+        *RST:  0
+        Example:  INP:EATT:STAT ON
+        Switches the electronic attenuator into the signal path.
+        """
+        self.fsw_write(f'INPut:EATT:STATe {on_off}')
+
+    def set_input_attenuation(self, att=30):
+        """
+        INPut<ip>:ATTenuation
+        This command defines the total attenuation for RF input.
+        If an electronic attenuator is available and active, the command defines a mechanical
+        attenuation (see INPut<ip>:EATT:STATe on page 1171).
+        If you set the attenuation manually, it is no longer coupled to the reference level, but
+        the reference level is coupled to the attenuation. Thus, if the current reference level is
+        not compatible with an attenuation that has been set manually, the command also
+        adjusts the reference level.
+        Suffix:
+        <ip> 1 | 2
+        irrelevant
+        Parameters:
+        <Attenuation> Range:  see data sheet
+        Increment:  5 dB (with optional electr. attenuator: 1 dB)
+        *RST:  10 dB (AUTO is set to ON)
+        Default unit: DB
+        Example:  INP:ATT 30dB
+        Defines a 30 dB attenuation and decouples the attenuation from
+        the reference level.
+        """
+        self.fsw_write(f'INPut:ATTenuation {att}')
+
     def set_freq_start(self, start_freq):
         """
         This command defines a start frequency for measurements in the frequency domain.
@@ -470,7 +513,7 @@ class FSW:
         """
         self.fsw_write(f'CALCulate:MARKer:FUNCtion:HARMonics:NHARmonics {number}')
 
-    def set_harmonic_bandwidth_auto(self, on_off='ON'):
+    def set_harmonic_bandwidth_auto(self, on_off='OFF'):
         """
         This command selects the resolution bandwidth of the harmonic in respect to the band-
         width of the first harmonic.
@@ -485,7 +528,7 @@ class FSW:
         a multiple
         *RST:  1
         """
-        self.fsw_write(f'CALCulate<n>:MARKer<m>:FUNCtion:HARMonics:BANDwidth:AUTO {on_off}')
+        self.fsw_write(f'CALCulate:MARKer:FUNCtion:HARMonics:BANDwidth:AUTO {on_off}')
 
     def get_time_register_query(self):
         """
