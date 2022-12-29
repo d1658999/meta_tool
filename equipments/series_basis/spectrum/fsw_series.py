@@ -36,24 +36,42 @@ class FSW:
         """
         self.fsw_write(f'SYSTem:PRESet')
 
-    def set_input_attenuation_state(self, on_off='ON'):
+    def set_reference_level(self, level=30):
         """
-        INPut<ip>:EATT:STATe
-        This command turns the electronic attenuator on and off.
+        DISPlay[:WINDow<n>][:SUBWindow<w>]:TRACe<t>:Y[:SCALe]:RLEVel <ReferenceLevel>
+        This command defines the reference level (for all traces in all windows).
+        With a reference level offset ≠ 0, the value range of the reference level is modified by
+        the offset.
         Suffix:
-        <ip> 1 | 2
-        irrelevant
+        <n> irrelevant
+        <w> subwindow
+        Not supported by all applications
+        <t> irrelevant
         Parameters:
-        <State> ON | OFF | 0 | 1
-        OFF | 0
-        Switches the function off
-        ON | 1
-        Switches the function on
-        *RST:  0
-        Example:  INP:EATT:STAT ON
-        Switches the electronic attenuator into the signal path.
+        <ReferenceLevel> The unit is variable.
+        Range:  see datasheet
+        *RST:  0 dBm
+        Default unit: DBM
+        Example:  DISP:TRAC:Y:RLEV -60dBm
         """
-        self.fsw_write(f'INPut:EATT:STATe {on_off}')
+        self.fsw_write(f'DISPlay:WINDow:TRACe:Y:SCALe:RLEVel {level}')
+
+    def ser_reference_level_offset(self, offset=30):
+        """
+        DISPlay[:WINDow<n>][:SUBWindow<w>]:TRACe<t>:Y[:SCALe]:RLEVel:OFFSet <Offset>
+        This command defines a reference level offset (for all traces in all windows).
+        Suffix:
+        <n> irrelevant
+        <w> subwindow
+        Not supported by all applications
+        <t> irrelevant
+        Parameters:
+        <Offset> Range:  -200 dB  to  200 dB
+        *RST:  0dB
+        Default unit: DB
+        Example:  DISP:TRAC:Y:RLEV:OFFS -10dB
+        """
+        self.fsw_write(f'DISPlay:WINDow:TRACe:Y:SCALe:RLEVel:OFFSet {offset}')
 
     def set_input_attenuation(self, att=30):
         """
@@ -78,6 +96,22 @@ class FSW:
         the reference level.
         """
         self.fsw_write(f'INPut:ATTenuation {att}')
+
+    def set_input_attenuation_auto(self, on_off='ON'):
+        """
+        This command couples or decouples the attenuation to the reference level. Thus, when
+        the reference level is changed, the R&S FSW determines the signal level for optimal
+        internal data processing and sets the required attenuation accordingly.
+        Suffix:
+        <ip> 1 | 2
+        irrelevant
+        Parameters:
+        <State> ON | OFF | 0 | 1
+        *RST:  1
+        Example:  INP:ATT:AUTO ON
+        Couples the attenuation to the reference level.
+        """
+        self.fsw_write(f'INPut:ATTenuation:AUTO {on_off}')
 
     def set_freq_start(self, start_freq):
         """
