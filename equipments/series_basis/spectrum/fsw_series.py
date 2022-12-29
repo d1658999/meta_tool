@@ -56,7 +56,7 @@ class FSW:
         """
         self.fsw_write(f'DISPlay:WINDow:TRACe:Y:SCALe:RLEVel {level}')
 
-    def ser_reference_level_offset(self, offset=30):
+    def set_reference_level_offset(self, offset=30):
         """
         DISPlay[:WINDow<n>][:SUBWindow<w>]:TRACe<t>:Y[:SCALe]:RLEVel:OFFSet <Offset>
         This command defines a reference level offset (for all traces in all windows).
