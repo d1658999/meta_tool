@@ -86,7 +86,7 @@ class VisaComport:
                     inst = pyvisa.ResourceManager().open_resource(gpib_usb)
                     inst_res = inst.query('*IDN?').strip()
                     logger.info('----------Search FSW we are using----------')
-                    if '8820' in inst_res or '8821' in inst_res:
+                    if 'FSW' in inst_res or 'fsw' in inst_res:
                         gpib_usb_wanted = gpib_usb
                         break
 
