@@ -839,7 +839,23 @@ class FSW:
 
 
 def main():
-    pass
+    fsw = FSW()
+    fsw.set_reference_level(-30)
+    fsw.set_reference_level_offset(5)
+    fsw.set_input_attenuation(1)
+    fsw.set_freq_center(3900000)
+    fsw.set_freq_span(1000)
+    fsw.set_rbw(1000)
+    fsw.set_vbw_rbw_ratio(1)
+    fsw.set_sweep_count(20)
+    fsw.set_sweep_time_auto('ON')
+    fsw.set_sweep_mode('OFF')
+    fsw.set_measure()
+
+    fsw.set_peak_mark_auto()
+    mark_x = fsw.get_peak_mark_x_query()
+    mark_y = fsw.get_peak_mark_y_query()
+    print(mark_x, mark_y)
 
 
 if __name__ == '__main__':
