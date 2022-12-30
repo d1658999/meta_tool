@@ -768,8 +768,10 @@ class FSW:
         Return values:
         <Result> Default unit: Hz
         Usage:  Query only
+        return unit: kHz
         """
-        return self.fsw_query(f'CALCulate:MARKer{mark}:X?')
+        freq_str = self.fsw_query(f'CALCulate:MARKer{mark}:X?')
+        return int(eval(freq_str) / 1000)
 
     def get_peak_mark_y_query(self, mark=1):
         """
@@ -781,8 +783,10 @@ class FSW:
         Return values:
         <Result> Default unit: DBM
         Usage:  Query only
+        return unit: dBm
         """
-        return self.fsw_query(f'CALCulate:MARKer{mark}:Y?')
+        level_str = self.fsw_query(f'CALCulate:MARKer{mark}:Y?')
+        return round(eval(level_str), 2)
 
     def get_peak_func_x_query(self):
         """
