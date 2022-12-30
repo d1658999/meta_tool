@@ -6,7 +6,7 @@ logger = log_set('FSW_series')
 
 
 class FSW:
-    def __init__(self, equipment='FSW'):
+    def __init__(self, equipment):
         self.fsw = VisaComport(equipment)
 
     def fsw_query(self, tcpip_command):
