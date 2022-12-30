@@ -570,7 +570,7 @@ class FSW:
         """
         self.fsw_write(f'CALCulate:MARKer:FUNCtion:HARMonics:BANDwidth:AUTO {on_off}')
 
-    def set_peak_search_state(self, trace=1, on_off='ON'):
+    def set_peak_func_state(self, trace=1, on_off='ON'):
         """
         This command turns a peak search on and off.
         Suffix:
@@ -586,6 +586,23 @@ class FSW:
                   Activates marker peak search
         """
         self.fsw_write(f'CALCulate:MARKer{trace}:FUNCtion:FPEaks:STATe {on_off}')
+
+    def set_peak_func_list(self, number=50):
+        """
+        CALCulate<n>:MARKer<m>:FUNCtion:FPEaks:LIST:SIZE <MaxNoPeaks>
+        This command defines the maximum number of peaks that the R&S FSW looks for
+        during a peak search.
+        Suffix:
+        <n> Window
+        <m> Marker
+        Parameters:
+        <MaxNoPeaks> Maximum number of peaks to be determined.
+        Range:  1  to  500
+        *RST:  50
+        Example:  CALC:MARK:FUNC:FPE:LIST:SIZE 10
+                  The marker peak list will contain a maximum of 10 peaks.
+        """
+        self.fsw_write(f'CALCulate:MARKer:FUNCtion:FPEaks:LIST:SIZE {number}')
 
     def set_mark_peak_auto(self, trace=1,on_off='ON'):
         """
@@ -620,54 +637,54 @@ class FSW:
         """
         self.fsw_write(f'CALCulate:MARKer{trace}:MAXimum:PEAK')
 
-    def set_peak_search_number(self, number):
-        """
-        CALCulate<n>:PSEarch:SUBRanges <NumberPeaks>
-        CALCulate<n>:PEAKsearch:SUBRanges <NumberPeaks>
-        This command defines the number of peaks included in the peak list.
-        After this number of peaks has been found, the R&S FSW stops the peak search and
-        continues the search in the next measurement range.
-        Suffix:
-        <n> Window
-        Parameters:
-        <NumberPeaks> Range:  1  to  50
-        *RST:  25
-        Example:  CALC:PSE:SUBR 10
-                  Sets 10 peaks per range to be stored in the list.
-        """
-        self.fsw_write(f'CALCulate:PEAKsearch:SUBRanges {number}')
+    # def set_peak_search_number(self, number):
+    #     """
+    #     CALCulate<n>:PSEarch:SUBRanges <NumberPeaks>
+    #     CALCulate<n>:PEAKsearch:SUBRanges <NumberPeaks>
+    #     This command defines the number of peaks included in the peak list.
+    #     After this number of peaks has been found, the R&S FSW stops the peak search and
+    #     continues the search in the next measurement range.
+    #     Suffix:
+    #     <n> Window
+    #     Parameters:
+    #     <NumberPeaks> Range:  1  to  50
+    #     *RST:  25
+    #     Example:  CALC:PSE:SUBR 10
+    #               Sets 10 peaks per range to be stored in the list.
+    #     """
+    #     self.fsw_write(f'CALCulate:PEAKsearch:SUBRanges {number}')
 
-    def set_peak_lable_enable(self, on_off='OFF'):
-        """
-        CALCulate<n>:PSEarch:PSHow <State>
-        CALCulate<n>:PEAKsearch:PSHow <State>
-        This command turns the peak labels in the diagram on and off.
-        Peak labels are blue squares.
-        Suffix:
-        <n> Window
-        Parameters:
-        <State> ON | OFF | 1 | 0
-        *RST:  0
-        Example:  CALC:PSE:PSH ON
-                  Marks all peaks with blue squares.
-        """
-        self.fsw_write(f'CALCulate:PSEarch:PSHow {on_off}')
+    # def set_peak_lable_enable(self, on_off='OFF'):
+    #     """
+    #     CALCulate<n>:PSEarch:PSHow <State>
+    #     CALCulate<n>:PEAKsearch:PSHow <State>
+    #     This command turns the peak labels in the diagram on and off.
+    #     Peak labels are blue squares.
+    #     Suffix:
+    #     <n> Window
+    #     Parameters:
+    #     <State> ON | OFF | 1 | 0
+    #     *RST:  0
+    #     Example:  CALC:PSE:PSH ON
+    #               Marks all peaks with blue squares.
+    #     """
+    #     self.fsw_write(f'CALCulate:PSEarch:PSHow {on_off}')
 
-    def set_peak_list_auto(self, on_off='ON'):
-        """
-        CALCulate<n>:PSEarch:AUTO <State>
-        CALCulate<n>:PEAKsearch:AUTO <State>
-        This command turns the list evaluation on and off.
-        Suffix:
-        <n> Window
-        Parameters:
-        <State> ON | OFF | 0 | 1
-        *RST:  1
-        Example:  CALC:PSE:AUTO OFF
-        Deactivates the list evaluation.
-        Manual operation:  See "List Evaluation State" on page 283
-        """
-        self.fsw_write(f'CALCulate:PEAKsearch:AUTO {on_off}')
+    # def set_peak_list_auto(self, on_off='ON'):
+    #     """
+    #     CALCulate<n>:PSEarch:AUTO <State>
+    #     CALCulate<n>:PEAKsearch:AUTO <State>
+    #     This command turns the list evaluation on and off.
+    #     Suffix:
+    #     <n> Window
+    #     Parameters:
+    #     <State> ON | OFF | 0 | 1
+    #     *RST:  1
+    #     Example:  CALC:PSE:AUTO OFF
+    #     Deactivates the list evaluation.
+    #     Manual operation:  See "List Evaluation State" on page 283
+    #     """
+    #     self.fsw_write(f'CALCulate:PEAKsearch:AUTO {on_off}')
 
     def get_time_register_query(self):
         """
@@ -741,7 +758,33 @@ class FSW:
         """
         return self.fsw_query(f'CALCulate:MARKer:FUNCtion:HARMonics:LIST')
 
-    def get_peak_mark_x_query(self):
+    def get_peak_mark_x_query(self, mark=1):
+        """
+        CALCulate<n>:MARKer<m>:X?
+        Queries the result at the position of the specified marker.
+        Suffix:
+        <n> 1..n
+        <m> 1..n
+        Return values:
+        <Result> Default unit: Hz
+        Usage:  Query only
+        """
+        return self.fsw_query(f'CALCulate:MARKer{mark}:X?')
+
+    def get_peak_mark_y_query(self, mark=1):
+        """
+        CALCulate<n>:MARKer<m>:Y?
+        Queries the result at the position of the specified marker.
+        Suffix:
+        <n> 1..n
+        <m> 1..n
+        Return values:
+        <Result> Default unit: DBM
+        Usage:  Query only
+        """
+        return self.fsw_query(f'CALCulate:MARKer{mark}:Y?')
+
+    def get_peak_func_x_query(self):
         """
         This command queries the position of the peaks on the x-axis.
         The order depends on the sort order that has been set with CALCulate<n>:
@@ -758,7 +801,7 @@ class FSW:
         """
         return self.fsw_query(f'CALCulate:MARKer:FUNCtion:FPEaks:X?')
 
-    def get_peak_mark_y_query(self):
+    def get_peak_func_y_query(self):
         """
         This command queries the position of the peaks on the y-axis.
         The order depends on the sort order that has been set with CALCulate<n>:
