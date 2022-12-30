@@ -356,3 +356,14 @@ class TxHarmonics(TxTestGenre, FSW50):
                 }
                 self.file_path = tx_power_relative_test_export_excel_ftm(data_chan, self.parameters)  # mode=1: LMH mode
         self.set_test_end_gsm()
+
+    def run(self):
+        for tech in ext_pmt.tech:
+            if tech == 'LTE':
+                self.tx_harmonics_pipline_lte()
+            elif tech == 'FR1':
+                self.tx_harmonics_pipline_fr1()
+            elif tech == 'WCDMA':
+                self.tx_harmonics_pipline_wcdma()
+            elif tech == 'GSM':
+                self.tx_harmonics_pipline_gsm()

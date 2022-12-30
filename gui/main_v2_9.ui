@@ -35,7 +35,7 @@
                       <object class="tk.OptionMenu" id="optionmenu_instruments_ftm">
                         <property name="command" type="command" cbtype="simple">inst_select</property>
                         <property name="value">Cmw100</property>
-                        <property name="values">Cmw100</property>
+                        <property name="values">Cmw100, Cmw+Fsw</property>
                         <property name="variable">string:instrument</property>
                         <layout manager="pack">
                           <property name="fill">x</property>
