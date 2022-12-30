@@ -1,3 +1,4 @@
+from math import log10
 from connection_interface.connection_visa import VisaComport
 from utils.log_init import log_set
 
@@ -56,7 +57,7 @@ class FSW:
         """
         self.fsw_write(f'DISPlay:WINDow:TRACe:Y:SCALe:RLEVel {level}')
 
-    def set_reference_level_offset(self, offset=30.0):
+    def set_reference_level_offset(self, band, offset=0.0):
         """
         DISPlay[:WINDow<n>][:SUBWindow<w>]:TRACe<t>:Y[:SCALe]:RLEVel:OFFSet <Offset>
         This command defines a reference level offset (for all traces in all windows).
@@ -71,6 +72,7 @@ class FSW:
         Default unit: DB
         Example:  DISP:TRAC:Y:RLEV:OFFS -10dB
         """
+        offset += self.duty_factor(band)
         self.fsw_write(f'DISPlay:WINDow:TRACe:Y:SCALe:RLEVel:OFFSet {offset}')
 
     def set_input_attenuation(self, att=30.0):
@@ -819,6 +821,21 @@ class FSW:
         Usage:  Query only
         """
         return self.fsw_query(f'CALCulate:MARKer:FUNCtion:FPEaks:Y?')
+
+    @staticmethod
+    def duty_factor(band):
+        """
+        The formual is 10log(1/d)
+        where d is the percentage of on in the period
+        for P22 is 20% for 41, so d is 0.2
+        for P23 is 40% for 41, so d is 0.4
+        """
+        d = 0.4
+        if band in [38, 39, 40, 41, 46, 42, 48, 77, 78, 79]:
+            factor = round((10 * log10(1/d)), 2)
+            return factor
+        else:
+            return 0
 
 
 def main():
