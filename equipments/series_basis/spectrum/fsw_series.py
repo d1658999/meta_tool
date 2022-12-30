@@ -36,7 +36,7 @@ class FSW:
         """
         self.fsw_write(f'SYSTem:PRESet')
 
-    def set_reference_level(self, level=30):
+    def set_reference_level(self, level=30.0):
         """
         DISPlay[:WINDow<n>][:SUBWindow<w>]:TRACe<t>:Y[:SCALe]:RLEVel <ReferenceLevel>
         This command defines the reference level (for all traces in all windows).
@@ -56,7 +56,7 @@ class FSW:
         """
         self.fsw_write(f'DISPlay:WINDow:TRACe:Y:SCALe:RLEVel {level}')
 
-    def set_reference_level_offset(self, offset=30):
+    def set_reference_level_offset(self, offset=30.0):
         """
         DISPlay[:WINDow<n>][:SUBWindow<w>]:TRACe<t>:Y[:SCALe]:RLEVel:OFFSet <Offset>
         This command defines a reference level offset (for all traces in all windows).
@@ -73,7 +73,7 @@ class FSW:
         """
         self.fsw_write(f'DISPlay:WINDow:TRACe:Y:SCALe:RLEVel:OFFSet {offset}')
 
-    def set_input_attenuation(self, att=30):
+    def set_input_attenuation(self, att=30.0):
         """
         INPut<ip>:ATTenuation
         This command defines the total attenuation for RF input.
