@@ -604,7 +604,7 @@ class FSW:
         """
         self.fsw_write(f'CALCulate:MARKer:FUNCtion:FPEaks:LIST:SIZE {number}')
 
-    def set_mark_peak_auto(self, trace=1,on_off='ON'):
+    def set_peak_mark_auto(self, mark=1, on_off='ON'):
         """
         This command turns an automatic marker peak search for a trace maximum on and
         off. The R&S FSW performs the peak search after each sweep.
@@ -621,9 +621,9 @@ class FSW:
                   Activates the automatic peak search function for marker 1 at the
                   end of each particular sweep.
         """
-        self.fsw_write(f'CALCulate:MARKer{trace}:MAXimum:AUTO {on_off}')
+        self.fsw_write(f'CALCulate:MARKer{mark}:MAXimum:AUTO {on_off}')
 
-    def set_mark_peak(self, trace=1):
+    def set_peak_mark(self, mark=1):
         """
         CALCulate<n>:MARKer<m>:MAXimum[:PEAK]
         This command moves a marker to the highest level.
@@ -635,7 +635,7 @@ class FSW:
         <m> Marker
         Manual operation:  See "Peak Search" on page 549
         """
-        self.fsw_write(f'CALCulate:MARKer{trace}:MAXimum:PEAK')
+        self.fsw_write(f'CALCulate:MARKer{mark}:MAXimum:PEAK')
 
     # def set_peak_search_number(self, number):
     #     """
