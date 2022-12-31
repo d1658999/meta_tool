@@ -839,9 +839,9 @@ class FSW:
 
 
 def main():
-    fsw = FSW()
+    fsw = FSW('FSW50')
     fsw.set_reference_level(-30)
-    fsw.set_reference_level_offset(5)
+    fsw.set_reference_level_offset(1, 5)
     fsw.set_input_attenuation(1)
     fsw.set_freq_center(3900000)
     fsw.set_freq_span(1000)

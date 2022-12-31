@@ -12,10 +12,10 @@ class FSW50(FSW):
     def __init__(self, equipment='FSW50'):
         super().__init__(equipment)
 
-    def get_level_harmonics(self, harmonic_freq, loss):
+    def get_level_harmonics(self, band, harmonic_freq, loss):
         # basic environment setting
         self.set_reference_level(-30)
-        self.set_reference_level_offset(loss)
+        self.set_reference_level_offset(band, loss)
         self.set_input_attenuation(0)
         self.set_freq_center(harmonic_freq)
         self.set_freq_span(1000)  # span 1G
@@ -35,8 +35,8 @@ class FSW50(FSW):
         logger.info(f'Peak level: {mark_y} and response to the Freq: {mark_x}')
         return mark_x, mark_y
 
-    def get_harmonics_order(self, order, tx_freq):
+    def get_harmonics_order(self, band, order, tx_freq):
         tx_freq_order = int(tx_freq * order)
         loss = get_loss_spectrum(tx_freq_order)
         logger.info(f'This is {order} Harmonic')
-        return self.get_level_harmonics(tx_freq_order, loss)
+        return self.get_level_harmonics(band, tx_freq_order, loss)

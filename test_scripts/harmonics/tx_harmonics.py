@@ -97,8 +97,8 @@ class TxHarmonics(TxTestGenre, FSW50):
                             logger.debug(aclr_mod_results)
                             aclr_mod_current_results.append(self.measure_current(self.band_fr1))
                             data_freq[self.tx_freq_fr1] = aclr_mod_current_results + self.get_temperature() \
-                                                          + self.get_harmonics_order(2, self.tx_freq_fr1) \
-                                                          + self.get_harmonics_order(3, self.tx_freq_fr1)
+                                                          + self.get_harmonics_order(self.band_fr1, 2, tx_freq_fr1) \
+                                                          + self.get_harmonics_order(self.band_fr1, 3, tx_freq_fr1)
                         logger.debug(data_freq)
                         # ready to export to excel
                         self.parameters = {
@@ -190,8 +190,8 @@ class TxHarmonics(TxTestGenre, FSW50):
                             logger.debug(aclr_mod_results)
                             aclr_mod_current_results.append(self.measure_current(self.band_lte))
                             data_freq[self.tx_freq_lte] = aclr_mod_current_results + self.get_temperature() \
-                                                          + self.get_harmonics_order(2, self.tx_freq_lte) \
-                                                          + self.get_harmonics_order(3, self.tx_freq_lte)
+                                                          + self.get_harmonics_order(self.band_lte, 2, tx_freq_lte) \
+                                                          + self.get_harmonics_order(self.band_lte, 3, tx_freq_lte)
                         logger.debug(data_freq)
                         # ready to export to excel
                         self.parameters = {
@@ -261,8 +261,8 @@ class TxHarmonics(TxTestGenre, FSW50):
                     aclr_mod_current_results.append(self.measure_current(self.band_wcdma))
                     tx_freq_wcdma = cm_pmt_ftm.transfer_chan2freq_wcdma(self.band_wcdma, self.tx_chan_wcdma)
                     data_chan[tx_freq_wcdma] = aclr_mod_current_results + self.get_temperature() \
-                                               + self.get_harmonics_order(2, tx_freq_wcdma) \
-                                               + self.get_harmonics_order(3, tx_freq_wcdma)
+                                               + self.get_harmonics_order(self.band_wcdma, 2, tx_freq_wcdma) \
+                                               + self.get_harmonics_order(self.band_wcdma, 3, tx_freq_wcdma)
 
                 logger.debug(data_chan)
                 # ready to export to excel
@@ -331,8 +331,8 @@ class TxHarmonics(TxTestGenre, FSW50):
                     logger.debug(aclr_mod_results)
                     aclr_mod_current_results.append(self.measure_current(self.band_gsm))
                     data_chan[self.rx_freq_gsm] = aclr_mod_current_results + self.get_temperature() \
-                                                  + self.get_harmonics_order(2, self.tx_freq_gsm) \
-                                                  + self.get_harmonics_order(3, self.tx_freq_gsm)
+                                                  + self.get_harmonics_order(self.band_gsm, 2, self.tx_freq_gsm) \
+                                                  + self.get_harmonics_order(self.band_gsm, 3, self.tx_freq_gsm)
 
                 logger.debug(data_chan)
                 # ready to export to excel
