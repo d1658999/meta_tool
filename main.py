@@ -2580,6 +2580,18 @@ class MainApp:
                 inst.run()
                 inst.ser.com_close()
 
+        elif self.instrument.get() == 'Cmw+Fsw':
+            from test_scripts.harmonics.tx_harmonics import TxHarmonics
+
+            excel_folder_create()
+            # self.test_pipeline(inst_class_dict)
+            if self.wanted_test['tx'] and ext_pmt.sa_nsa == 0:
+                for script in ext_pmt.scripts:
+                    if script == 'GENERAL':
+                        inst = TxHarmonics()
+                        inst.run()
+                        inst.ser.com_close()
+
         for button_run in self.button_run_list:
             button_run['state'] = tkinter.NORMAL
 
