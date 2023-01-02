@@ -156,6 +156,7 @@ class AtCmd:
         self.rb_select_lte_dict = {
             'PRB': 0,
             'FRB': 1,
+            '1RB_0': 3,
         }
         self.type_dict = {
             'DFTS': 0,

@@ -72,5 +72,6 @@ test_items:
   tx_1rb_sweep: false
   tx_freq_sweep: false
   tx_level_sweep: false
+  tx_harmonics: false
 type:
   type_fr1: []

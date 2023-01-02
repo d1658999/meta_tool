@@ -18,7 +18,7 @@ from equipments.temp_chamber import TempChamber
 logger = log_set('GUI')
 
 PROJECT_PATH = pathlib.Path(__file__).parent
-PROJECT_UI = PROJECT_PATH / pathlib.Path('gui') /"main_v2_9.ui"
+PROJECT_UI = PROJECT_PATH / pathlib.Path('gui') / "main_v2_10.ui"
 
 
 class MainApp:
@@ -45,6 +45,7 @@ class MainApp:
 
         self.instrument = None
         self.general = None
+        self.cse = None
         self.sa_nsa = None
         self.port_tx = None
         self.port_tx_lte = None
@@ -85,6 +86,7 @@ class MainApp:
         self.tx_level_sweep = None
         self.tx_freq_sweep = None
         self.tx_1rb_sweep = None
+        self.tx_harmonics = None
         self.qpsk_lte = None
         self.q16_lte = None
         self.q64_lte = None
@@ -258,6 +260,7 @@ class MainApp:
             [
                 "instrument",
                 "general",
+                "cse",
                 "sa_nsa",
                 "port_tx",
                 "port_tx_lte",
@@ -298,6 +301,7 @@ class MainApp:
                 "tx_level_sweep",
                 "tx_freq_sweep",
                 "tx_1rb_sweep",
+                "tx_harmonics",
                 "qpsk_lte",
                 "q16_lte",
                 "q64_lte",
@@ -482,7 +486,8 @@ class MainApp:
         t = threading.Thread(target=self.stop)
         t.start()
 
-    def stop(self):
+    @staticmethod
+    def stop():
         print('Crtrl C')
         os.kill(signal.CTRL_C_EVENT, 0)
 
@@ -549,6 +554,7 @@ class MainApp:
         self.tx_level_sweep.set(ui_init['test_items']['tx_level_sweep'])
         self.tx_freq_sweep.set(ui_init['test_items']['tx_freq_sweep'])
         self.tx_1rb_sweep.set(ui_init['test_items']['tx_1rb_sweep'])
+        self.tx_harmonics.set(ui_init['test_items']['tx_harmonics'])
         self.port_tx.set(ui_init['port']['port_tx'])
         self.port_tx_lte.set(ui_init['port']['port_tx_lte'])
         self.port_tx_fr1.set(ui_init['port']['port_tx_fr1'])
@@ -882,11 +888,13 @@ class MainApp:
                 self.ce.set(True)
             elif script == 'ENDC':
                 self.endc.set(True)
+            elif script == 'CSE':
+                self.cse.set(True)
 
-        for type in ui_init['type']['type_fr1']:
-            if type == 'DFTS':
+        for _type in ui_init['type']['type_fr1']:
+            if _type == 'DFTS':
                 self.dfts.set(True)
-            elif type == 'CP':
+            elif _type == 'CP':
                 self.cp.set(True)
 
         for rb_ftm in ui_init['rb_set']['rb_ftm_lte']:
@@ -1008,7 +1016,7 @@ class MainApp:
         band_segment = self.band_segment.get()
         band_segment_fr1 = self.band_segment_fr1.get()
         chan = self.wanted_chan()
-        tx, rx, rx_freq_sweep, tx_level_sweep, tx_freq_sweep, tx_1rb_sweep = self.wanted_tx_rx_sweep()
+        tx, rx, rx_freq_sweep, tx_level_sweep, tx_freq_sweep, tx_1rb_sweep, tx_harmonics = self.wanted_tx_rx_sweep()
         tpchb_enable = self.tempcham_enable.get()
         psu_enable = self.psu_enable.get()
         odpm_enable = self.odpm_enable.get()
@@ -1051,6 +1059,7 @@ class MainApp:
                 'tx_level_sweep': tx_level_sweep,
                 'tx_freq_sweep': tx_freq_sweep,
                 'tx_1rb_sweep': tx_1rb_sweep,
+                'tx_harmonics': tx_harmonics,
             },
             'band': {
                 'bands_fr1': bands_fr1,
@@ -1177,7 +1186,8 @@ class MainApp:
         self.UHB_all_state()
         self.UHB_all_state_fr1()
 
-    def thermal_dis(self):
+    @staticmethod
+    def thermal_dis():
         from utils.adb_handler import thermal_charger_disable
         thermal_charger_disable()
 
@@ -1637,6 +1647,7 @@ class MainApp:
         self.wanted_test.setdefault('tx_level_sweep', False)
         self.wanted_test.setdefault('tx_freq_sweep', False)
         self.wanted_test.setdefault('tx_1rb_sweep', False)
+        self.wanted_test.setdefault('tx_harmonics', False)
 
         if self.tx.get():
             logger.debug(self.tx.get())
@@ -1654,6 +1665,10 @@ class MainApp:
             logger.debug(self.tx_1rb_sweep.get())
             self.wanted_test['tx_1rb_sweep'] = self.tx_1rb_sweep.get()
 
+        if self.tx_harmonics.get():
+            logger.debug(self.tx_harmonics.get())
+            self.wanted_test['tx_harmonics'] = self.tx_harmonics.get()
+
         if self.rx.get():
             logger.debug(self.rx.get())
             self.wanted_test['rx'] = self.rx.get()
@@ -1666,7 +1681,8 @@ class MainApp:
             logger.debug('Nothing to select for test items')
 
         logger.info(self.wanted_test)
-        return self.tx.get(), self.rx.get(), self.rx_freq_sweep.get(), self.tx_level_sweep.get(), self.tx_freq_sweep.get(), self.tx_1rb_sweep.get()
+        return self.tx.get(), self.rx.get(), self.rx_freq_sweep.get(), self.tx_level_sweep.get(), \
+               self.tx_freq_sweep.get(), self.tx_1rb_sweep.get(), self.tx_harmonics.get()
 
     def wanted_ue_pwr(self):
         self.ue_power = []
@@ -2205,20 +2221,20 @@ class MainApp:
         return self.mcs_lte
 
     def wanted_type(self):
-        self.type = []
+        self.type_ = []
         if self.dfts.get():
             logger.debug('DFTS')
-            self.type.append('DFTS')
+            self.type_.append('DFTS')
 
         if self.cp.get():
             logger.debug('CP')
-            self.type.append('CP')
+            self.type_.append('CP')
 
-        if self.type == []:
+        if self.type_ == []:
             logger.debug('Nothing to select for type')
 
-        logger.info(f'type select: {self.type}')
-        return self.type
+        logger.info(f'type select: {self.type_}')
+        return self.type_
 
     def fr1_mode_select(self):
         if self.sa_nsa.get() == 0:
@@ -2247,6 +2263,10 @@ class MainApp:
         if self.endc.get():
             logger.debug('ENDC')
             self.script.append('ENDC')
+
+        if self.cse.get():
+            logger.debug('CSE')
+            self.script.append('CSE')
 
         if self.script == []:
             logger.debug('Nothing to select for script')
@@ -2444,7 +2464,6 @@ class MainApp:
     def measure(self):
         import utils.parameters.external_paramters as ext_pmt
 
-
         for button_run in self.button_run_list:
             button_run['state'] = tkinter.DISABLED
 
@@ -2585,9 +2604,9 @@ class MainApp:
 
             excel_folder_create()
             # self.test_pipeline(inst_class_dict)
-            if self.wanted_test['tx'] and ext_pmt.sa_nsa == 0:
+            if self.wanted_test['tx_harmonics'] and ext_pmt.sa_nsa == 0:
                 for script in ext_pmt.scripts:
-                    if script == 'GENERAL':
+                    if script == 'CSE':
                         inst = TxHarmonics()
                         inst.run()
                         inst.ser.com_close()
