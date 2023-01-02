@@ -76,6 +76,7 @@ def select_file_name_genre_tx_ftm(bw, tech, test_item='lmh'):
         lmh
         freq_sweep
         1rb_sweep
+        harmonics
     """
     if ext_pmt.part_number == "":
         if test_item == 'level_sweep':
@@ -86,6 +87,9 @@ def select_file_name_genre_tx_ftm(bw, tech, test_item='lmh'):
             return f'Tx_freq_sweep_{bw}MHZ_{tech}.xlsx'
         elif test_item == '1rb_sweep':
             return f'Tx_1RB_sweep_{bw}MHZ_{tech}.xlsx'
+        elif test_item == 'harmonics':
+            return f'Tx_harmonics_{bw}MHZ_{tech}.xlsx'
+
     else:
         if test_item == 'level_sweep':
             return f'Tx_level_sweep_{bw}MHZ_{tech}_{ext_pmt.part_number}.xlsx'
@@ -95,6 +99,8 @@ def select_file_name_genre_tx_ftm(bw, tech, test_item='lmh'):
             return f'Tx_freq_sweep_{bw}MHZ_{tech}_{ext_pmt.part_number}.xlsx'
         elif test_item == '1rb_sweep':
             return f'Tx_1RB_sweep_{bw}MHZ_{tech}_{ext_pmt.part_number}.xlsx'
+        elif test_item == 'harmonics':
+            return f'Tx_harmonics_{bw}MHZ_{tech}_{ext_pmt.part_number}.xlsx'
 
 
 def select_file_name_rx_sig(bw, tech):
@@ -282,6 +288,8 @@ def tx_power_relative_test_export_excel_ftm(data, parameters_dict):
                         ws['X1'] = 'Condition'
                         ws['Y1'] = 'Temp0'
                         ws['Z1'] = 'Temp1'
+                        ws['AA1'] = '2f0' if test_item == 'harmonics' else None
+                        ws['AB1'] = '3f0' if test_item == 'harmonics' else None
                     else:  # to pass the dashboard
                         pass
 
@@ -325,6 +333,8 @@ def tx_power_relative_test_export_excel_ftm(data, parameters_dict):
                         ws['Y1'] = 'Condition'
                         ws['Z1'] = 'Temp0'
                         ws['AA1'] = 'Temp1'
+                        ws['AB1'] = '2f0' if test_item == 'harmonics' else None
+                        ws['AC1'] = '3f0' if test_item == 'harmonics' else None
                     else:  # to pass the dashboard
                         pass
 
@@ -359,6 +369,8 @@ def tx_power_relative_test_export_excel_ftm(data, parameters_dict):
                         ws['R1'] = 'Condition'
                         ws['S1'] = 'Temp0'
                         ws['T1'] = 'Temp1'
+                        ws['U1'] = '2f0' if test_item == 'harmonics' else None
+                        ws['V1'] = '3f0' if test_item == 'harmonics' else None
                     else:  # to pass the dashboard
                         pass
 
@@ -401,6 +413,8 @@ def tx_power_relative_test_export_excel_ftm(data, parameters_dict):
                         ws['X1'] = 'Condition'
                         ws['Y1'] = 'Temp0'
                         ws['Z1'] = 'Temp1'
+                        ws['AA1'] = '2f0' if test_item == 'harmonics' else None
+                        ws['AB1'] = '3f0' if test_item == 'harmonics' else None
                     else:  # to pass the dashboard
                         pass
 
@@ -481,6 +495,8 @@ def tx_power_relative_test_export_excel_ftm(data, parameters_dict):
                     ws.cell(row, 24).value = ext_pmt.condition if test_item == 'lmh' else None
                     ws.cell(row, 25).value = measured_data[11] if test_item == 'lmh' else None
                     ws.cell(row, 26).value = measured_data[12] if test_item == 'lmh' else None
+                    ws.cell(row, 27).value = measured_data[13] if test_item == 'harmonics' else None  # 2f0
+                    ws.cell(row, 28).value = measured_data[14] if test_item == 'harmonics' else None  # 3f0
                     row += 1
 
         elif tech == 'FR1':
@@ -546,6 +562,8 @@ def tx_power_relative_test_export_excel_ftm(data, parameters_dict):
                     ws.cell(row, 25).value = ext_pmt.condition if test_item == 'lmh' else None
                     ws.cell(row, 26).value = measured_data[11] if test_item == 'lmh' else None
                     ws.cell(row, 27).value = measured_data[12] if test_item == 'lmh' else None
+                    ws.cell(row, 28).value = measured_data[13] if test_item == 'harmonics' else None  # 2f0
+                    ws.cell(row, 29).value = measured_data[14] if test_item == 'harmonics' else None  # 3f0
                     row += 1
 
         elif tech == 'WCDMA':
@@ -598,6 +616,8 @@ def tx_power_relative_test_export_excel_ftm(data, parameters_dict):
                     ws.cell(row, 18).value = ext_pmt.condition if test_item == 'lmh' else None
                     ws.cell(row, 19).value = measured_data[10] if test_item == 'lmh' else None
                     ws.cell(row, 20).value = measured_data[11] if test_item == 'lmh' else None
+                    ws.cell(row, 21).value = measured_data[12] if test_item == 'harmonics' else None  # 2f0
+                    ws.cell(row, 22).value = measured_data[13] if test_item == 'harmonics' else None  # 3f0
                     row += 1
 
         elif tech == 'GSM':
@@ -662,6 +682,8 @@ def tx_power_relative_test_export_excel_ftm(data, parameters_dict):
                     ws.cell(row, 24).value = ext_pmt.condition if test_item == 'lmh' else None
                     ws.cell(row, 25).value = measured_data[17] if test_item == 'lmh' else None
                     ws.cell(row, 26).value = measured_data[18] if test_item == 'lmh' else None
+                    ws.cell(row, 27).value = measured_data[19] if test_item == 'harmonics' else None  # 2f0
+                    ws.cell(row, 28).value = measured_data[20] if test_item == 'harmonics' else None  # 3f0
                     row += 1
 
         wb.save(file_path)
@@ -688,7 +710,7 @@ def txp_aclr_evm_current_plot_ftm(file_path, parameters_dict):
     type_ = parameters_dict['type']
     logger.info('----------Plot Chart---------')
     wb = openpyxl.load_workbook(file_path)
-    if script == 'GENERAL':
+    if script in ['GENERAL', 'CSE']:
         if tech == 'LTE':
             for ws_name in wb.sheetnames:
                 if 'Raw_Data' in ws_name:

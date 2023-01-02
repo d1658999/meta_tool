@@ -2604,12 +2604,14 @@ class MainApp:
 
             excel_folder_create()
             # self.test_pipeline(inst_class_dict)
-            if self.wanted_test['tx_harmonics'] and ext_pmt.sa_nsa == 0:
-                for script in ext_pmt.scripts:
-                    if script == 'CSE':
+            for script in ext_pmt.scripts:
+                if script == 'CSE':
+                    if self.wanted_test['tx_harmonics'] and ext_pmt.sa_nsa == 0:
                         inst = TxHarmonics()
                         inst.run()
                         inst.ser.com_close()
+                else:
+                    pass
 
         for button_run in self.button_run_list:
             button_run['state'] = tkinter.NORMAL

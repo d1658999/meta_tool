@@ -2,7 +2,14 @@ from pathlib import Path
 from test_scripts.cmw100_items.tx_lmh import TxTestGenre
 from equipments.fsw50 import FSW50
 from utils.log_init import log_set
+import utils.parameters.external_paramters as ext_pmt
+import utils.parameters.common_parameters_ftm as cm_pmt_ftm
 from utils.loss_handler_harmonic import get_loss_cmw100
+from utils.excel_handler import select_file_name_genre_tx_ftm
+from utils.excel_handler import txp_aclr_evm_current_plot_ftm, tx_power_relative_test_export_excel_ftm
+from utils.channel_handler import channel_freq_select
+import utils.parameters.rb_parameters as rb_pmt
+import time
 
 
 logger = log_set('Tx_Harmonics')
@@ -75,7 +82,7 @@ class TxHarmonics(TxTestGenre, FSW50):
         for mcs in ext_pmt.mcs_fr1:
             self.mcs_fr1 = mcs
             for script in ext_pmt.scripts:
-                if script == 'GENERAL':
+                if script == 'CSE':
                     self.script = script
                     for rb_ftm in ext_pmt.rb_ftm_fr1:  # INNER_FULL, OUTER_FULL
                         self.rb_size_fr1, self.rb_start_fr1 = \
@@ -117,7 +124,7 @@ class TxHarmonics(TxTestGenre, FSW50):
                             'asw_srs_path': self.asw_srs_path,
                             'scs': self.scs,
                             'type': self.type_fr1,
-                            'test_item': 'lmh',
+                            'test_item': 'harmoncis',
                         }
                         self.file_path = tx_power_relative_test_export_excel_ftm(data_freq, self.parameters)
         self.set_test_end_fr1()
@@ -148,7 +155,7 @@ class TxHarmonics(TxTestGenre, FSW50):
                     logger.info(f'B{self.band_lte} does not have BW {self.bw_lte}MHZ')
         for bw in ext_pmt.lte_bandwidths:
             try:
-                file_name = select_file_name_genre_tx_ftm(bw, self.tech, 'lmh')
+                file_name = select_file_name_genre_tx_ftm(bw, self.tech, 'harmonics')
                 file_path = Path(self.file_path).parent / Path(file_name)
                 txp_aclr_evm_current_plot_ftm(file_path, self.parameters)
             except TypeError:
@@ -175,7 +182,7 @@ class TxHarmonics(TxTestGenre, FSW50):
         for mcs in ext_pmt.mcs_lte:
             self.mcs_lte = mcs
             for script in ext_pmt.scripts:
-                if script == 'GENERAL':
+                if script == 'CSE':
                     self.script = script
                     for rb_ftm in ext_pmt.rb_ftm_lte:  # PRB, FRB
                         self.rb_size_lte, self.rb_start_lte = rb_pmt.GENERAL_LTE[self.bw_lte][
@@ -210,7 +217,7 @@ class TxHarmonics(TxTestGenre, FSW50):
                             'asw_srs_path': self.asw_srs_path,
                             'scs': None,
                             'type': None,
-                            'test_item': 'lmh',
+                            'test_item': 'harmoncis',
                         }
                         self.file_path = tx_power_relative_test_export_excel_ftm(data_freq, self.parameters)
         self.set_test_end_lte()
@@ -237,7 +244,7 @@ class TxHarmonics(TxTestGenre, FSW50):
         self.preset_instrument()
 
         for script in ext_pmt.scripts:
-            if script == 'GENERAL':
+            if script == 'CSE':
                 self.script = script
                 data_chan = {}
                 for tx_rx_chan_wcdma in tx_rx_chan_select_list:
@@ -282,7 +289,7 @@ class TxHarmonics(TxTestGenre, FSW50):
                     'asw_srs_path': self.asw_srs_path,
                     'scs': None,
                     'type': None,
-                    'test_item': 'lmh',
+                    'test_item': 'harmoncis',
                 }
                 self.file_path = tx_power_relative_test_export_excel_ftm(data_chan, self.parameters)  # mode=1: LMH mode
         self.set_test_end_wcdma()
@@ -312,7 +319,7 @@ class TxHarmonics(TxTestGenre, FSW50):
         self.set_test_end_gsm()
 
         for script in ext_pmt.scripts:
-            if script == 'GENERAL':
+            if script == 'CSE':
                 self.script = script
                 data_chan = {}
                 for rx_chan_gsm in rx_chan_select_list:
@@ -352,7 +359,7 @@ class TxHarmonics(TxTestGenre, FSW50):
                     'asw_srs_path': self.asw_srs_path,
                     'scs': None,
                     'type': None,
-                    'test_item': 'lmh',
+                    'test_item': 'harmoncis',
                 }
                 self.file_path = tx_power_relative_test_export_excel_ftm(data_chan, self.parameters)  # mode=1: LMH mode
         self.set_test_end_gsm()

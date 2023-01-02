@@ -1,7 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <interface version="1.2">
   <object class="tk.Toplevel" id="toplevel1">
-    <property name="overrideredirect">True</property>
     <property name="relief">flat</property>
     <property name="resizable">none</property>
     <property name="takefocus">false</property>
