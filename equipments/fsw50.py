@@ -19,7 +19,7 @@ class FSW50(FSW):
         self.set_reference_level_offset(band, loss)
         self.set_input_attenuation(0)
         self.set_freq_center(harmonic_freq)
-        self.set_freq_span(500)  # span 1000MHz
+        self.set_freq_span(500)  # span 500MHz
         self.set_rbw(1000)  # RBW 1MHz
         self.set_vbw_rbw_ratio(1)  # RBW/VBW ratio = 1
         self.set_sweep_count(100)  # count = 100
