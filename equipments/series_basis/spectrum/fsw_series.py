@@ -72,7 +72,7 @@ class FSW:
         Default unit: DB
         Example:  DISP:TRAC:Y:RLEV:OFFS -10dB
         """
-        # offset += self.duty_factor(band)  # due to the loss is minus
+        offset += self.duty_factor(band)  # due to the loss is minus
         self.fsw_write(f'DISPlay:WINDow:TRACe:Y:SCALe:RLEVel:OFFSet {offset}')
 
     def set_input_attenuation(self, att=30.0):
@@ -443,6 +443,67 @@ class FSW:
         *RST:  LOGarithmic
         """
         self.fsw_write(f'BANDwidth:VIDeo:TYPE {type_}')
+
+    def set_detector(self, detector='RMS'):
+        """
+        This command selects the detector for a spurious emission measurement range.
+        Suffix:
+        <ri> 1..n
+        Selects the measurement range.
+        Parameters:
+        <Detector> APEak
+                   Autopeak
+                   NEGative
+                   minimum peak detector
+                   POSitive
+                   peak detector
+                   SAMPle
+                   sample detector
+                   RMS
+                   RMS detector
+                   AVERage
+                   average detector
+                   *RST:  RMS
+        Example:  LIST:RANG2:DET AVER
+        """
+        self.fsw_write(f'LIST:RANGe:DETector {detector}')
+
+    def set_diplay_trace_detector(self, trace=1, detector='RMS'):
+        """
+        Defines the trace detector to be used for trace analysis.
+        For details see "Mapping samples to sweep points with the trace detector"
+        on page 594.
+        For EMI measurements, the trace detector is used for the initial peak search only, not
+        for the final test. The detector for the final test is configured using CALCulate<n>:
+        MARKer<m>:FUNCtion:FMEasurement:DETector on page 1053.
+        If the EMI (R&S FSW-K54) measurement option is installed and the filter type "CISPR"
+        is selected, additional detectors are available, even if EMI measurement is not active.
+        For details see Chapter 6.13.3.2, "Detectors and dwell time", on page 330.
+        Suffix:
+        <n> Window
+        <t> Trace
+        Parameters:
+        <Detector> APEak
+                   Autopeak
+                   NEGative
+                   Negative peak
+                   POSitive
+                   Positive peak
+                   QPEak
+                   Quasipeak (CISPR filter only)
+                   SAMPle
+                   First value detected per trace point
+                   RMS
+                   RMS value
+                   AVERage
+                   Average
+                   CAVerage
+                   CISPR Average (CISPR filter only)
+                   CRMS
+                   CISPR RMS (CISPR filter only)
+                   *RST:  APEak
+        """
+        self.fsw_write(f'DETector{trace} {detector}')
 
     def set_display_trace(self, trace=1, on_off='ON'):
         """
@@ -831,7 +892,7 @@ class FSW:
         for P23 is 40% for 41, so d is 0.4
         """
         d = 0.4
-        if band in [38, 39, 40, 41, 46, 42, 48, 77, 78, 79]:
+        if band in [38, 39, 40, 41, 46, 42, 48, 77, 78, 79, 850, 900, 1800, 1900]:
             factor = round((10 * log10(1/d)), 2)
             return factor
         else:

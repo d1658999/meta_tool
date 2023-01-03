@@ -1,4 +1,5 @@
 from pathlib import Path
+import time
 from test_scripts.cmw100_items.tx_lmh import TxTestGenre
 from equipments.series_basis.spectrum.fsw_series import FSW
 from utils.log_init import log_set
@@ -14,20 +15,21 @@ class FSW50(FSW):
 
     def get_level_harmonics(self, band, harmonic_freq, loss):
         # basic environment setting
-        self.set_reference_level(-30)
+        # self.set_reference_level(-30)
         self.set_reference_level_offset(band, loss)
         self.set_input_attenuation(0)
         self.set_freq_center(harmonic_freq)
-        self.set_freq_span(1000)  # span 1G
+        self.set_freq_span(500)  # span 1000MHz
         self.set_rbw(1000)  # RBW 1MHz
         self.set_vbw_rbw_ratio(1)  # RBW/VBW ratio = 1
         self.set_sweep_count(100)  # count = 100
         self.set_sweep_time_auto('ON')  # auto sweep time dependent on span and RBW
-        self.set_display_trace_mode(1, 'MAXHold')
+        self.set_diplay_trace_detector()  # default use 'RMS'
+        self.set_display_trace_mode(1, 'AVERage')
         self.set_sweep_mode('OFF')  # single sweep
         self.fsw.query('*OPC?')
+        self.set_reference_level(-30)
         self.set_measure()  # start to measure
-
 
         # mark the peak search
         self.set_peak_mark_auto()  # to activate the peak automatically
