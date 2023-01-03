@@ -10,7 +10,7 @@ def read_loss_file_cmw100():
         next(rows)  # skip the title
         loss_dict = {}
         for row in list(rows):
-            loss_dict[int(row[0])] = float(row[1])
+            loss_dict[float(row[0])] = float(row[1])
         return loss_dict
 
 
@@ -22,7 +22,7 @@ def read_loss_file_spectrum():
         next(rows)  # skip the title
         loss_dict = {}
         for row in list(rows):
-            loss_dict[int(row[0])] = float(row[1])
+            loss_dict[float(row[0])] = float(row[1])
         return loss_dict
 
 
@@ -66,11 +66,11 @@ def get_loss_cmw100(freq):
     loss_table_dict = read_loss_file_cmw100()
     want_loss = None
     for f in loss_table_dict:
-        if freq >= int(f) * 1000:
+        if freq >= f * 1000:
             want_loss = float(loss_table_dict[f])
-        elif int(f) * 1000 > freq:
+        elif f * 1000 > freq:
             break
-    return want_loss
+    return -want_loss
 
 
 def get_loss_spectrum(freq):
@@ -81,7 +81,7 @@ def get_loss_spectrum(freq):
             want_loss = float(loss_table_dict[f])
         elif int(f) * 1000 > freq:
             break
-    return want_loss
+    return -want_loss
 
 
 # def get_loss_lb(freq):

@@ -50,7 +50,7 @@ class TxHarmonics(TxTestGenre, FSW50):
                     logger.info(f'B{self.band_fr1} does not have BW {self.bw_fr1}MHZ')
         for bw in ext_pmt.fr1_bandwidths:
             try:
-                file_name = select_file_name_genre_tx_ftm(bw, self.tech, 'lmh')
+                file_name = select_file_name_genre_tx_ftm(bw, self.tech, 'harmonics')
                 file_path = Path(self.file_path).parent / Path(file_name)
                 txp_aclr_evm_current_plot_ftm(file_path, self.parameters)
             except TypeError:
@@ -104,8 +104,10 @@ class TxHarmonics(TxTestGenre, FSW50):
                             logger.debug(aclr_mod_results)
                             aclr_mod_current_results.append(self.measure_current(self.band_fr1))
                             data_freq[self.tx_freq_fr1] = aclr_mod_current_results + self.get_temperature() \
-                                                          + self.get_harmonics_order(self.band_fr1, 2, tx_freq_fr1) \
-                                                          + self.get_harmonics_order(self.band_fr1, 3, tx_freq_fr1)
+                                                          + [
+                                                              self.get_harmonics_order(self.band_fr1, 2, tx_freq_fr1),
+                                                              self.get_harmonics_order(self.band_fr1, 3, tx_freq_fr1),
+                                                          ]
                         logger.debug(data_freq)
                         # ready to export to excel
                         self.parameters = {
@@ -124,7 +126,7 @@ class TxHarmonics(TxTestGenre, FSW50):
                             'asw_srs_path': self.asw_srs_path,
                             'scs': self.scs,
                             'type': self.type_fr1,
-                            'test_item': 'harmoncis',
+                            'test_item': 'harmonics',
                         }
                         self.file_path = tx_power_relative_test_export_excel_ftm(data_freq, self.parameters)
         self.set_test_end_fr1()
@@ -197,8 +199,10 @@ class TxHarmonics(TxTestGenre, FSW50):
                             logger.debug(aclr_mod_results)
                             aclr_mod_current_results.append(self.measure_current(self.band_lte))
                             data_freq[self.tx_freq_lte] = aclr_mod_current_results + self.get_temperature() \
-                                                          + self.get_harmonics_order(self.band_lte, 2, tx_freq_lte) \
-                                                          + self.get_harmonics_order(self.band_lte, 3, tx_freq_lte)
+                                                          + [
+                                                              self.get_harmonics_order(self.band_lte, 2, tx_freq_lte),
+                                                              self.get_harmonics_order(self.band_lte, 3, tx_freq_lte),
+                                                          ]
                         logger.debug(data_freq)
                         # ready to export to excel
                         self.parameters = {
@@ -217,7 +221,7 @@ class TxHarmonics(TxTestGenre, FSW50):
                             'asw_srs_path': self.asw_srs_path,
                             'scs': None,
                             'type': None,
-                            'test_item': 'harmoncis',
+                            'test_item': 'harmonics',
                         }
                         self.file_path = tx_power_relative_test_export_excel_ftm(data_freq, self.parameters)
         self.set_test_end_lte()
@@ -268,8 +272,10 @@ class TxHarmonics(TxTestGenre, FSW50):
                     aclr_mod_current_results.append(self.measure_current(self.band_wcdma))
                     tx_freq_wcdma = cm_pmt_ftm.transfer_chan2freq_wcdma(self.band_wcdma, self.tx_chan_wcdma)
                     data_chan[tx_freq_wcdma] = aclr_mod_current_results + self.get_temperature() \
-                                               + self.get_harmonics_order(self.band_wcdma, 2, tx_freq_wcdma) \
-                                               + self.get_harmonics_order(self.band_wcdma, 3, tx_freq_wcdma)
+                                               + [
+                                                   self.get_harmonics_order(self.band_wcdma, 2, tx_freq_wcdma),
+                                                   self.get_harmonics_order(self.band_wcdma, 3, tx_freq_wcdma),
+                                               ]
 
                 logger.debug(data_chan)
                 # ready to export to excel
@@ -289,7 +295,7 @@ class TxHarmonics(TxTestGenre, FSW50):
                     'asw_srs_path': self.asw_srs_path,
                     'scs': None,
                     'type': None,
-                    'test_item': 'harmoncis',
+                    'test_item': 'harmonics',
                 }
                 self.file_path = tx_power_relative_test_export_excel_ftm(data_chan, self.parameters)  # mode=1: LMH mode
         self.set_test_end_wcdma()
@@ -338,8 +344,10 @@ class TxHarmonics(TxTestGenre, FSW50):
                     logger.debug(aclr_mod_results)
                     aclr_mod_current_results.append(self.measure_current(self.band_gsm))
                     data_chan[self.rx_freq_gsm] = aclr_mod_current_results + self.get_temperature() \
-                                                  + self.get_harmonics_order(self.band_gsm, 2, self.tx_freq_gsm) \
-                                                  + self.get_harmonics_order(self.band_gsm, 3, self.tx_freq_gsm)
+                                                  + [
+                                                      self.get_harmonics_order(self.band_gsm, 2, self.tx_freq_gsm),
+                                                      self.get_harmonics_order(self.band_gsm, 3, self.tx_freq_gsm),
+                                                  ]
 
                 logger.debug(data_chan)
                 # ready to export to excel
@@ -359,7 +367,7 @@ class TxHarmonics(TxTestGenre, FSW50):
                     'asw_srs_path': self.asw_srs_path,
                     'scs': None,
                     'type': None,
-                    'test_item': 'harmoncis',
+                    'test_item': 'harmonics',
                 }
                 self.file_path = tx_power_relative_test_export_excel_ftm(data_chan, self.parameters)  # mode=1: LMH mode
         self.set_test_end_gsm()

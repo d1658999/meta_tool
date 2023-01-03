@@ -232,7 +232,7 @@ def tx_power_relative_test_export_excel_ftm(data, parameters_dict):
     test_item = parameters_dict['test_item']
     logger.info('----------save to excel----------')
     filename = None
-    if script == 'GENERAL':
+    if script in ['GENERAL', 'CSE']:
         if tx_freq_level >= 100:
             filename = select_file_name_genre_tx_ftm(bw, tech, test_item)
         elif tx_freq_level <= 100:
@@ -495,8 +495,8 @@ def tx_power_relative_test_export_excel_ftm(data, parameters_dict):
                     ws.cell(row, 24).value = ext_pmt.condition if test_item == 'lmh' else None
                     ws.cell(row, 25).value = measured_data[11] if test_item == 'lmh' else None
                     ws.cell(row, 26).value = measured_data[12] if test_item == 'lmh' else None
-                    ws.cell(row, 27).value = measured_data[13] if test_item == 'harmonics' else None  # 2f0
-                    ws.cell(row, 28).value = measured_data[14] if test_item == 'harmonics' else None  # 3f0
+                    ws.cell(row, 27).value = measured_data[13][1] if test_item == 'harmonics' else None  # 2f0
+                    ws.cell(row, 28).value = measured_data[14][1] if test_item == 'harmonics' else None  # 3f0
                     row += 1
 
         elif tech == 'FR1':
@@ -562,8 +562,8 @@ def tx_power_relative_test_export_excel_ftm(data, parameters_dict):
                     ws.cell(row, 25).value = ext_pmt.condition if test_item == 'lmh' else None
                     ws.cell(row, 26).value = measured_data[11] if test_item == 'lmh' else None
                     ws.cell(row, 27).value = measured_data[12] if test_item == 'lmh' else None
-                    ws.cell(row, 28).value = measured_data[13] if test_item == 'harmonics' else None  # 2f0
-                    ws.cell(row, 29).value = measured_data[14] if test_item == 'harmonics' else None  # 3f0
+                    ws.cell(row, 28).value = measured_data[13][1] if test_item == 'harmonics' else None  # 2f0
+                    ws.cell(row, 29).value = measured_data[14][1] if test_item == 'harmonics' else None  # 3f0
                     row += 1
 
         elif tech == 'WCDMA':
@@ -616,8 +616,8 @@ def tx_power_relative_test_export_excel_ftm(data, parameters_dict):
                     ws.cell(row, 18).value = ext_pmt.condition if test_item == 'lmh' else None
                     ws.cell(row, 19).value = measured_data[10] if test_item == 'lmh' else None
                     ws.cell(row, 20).value = measured_data[11] if test_item == 'lmh' else None
-                    ws.cell(row, 21).value = measured_data[12] if test_item == 'harmonics' else None  # 2f0
-                    ws.cell(row, 22).value = measured_data[13] if test_item == 'harmonics' else None  # 3f0
+                    ws.cell(row, 21).value = measured_data[12][1] if test_item == 'harmonics' else None  # 2f0
+                    ws.cell(row, 22).value = measured_data[13][1] if test_item == 'harmonics' else None  # 3f0
                     row += 1
 
         elif tech == 'GSM':
@@ -682,8 +682,8 @@ def tx_power_relative_test_export_excel_ftm(data, parameters_dict):
                     ws.cell(row, 24).value = ext_pmt.condition if test_item == 'lmh' else None
                     ws.cell(row, 25).value = measured_data[17] if test_item == 'lmh' else None
                     ws.cell(row, 26).value = measured_data[18] if test_item == 'lmh' else None
-                    ws.cell(row, 27).value = measured_data[19] if test_item == 'harmonics' else None  # 2f0
-                    ws.cell(row, 28).value = measured_data[20] if test_item == 'harmonics' else None  # 3f0
+                    ws.cell(row, 27).value = measured_data[19][1] if test_item == 'harmonics' else None  # 2f0
+                    ws.cell(row, 28).value = measured_data[20][1] if test_item == 'harmonics' else None  # 3f0
                     row += 1
 
         wb.save(file_path)

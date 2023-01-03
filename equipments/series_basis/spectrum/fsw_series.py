@@ -72,7 +72,7 @@ class FSW:
         Default unit: DB
         Example:  DISP:TRAC:Y:RLEV:OFFS -10dB
         """
-        offset += self.duty_factor(band)
+        # offset += self.duty_factor(band)  # due to the loss is minus
         self.fsw_write(f'DISPlay:WINDow:TRACe:Y:SCALe:RLEVel:OFFSet {offset}')
 
     def set_input_attenuation(self, att=30.0):

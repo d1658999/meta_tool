@@ -12183,7 +12183,7 @@ Disable</property>
                       <object class="ttk.Checkbutton" id="checkbutton525">
                         <property name="command" type="command" cbtype="simple">wanted_ftm_rb_lte</property>
                         <property name="text" translatable="yes">1RB_0</property>
-                        <property name="variable">boolean:one_rb_lte</property>
+                        <property name="variable">boolean:one_rb0_lte</property>
                         <layout manager="grid">
                           <property name="column">0</property>
                           <property name="padx">5</property>

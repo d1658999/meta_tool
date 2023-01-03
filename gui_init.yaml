@@ -30,7 +30,7 @@ external_inst:
   tempchb: false
   wait_time: 300
 instrument:
-  instrument: Anritsu8821
+  instrument: Cmw+Fsw
 mcs:
   mcs_fr1: []
   mcs_lte: []
@@ -59,9 +59,8 @@ rb_set:
 rx_set:
   ue_power: []
 scripts:
-  scripts:
-  - GENERAL
-tab: 0
+  scripts: []
+tab: 6
 tech:
   tech: []
 test_items:
@@ -71,7 +70,7 @@ test_items:
   tx: false
   tx_1rb_sweep: false
   tx_freq_sweep: false
-  tx_level_sweep: false
   tx_harmonics: false
+  tx_level_sweep: false
 type:
   type_fr1: []

@@ -96,6 +96,7 @@ class MainApp:
         self.chan_H = None
         self.prb_lte = None
         self.frb_lte = None
+        self.one_rb0_lte = None
         self.bw5_fr1 = None
         self.bw10_fr1 = None
         self.bw15_fr1 = None
@@ -311,6 +312,7 @@ class MainApp:
                 "chan_H",
                 "prb_lte",
                 "frb_lte",
+                "one_rb0_lte",
                 "bw5_fr1",
                 "bw10_fr1",
                 "bw15_fr1",
@@ -902,6 +904,8 @@ class MainApp:
                 self.prb_lte.set(True)
             elif rb_ftm == 'FRB':
                 self.frb_lte.set(True)
+            elif rb_ftm == '1RB_0':
+                self.one_rb0_lte.set(True)
 
         for rb_ftm in ui_init['rb_set']['rb_ftm_fr1']:
             if rb_ftm == 'INNER_FULL':
@@ -2402,6 +2406,10 @@ class MainApp:
         if self.frb_lte.get():
             logger.debug('FRB')
             self.ftm_rb_lte.append('FRB')
+
+        if self.one_rb0_lte.get():
+            logger.debug('1RB_0')
+            self.ftm_rb_lte.append('1RB_0')
 
         if self.ftm_rb_lte == []:
             logger.debug('Nothing to select on RB setting for LTE')

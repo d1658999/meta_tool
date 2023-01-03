@@ -23,8 +23,11 @@ class FSW50(FSW):
         self.set_vbw_rbw_ratio(1)  # RBW/VBW ratio = 1
         self.set_sweep_count(100)  # count = 100
         self.set_sweep_time_auto('ON')  # auto sweep time dependent on span and RBW
+        self.set_display_trace_mode(1, 'MAXHold')
         self.set_sweep_mode('OFF')  # single sweep
+        self.fsw.query('*OPC?')
         self.set_measure()  # start to measure
+
 
         # mark the peak search
         self.set_peak_mark_auto()  # to activate the peak automatically
