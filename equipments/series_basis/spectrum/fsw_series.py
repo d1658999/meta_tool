@@ -891,9 +891,14 @@ class FSW:
         for P22 is 20% for 41, so d is 0.2
         for P23 is 40% for 41, so d is 0.4
         """
-        d = 0.4
-        if band in [38, 39, 40, 41, 46, 42, 48, 77, 78, 79, 850, 900, 1800, 1900]:
-            factor = round((10 * log10(1/d)), 2)
+
+        if band in [38, 39, 40, 41, 46, 42, 48, 77, 78, 79, ]:
+            d = 0.4
+            factor = round((10 * log10(1 / d)), 2)
+            return factor
+        elif band in [850, 900, 1800, 1900]:
+            d = 0.125
+            factor = round((10 * log10(1 / d)), 2)
             return factor
         else:
             return 0
