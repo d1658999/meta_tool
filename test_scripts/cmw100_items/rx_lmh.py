@@ -480,15 +480,18 @@ class RxTestGenre(AtCmd, CMW100):
                     self.scs,
                     self.bw_fr1)  # for RB set(including special tx setting)
                 self.antenna_switch_v2()
-                if self.band_fr1 not in [29, ]:
+                if self.band_fr1 not in [29, 75, 76]:
                     self.tx_set_fr1()
-                # aclr_results + mod_results  # U_-2, U_-1, E_-1, Pwr, E_+1, U_+1, U_+2, EVM, Freq_Err, IQ_OFFSET
-                aclr_mod_results = self.tx_measure_fr1()
+                    # aclr_results + mod_results  # U_-2, U_-1, E_-1, Pwr, E_+1, U_+1, U_+2, EVM, Freq_Err, IQ_OFFSET
+                    aclr_mod_results = self.tx_measure_fr1()
+                    measured_power = round(aclr_mod_results[3], 1)
+                else:
+                    measured_power = None
                 # self.command_cmw100_query('*OPC?')
                 self.sensitivity_solution_select_fr1()
-                logger.info(f'Power: {aclr_mod_results[3]:.1f}, Sensitivity: {self.rx_level}')
+                logger.info(f'Power: {measured_power}, Sensitivity: {self.rx_level}')
                 # measured_power, measured_rx_level, rsrp_list, cinr_list, agc_list, thermistor_list
-                data[self.tx_freq_fr1] = [aclr_mod_results[3], self.rx_level, self.rsrp_list, self.cinr_list,
+                data[self.tx_freq_fr1] = [measured_power, self.rx_level, self.rsrp_list, self.cinr_list,
                                           self.agc_list, self.get_temperature()]
                 self.set_test_end_fr1()
             parameters = {
@@ -535,15 +538,18 @@ class RxTestGenre(AtCmd, CMW100):
                 self.antenna_switch_v2()
                 if self.band_lte not in [29, 32, 46]:
                     self.tx_set_lte()
-                aclr_mod_results = self.tx_measure_lte()  # aclr_results + mod_results  # U_-2, U_-1, E_-1, Pwr,
+                    aclr_mod_results = self.tx_measure_lte()  # aclr_results + mod_results  # U_-2, U_-1, E_-1, Pwr,
+                    measured_power = round(aclr_mod_results[3], 1)
+                else:
+                    measured_power = None
                 # E_+1, U_+1, U_+2, EVM, Freq_Err, IQ_OFFSET
                 # self.command_cmw100_query('*OPC?')
                 # self.search_sensitivity_lte()
                 # self.query_rx_measure_lte()
                 self.sensitivity_solution_select_lte()
-                logger.info(f'Power: {aclr_mod_results[3]:.1f}, Sensitivity: {self.rx_level}')
+                logger.info(f'Power: {measured_power}, Sensitivity: {self.rx_level}')
                 # measured_power, measured_rx_level, rsrp_list, cinr_list, agc_list, thermistor_list
-                data[self.tx_freq_lte] = [aclr_mod_results[3], self.rx_level, self.rsrp_list, self.cinr_list,
+                data[self.tx_freq_lte] = [measured_power, self.rx_level, self.rsrp_list, self.cinr_list,
                                           self.agc_list, self.get_temperature()]
                 self.set_test_end_lte()
             parameters = {
