@@ -178,7 +178,7 @@ class TxTestLevelSweep(AtCmd, CMW100):
         self.set_uldl_periodicity_fr1('MS25')
         self.set_uldl_pattern_fr1(self.scs)
         self.set_measured_slot_fr1('ALL')
-        self.set_rf_rx_port_fr1(self.port_tx)
+        self.set_rf_tx_port_fr1(self.port_tx)
         self.set_rf_setting_user_margin_fr1(10.00)
         self.set_modulation_count_fr1(5)
         self.set_aclr_count_fr1(5)
