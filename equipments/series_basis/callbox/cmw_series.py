@@ -951,7 +951,7 @@ class CMW:
         Optional parameter, specifying that a query returns the absolute
         path.
         """
-        self.cmw_write(f'SOURce:GPRF:GENerator1:ARB:FILE "{waveform_path}"')
+        self.cmw_write(f'SOURce:GPRF:GEN1:ARB:FILE "{waveform_path}"')
 
     def set_generator_state_gprf(self, state='ON'):
         """
