@@ -323,18 +323,19 @@ def tx_power_relative_test_export_excel_ftm(data, parameters_dict):
                         ws['O1'] = 'IQ_OFFSET'
                         ws['P1'] = 'RB_num'
                         ws['Q1'] = 'RB_start'
-                        ws['R1'] = 'Type'
-                        ws['S1'] = 'Tx_Path'
-                        ws['T1'] = 'SCS(KHz)'
-                        ws['U1'] = 'RB_STATE'
-                        ws['V1'] = 'Sync_Path'
-                        ws['W1'] = 'AS_SRS_Path'
-                        ws['X1'] = 'Current(mA)'
-                        ws['Y1'] = 'Condition'
-                        ws['Z1'] = 'Temp0'
-                        ws['AA1'] = 'Temp1'
-                        ws['AB1'] = '2f0' if test_item == 'harmonics' else None
-                        ws['AC1'] = '3f0' if test_item == 'harmonics' else None
+                        ws['R1'] = 'MCS'
+                        ws['S1'] = 'Type'
+                        ws['T1'] = 'Tx_Path'
+                        ws['U1'] = 'SCS(KHz)'
+                        ws['V1'] = 'RB_STATE'
+                        ws['W1'] = 'Sync_Path'
+                        ws['X1'] = 'AS_SRS_Path'
+                        ws['Y1'] = 'Current(mA)'
+                        ws['Z1'] = 'Condition'
+                        ws['AA1'] = 'Temp0'
+                        ws['AB1'] = 'Temp1'
+                        ws['AC1'] = '2f0' if test_item == 'harmonics' else None
+                        ws['AD1'] = '3f0' if test_item == 'harmonics' else None
                     else:  # to pass the dashboard
                         pass
 
@@ -522,14 +523,15 @@ def tx_power_relative_test_export_excel_ftm(data, parameters_dict):
                     ws.cell(row, 15).value = measured_data[9]
                     ws.cell(row, 16).value = rb_size
                     ws.cell(row, 17).value = rb_start
-                    ws.cell(row, 18).value = type_
-                    ws.cell(row, 19).value = tx_path
-                    ws.cell(row, 20).value = scs
-                    ws.cell(row, 21).value = rb_state
-                    ws.cell(row, 22).value = sync_path
-                    ws.cell(row, 23).value = asw_srs_path
-                    ws.cell(row, 24).value = measured_data[10]
-                    ws.cell(row, 25).value = ext_pmt.condition
+                    ws.cell(row, 18).value = mcs
+                    ws.cell(row, 19).value = type_
+                    ws.cell(row, 20).value = tx_path
+                    ws.cell(row, 21).value = scs
+                    ws.cell(row, 22).value = rb_state
+                    ws.cell(row, 23).value = sync_path
+                    ws.cell(row, 24).value = asw_srs_path
+                    ws.cell(row, 25).value = measured_data[10]
+                    ws.cell(row, 26).value = ext_pmt.condition
                     row += 1
 
             elif tx_freq_level <= 100:  # 1rb_sweep, lmh, freq_sweep
@@ -552,18 +554,19 @@ def tx_power_relative_test_export_excel_ftm(data, parameters_dict):
                     ws.cell(row, 15).value = measured_data[9]
                     ws.cell(row, 16).value = rb_size
                     ws.cell(row, 17).value = rb_start
-                    ws.cell(row, 18).value = type_
-                    ws.cell(row, 19).value = tx_path
-                    ws.cell(row, 20).value = scs
-                    ws.cell(row, 21).value = rb_state
-                    ws.cell(row, 22).value = sync_path
-                    ws.cell(row, 23).value = asw_srs_path
-                    ws.cell(row, 24).value = measured_data[10] if test_item == 'lmh' else None
-                    ws.cell(row, 25).value = ext_pmt.condition if test_item == 'lmh' else None
-                    ws.cell(row, 26).value = measured_data[11] if test_item == 'lmh' else None
-                    ws.cell(row, 27).value = measured_data[12] if test_item == 'lmh' else None
-                    ws.cell(row, 28).value = measured_data[13][1] if test_item == 'harmonics' else None  # 2f0
-                    ws.cell(row, 29).value = measured_data[14][1] if test_item == 'harmonics' else None  # 3f0
+                    ws.cell(row, 18).value = mcs
+                    ws.cell(row, 19).value = type_
+                    ws.cell(row, 20).value = tx_path
+                    ws.cell(row, 21).value = scs
+                    ws.cell(row, 22).value = rb_state
+                    ws.cell(row, 23).value = sync_path
+                    ws.cell(row, 24).value = asw_srs_path
+                    ws.cell(row, 25).value = measured_data[10] if test_item == 'lmh' else None
+                    ws.cell(row, 26).value = ext_pmt.condition if test_item == 'lmh' else None
+                    ws.cell(row, 27).value = measured_data[11] if test_item == 'lmh' else None
+                    ws.cell(row, 28).value = measured_data[12] if test_item == 'lmh' else None
+                    ws.cell(row, 29).value = measured_data[13][1] if test_item == 'harmonics' else None  # 2f0
+                    ws.cell(row, 30).value = measured_data[14][1] if test_item == 'harmonics' else None  # 3f0
                     row += 1
 
         elif tech == 'WCDMA':
