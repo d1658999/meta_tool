@@ -125,7 +125,7 @@ class TxTestFreqSweep(AtCmd, CMW100):
         self.sig_gen_lte()
         self.sync_lte()
 
-        freq_range_list = [tx_freq_list[0], tx_freq_list[2], 1000]
+        freq_range_list = [tx_freq_list[0], tx_freq_list[2], ext_pmt.freq_sweep_step]
         step = freq_range_list[2]
 
         for mcs in ext_pmt.mcs_lte:
