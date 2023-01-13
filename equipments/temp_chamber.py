@@ -15,8 +15,8 @@ class TempChamber:
         logger.info('----------Init Temp----------')
         logger.info(self.tpchb.query("*IDN?").strip())
         logger.info(f'Start to go to temp {target_temp} C')
-        self.tpchb.write(f'POWER,ON')
-        self.tpchb.write(f'TEMP,S{target_temp} H80 L-40')
+        self.power_on()
+        self.set_temperature(target_temp)
         time.sleep(0.2)
         temp_state = None
         try:
@@ -34,6 +34,26 @@ class TempChamber:
                     logger.info(f'Now the room temp is {temp_state}C')
             logger.info(f'Achieve to the target temp {target_temp}, and need to wait {wait} seconds')
             time.sleep(wait)
+
+    def power_off(self):
+        """
+        power off the temop chamber
+        """
+        logger.into('Power off the temp-chamber')
+        self.tpchb.write(f'POWER,OFF')
+
+    def power_on(self):
+        """
+        power on the temop chamber
+        """
+        logger.into('Power on the temp-chamber')
+        self.tpchb.write(f'POWER,ON')
+
+    def set_temperature(self, target_temp=25.0):
+        """
+        set the target temp
+        """
+        self.tpchb.write(f'TEMP,S{target_temp} H80 L-40')
 
     @staticmethod
     def get_gpib_tpchb():

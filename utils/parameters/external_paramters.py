@@ -68,6 +68,8 @@ tx_pcl_range_list_lb = [19, 5]  # tx_pcl_1, tx_pcl_2; GMSK_LB: 5 ~ 19, EPSK_LB: 
 tx_pcl_range_list_mb = [15, 0]  # tx_pcl_1, tx_pcl_2; GMSK_MB: 0 ~ 15, EPSK_MB: 2~15
 part_number = 'ttt'
 freq_sweep_step = 1000
+freq_sweep_start = 1950000
+freq_sweep_stop = 1950000
 
 
 def main():

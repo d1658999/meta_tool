@@ -57,7 +57,11 @@ class TxTestFreqSweep(AtCmd, CMW100):
         self.sig_gen_fr1()
         self.sync_fr1()
 
-        freq_range_list = [tx_freq_list[0], tx_freq_list[2], ext_pmt.freq_sweep_step]
+        # to judge if there is correct freq filled in the entry
+        start = tx_freq_list[0] if ext_pmt.freq_sweep_start <= 0 else ext_pmt.freq_sweep_start
+        stop = tx_freq_list[2] if ext_pmt.freq_sweep_stop <= 0 else ext_pmt.freq_sweep_stop
+
+        freq_range_list = [start, stop, ext_pmt.freq_sweep_step]
         step = freq_range_list[2]
 
         for mcs in ext_pmt.mcs_fr1:
@@ -125,7 +129,11 @@ class TxTestFreqSweep(AtCmd, CMW100):
         self.sig_gen_lte()
         self.sync_lte()
 
-        freq_range_list = [tx_freq_list[0], tx_freq_list[2], ext_pmt.freq_sweep_step]
+        # to judge if there is correct freq filled in the entry
+        start = tx_freq_list[0] if ext_pmt.freq_sweep_start <= 0 else ext_pmt.freq_sweep_start
+        stop = tx_freq_list[2] if ext_pmt.freq_sweep_stop <= 0 else ext_pmt.freq_sweep_stop
+
+        freq_range_list = [start, stop, ext_pmt.freq_sweep_step]
         step = freq_range_list[2]
 
         for mcs in ext_pmt.mcs_lte:

@@ -18,7 +18,7 @@ from equipments.temp_chamber import TempChamber
 logger = log_set('GUI')
 
 PROJECT_PATH = pathlib.Path(__file__).parent
-PROJECT_UI = PROJECT_PATH / pathlib.Path('gui') / "main_v2_10.ui"
+PROJECT_UI = PROJECT_PATH / pathlib.Path('gui') / "main_v2_11.ui"
 
 
 class MainApp:
@@ -256,6 +256,9 @@ class MainApp:
         self.wait_time = None
         self.part_number = None
         self.freq_sweep_step = None
+        self.freq_sweep_start = None
+        self.freq_sweep_stop = None
+        self.tpchb = None
         builder.import_variables(
             self,
             [
@@ -471,6 +474,8 @@ class MainApp:
                 "wait_time",
                 "part_number",
                 "freq_sweep_step",
+                "freq_sweep_start",
+                "freq_sweep_stop",
             ],
         )
 
@@ -533,6 +538,11 @@ class MainApp:
     def t_measure(self):
         t = threading.Thread(target=self.mega_measure, daemon=True)
         t.start()
+
+    def temp_power_off(self):
+        if self.tpchb is None:
+            self.tpchb = TempChamber()
+        self.tpchb.power_off()
 
     def import_ui_setting_yaml(self):
         """
@@ -2524,6 +2534,8 @@ class MainApp:
         ext_pmt.condition = self.condition
         ext_pmt.part_number = self.part_number.get()
         ext_pmt.freq_sweep_step = self.freq_sweep_step.get()
+        ext_pmt.freq_sweep_start = self.freq_sweep_start.get()
+        ext_pmt.freq_sweep_stop = self.freq_sweep_stop.get()
 
         if self.instrument.get() == 'Anritsu8820':
             from test_scripts.anritsu_items.mt8820_tx_lmh import TxTestGenre
