@@ -11,7 +11,7 @@ class TempChamber:
     def __init__(self):
         self.tpchb = VisaComport('temp_chamber')
 
-    def tpchb_init(self, target_temp=ext_pmt.temp, wait=ext_pmt.wait_time):
+    def tpchb_init(self, target_temp, wait):
         logger.info('----------Init Temp----------')
         logger.info(self.tpchb.query("*IDN?").strip())
         logger.info(f'Start to go to temp {target_temp} C')
@@ -46,7 +46,7 @@ class TempChamber:
         """
         power on the temop chamber
         """
-        logger.into('Power on the temp-chamber')
+        logger.info('Power on the temp-chamber')
         self.tpchb.write(f'POWER,ON')
 
     def set_temperature(self, target_temp=25.0):

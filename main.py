@@ -518,7 +518,8 @@ class MainApp:
                 self.condition = temp_volt  # HVHV, HTLV, NVNV, LTHV, LVLV
                 temp = temp_dict[temp_volt[:2]]
                 volt = volts_dict[temp_volt[2:]]
-                self.tpchb.tpchb_init(temp)
+                wait = self.wait_time.get()
+                self.tpchb.tpchb_init(temp, wait)
                 self.psu.psu_init(volt)
                 self.measure()
         elif self.psu_enable.get() and (self.tempcham_enable.get() is False):  # with only PSU
@@ -2385,7 +2386,7 @@ class MainApp:
         logger.info(f'select TX Level {self.tx_level.get()}')
 
     def select_wait_time(self, option):
-        logger.info(f'select Wait time {self.wait_time.get()}')
+        logger.info(f'select Wait Time {self.wait_time.get()}')
 
     def count_select(self, option):
         logger.info(f'select Count Number: {self.count.get()}')
@@ -2526,7 +2527,7 @@ class MainApp:
         ext_pmt.tx_pcl_lb = self.pcl_lb.get()
         ext_pmt.tx_pcl_mb = self.pcl_mb.get()
         ext_pmt.tx_level = self.tx_level.get()
-        ext_pmt.wait_time = self.wait_time.get()
+        # ext_pmt.wait_time = self.wait_time.get()  # obsolete
         ext_pmt.current_count = self.count.get()
         ext_pmt.psu_enable = self.psu_enable.get()
         ext_pmt.odpm_enable = self.odpm_enable.get()
