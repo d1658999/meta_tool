@@ -39,7 +39,7 @@ class TempChamber:
         """
         power off the temop chamber
         """
-        logger.into('Power off the temp-chamber')
+        logger.info('Power off the temp-chamber')
         self.tpchb.write(f'POWER,OFF')
 
     def power_on(self):
