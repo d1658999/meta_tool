@@ -165,15 +165,13 @@ class RxTestGenre(AtCmd, Anritsu8821):
                                     for dl_ch in ch_list:
                                         self.rx_core(standard, band, dl_ch, bw)
                                     time.sleep(1)
+                        rx_desense_process_sig(standard, self.excel_path)
+                        rxs_relative_plot_sig(self.excel_path, self.parameters_dict)
 
                 except Exception as err:
                     logger.debug(err)
                     logger.info('Rx path is unchecked')
                     logger.info('It might forget to choose Band or Channel or BW or others')
-
-                else:
-                    rx_desense_process_sig(standard, self.excel_path)
-                    rxs_relative_plot_sig(self.excel_path, self.parameters_dict)
 
             elif tech == 'WCDMA' and ext_pmt.wcdma_bands != []:
                 standard = self.set_switch_to_wcdma()
