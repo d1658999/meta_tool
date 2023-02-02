@@ -905,7 +905,7 @@ def txp_aclr_evm_current_plot_ftm(file_path, parameters_dict):
                     chart.height = 20
                     chart.width = 32
 
-                    y_data = Reference(ws, min_col=24, min_row=1, max_col=24, max_row=ws.max_row)
+                    y_data = Reference(ws, min_col=25, min_row=1, max_col=25, max_row=ws.max_row)
                     x_data = Reference(ws, min_col=1, min_row=2, max_col=3, max_row=ws.max_row)
                     chart.add_data(y_data, titles_from_data=True)
                     chart.set_categories(x_data)
