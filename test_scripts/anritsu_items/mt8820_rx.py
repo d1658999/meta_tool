@@ -145,20 +145,20 @@ class RxTestGenre(AtCmd, Anritsu8820):
                                         if band == 28:
                                             self.band_segment = ext_pmt.band_segment
                                         self.set_test_parameter_normal()
-                                        band_ch_list = cm_pmt_anritsu.dl_ch_selected(standard, band)
+                                        band_ch_list = cm_pmt_anritsu.dl_ch_selected(standard, band, bw)
                                         ch_list = channel_freq_select(ext_pmt.channel, band_ch_list)
                                         logger.debug(f'Test Channel List: {band}, {bw}MHZ, '
                                                      f'downlink channel list:{ch_list}')
                                         for dl_ch in ch_list:
                                             self.rx_core(standard, band, dl_ch, bw)
                                         time.sleep(1)
-                            else:
+                            else:  # if rx path is not selected, default is all path
                                 self.rx_path = ext_pmt.rfout_anritsu
                                 if bw in cm_pmt_anritsu.bandwidths_selected(band):
                                     if band == 28:
                                         self.band_segment = ext_pmt.band_segment
                                     self.set_test_parameter_normal()
-                                    band_ch_list = cm_pmt_anritsu.dl_ch_selected(standard, band)
+                                    band_ch_list = cm_pmt_anritsu.dl_ch_selected(standard, band, bw)
                                     ch_list = channel_freq_select(ext_pmt.channel, band_ch_list)
                                     logger.debug(f'Test Channel List: {band}, {bw}MHZ, '
                                                  f'downlink channel list:{ch_list}')
