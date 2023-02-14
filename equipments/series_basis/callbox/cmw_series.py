@@ -1184,6 +1184,52 @@ class CMW:
         """
         self.cmw_write(f'CONFigure:LTE:MEASurement:BAND OB{band}')
 
+    def set_cc_bw_lte_cmw(self, carrier_num, bw='5'):
+        """
+        Selects the channel bandwidth of component carrier CC<no>. Without carrier aggrega-
+        tion, you can omit <no>.
+        For the combined signal path scenario, use:
+        ● CONFigure:LTE:SIGN<i>:CELL:BANDwidth[:PCC]:DL
+        ● CONFigure:LTE:SIGN<i>:CELL:BANDwidth:SCC<c>:DL
+        Suffix:
+        <no>
+        .
+        1..4
+        Parameters:
+        <ChannelBW> B014 | B030 | B050 | B100 | B150 | B200
+        B014: 1.4 MHz
+        B030: 3 MHz
+        B050: 5 MHz
+        B100: 10 MHz
+        B150: 15 MHz
+        B200: 20 MHz
+        *RST:  B200
+        """
+        bw10 = f'0{int(bw * 10)}' if eval(bw) < 10 else f'{int(eval(bw) * 10)}'
+        self.cmw_write(f'CONFigure:LTE:MEASurement:CC{carrier_num}:CBANdwidth B{bw10}')
+
+    def set_cc_channel_lte(self, carrier_num, channel=19300):
+        """
+        Selects the center frequency of component carrier CC<no>. Without carrier aggrega-
+        tion, you can omit <no>.
+        Using the unit CH, the frequency can be set via the channel number. The allowed
+        channel number range depends on the operating band, see Chapter 5.2.11.4, "Fre-
+        quency Bands", on page 928.
+        For the combined signal path scenario, use:
+        ● CONFigure:LTE:SIGN<i>:RFSettings[:PCC]:CHANnel:UL
+        ● CONFigure:LTE:SIGN<i>:RFSettings:SCC<c>:CHANnel:UL
+        For the supported frequency range, see Chapter 5.5.1.5, "Frequency Ranges",
+        on page 1021.
+        Suffix:
+        <no>
+        .
+        1..4
+        Parameters:
+        <AnalyzerFreq> *RST:  Depends on <no>
+        Default unit: Hz
+        """
+        self.cmw_write(f'CONFigure:LTE:MEAS:RFSettings:CC{carrier_num}:FREQuency {channel} Ch')
+
     def set_band_wcdma(self, band):
         """
         CONFigure:WCDMa:MEAS<i>:CARRier<c>:BAND <Band>
@@ -3261,6 +3307,36 @@ class CMW:
         parameters = '0, 1, 0'
         self.cmw_write(f'CONFigure:GSM:MEASurement:MEValuation:MSLots {parameters}')
 
+    def set_ca_mode(self, mode='INTRaband'):
+        """
+        Selects how many component carriers with intra-band contiguous aggregation are
+        measured.
+        For the combined signal path scenario, use ROUTe:LTE:MEAS<i>:SCENario:
+        CSPath.
+        Parameters:
+        <CAmode> OFF | INTRaband | ICD | ICE
+        OFF: only one carrier is measured
+        """
+        self.cmw_write(f'CONFigure:LTE:MEASurement:CAGGregation:MODE {mode}')
+
+    def set_select_carrier(self, carrier='CC1'):
+        """
+        Selects a component carrier for single-carrier measurements.
+        Parameters:
+        <MeasCarrier> CC1 | CC2 | CC3 | CC4
+        *RST:  CC1
+        """
+        self.cmw_write(f'CONFigure:LTE:MEASurement:CAGGregation:MCARrier:ENHanced {carrier}')
+
+    def set_ca_spacing(self):
+        """
+        Adjusts the component carrier frequencies, so that the carriers are aggregated contigu-
+        ously.
+        For the combined signal path scenario, use CONFigure:LTE:SIGN<i>:
+        CAGGregation:SET.
+        """
+        self.cmw_write(f'CONFigure:LTE:MEAS:CAGGregation:ACSPacing')
+
     def get_pvt_average_query_gsm(self):
         """
         Returns special burst power values for the "Measure Slot".
@@ -3349,6 +3425,35 @@ class CMW:
     #         if timeout_count > timeout_max:
     #             self._logger.error('Socket Timeout exceeded max trys')
     # return resp[resp.find(b'\x89PNG'):]
+
+    def get_cc2_freq_query(self):
+        return self.cmw_query(f'CONFigure:LTE:MEASurement:RFSettings:CC2:FREQuency?')
+
+    def get_ca_freq_low_query(self):
+        """
+        Queries the lower edge of the aggregated bandwidth.
+        Return values:
+        <FrequencyLow> Default unit: Hz
+        """
+        return self.cmw_query(f'CONFigure:LTE:MEASurement:CAGGregation:FREQuency:AGGRegated:LOW?')
+
+    def get_ca_freq_center_query(self):
+        """
+        Queries the center frequency of the aggregated bandwidth.
+        Return values:
+        <FrequencyLow> Default unit: Hz
+        """
+        freq_str = self.cmw_query(f'CONFigure:LTE:MEASurement:CAGGregation:FREQuency:AGGRegated:CENTer?')
+        freq_int = int(eval(freq_str) / 1000)
+        return freq_int
+
+    def get_ca_freq_high_query(self):
+        """
+        Queries the high edge of the aggregated bandwidth.
+        Return values:
+        <FrequencyLow> Default unit: Hz
+        """
+        return self.cmw_query(f'CONFigure:LTE:MEASurement:CAGGregation:FREQuency:AGGRegated:HIGH?')
 
 
 def main():

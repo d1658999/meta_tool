@@ -12,6 +12,7 @@ logger = log_set('CMW100')
 class CMW100(CMW):
     def __init__(self, equipment='cmw100'):
         super().__init__(equipment)
+        self.mcs_cc1_lte = None
         self.port_tx = None
         self.tech = None
         self.bw_fr1 = None
@@ -160,7 +161,7 @@ class CMW100(CMW):
         aclr_results = aclr_results.split(',')[1:]
         aclr_results = [eval(aclr) * -1 if eval(aclr) > 30 else eval(aclr) for aclr in
                         aclr_results]  # UTRA2(-), UTRA1(-), NR(-), TxP, NR(+), UTRA1(+), UTRA2(+)
-        logger.info(f'Power: {aclr_results[3]:.2f}, '
+        logger.info(f'Carrier Power: {aclr_results[3]:.2f}, '
                     f'E-UTRA: [{aclr_results[2]:.2f}, {aclr_results[4]:.2f}], '
                     f'UTRA_1: [{aclr_results[1]:.2f}, {aclr_results[5]:.2f}], '
                     f'UTRA_2: [{aclr_results[0]:.2f}, {aclr_results[6]:.2f}]')
@@ -175,7 +176,7 @@ class CMW100(CMW):
         aclr_results = aclr_results.split(',')[1:]
         aclr_results = [eval(aclr) * -1 if eval(aclr) > 30 else eval(aclr) for aclr in
                         aclr_results]  # U_-2, U_-1, E_-1, Pwr, E_+1, U_+1, U_+2
-        logger.info(f'Power: {aclr_results[3]:.2f}, '
+        logger.info(f'Carrier Power: {aclr_results[3]:.2f}, '
                     f'E-UTRA: [{aclr_results[2]:.2f}, {aclr_results[4]:.2f}], '
                     f'UTRA_1: [{aclr_results[1]:.2f}, {aclr_results[5]:.2f}], '
                     f'UTRA_2: [{aclr_results[0]:.2f}, {aclr_results[6]:.2f}]')
@@ -578,6 +579,42 @@ class CMW100(CMW):
         self.cmw_query('*OPC?')
         logger.debug(aclr_results + mod_results)
         return aclr_results + mod_results  # U_-2, U_-1, NR_-1, Pwr, NR_+1, U_+1, U_+2, EVM, Freq_Err, IQ_OFFSET
+
+    def tx_measure_ca_lte(self):
+        # measurement like tx measure button
+        self.set_mcs_lte(self.mcs_cc1_lte)
+        self.set_type_cyclic_prefix_lte('NORM')
+        self.set_plc_lte(0)
+        self.set_delta_sequence_shift_lte(0)
+        self.set_rf_setting_external_tx_port_attenuation_lte(self.loss_tx)
+        self.set_expect_power_lte(self.tx_level)
+        self.set_rf_setting_user_margin_lte(10)
+        self.set_rb_auto_detect_lte('ON')
+        self.set_meas_on_exception_lte('ON')
+        self.set_modulation_count_lte(5)
+        self.cmw_query('*OPC?')
+        self.set_aclr_count_lte(5)
+        self.cmw_query('*OPC?')
+        self.set_sem_count_lte(5)
+        self.cmw_query('*OPC?')
+        self.set_trigger_source_lte('GPRF Gen1: Restart Marker')
+        self.set_trigger_threshold_lte(-20.0)
+        self.set_repetition_lte('SING')
+        self.set_measurements_enable_all_lte()
+        self.cmw_query('*OPC?')
+        self.set_measured_subframe_lte()
+        self.system_err_all_query()
+        self.set_rf_tx_port_gprf(self.port_tx)
+        self.cmw_query('*OPC?')
+        self.set_rf_tx_port_lte(self.port_tx)
+        self.cmw_query('*OPC?')
+        self.set_select_carrier('CC1')
+        self.get_modulation_avgerage_lte()
+        self.set_select_carrier('CC2')
+        self.get_modulation_avgerage_lte()
+        self.set_measure_start_on_lte()
+        self.cmw_query('*OPC?')
+        self.get_aclr_average_lte()
 
     def tx_measure_lte(self):
         logger.info('---------Tx Measure----------')

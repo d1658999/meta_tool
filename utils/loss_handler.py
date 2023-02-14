@@ -4,6 +4,7 @@ from pathlib import Path
 
 def read_loss_file():
     # file_path = Path('loss.csv')  # test use
+    # file_path = Path.cwd().parents[1] / Path('utils') / Path('loss.csv')  # test use
     file_path = Path('utils') / Path('loss.csv')
     with open(file_path, 'r') as csvfile:
         rows = csv.reader(csvfile)

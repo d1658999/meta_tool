@@ -10,6 +10,13 @@ logger = log_set('AtCmd')
 
 class AtCmd:
     def __init__(self):
+        self.mcs_cc2_lte = None
+        self.rb_start_cc2_lte = None
+        self.rb_size_cc2_lte = None
+        self.mcs_cc1_lte = None
+        self.rb_start_cc1_lte = None
+        self.rb_size_cc1_lte = None
+        self.bw_combo_lte = None
         self.ser = ModemComport()
         self.port_tx = None
         self.tech = None
@@ -685,3 +692,27 @@ class AtCmd:
 
     def set_chan_request_lte(self):
         self.command(f'AT+LTXCHNSDREQ')
+
+    def set_ca_combo_lte(self):
+        bw_ca_index = {
+            '20+5': 6,
+            '20+10': 7,
+            '20+15': 8,
+            '20+20': 9,
+            '15+15': 10,
+            '15+10': 11,
+            '15+20': 12,
+            '10+20': 13,
+            '10+15': 14,
+            '5+20': 15,
+            '5+10': 16,
+            '10+10': 17,
+            '10+5': 18,
+            '5+15': 19,
+            '15+5': 20,
+            '40': 21,
+        }
+        self.command(f'AT+LTXSENDREQSLOAPT={self.tx_path_dict[self.tx_path]},{bw_ca_index[self.bw_combo_lte]},{self.tx_freq_lte},'
+                     f'{self.rb_size_cc1_lte},{self.rb_start_cc1_lte},{self.mcs_lte_dict[self.mcs_cc1_lte]},'
+                     f'{self.rb_size_cc2_lte},{self.rb_start_cc2_lte},{self.mcs_lte_dict[self.mcs_cc2_lte]},'
+                     f'2,2,{self.tx_level},0')

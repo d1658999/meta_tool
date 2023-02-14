@@ -1,4 +1,4 @@
-lte_bands = [5]       # 1,2,3,4,7,25,66,38,39,40,41,5,8,12,13,14,17,18,19,20,28,71,42,48
+lte_bands = [3]       # 1,2,3,4,7,25,66,38,39,40,41,5,8,12,13,14,17,18,19,20,28,71,42,48
 wcdma_bands = [5,8]
 gsm_bands = [900, 850]  # 900, 1800, 1900, 850
 hsupa_bands = [1]
@@ -11,9 +11,10 @@ devices_serial = None
 
 lte_bandwidths = [10]     # 1.4, 3, 5, 10, 15, 20
 fr1_bandwidths = [10]  # 10, 15, 20, 25, 30 , 40, 50, 60, 80, 90, 100, 70
+lte_bandwidths_ca_combo = ['20+20']
 
-tech = ['WCDMA']   # 'LTE' | 'WCDMA' | 'GSM' | 'HSUPA' | 'HSDPA' | 'FR1'
-channel = 'LMH'  # 'LMH'
+tech = ['LTE']   # 'LTE' | 'WCDMA' | 'GSM' | 'HSUPA' | 'HSDPA' | 'FR1'
+channel = 'L'  # 'LMH'
 
 fdd_tdd_cross_test = 0     # this is only for 8821,  0: only measure one of FDD or TDD; 1: measure both FDD and TDD
 
