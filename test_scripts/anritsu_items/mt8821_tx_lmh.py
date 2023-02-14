@@ -46,20 +46,20 @@ class TxTestGenre(AtCmd, Anritsu8821):
         # calling process
         if standard == 'LTE':
             if conn_state != cm_pmt_anritsu.ANRITSU_CONNECTED:
-                self.set_init_before_calling(standard, dl_ch, bw)
+                self.set_init_before_calling(standard, self.m_dl_ch, bw)
                 self.set_registration_calling(standard)
         elif standard == 'WCDMA' and self.chcoding == 'REFMEASCH':  # this is WCDMA
             if conn_state != cm_pmt_anritsu.ANRITSU_LOOP_MODE_1:
-                self.set_init_before_calling(standard, dl_ch, bw)
+                self.set_init_before_calling(standard, self.m_dl_ch, bw)
                 self.set_registration_calling(standard)
         elif standard == 'WCDMA' and self.chcoding == 'EDCHTEST':  # this is HSUPA
             if conn_state != cm_pmt_anritsu.ANRITSU_LOOP_MODE_1:
-                self.set_init_before_calling(standard, dl_ch, bw)
+                self.set_init_before_calling(standard, self.m_dl_ch, bw)
                 self.set_init_hspa()
                 self.set_registration_calling(standard)
         elif standard == 'WCDMA' and self.chcoding == 'FIXREFCH':  # this is HSDPA
             if conn_state != cm_pmt_anritsu.ANRITSU_LOOP_MODE_1:
-                self.set_init_before_calling(standard, dl_ch, bw)
+                self.set_init_before_calling(standard, self.m_dl_ch, bw)
                 self.set_init_hspa()
                 self.set_registration_calling(standard)
 
@@ -120,12 +120,18 @@ class TxTestGenre(AtCmd, Anritsu8821):
                             self.set_test_parameter('NORMAL')
                             dl_chan_list = cm_pmt_anritsu.dl_ch_selected(standard, band, bw)
                             ch_list = channel_freq_select(ext_pmt.channel, dl_chan_list)
+                            self.m_dl_ch = ch_list[1]  # this is used for the handover smoothly by Mch when calling
+                            self.set_dl_chan(self.m_dl_ch)
                             logger.debug(f'Test Channel List: {band}, {bw}MHZ, downlink channel list:{ch_list}')
                             for dl_ch in ch_list:
                                 self.tx_core(standard, band, dl_ch, bw)
-                                self.set_test_parameter('NORMAL')
+                                self.set_test_parameter_normal()
+                                self.set_tpc('AUTO')
+                                self.set_input_level(5)
+                            self.set_dl_chan(self.m_dl_ch)
                         else:
                             logger.info(f'B{band} do not have BW {bw}MHZ')
+
                     txp_aclr_evm_current_plot_sig(standard, self.excel_path)
 
             elif (tech == 'WCDMA' or tech == 'HSUPA' or tech == 'HSDPA') and (

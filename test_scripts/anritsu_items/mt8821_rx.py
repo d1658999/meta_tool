@@ -147,10 +147,17 @@ class RxTestGenre(AtCmd, Anritsu8821):
                                         self.set_test_parameter_normal()
                                         band_ch_list = cm_pmt_anritsu.dl_ch_selected(standard, band, bw)
                                         ch_list = channel_freq_select(ext_pmt.channel, band_ch_list)
+
+                                        # this is used for the handover smoothly by Mch when calling
+                                        self.m_dl_ch = ch_list[1]
+                                        self.set_dl_chan(self.m_dl_ch)
+
                                         logger.debug(f'Test Channel List: {band}, {bw}MHZ, '
                                                      f'downlink channel list:{ch_list}')
                                         for dl_ch in ch_list:
                                             self.rx_core(standard, band, dl_ch, bw)
+
+                                        self.set_dl_chan(self.m_dl_ch)
                                         time.sleep(1)
                             else:  # if rx path is not selected, default is all path
                                 self.rx_path = ext_pmt.rfout_anritsu
@@ -160,10 +167,17 @@ class RxTestGenre(AtCmd, Anritsu8821):
                                     self.set_test_parameter_normal()
                                     band_ch_list = cm_pmt_anritsu.dl_ch_selected(standard, band, bw)
                                     ch_list = channel_freq_select(ext_pmt.channel, band_ch_list)
+
+                                    # this is used for the handover smoothly by Mch when calling
+                                    self.m_dl_ch = ch_list[1]
+                                    self.set_dl_chan(self.m_dl_ch)
+
                                     logger.debug(f'Test Channel List: {band}, {bw}MHZ, '
                                                  f'downlink channel list:{ch_list}')
                                     for dl_ch in ch_list:
                                         self.rx_core(standard, band, dl_ch, bw)
+
+                                    self.set_dl_chan(self.m_dl_ch)
                                     time.sleep(1)
                         rx_desense_process_sig(standard, self.excel_path)
                         rxs_relative_plot_sig(self.excel_path, self.parameters_dict)
