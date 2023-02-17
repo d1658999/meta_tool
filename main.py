@@ -490,7 +490,8 @@ class MainApp:
         self.mainwindow.mainloop()
 
     def t_stop(self):
-        t = threading.Thread(target=self.stop)
+        # t = threading.Thread(target=self.stop)
+        t = threading.Thread(target=self.mainwindow.destroy())
         t.start()
 
     @staticmethod
