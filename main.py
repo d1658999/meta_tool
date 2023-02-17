@@ -18,7 +18,7 @@ from equipments.temp_chamber import TempChamber
 logger = log_set('GUI')
 
 PROJECT_PATH = pathlib.Path(__file__).parent
-PROJECT_UI = PROJECT_PATH / pathlib.Path('gui') / "main_v2_11.ui"
+PROJECT_UI = PROJECT_PATH / pathlib.Path('gui') / "main_v2_12.ui"
 
 
 class MainApp:
@@ -33,8 +33,10 @@ class MainApp:
         button_run_ftm_ce = builder.get_object("button_run_ftm_ce", master)
         button_run_ftm_endc = builder.get_object("button_run_ftm_endc", master)
         button_run_signaling = builder.get_object("button_run_signaling", master)
+        button_run_cse = builder.get_object("button_run_cse", master)
+        button_run_ulca = builder.get_object("button_run_ulca", master)
         self.button_run_list = [button_run_ftm, button_run_ftm_fcc, button_run_ftm_ce, button_run_ftm_endc,
-                                button_run_signaling]
+                                button_run_signaling, button_run_cse, button_run_ulca]
         ICON_FILE = PROJECT_PATH / pathlib.Path('utils') / pathlib.Path('Wave.ico')
         self.mainwindow.iconbitmap(ICON_FILE)
         # self.checkbox_hsupa = builder.get_object("checkbutton_WCDMA", master)
@@ -46,6 +48,7 @@ class MainApp:
         self.instrument = None
         self.general = None
         self.cse = None
+        self.ulca = None
         self.sa_nsa = None
         self.port_tx = None
         self.port_tx_lte = None
@@ -79,6 +82,22 @@ class MainApp:
         self.bw10 = None
         self.bw15 = None
         self.bw20 = None
+        self.bw20_5 = None
+        self.bw20_10 = None
+        self.bw20_15 = None
+        self.bw20_20 = None
+        self.bw15_15 = None
+        self.bw15_10 = None
+        self.bw15_20 = None
+        self.bw10_20 = None
+        self.bw10_15 = None
+        self.bw5_20 = None
+        self.bw5_10 = None
+        self.bw10_10 = None
+        self.bw10_5 = None
+        self.bw5_15 = None
+        self.bw15_5 = None
+        self.bw40 = None
         self.TxMax = None
         self.TxLow = None
         self.tx = None
@@ -87,6 +106,8 @@ class MainApp:
         self.tx_freq_sweep = None
         self.tx_1rb_sweep = None
         self.tx_harmonics = None
+        self.tx_ca = None
+        self.tx_ca_cbe = None
         self.qpsk_lte = None
         self.q16_lte = None
         self.q64_lte = None
@@ -265,6 +286,7 @@ class MainApp:
                 "instrument",
                 "general",
                 "cse",
+                "ulca",
                 "sa_nsa",
                 "port_tx",
                 "port_tx_lte",
@@ -298,6 +320,22 @@ class MainApp:
                 "bw10",
                 "bw15",
                 "bw20",
+                "bw20_5",
+                "bw20_10",
+                "bw20_15",
+                "bw20_20",
+                "bw15_15",
+                "bw15_10",
+                "bw15_20",
+                "bw10_20",
+                "bw10_15",
+                "bw5_20",
+                "bw5_10",
+                "bw10_10",
+                "bw10_5",
+                "bw5_15",
+                "bw15_5",
+                "bw40",
                 "TxMax",
                 "TxLow",
                 "tx",
@@ -306,6 +344,8 @@ class MainApp:
                 "tx_freq_sweep",
                 "tx_1rb_sweep",
                 "tx_harmonics",
+                "tx_ca",
+                "tx_ca_cbe",
                 "qpsk_lte",
                 "q16_lte",
                 "q64_lte",
@@ -569,6 +609,8 @@ class MainApp:
         self.tx_freq_sweep.set(ui_init['test_items']['tx_freq_sweep'])
         self.tx_1rb_sweep.set(ui_init['test_items']['tx_1rb_sweep'])
         self.tx_harmonics.set(ui_init['test_items']['tx_harmonics'])
+        self.tx_ca.set(ui_init['test_items']['tx_ca'])
+        self.tx_ca_cbe.set(ui_init['test_items']['tx_ca_cbe'])
         self.port_tx.set(ui_init['port']['port_tx'])
         self.port_tx_lte.set(ui_init['port']['port_tx_lte'])
         self.port_tx_fr1.set(ui_init['port']['port_tx_fr1'])
@@ -850,6 +892,38 @@ class MainApp:
                 self.bw15.set(True)
             elif bw == 20:
                 self.bw20.set(True)
+            elif bw == "20+5":
+                self.bw20_5.set(True)
+            elif bw == "20+10":
+                self.bw20_10.set(True)
+            elif bw == "20+15":
+                self.bw20_15.set(True)
+            elif bw == "20+20":
+                self.bw20_20.set(True)
+            elif bw == "15+15":
+                self.bw15_15.set(True)
+            elif bw == "15+10":
+                self.bw15_10.set(True)
+            elif bw == "15+20":
+                self.bw15_20.set(True)
+            elif bw == "10+20":
+                self.bw10_20.set(True)
+            elif bw == "10+15":
+                self.bw10_15.set(True)
+            elif bw == "5+20":
+                self.bw5_20.set(True)
+            elif bw == "5+10":
+                self.bw5_10.set(True)
+            elif bw == "10+10":
+                self.bw10_10.set(True)
+            elif bw == "10+5":
+                self.bw10_5.set(True)
+            elif bw == "5+15":
+                self.bw5_15.set(True)
+            elif bw == "15+5":
+                self.bw15_5.set(True)
+            elif bw == "40":
+                self.bw40.set(True)
 
         for bw in ui_init['bw']['bw_fr1']:
             if bw == 5:
@@ -904,6 +978,8 @@ class MainApp:
                 self.endc.set(True)
             elif script == 'CSE':
                 self.cse.set(True)
+            elif script == 'ULCA':
+                self.ulca.set(True)
 
         for _type in ui_init['type']['type_fr1']:
             if _type == 'DFTS':
@@ -1032,7 +1108,8 @@ class MainApp:
         band_segment = self.band_segment.get()
         band_segment_fr1 = self.band_segment_fr1.get()
         chan = self.wanted_chan()
-        tx, rx, rx_freq_sweep, tx_level_sweep, tx_freq_sweep, tx_1rb_sweep, tx_harmonics = self.wanted_tx_rx_sweep()
+        tx, rx, rx_freq_sweep, tx_level_sweep, tx_freq_sweep, tx_1rb_sweep, tx_harmonics, \
+        tx_ca, tx_ca_cbe = self.wanted_tx_rx_sweep()
         tpchb_enable = self.tempcham_enable.get()
         psu_enable = self.psu_enable.get()
         odpm_enable = self.odpm_enable.get()
@@ -1076,6 +1153,9 @@ class MainApp:
                 'tx_freq_sweep': tx_freq_sweep,
                 'tx_1rb_sweep': tx_1rb_sweep,
                 'tx_harmonics': tx_harmonics,
+                'tx_ca': tx_ca,
+                'tx_ca_cbe': tx_ca_cbe,
+
             },
             'band': {
                 'bands_fr1': bands_fr1,
@@ -1664,6 +1744,9 @@ class MainApp:
         self.wanted_test.setdefault('tx_freq_sweep', False)
         self.wanted_test.setdefault('tx_1rb_sweep', False)
         self.wanted_test.setdefault('tx_harmonics', False)
+        self.wanted_test.setdefault('tx_ca', False)
+        self.wanted_test.setdefault('tx_ca_cbe', False)
+
 
         if self.tx.get():
             logger.debug(self.tx.get())
@@ -1685,6 +1768,14 @@ class MainApp:
             logger.debug(self.tx_harmonics.get())
             self.wanted_test['tx_harmonics'] = self.tx_harmonics.get()
 
+        if self.tx_ca.get():
+            logger.debug(self.tx_ca.get())
+            self.wanted_test['tx_ca'] = self.tx_ca.get()
+
+        if self.tx_ca_cbe.get():
+            logger.debug(self.tx_ca_cbe.get())
+            self.wanted_test['tx_ca_cbe'] = self.tx_ca_cbe.get()
+
         if self.rx.get():
             logger.debug(self.rx.get())
             self.wanted_test['rx'] = self.rx.get()
@@ -1698,7 +1789,8 @@ class MainApp:
 
         logger.info(self.wanted_test)
         return self.tx.get(), self.rx.get(), self.rx_freq_sweep.get(), self.tx_level_sweep.get(), \
-               self.tx_freq_sweep.get(), self.tx_1rb_sweep.get(), self.tx_harmonics.get()
+               self.tx_freq_sweep.get(), self.tx_1rb_sweep.get(), self.tx_harmonics.get(), \
+               self.tx_ca.get(), self.tx_ca_cbe.get()
 
     def wanted_ue_pwr(self):
         self.ue_power = []
@@ -1767,6 +1859,39 @@ class MainApp:
 
         logger.info(f'select BW: {self.bw}')
         return self.bw
+
+    def wanted_bw_ca(self):  # this checkpoint
+        self.bw = []
+
+        if self.bw1p4.get():
+            logger.debug('Bw_1.4')
+            self.bw.append(1.4)
+
+        if self.bw3.get():
+            logger.debug('Bw_3')
+            self.bw.append(3)
+
+        if self.bw5.get():
+            logger.debug('Bw_5')
+            self.bw.append(5)
+
+        if self.bw10.get():
+            logger.debug('Bw_10')
+            self.bw.append(10)
+
+        if self.bw15.get():
+            logger.debug('Bw_15')
+            self.bw.append(15)
+
+        if self.bw20.get():
+            logger.debug('Bw_20')
+            self.bw.append(20)
+
+        if self.bw == []:
+            logger.debug('Nothing to select for Bw')
+
+        logger.info(f'select BW: {self.bw}')
+        return self.bw_ca
 
     def wanted_tech(self):
         self.tech = []
@@ -2284,6 +2409,10 @@ class MainApp:
             logger.debug('CSE')
             self.script.append('CSE')
 
+        if self.ulca.get():
+            logger.debug('ULCA')
+            self.script.append('ULCA')
+
         if self.script == []:
             logger.debug('Nothing to select for script')
 
@@ -2484,159 +2613,172 @@ class MainApp:
     def measure(self):
         import utils.parameters.external_paramters as ext_pmt
 
-        for button_run in self.button_run_list:
-            button_run['state'] = tkinter.DISABLED
+        try:
+            # to make the button to disabled state
+            for button_run in self.button_run_list:
+                button_run['state'] = tkinter.DISABLED
 
-        self.export_ui_setting_yaml()
-        # list-like
-        ext_pmt.devices_serial = get_serial_devices()
-        ext_pmt.tech = self.wanted_tech()
-        ext_pmt.endc_bands = self.wanted_band_ENDC()
-        ext_pmt.fr1_bands = self.wanted_band_FR1()
-        ext_pmt.lte_bands = self.wanted_band_LTE()
-        ext_pmt.wcdma_bands = self.wanted_band_WCDMA()
-        ext_pmt.gsm_bands = self.wanted_band_GSM()
-        ext_pmt.hsupa_bands = self.wanted_band_HSUPA()
-        ext_pmt.hsdpa_bands = self.wanted_band_HSDPA()
-        ext_pmt.lte_bandwidths = self.wanted_bw()
-        ext_pmt.fr1_bandwidths = self.wanted_bw_fr1()
-        ext_pmt.channel = self.wanted_chan()
-        ext_pmt.tx_max_pwr_sensitivity = self.wanted_ue_pwr()
-        ext_pmt.rb_ftm_lte = self.wanted_ftm_rb_lte()
-        ext_pmt.rb_ftm_fr1 = self.wanted_ftm_rb_fr1()
-        ext_pmt.tx_paths = self.wanted_tx_path()
-        ext_pmt.rx_paths = self.wanted_rx_path()
-        ext_pmt.mcs_lte = self.wanted_mcs_lte()
-        ext_pmt.mcs_fr1 = self.wanted_mcs_fr1()
-        ext_pmt.type_fr1 = self.wanted_type()
-        ext_pmt.scripts = self.wanted_scripts()
-        # non list-lke
-        ext_pmt.port_tx = self.port_tx.get()
-        ext_pmt.port_tx_lte = self.port_tx_lte.get()
-        ext_pmt.port_tx_fr1 = self.port_tx_fr1.get()
-        ext_pmt.band_segment = self.band_segment.get()
-        ext_pmt.band_segment_fr1 = self.band_segment_fr1.get()
-        ext_pmt.rfout_anritsu = self.rfout_anritsu.get()
-        ext_pmt.asw_path = self.asw_path.get()
-        ext_pmt.srs_path = self.srs_path.get()
-        ext_pmt.srs_path_enable = self.srs_path_enable.get()
-        ext_pmt.asw_path_enable = self.asw_path_enable.get()
-        ext_pmt.rx_fast_test_enable = self.rx_quick_enable.get()
-        ext_pmt.sync_path = self.sync_path.get()
-        ext_pmt.sa_nsa = self.sa_nsa.get()
-        ext_pmt.mod_gsm = self.mod_gsm.get()
-        ext_pmt.tx_pcl_lb = self.pcl_lb.get()
-        ext_pmt.tx_pcl_mb = self.pcl_mb.get()
-        ext_pmt.tx_level = self.tx_level.get()
-        # ext_pmt.wait_time = self.wait_time.get()  # obsolete
-        ext_pmt.current_count = self.count.get()
-        ext_pmt.psu_enable = self.psu_enable.get()
-        ext_pmt.odpm_enable = self.odpm_enable.get()
-        ext_pmt.record_current_enable = self.record_current_enable.get()
-        ext_pmt.condition = self.condition
-        ext_pmt.part_number = self.part_number.get()
-        ext_pmt.freq_sweep_step = self.freq_sweep_step.get()
-        ext_pmt.freq_sweep_start = self.freq_sweep_start.get()
-        ext_pmt.freq_sweep_stop = self.freq_sweep_stop.get()
+            self.export_ui_setting_yaml()
+            # list-like
+            ext_pmt.devices_serial = get_serial_devices()
+            ext_pmt.tech = self.wanted_tech()
+            ext_pmt.endc_bands = self.wanted_band_ENDC()
+            ext_pmt.fr1_bands = self.wanted_band_FR1()
+            ext_pmt.lte_bands = self.wanted_band_LTE()
+            ext_pmt.wcdma_bands = self.wanted_band_WCDMA()
+            ext_pmt.gsm_bands = self.wanted_band_GSM()
+            ext_pmt.hsupa_bands = self.wanted_band_HSUPA()
+            ext_pmt.hsdpa_bands = self.wanted_band_HSDPA()
+            ext_pmt.lte_bandwidths = self.wanted_bw()
+            ext_pmt.fr1_bandwidths = self.wanted_bw_fr1()
+            ext_pmt.channel = self.wanted_chan()
+            ext_pmt.tx_max_pwr_sensitivity = self.wanted_ue_pwr()
+            ext_pmt.rb_ftm_lte = self.wanted_ftm_rb_lte()
+            ext_pmt.rb_ftm_fr1 = self.wanted_ftm_rb_fr1()
+            ext_pmt.tx_paths = self.wanted_tx_path()
+            ext_pmt.rx_paths = self.wanted_rx_path()
+            ext_pmt.mcs_lte = self.wanted_mcs_lte()
+            ext_pmt.mcs_fr1 = self.wanted_mcs_fr1()
+            ext_pmt.type_fr1 = self.wanted_type()
+            ext_pmt.scripts = self.wanted_scripts()
+            # non list-lke
+            ext_pmt.port_tx = self.port_tx.get()
+            ext_pmt.port_tx_lte = self.port_tx_lte.get()
+            ext_pmt.port_tx_fr1 = self.port_tx_fr1.get()
+            ext_pmt.band_segment = self.band_segment.get()
+            ext_pmt.band_segment_fr1 = self.band_segment_fr1.get()
+            ext_pmt.rfout_anritsu = self.rfout_anritsu.get()
+            ext_pmt.asw_path = self.asw_path.get()
+            ext_pmt.srs_path = self.srs_path.get()
+            ext_pmt.srs_path_enable = self.srs_path_enable.get()
+            ext_pmt.asw_path_enable = self.asw_path_enable.get()
+            ext_pmt.rx_fast_test_enable = self.rx_quick_enable.get()
+            ext_pmt.sync_path = self.sync_path.get()
+            ext_pmt.sa_nsa = self.sa_nsa.get()
+            ext_pmt.mod_gsm = self.mod_gsm.get()
+            ext_pmt.tx_pcl_lb = self.pcl_lb.get()
+            ext_pmt.tx_pcl_mb = self.pcl_mb.get()
+            ext_pmt.tx_level = self.tx_level.get()
+            # ext_pmt.wait_time = self.wait_time.get()  # obsolete
+            ext_pmt.current_count = self.count.get()
+            ext_pmt.psu_enable = self.psu_enable.get()
+            ext_pmt.odpm_enable = self.odpm_enable.get()
+            ext_pmt.record_current_enable = self.record_current_enable.get()
+            ext_pmt.condition = self.condition
+            ext_pmt.part_number = self.part_number.get()
+            ext_pmt.freq_sweep_step = self.freq_sweep_step.get()
+            ext_pmt.freq_sweep_start = self.freq_sweep_start.get()
+            ext_pmt.freq_sweep_stop = self.freq_sweep_stop.get()
 
-        if self.instrument.get() == 'Anritsu8820':
-            from test_scripts.anritsu_items.mt8820_tx_lmh import TxTestGenre
-            from test_scripts.anritsu_items.mt8820_rx import RxTestGenre
-            from test_scripts.anritsu_items.mt8820_rx_freq_sweep import RxTestFreqSweep
+            if self.instrument.get() == 'Anritsu8820':
+                from test_scripts.anritsu_items.mt8820_tx_lmh import TxTestGenre
+                from test_scripts.anritsu_items.mt8820_rx import RxTestGenre
+                from test_scripts.anritsu_items.mt8820_rx_freq_sweep import RxTestFreqSweep
 
-            excel_folder_create()
-            if self.wanted_test['tx']:
-                inst = TxTestGenre()
-                inst.run()
+                excel_folder_create()
+                if self.wanted_test['tx']:
+                    inst = TxTestGenre()
+                    inst.run()
 
-            if self.wanted_test['rx']:
-                inst = RxTestGenre()
-                inst.run()
-                inst.ser.com_close()
+                if self.wanted_test['rx']:
+                    inst = RxTestGenre()
+                    inst.run()
+                    inst.ser.com_close()
 
-            if self.wanted_test['rx_freq_sweep']:
-                inst = RxTestFreqSweep()
-                inst.run()
+                if self.wanted_test['rx_freq_sweep']:
+                    inst = RxTestFreqSweep()
+                    inst.run()
 
-        elif self.instrument.get() == 'Anritsu8821':
-            from test_scripts.anritsu_items.mt8821_tx_lmh import TxTestGenre
-            from test_scripts.anritsu_items.mt8821_rx import RxTestGenre
-            from test_scripts.anritsu_items.mt8821_rx_freq_sweep import RxTestFreqSweep
+            elif self.instrument.get() == 'Anritsu8821':
+                from test_scripts.anritsu_items.mt8821_tx_lmh import TxTestGenre
+                from test_scripts.anritsu_items.mt8821_rx import RxTestGenre
+                from test_scripts.anritsu_items.mt8821_rx_freq_sweep import RxTestFreqSweep
 
-            excel_folder_create()
-            if self.wanted_test['tx']:
-                inst = TxTestGenre()
-                inst.run()
+                excel_folder_create()
+                if self.wanted_test['tx']:
+                    inst = TxTestGenre()
+                    inst.run()
 
-            if self.wanted_test['rx']:
-                inst = RxTestGenre()
-                inst.run()
-                inst.ser.com_close()  # because this might have multiple Rx controller by AT command to choose Rx path
+                if self.wanted_test['rx']:
+                    inst = RxTestGenre()
+                    inst.run()
+                    inst.ser.com_close()  # because this might have multiple Rx controller by AT command to choose Rx path
 
-            if self.wanted_test['rx_freq_sweep']:
-                inst = RxTestFreqSweep()
-                inst.run()
+                if self.wanted_test['rx_freq_sweep']:
+                    inst = RxTestFreqSweep()
+                    inst.run()
 
-        elif self.instrument.get() == 'Agilent8960':
-            pass
+            elif self.instrument.get() == 'Agilent8960':
+                pass
 
-        elif self.instrument.get() == 'Cmw100':
-            from test_scripts.cmw100_items.tx_lmh import TxTestGenre
-            from test_scripts.cmw100_items.rx_lmh import RxTestGenre
-            from test_scripts.cmw100_items.tx_level_sweep import TxTestLevelSweep
-            from test_scripts.cmw100_items.tx_freq_sweep import TxTestFreqSweep
-            from test_scripts.cmw100_items.tx_1rb_sweep import TxTest1RbSweep
-            from test_scripts.cmw100_items.tx_power_fcc_ce import TxTestFccCe
+            elif self.instrument.get() == 'Cmw100':
+                from test_scripts.cmw100_items.tx_lmh import TxTestGenre
+                from test_scripts.cmw100_items.rx_lmh import RxTestGenre
+                from test_scripts.cmw100_items.tx_level_sweep import TxTestLevelSweep
+                from test_scripts.cmw100_items.tx_freq_sweep import TxTestFreqSweep
+                from test_scripts.cmw100_items.tx_1rb_sweep import TxTest1RbSweep
+                from test_scripts.cmw100_items.tx_power_fcc_ce import TxTestFccCe
+                # this is placeholder for tx_ca, tx_ca_cbe
 
-            excel_folder_create()
-            # self.test_pipeline(inst_class_dict)
-            if self.wanted_test['tx'] and ext_pmt.sa_nsa == 0:
+                excel_folder_create()
+                # self.test_pipeline(inst_class_dict)
+                if self.wanted_test['tx'] and ext_pmt.sa_nsa == 0:
+                    for script in ext_pmt.scripts:
+                        if script == 'GENERAL':
+                            inst = TxTestGenre()
+                            inst.run()
+                            inst.ser.com_close()
+                        elif script in ['FCC', 'CE']:
+                            inst = TxTestFccCe()
+                            inst.run(script)
+                            inst.ser.com_close()
+
+                if self.wanted_test['rx']:
+                    inst = RxTestGenre()
+                    inst.run()
+                    inst.ser.com_close()
+
+                if self.wanted_test['tx_level_sweep'] and ext_pmt.sa_nsa == 0:
+                    inst = TxTestLevelSweep()
+                    inst.run()
+                    inst.ser.com_close()
+
+                if self.wanted_test['tx_freq_sweep'] and ext_pmt.sa_nsa == 0:
+                    inst = TxTestFreqSweep()
+                    inst.run()
+                    inst.ser.com_close()
+
+                if self.wanted_test['tx_1rb_sweep'] and ext_pmt.sa_nsa == 0:
+                    inst = TxTest1RbSweep()
+                    inst.run()
+                    inst.ser.com_close()
+
+                # this is placeholder for tx_ca
+
+            elif self.instrument.get() == 'Cmw+Fsw':
+                from test_scripts.harmonics.tx_harmonics import TxHarmonics
+
+                excel_folder_create()
+                # self.test_pipeline(inst_class_dict)
                 for script in ext_pmt.scripts:
-                    if script == 'GENERAL':
-                        inst = TxTestGenre()
-                        inst.run()
-                        inst.ser.com_close()
-                    elif script in ['FCC', 'CE']:
-                        inst = TxTestFccCe()
-                        inst.run(script)
-                        inst.ser.com_close()
+                    if script == 'CSE':
+                        if self.wanted_test['tx_harmonics'] and ext_pmt.sa_nsa == 0:
+                            inst = TxHarmonics()
+                            inst.run()
+                            inst.ser.com_close()
+                    else:
+                        pass
+                    # this is placeholder for tx_ca_cbe
 
-            if self.wanted_test['rx']:
-                inst = RxTestGenre()
-                inst.run()
-                inst.ser.com_close()
+            # to make the button to normal state
+            for button_run in self.button_run_list:
+                button_run['state'] = tkinter.NORMAL
 
-            if self.wanted_test['tx_level_sweep'] and ext_pmt.sa_nsa == 0:
-                inst = TxTestLevelSweep()
-                inst.run()
-                inst.ser.com_close()
-
-            if self.wanted_test['tx_freq_sweep'] and ext_pmt.sa_nsa == 0:
-                inst = TxTestFreqSweep()
-                inst.run()
-                inst.ser.com_close()
-
-            if self.wanted_test['tx_1rb_sweep'] and ext_pmt.sa_nsa == 0:
-                inst = TxTest1RbSweep()
-                inst.run()
-                inst.ser.com_close()
-
-        elif self.instrument.get() == 'Cmw+Fsw':
-            from test_scripts.harmonics.tx_harmonics import TxHarmonics
-
-            excel_folder_create()
-            # self.test_pipeline(inst_class_dict)
-            for script in ext_pmt.scripts:
-                if script == 'CSE':
-                    if self.wanted_test['tx_harmonics'] and ext_pmt.sa_nsa == 0:
-                        inst = TxHarmonics()
-                        inst.run()
-                        inst.ser.com_close()
-                else:
-                    pass
-
-        for button_run in self.button_run_list:
-            button_run['state'] = tkinter.NORMAL
+        except Exception as err:
+            logger.info(err)
+            # to make the button to normal state
+            for button_run in self.button_run_list:
+                button_run['state'] = tkinter.NORMAL
 
 
 if __name__ == "__main__":
