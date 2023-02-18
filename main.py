@@ -2057,7 +2057,7 @@ class MainApp:
             logger.debug(self.tech_GSM.get())
             tech.append('GSM')
 
-        if self.tech == []:
+        if tech == []:
             logger.debug('Nothing to select for tech')
 
         logger.info(f'select tech: {tech}')
