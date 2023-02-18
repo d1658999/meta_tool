@@ -17,7 +17,7 @@ condition:
   hthv: false
   htlv: false
   hv: false
-  lthv: false
+  lthv: true
   ltlv: false
   lv: false
   mv: false
@@ -30,7 +30,7 @@ external_inst:
   tempchb: false
   wait_time: 300
 instrument:
-  instrument: Cmw+Fsw
+  instrument: Cmw100
 mcs:
   mcs_fr1: []
   mcs_lte: []
@@ -60,7 +60,7 @@ rx_set:
   ue_power: []
 scripts:
   scripts: []
-tab: 6
+tab: 0
 tech:
   tech: []
 test_items:
@@ -69,6 +69,8 @@ test_items:
   rx_quick_enable: false
   tx: false
   tx_1rb_sweep: false
+  tx_ca: false
+  tx_ca_cbe: false
   tx_freq_sweep: false
   tx_harmonics: false
   tx_level_sweep: false
