@@ -12081,6 +12081,22 @@ Disable</property>
                             </layout>
                           </object>
                         </child>
+                        <child>
+                          <object class="ttk.Checkbutton" id="checkbutton722">
+                            <property name="command" type="command" cbtype="simple">wanted_tx_rx_sweep</property>
+                            <property name="state">disabled</property>
+                            <property name="takefocus">false</property>
+                            <property name="text" translatable="yes">Tx_CBE</property>
+                            <property name="variable">boolean:tx_cbe</property>
+                            <layout manager="grid">
+                              <property name="column">0</property>
+                              <property name="padx">5</property>
+                              <property name="pady">5</property>
+                              <property name="row">1</property>
+                              <property name="sticky">nw</property>
+                            </layout>
+                          </object>
+                        </child>
                       </object>
                     </child>
                   </object>
@@ -14296,8 +14312,8 @@ Disable</property>
                     <child>
                       <object class="tk.OptionMenu" id="optionmenu32">
                         <property name="command" type="command" cbtype="simple">inst_select</property>
-                        <property name="value">Cmw+Fsw</property>
-                        <property name="values">Cmw+Fsw</property>
+                        <property name="value">Cmw100</property>
+                        <property name="values">Cmw100,Cmw+Fsw</property>
                         <property name="variable">string:instrument</property>
                         <layout manager="pack">
                           <property name="fill">x</property>
@@ -14932,6 +14948,7 @@ Disable</property>
                         <child>
                           <object class="ttk.Checkbutton" id="checkbutton720">
                             <property name="command" type="command" cbtype="simple">wanted_tx_rx_sweep</property>
+                            <property name="state">disabled</property>
                             <property name="takefocus">false</property>
                             <property name="text" translatable="yes">Tx_CBE</property>
                             <property name="variable">boolean:tx_ca_cbe</property>
@@ -15193,7 +15210,7 @@ Disable</property>
                     </layout>
                     <child>
                       <object class="ttk.Checkbutton" id="checkbutton626">
-                        <property name="command" type="command" cbtype="simple">wanted_band_LTE</property>
+                        <property name="command" type="command" cbtype="simple">wanted_band_ca_LTE</property>
                         <property name="onvalue">5B</property>
                         <property name="text" translatable="yes">5B</property>
                         <property name="variable">string:B5B</property>
@@ -15222,7 +15239,7 @@ Disable</property>
                     </layout>
                     <child>
                       <object class="ttk.Checkbutton" id="checkbutton649">
-                        <property name="command" type="command" cbtype="simple">wanted_band_LTE</property>
+                        <property name="command" type="command" cbtype="simple">wanted_band_ca_LTE</property>
                         <property name="onvalue">1C</property>
                         <property name="text" translatable="yes">1C</property>
                         <property name="variable">string:B1C</property>
@@ -15238,7 +15255,7 @@ Disable</property>
                     </child>
                     <child>
                       <object class="ttk.Checkbutton" id="checkbutton651">
-                        <property name="command" type="command" cbtype="simple">wanted_band_LTE</property>
+                        <property name="command" type="command" cbtype="simple">wanted_band_ca_LTE</property>
                         <property name="onvalue">3C</property>
                         <property name="text" translatable="yes">3C</property>
                         <property name="variable">string:B3C</property>
@@ -15254,7 +15271,7 @@ Disable</property>
                     </child>
                     <child>
                       <object class="ttk.Checkbutton" id="checkbutton653">
-                        <property name="command" type="command" cbtype="simple">wanted_band_LTE</property>
+                        <property name="command" type="command" cbtype="simple">wanted_band_ca_LTE</property>
                         <property name="onvalue">7C</property>
                         <property name="text" translatable="yes">7C</property>
                         <property name="variable">string:B7C</property>
@@ -15270,7 +15287,7 @@ Disable</property>
                     </child>
                     <child>
                       <object class="ttk.Checkbutton" id="checkbutton655">
-                        <property name="command" type="command" cbtype="simple">wanted_band_LTE</property>
+                        <property name="command" type="command" cbtype="simple">wanted_band_ca_LTE</property>
                         <property name="onvalue">66B</property>
                         <property name="text" translatable="yes">66B</property>
                         <property name="variable">string:B66B</property>
@@ -15286,7 +15303,7 @@ Disable</property>
                     </child>
                     <child>
                       <object class="ttk.Checkbutton" id="checkbutton656">
-                        <property name="command" type="command" cbtype="simple">wanted_band_LTE</property>
+                        <property name="command" type="command" cbtype="simple">wanted_band_ca_LTE</property>
                         <property name="onvalue">66C</property>
                         <property name="text" translatable="yes">66C</property>
                         <property name="variable">string:B66C</property>
@@ -15302,7 +15319,7 @@ Disable</property>
                     </child>
                     <child>
                       <object class="ttk.Checkbutton" id="checkbutton658">
-                        <property name="command" type="command" cbtype="simple">wanted_band_LTE</property>
+                        <property name="command" type="command" cbtype="simple">wanted_band_ca_LTE</property>
                         <property name="onvalue">40C</property>
                         <property name="text" translatable="yes">40C</property>
                         <property name="variable">string:B40C</property>
@@ -15318,7 +15335,7 @@ Disable</property>
                     </child>
                     <child>
                       <object class="ttk.Checkbutton" id="checkbutton659">
-                        <property name="command" type="command" cbtype="simple">wanted_band_LTE</property>
+                        <property name="command" type="command" cbtype="simple">wanted_band_ca_LTE</property>
                         <property name="onvalue">38C</property>
                         <property name="text" translatable="yes">38C</property>
                         <property name="variable">string:B38C</property>
@@ -15334,7 +15351,7 @@ Disable</property>
                     </child>
                     <child>
                       <object class="ttk.Checkbutton" id="checkbutton660">
-                        <property name="command" type="command" cbtype="simple">wanted_band_LTE</property>
+                        <property name="command" type="command" cbtype="simple">wanted_band_ca_LTE</property>
                         <property name="onvalue">41C</property>
                         <property name="text" translatable="yes">41C</property>
                         <property name="variable">string:B41C</property>
@@ -15350,7 +15367,7 @@ Disable</property>
                     </child>
                     <child>
                       <object class="ttk.Checkbutton" id="checkbutton661">
-                        <property name="command" type="command" cbtype="simple">MHB_all_state</property>
+                        <property name="command" type="command" cbtype="simple">MHB_CA_all_state</property>
                         <property name="text" translatable="yes">all</property>
                         <property name="variable">boolean:MHB_CA_all</property>
                         <layout manager="grid">
@@ -15377,7 +15394,7 @@ Disable</property>
                     </layout>
                     <child>
                       <object class="ttk.Checkbutton" id="checkbutton662">
-                        <property name="command" type="command" cbtype="simple">wanted_band_LTE</property>
+                        <property name="command" type="command" cbtype="simple">wanted_band_ca_LTE</property>
                         <property name="onvalue">42C</property>
                         <property name="text" translatable="yes">42C</property>
                         <property name="variable">string:B42C</property>
@@ -15393,7 +15410,7 @@ Disable</property>
                     </child>
                     <child>
                       <object class="ttk.Checkbutton" id="checkbutton663">
-                        <property name="command" type="command" cbtype="simple">wanted_band_LTE</property>
+                        <property name="command" type="command" cbtype="simple">wanted_band_ca_LTE</property>
                         <property name="onvalue">48</property>
                         <property name="state">disabled</property>
                         <property name="text" translatable="yes">48C</property>

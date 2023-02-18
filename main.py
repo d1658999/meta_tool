@@ -106,6 +106,7 @@ class MainApp:
         self.tx_freq_sweep = None
         self.tx_1rb_sweep = None
         self.tx_harmonics = None
+        self.tx_cbe = None
         self.tx_ca = None
         self.tx_ca_cbe = None
         self.qpsk_lte = None
@@ -146,6 +147,17 @@ class MainApp:
         self.edge_1rb_right_fr1 = None
         self.edge_full_left_fr1 = None
         self.edge_full_right_fr1 = None
+        self.B5B = None
+        self.B1C = None
+        self.B3C = None
+        self.B7C = None
+        self.B66B = None
+        self.B66C = None
+        self.B40C = None
+        self.B38C = None
+        self.B41C = None
+        self.B42C = None
+        self.B48C = None
         self.B5 = None
         self.B8 = None
         self.B12 = None
@@ -177,9 +189,11 @@ class MainApp:
         self.B38 = None
         self.B41 = None
         self.MHB_all = None
+        self.MHB_CA_all = None
         self.B42 = None
         self.B48 = None
         self.UHB_all = None
+        self.BW_CA_all = None
         self.W1 = None
         self.W2 = None
         self.WCDMA_all = None
@@ -344,6 +358,7 @@ class MainApp:
                 "tx_freq_sweep",
                 "tx_1rb_sweep",
                 "tx_harmonics",
+                "tx_cbe",
                 "tx_ca",
                 "tx_ca_cbe",
                 "qpsk_lte",
@@ -384,6 +399,17 @@ class MainApp:
                 "edge_1rb_right_fr1",
                 "edge_full_left_fr1",
                 "edge_full_right_fr1",
+                "B5B",
+                "B1C",
+                "B3C",
+                "B7C",
+                "B66B",
+                "B66C",
+                "B40C",
+                "B38C",
+                "B41C",
+                "B42C",
+                "B48C",
                 "B5",
                 "B8",
                 "B12",
@@ -415,9 +441,11 @@ class MainApp:
                 "B38",
                 "B41",
                 "MHB_all",
+                "MHB_CA_all",
                 "B42",
                 "B48",
                 "UHB_all",
+                "BW_CA_all",
                 "W1",
                 "W2",
                 "WCDMA_all",
@@ -609,6 +637,7 @@ class MainApp:
         self.tx_freq_sweep.set(ui_init['test_items']['tx_freq_sweep'])
         self.tx_1rb_sweep.set(ui_init['test_items']['tx_1rb_sweep'])
         self.tx_harmonics.set(ui_init['test_items']['tx_harmonics'])
+        self.tx_cbe.set(ui_init['test_items']['tx_cbe'])
         self.tx_ca.set(ui_init['test_items']['tx_ca'])
         self.tx_ca_cbe.set(ui_init['test_items']['tx_ca_cbe'])
         self.port_tx.set(ui_init['port']['port_tx'])
@@ -1108,7 +1137,7 @@ class MainApp:
         band_segment = self.band_segment.get()
         band_segment_fr1 = self.band_segment_fr1.get()
         chan = self.wanted_chan()
-        tx, rx, rx_freq_sweep, tx_level_sweep, tx_freq_sweep, tx_1rb_sweep, tx_harmonics, \
+        tx, rx, rx_freq_sweep, tx_level_sweep, tx_freq_sweep, tx_1rb_sweep, tx_harmonics, tx_cbe, \
         tx_ca, tx_ca_cbe = self.wanted_tx_rx_sweep()
         tpchb_enable = self.tempcham_enable.get()
         psu_enable = self.psu_enable.get()
@@ -1153,6 +1182,7 @@ class MainApp:
                 'tx_freq_sweep': tx_freq_sweep,
                 'tx_1rb_sweep': tx_1rb_sweep,
                 'tx_harmonics': tx_harmonics,
+                'tx_cbe': tx_cbe,
                 'tx_ca': tx_ca,
                 'tx_ca_cbe': tx_ca_cbe,
 
@@ -1276,11 +1306,19 @@ class MainApp:
         self.MHB_all_state()
         self.MHB_all_state_fr1()
 
+    def off_all_reset_MHB_CA(self):
+        self.MHB_CA_all.set(False)
+        self.MHB_CA_all_state()
+
     def off_all_reset_UHB(self):
         self.UHB_all.set(False)
         self.UHB_all_fr1.set(False)
         self.UHB_all_state()
         self.UHB_all_state_fr1()
+
+    def off_call_reset_bw_ca(self):
+        self.BW_CA_all.set(False)
+        self.BW_CA_all_state()
 
     @staticmethod
     def thermal_dis():
@@ -1488,104 +1526,158 @@ class MainApp:
         return self.band_fr1
 
     def wanted_band_LTE(self):
-        self.band_lte = []
+        band_lte = []
 
         if self.B1.get() == 1:
             logger.debug(self.B1.get())
-            self.band_lte.append(self.B1.get())
+            band_lte.append(self.B1.get())
         if self.B2.get() == 2:
             logger.debug(self.B2.get())
-            self.band_lte.append(self.B2.get())
+            band_lte.append(self.B2.get())
         if self.B3.get() == 3:
             logger.debug(self.B3.get())
-            self.band_lte.append(self.B3.get())
+            band_lte.append(self.B3.get())
         if self.B4.get() == 4:
             logger.debug(self.B4.get())
-            self.band_lte.append(self.B4.get())
+            band_lte.append(self.B4.get())
         if self.B7.get() == 7:
             logger.debug(self.B7.get())
-            self.band_lte.append(self.B7.get())
+            band_lte.append(self.B7.get())
         if self.B25.get() == 25:
             logger.debug(self.B25.get())
-            self.band_lte.append(self.B25.get())
+            band_lte.append(self.B25.get())
         if self.B66.get() == 66:
             logger.debug(self.B66.get())
-            self.band_lte.append(self.B66.get())
+            band_lte.append(self.B66.get())
         if self.B30.get() == 30:
             logger.debug(self.B30.get())
-            self.band_lte.append(self.B30.get())
+            band_lte.append(self.B30.get())
         if self.B39.get() == 39:
             logger.debug(self.B39.get())
-            self.band_lte.append(self.B39.get())
+            band_lte.append(self.B39.get())
         if self.B40.get() == 40:
             logger.debug(self.B40.get())
-            self.band_lte.append(self.B40.get())
+            band_lte.append(self.B40.get())
         if self.B38.get() == 38:
             logger.debug(self.B38.get())
-            self.band_lte.append(self.B38.get())
+            band_lte.append(self.B38.get())
         if self.B41.get() == 41:
             logger.debug(self.B41.get())
-            self.band_lte.append(self.B41.get())
+            band_lte.append(self.B41.get())
         if self.B5.get() == 5:
             logger.debug(self.B5.get())
-            self.band_lte.append(self.B5.get())
+            band_lte.append(self.B5.get())
         if self.B8.get() == 8:
             logger.debug(self.B8.get())
-            self.band_lte.append(self.B8.get())
+            band_lte.append(self.B8.get())
         if self.B12.get() == 12:
             logger.debug(self.B12.get())
-            self.band_lte.append(self.B12.get())
+            band_lte.append(self.B12.get())
         if self.B13.get() == 13:
             logger.debug(self.B13.get())
-            self.band_lte.append(self.B13.get())
+            band_lte.append(self.B13.get())
         if self.B14.get() == 14:
             logger.debug(self.B14.get())
-            self.band_lte.append(self.B14.get())
+            band_lte.append(self.B14.get())
         if self.B17.get() == 17:
             logger.debug(self.B17.get())
-            self.band_lte.append(self.B17.get())
+            band_lte.append(self.B17.get())
         if self.B18.get() == 18:
             logger.debug(self.B18.get())
-            self.band_lte.append(self.B18.get())
+            band_lte.append(self.B18.get())
         if self.B19.get() == 19:
             logger.debug(self.B19.get())
-            self.band_lte.append(self.B19.get())
+            band_lte.append(self.B19.get())
         if self.B20.get() == 20:
             logger.debug(self.B20.get())
-            self.band_lte.append(self.B20.get())
+            band_lte.append(self.B20.get())
         if self.B21.get() == 21:
             logger.debug(self.B21.get())
-            self.band_lte.append(self.B21.get())
+            band_lte.append(self.B21.get())
         if self.B24.get() == 24:
             logger.debug(self.B24.get())
-            self.band_lte.append(self.B24.get())
+            band_lte.append(self.B24.get())
         if self.B26.get() == 26:
             logger.debug(self.B26.get())
-            self.band_lte.append(self.B26.get())
+            band_lte.append(self.B26.get())
         if self.B28.get() == 28:
             logger.debug(self.B28.get())
-            self.band_lte.append(self.B28.get())
+            band_lte.append(self.B28.get())
         if self.B29.get() == 29:
             logger.debug(self.B29.get())
-            self.band_lte.append(self.B29.get())
+            band_lte.append(self.B29.get())
         if self.B32.get() == 32:
             logger.debug(self.B32.get())
-            self.band_lte.append(self.B32.get())
+            band_lte.append(self.B32.get())
         if self.B71.get() == 71:
             logger.debug(self.B71.get())
-            self.band_lte.append(self.B71.get())
+            band_lte.append(self.B71.get())
         if self.B42.get() == 42:
             logger.debug(self.B42.get())
-            self.band_lte.append(self.B42.get())
+            band_lte.append(self.B42.get())
         if self.B48.get() == 48:
             logger.debug(self.B48.get())
-            self.band_lte.append(self.B48.get())
+            band_lte.append(self.B48.get())
 
-        if self.band_lte == []:
+        if band_lte == []:
             logger.debug('Nothing to select for LTE')
 
-        logger.info(f'select LTE band: {self.band_lte}')
-        return self.band_lte
+        logger.info(f'select LTE band: {band_lte}')
+        return band_lte
+
+    def wanted_band_ca_LTE(self):  # checkpoint
+        band_ca_lte = []
+
+        if self.B5B.get():
+            logger.debug(self.B5B.get())
+            band_ca_lte.append(self.B5B.get())
+
+        if self.B1C.get():
+            logger.debug(self.B1C.get())
+            band_ca_lte.append(self.B1C.get())
+
+        if self.B3C.get():
+            logger.debug(self.B3C.get())
+            band_ca_lte.append(self.B3C.get())
+
+        if self.B7C.get():
+            logger.debug(self.B7C.get())
+            band_ca_lte.append(self.B7C.get())
+
+        if self.B66B.get():
+            logger.debug(self.B66B.get())
+            band_ca_lte.append(self.B66B.get())
+
+        if self.B66C.get():
+            logger.debug(self.B66C.get())
+            band_ca_lte.append(self.B66C.get())
+
+        if self.B40C.get():
+            logger.debug(self.B40C.get())
+            band_ca_lte.append(self.B40C.get())
+
+        if self.B38C.get():
+            logger.debug(self.B38C.get())
+            band_ca_lte.append(self.B38C.get())
+
+        if self.B41C.get():
+            logger.debug(self.B41C.get())
+            band_ca_lte.append(self.B41C.get())
+
+        if self.B42C.get():
+            logger.debug(self.B42C.get())
+            band_ca_lte.append(self.B42C.get())
+
+        if self.B48C.get():
+            logger.debug(self.B48C.get())
+            band_ca_lte.append(self.B48C.get())
+
+        if band_ca_lte == []:
+            logger.debug('Nothing to select for LTE')
+
+        logger.info(f'select LTE_CA band: {band_ca_lte}')
+        return band_ca_lte
+
 
     def wanted_band_WCDMA(self):
         self.band_wcdma = []
@@ -1618,85 +1710,85 @@ class MainApp:
         return self.band_wcdma
 
     def wanted_band_HSUPA(self):
-        self.band_hsupa = []
+        band_hsupa = []
 
         if self.U1.get() == 1:
             logger.debug(self.U1.get())
-            self.band_hsupa.append(self.U1.get())
+            band_hsupa.append(self.U1.get())
         if self.U2.get() == 2:
             logger.debug(self.U2.get())
-            self.band_hsupa.append(self.U2.get())
+            band_hsupa.append(self.U2.get())
         if self.U4.get() == 4:
             logger.debug(self.U4.get())
-            self.band_hsupa.append(self.U4.get())
+            band_hsupa.append(self.U4.get())
         if self.U5.get() == 5:
             logger.debug(self.U5.get())
-            self.band_hsupa.append(self.U5.get())
+            band_hsupa.append(self.U5.get())
         if self.U8.get() == 8:
             logger.debug(self.U8.get())
-            self.band_hsupa.append(self.U8.get())
+            band_hsupa.append(self.U8.get())
         if self.U6.get() == 6:
             logger.debug(self.U6.get())
-            self.band_hsupa.append(self.U6.get())
+            band_hsupa.append(self.U6.get())
         if self.U19.get() == 19:
             logger.debug(self.U19.get())
-            self.band_hsupa.append(self.U19.get())
-        if self.band_hsupa == []:
+            band_hsupa.append(self.U19.get())
+        if band_hsupa == []:
             logger.debug('Nothing to select for WCDMA')
 
-        logger.info(f'select HSUPA band: {self.band_hsupa}')
-        return self.band_hsupa
+        logger.info(f'select HSUPA band: {band_hsupa}')
+        return band_hsupa
 
     def wanted_band_HSDPA(self):
-        self.band_hsdpa = []
+        band_hsdpa = []
 
         if self.D1.get() == 1:
             logger.debug(self.D1.get())
-            self.band_hsdpa.append(self.D1.get())
+            band_hsdpa.append(self.D1.get())
         if self.D2.get() == 2:
             logger.debug(self.D2.get())
-            self.band_hsdpa.append(self.D2.get())
+            band_hsdpa.append(self.D2.get())
         if self.D4.get() == 4:
             logger.debug(self.D4.get())
-            self.band_hsdpa.append(self.D4.get())
+            band_hsdpa.append(self.D4.get())
         if self.D5.get() == 5:
             logger.debug(self.D5.get())
-            self.band_hsdpa.append(self.D5.get())
+            band_hsdpa.append(self.D5.get())
         if self.D8.get() == 8:
             logger.debug(self.D8.get())
-            self.band_hsdpa.append(self.D8.get())
+            band_hsdpa.append(self.D8.get())
         if self.D6.get() == 6:
             logger.debug(self.D6.get())
-            self.band_hsdpa.append(self.D6.get())
+            band_hsdpa.append(self.D6.get())
         if self.D19.get() == 19:
             logger.debug(self.D19.get())
-            self.band_hsdpa.append(self.D19.get())
-        if self.band_hsdpa == []:
+            band_hsdpa.append(self.D19.get())
+        if band_hsdpa == []:
             logger.debug('Nothing to select for HSDPA')
 
-        logger.info(f'select HSUPA band: {self.band_hsdpa}')
-        return self.band_hsdpa
+        logger.info(f'select HSUPA band: {band_hsdpa}')
+        return band_hsdpa
 
     def wanted_band_GSM(self):
-        self.band_gsm = []
+        band_gsm = []
 
         if self.GSM850.get() == 850:
             logger.debug(self.GSM850.get())
-            self.band_gsm.append(self.GSM850.get())
+            band_gsm.append(self.GSM850.get())
         if self.GSM900.get() == 900:
             logger.debug(self.GSM900.get())
-            self.band_gsm.append(self.GSM900.get())
+            band_gsm.append(self.GSM900.get())
         if self.GSM1800.get() == 1800:
             logger.debug(self.GSM1800.get())
-            self.band_gsm.append(self.GSM1800.get())
+            band_gsm.append(self.GSM1800.get())
         if self.GSM1900.get() == 1900:
             logger.debug(self.GSM1900.get())
-            self.band_gsm.append(self.GSM1900.get())
-        if self.band_gsm == []:
+            band_gsm.append(self.GSM1900.get())
+        if band_gsm == []:
             logger.debug('Nothing to select for GSM')
 
-        logger.info(f'select GSM band: {self.band_gsm}')
-        return self.band_gsm
+        logger.info(f'select GSM band: {band_gsm}')
+        return band_gsm
 
     # def inst_to_tech(self):
     #     if self.instrument.get() == 'Cmw100':
@@ -1744,6 +1836,7 @@ class MainApp:
         self.wanted_test.setdefault('tx_freq_sweep', False)
         self.wanted_test.setdefault('tx_1rb_sweep', False)
         self.wanted_test.setdefault('tx_harmonics', False)
+        self.wanted_test.setdefault('tx_cbe', False)
         self.wanted_test.setdefault('tx_ca', False)
         self.wanted_test.setdefault('tx_ca_cbe', False)
 
@@ -1768,6 +1861,10 @@ class MainApp:
             logger.debug(self.tx_harmonics.get())
             self.wanted_test['tx_harmonics'] = self.tx_harmonics.get()
 
+        if self.tx_cbe.get():
+            logger.debug(self.tx_cbe.get())
+            self.wanted_test['tx_cbe'] = self.tx_cbe.get()
+
         if self.tx_ca.get():
             logger.debug(self.tx_ca.get())
             self.wanted_test['tx_ca'] = self.tx_ca.get()
@@ -1789,7 +1886,7 @@ class MainApp:
 
         logger.info(self.wanted_test)
         return self.tx.get(), self.rx.get(), self.rx_freq_sweep.get(), self.tx_level_sweep.get(), \
-               self.tx_freq_sweep.get(), self.tx_1rb_sweep.get(), self.tx_harmonics.get(), \
+               self.tx_freq_sweep.get(), self.tx_1rb_sweep.get(), self.tx_harmonics.get(), self.tx_cbe.get(), \
                self.tx_ca.get(), self.tx_ca_cbe.get()
 
     def wanted_ue_pwr(self):
@@ -1828,103 +1925,143 @@ class MainApp:
         return self.chan
 
     def wanted_bw(self):
-        self.bw = []
+        bw = []
 
         if self.bw1p4.get():
             logger.debug('Bw_1.4')
-            self.bw.append(1.4)
+            bw.append(1.4)
 
         if self.bw3.get():
             logger.debug('Bw_3')
-            self.bw.append(3)
+            bw.append(3)
 
         if self.bw5.get():
             logger.debug('Bw_5')
-            self.bw.append(5)
+            bw.append(5)
 
         if self.bw10.get():
             logger.debug('Bw_10')
-            self.bw.append(10)
+            bw.append(10)
 
         if self.bw15.get():
             logger.debug('Bw_15')
-            self.bw.append(15)
+            bw.append(15)
 
         if self.bw20.get():
             logger.debug('Bw_20')
-            self.bw.append(20)
+            bw.append(20)
 
-        if self.bw == []:
+        if bw == []:
             logger.debug('Nothing to select for Bw')
 
-        logger.info(f'select BW: {self.bw}')
-        return self.bw
+        logger.info(f'select BW: {bw}')
+        return bw
 
-    def wanted_bw_ca(self):  # this checkpoint
-        self.bw = []
+    def wanted_bw_ca(self):
+        bw_ca = []
 
-        if self.bw1p4.get():
-            logger.debug('Bw_1.4')
-            self.bw.append(1.4)
+        if self.bw20_5.get():
+            logger.debug('20+5')
+            bw_ca.append('20+5')
 
-        if self.bw3.get():
-            logger.debug('Bw_3')
-            self.bw.append(3)
+        if self.bw20_10.get():
+            logger.debug('20+10')
+            bw_ca.append('20+10')
 
-        if self.bw5.get():
-            logger.debug('Bw_5')
-            self.bw.append(5)
+        if self.bw20_15.get():
+            logger.debug('20+15')
+            bw_ca.append('20+15')
 
-        if self.bw10.get():
-            logger.debug('Bw_10')
-            self.bw.append(10)
+        if self.bw20_20.get():
+            logger.debug('20+20')
+            bw_ca.append('20+20')
 
-        if self.bw15.get():
-            logger.debug('Bw_15')
-            self.bw.append(15)
+        if self.bw15_15.get():
+            logger.debug('15+15')
+            bw_ca.append('15+15')
 
-        if self.bw20.get():
-            logger.debug('Bw_20')
-            self.bw.append(20)
+        if self.bw15_10.get():
+            logger.debug('15+10')
+            bw_ca.append('15+10')
 
-        if self.bw == []:
+        if self.bw15_20.get():
+            logger.debug('15+20')
+            bw_ca.append('15+20')
+
+        if self.bw10_20.get():
+            logger.debug('10+20')
+            bw_ca.append('10+20')
+
+        if self.bw10_15.get():
+            logger.debug('10+15')
+            bw_ca.append('10+15')
+
+        if self.bw5_20.get():
+            logger.debug('5+20')
+            bw_ca.append('5+20')
+
+        if self.bw5_10.get():
+            logger.debug('5+10')
+            bw_ca.append('5+10')
+
+        if self.bw10_10.get():
+            logger.debug('10+10')
+            bw_ca.append('10+10')
+
+        if self.bw10_5.get():
+            logger.debug('10+5')
+            bw_ca.append('10+5')
+
+        if self.bw5_15.get():
+            logger.debug('5+15')
+            bw_ca.append('5+15')
+
+        if self.bw15_5.get():
+            logger.debug('15+5')
+            bw_ca.append('15+5')
+
+        if self.bw40.get():
+            logger.debug('40')
+            bw_ca.append('40')
+
+        if bw_ca == []:
             logger.debug('Nothing to select for Bw')
 
-        logger.info(f'select BW: {self.bw}')
-        return self.bw_ca
+        logger.info(f'select BW_CA: {bw_ca}')
+        return bw_ca
 
     def wanted_tech(self):
-        self.tech = []
+        tech = []
 
         if self.tech_FR1.get():
             logger.debug(self.tech_FR1.get())
-            self.tech.append('FR1')
+            tech.append('FR1')
 
         if self.tech_LTE.get():
             logger.debug(self.tech_LTE.get())
-            self.tech.append('LTE')
+            tech.append('LTE')
 
         if self.tech_WCDMA.get():
             logger.debug(self.tech_WCDMA.get())
-            self.tech.append('WCDMA')
+            tech.append('WCDMA')
 
         if self.tech_HSUPA.get():
             logger.debug(self.tech_HSUPA.get())
-            self.tech.append('HSUPA')
+            tech.append('HSUPA')
 
         if self.tech_HSDPA.get():
             logger.debug(self.tech_HSDPA.get())
-            self.tech.append('HSDPA')
+            tech.append('HSDPA')
 
         if self.tech_GSM.get():
             logger.debug(self.tech_GSM.get())
-            self.tech.append('GSM')
+            tech.append('GSM')
 
         if self.tech == []:
             logger.debug('Nothing to select for tech')
 
-        logger.info(f'select tech: {self.tech}')
-        return self.tech
+        logger.info(f'select tech: {tech}')
+        return tech
 
     def off_all_reset_bw(self):
         self.bw1p4.set(False)
@@ -1966,10 +2103,53 @@ class MainApp:
     def off_all_none_LB(self, event=None):
         self.LB_all.set(False)
 
+    def BW_CA_all_state(self):
+        logger.debug(self.BW_CA_all.get())
+        if self.BW_CA_all.get():
+            logger.debug("CA band all are checked")
+            self.bw20_5.set(True)
+            self.bw20_10.set(True)
+            self.bw20_15.set(True)
+            self.bw20_20.set(True)
+            self.bw15_15.set(True)
+            self.bw15_10.set(True)
+            self.bw15_20.set(True)
+            self.bw10_20.set(True)
+            self.bw10_15.set(True)
+            self.bw5_20.set(True)
+            self.bw5_10.set(True)
+            self.bw10_10.set(True)
+            self.bw10_5.set(True)
+            self.bw5_15.set(True)
+            self.bw15_5.set(True)
+            # self.bw40.set(True)
+
+        else:
+            logger.debug("CA band all are unchecked")
+            self.bw20_5.set(False)
+            self.bw20_10.set(False)
+            self.bw20_15.set(False)
+            self.bw20_20.set(False)
+            self.bw15_15.set(False)
+            self.bw15_10.set(False)
+            self.bw15_20.set(False)
+            self.bw10_20.set(False)
+            self.bw10_15.set(False)
+            self.bw5_20.set(False)
+            self.bw5_10.set(False)
+            self.bw10_10.set(False)
+            self.bw10_5.set(False)
+            self.bw5_15.set(False)
+            self.bw15_5.set(False)
+            # self.bw40.set(True)
+
+        self.wanted_bw_ca()
+
+
     def LB_all_state(self):
         logger.debug(self.LB_all.get())
         if self.LB_all.get():
-            logger.debug("LB band all is checked")
+            logger.debug("LB band all are checked")
             self.B5.set(5)
             self.B8.set(8)
             self.B12.set(12)
@@ -1988,7 +2168,7 @@ class MainApp:
             self.B71.set(71)
 
         else:
-            logger.debug("LB band all is unchecked")
+            logger.debug("LB band all are unchecked")
             self.B5.set(0)
             self.B8.set(0)
             self.B12.set(0)
@@ -2011,7 +2191,7 @@ class MainApp:
     def LB_all_state_fr1(self):
         logger.debug(self.LB_all_fr1.get())
         if self.LB_all_fr1.get():
-            logger.debug("LB band all is checked for FR1")
+            logger.debug("LB band all are checked for FR1")
             self.N5.set(5)
             self.N8.set(8)
             self.N12.set(12)
@@ -2027,7 +2207,7 @@ class MainApp:
             self.N71.set(71)
 
         else:
-            logger.debug("LB band all is unchecked for FR1")
+            logger.debug("LB band all are unchecked for FR1")
             self.N5.set(0)
             self.N8.set(0)
             self.N12.set(0)
@@ -2049,7 +2229,7 @@ class MainApp:
 
     def MHB_all_state(self):
         if self.MHB_all.get():
-            logger.debug("MHB band all is checked")
+            logger.debug("MHB band all are checked")
             self.B1.set(1)
             self.B2.set(2)
             self.B25.set(25)
@@ -2064,7 +2244,7 @@ class MainApp:
             self.B41.set(41)
 
         else:
-            logger.debug("MHB band all is unchecked")
+            logger.debug("MHB band all are unchecked")
             self.B1.set(0)
             self.B2.set(0)
             self.B25.set(0)
@@ -2080,10 +2260,36 @@ class MainApp:
 
         self.wanted_band_LTE()
 
+    def MHB_CA_all_state(self):
+        if self.MHB_CA_all.get():
+            logger.debug("MHB_CA band all are checked")
+            self.B1C.set('1C')
+            self.B3C.set('3C')
+            self.B7C.set('7C')
+            self.B66B.set('66B')
+            self.B66C.set('66C')
+            self.B40C.set('40C')
+            self.B38C.set('38C')
+            self.B41C.set('41C')
+
+        else:
+            logger.debug("MHB_CA band all are unchecked")
+            self.B1C.set('')
+            self.B3C.set('')
+            self.B7C.set('')
+            self.B66B.set('')
+            self.B66C.set('')
+            self.B40C.set('')
+            self.B38C.set('')
+            self.B41C.set('')
+
+        self.wanted_band_ca_LTE()
+
+
     def MHB_all_state_fr1(self):
         logger.debug(self.MHB_all_fr1.get())
         if self.MHB_all_fr1.get():
-            logger.debug("MHB band all is checked for FR1")
+            logger.debug("MHB band all are checked for FR1")
             self.N1.set(1)
             self.N2.set(2)
             self.N25.set(25)
@@ -2099,7 +2305,7 @@ class MainApp:
             self.N34.set(34)
 
         else:
-            logger.debug("MHB band all is unchecked for FR1")
+            logger.debug("MHB band all are unchecked for FR1")
             self.N1.set(0)
             self.N2.set(0)
             self.N25.set(0)
@@ -2121,12 +2327,12 @@ class MainApp:
 
     def UHB_all_state(self):
         if self.UHB_all.get():
-            logger.debug("UHB band all is checked")
+            logger.debug("UHB band all are checked")
             self.B48.set(48)
             self.B42.set(42)
 
         else:
-            logger.debug("UHB band all is unchecked")
+            logger.debug("UHB band all are unchecked")
             self.B48.set(0)
             self.B42.set(0)
 
@@ -2630,6 +2836,7 @@ class MainApp:
             ext_pmt.hsupa_bands = self.wanted_band_HSUPA()
             ext_pmt.hsdpa_bands = self.wanted_band_HSDPA()
             ext_pmt.lte_bandwidths = self.wanted_bw()
+            ext_pmt.lte_bandwidths_ca_combo = self.wanted_bw_ca()
             ext_pmt.fr1_bandwidths = self.wanted_bw_fr1()
             ext_pmt.channel = self.wanted_chan()
             ext_pmt.tx_max_pwr_sensitivity = self.wanted_ue_pwr()
@@ -2718,7 +2925,7 @@ class MainApp:
                 from test_scripts.cmw100_items.tx_freq_sweep import TxTestFreqSweep
                 from test_scripts.cmw100_items.tx_1rb_sweep import TxTest1RbSweep
                 from test_scripts.cmw100_items.tx_power_fcc_ce import TxTestFccCe
-                # this is placeholder for tx_ca, tx_ca_cbe
+                # this is placeholder for tx_ca import from
 
                 excel_folder_create()
                 # self.test_pipeline(inst_class_dict)
@@ -2753,10 +2960,14 @@ class MainApp:
                     inst.run()
                     inst.ser.com_close()
 
-                # this is placeholder for tx_ca
+                if self.wanted_test['tx_ca'] and ext_pmt.sa_nsa == 0:
+                    pass
+
 
             elif self.instrument.get() == 'Cmw+Fsw':
                 from test_scripts.harmonics.tx_harmonics import TxHarmonics
+                # this is placeholder for tx_ca_cbe import from
+                # this is placeholder for tx_ca_cbe import from
 
                 excel_folder_create()
                 # self.test_pipeline(inst_class_dict)
@@ -2766,9 +2977,13 @@ class MainApp:
                             inst = TxHarmonics()
                             inst.run()
                             inst.ser.com_close()
+                        elif self.wanted_test['tx_cbe'] and ext_pmt.sa_nsa == 0:
+                            pass
+                    elif scriop == 'CA':
+                        if slef.wanted_test['tx_ca_cbe'] and ext_pmt.sa_nsa == 0:
+                            pass
                     else:
                         pass
-                    # this is placeholder for tx_ca_cbe
 
             # to make the button to normal state
             for button_run in self.button_run_list:
