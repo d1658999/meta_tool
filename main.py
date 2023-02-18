@@ -1628,47 +1628,47 @@ class MainApp:
     def wanted_band_ca_LTE(self):  # checkpoint
         band_ca_lte = []
 
-        if self.B5B.get():
+        if self.B5B.get() == '5B':
             logger.debug(self.B5B.get())
             band_ca_lte.append(self.B5B.get())
 
-        if self.B1C.get():
+        if self.B1C.get() == '1C':
             logger.debug(self.B1C.get())
             band_ca_lte.append(self.B1C.get())
 
-        if self.B3C.get():
+        if self.B3C.get() == '3C':
             logger.debug(self.B3C.get())
             band_ca_lte.append(self.B3C.get())
 
-        if self.B7C.get():
+        if self.B7C.get() == '7C':
             logger.debug(self.B7C.get())
             band_ca_lte.append(self.B7C.get())
 
-        if self.B66B.get():
+        if self.B66B.get() == '66B':
             logger.debug(self.B66B.get())
             band_ca_lte.append(self.B66B.get())
 
-        if self.B66C.get():
+        if self.B66C.get() == '66C':
             logger.debug(self.B66C.get())
             band_ca_lte.append(self.B66C.get())
 
-        if self.B40C.get():
+        if self.B40C.get() == '40C':
             logger.debug(self.B40C.get())
             band_ca_lte.append(self.B40C.get())
 
-        if self.B38C.get():
+        if self.B38C.get() == '38C':
             logger.debug(self.B38C.get())
             band_ca_lte.append(self.B38C.get())
 
-        if self.B41C.get():
+        if self.B41C.get() == '41C':
             logger.debug(self.B41C.get())
             band_ca_lte.append(self.B41C.get())
 
-        if self.B42C.get():
+        if self.B42C.get() == '42C':
             logger.debug(self.B42C.get())
             band_ca_lte.append(self.B42C.get())
 
-        if self.B48C.get():
+        if self.B48C.get() == '48C':
             logger.debug(self.B48C.get())
             band_ca_lte.append(self.B48C.get())
 
@@ -1677,7 +1677,6 @@ class MainApp:
 
         logger.info(f'select LTE_CA band: {band_ca_lte}')
         return band_ca_lte
-
 
     def wanted_band_WCDMA(self):
         self.band_wcdma = []
@@ -1839,7 +1838,6 @@ class MainApp:
         self.wanted_test.setdefault('tx_cbe', False)
         self.wanted_test.setdefault('tx_ca', False)
         self.wanted_test.setdefault('tx_ca_cbe', False)
-
 
         if self.tx.get():
             logger.debug(self.tx.get())
@@ -2145,7 +2143,6 @@ class MainApp:
 
         self.wanted_bw_ca()
 
-
     def LB_all_state(self):
         logger.debug(self.LB_all.get())
         if self.LB_all.get():
@@ -2284,7 +2281,6 @@ class MainApp:
             self.B41C.set('')
 
         self.wanted_band_ca_LTE()
-
 
     def MHB_all_state_fr1(self):
         logger.debug(self.MHB_all_fr1.get())

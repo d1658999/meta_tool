@@ -15411,10 +15411,10 @@ Disable</property>
                     <child>
                       <object class="ttk.Checkbutton" id="checkbutton663">
                         <property name="command" type="command" cbtype="simple">wanted_band_ca_LTE</property>
-                        <property name="onvalue">48</property>
+                        <property name="onvalue">48C</property>
                         <property name="state">disabled</property>
                         <property name="text" translatable="yes">48C</property>
-                        <property name="variable">int:B48C</property>
+                        <property name="variable">string:B48C</property>
                         <bind sequence="&lt;1&gt;" handler="off_all_none_UHB" add="" />
                         <layout manager="grid">
                           <property name="column">0</property>
