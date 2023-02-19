@@ -1184,7 +1184,7 @@ class CMW:
         """
         self.cmw_write(f'CONFigure:LTE:MEASurement:BAND OB{band}')
 
-    def set_cc_bw_lte_cmw(self, carrier_num, bw='5'):
+    def set_cc_bw_lte(self, carrier_num, bw='5'):
         """
         Selects the channel bandwidth of component carrier CC<no>. Without carrier aggrega-
         tion, you can omit <no>.

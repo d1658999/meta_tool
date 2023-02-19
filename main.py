@@ -1625,7 +1625,7 @@ class MainApp:
         logger.info(f'select LTE band: {band_lte}')
         return band_lte
 
-    def wanted_band_ca_LTE(self):  # checkpoint
+    def wanted_band_ca_LTE(self):
         band_ca_lte = []
 
         if self.B5B.get() == '5B':
@@ -2827,6 +2827,7 @@ class MainApp:
             ext_pmt.endc_bands = self.wanted_band_ENDC()
             ext_pmt.fr1_bands = self.wanted_band_FR1()
             ext_pmt.lte_bands = self.wanted_band_LTE()
+            ext_pmt.lte_ca_bands = self.wanted_band_ca_LTE()
             ext_pmt.wcdma_bands = self.wanted_band_WCDMA()
             ext_pmt.gsm_bands = self.wanted_band_GSM()
             ext_pmt.hsupa_bands = self.wanted_band_HSUPA()

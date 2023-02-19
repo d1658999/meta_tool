@@ -20,6 +20,7 @@ class TxTestCa(AtCmd, CMW100):
         AtCmd.__init__(self)
         CMW100.__init__(self)
         self.band_cc1_channel_lte = None
+        self.band_cc2_channel_lte = None
         self.bw_cc2 = None
         self.bw_cc1 = None
         self.combo_list = None
@@ -39,25 +40,25 @@ class TxTestCa(AtCmd, CMW100):
     #     self.bw_cc1_lte = int(bw_cc1)
     #     self.bw_cc2_lte = int(bw_cc2)
 
-    def set_rb_location(self, cc1_rb_size, cc2_rb_size):
+    def set_rb_size(self, cc1_rb_size, cc2_rb_size):
         self.rb_size_cc1_lte = cc1_rb_size
         self.rb_size_cc2_lte = cc2_rb_size
         self.rb_start_cc1_lte = 0
         self.rb_start_cc2_lte = 0
 
     def tx_set_ca_lte(self):
-        self.select_mode_fdd_tdd(self.band_lte)
-        self.set_ca_mode('INTRaband')
-        self.set_band_lte(self.band_lte)
-        self.set_cc_bw_lte_cmw(1, self.bw_cc1)
-        self.set_cc_bw_lte_cmw(2, self.bw_cc2)
-        self.set_cc_channel_lte(1, self.band_cc1_channel_lte)
-        self.set_ca_spacing()
-        self.get_cc2_freq_query()
-        self.get_ca_freq_low_query()
-        self.get_ca_freq_high_query()
-        self.tx_freq_lte = self.get_ca_freq_center_query()
-        self.loss_tx = get_loss(self.tx_freq_lte)
+        # self.select_mode_fdd_tdd(self.band_lte)
+        # self.set_ca_mode('INTRaband')
+        # self.set_band_lte(self.band_lte)
+        # self.set_cc_bw_lte(1, self.bw_cc1)
+        # self.set_cc_bw_lte(2, self.bw_cc2)
+        # self.set_cc_channel_lte(1, self.band_cc1_channel_lte)
+        # self.set_ca_spacing()
+        # self.get_cc2_freq_query()
+        # self.get_ca_freq_low_query()
+        # self.get_ca_freq_high_query()
+        # self.tx_freq_lte = self.get_ca_freq_center_query()
+        # self.loss_tx = get_loss(self.tx_freq_lte)
         self.set_ca_combo_lte()  # this is at command
 
     def tx_power_aclr_ca_process_lte(self):
@@ -91,29 +92,36 @@ class TxTestCa(AtCmd, CMW100):
 
         for tech in ext_pmt.tech:
             for tx_path in ext_pmt.tx_paths:
-                for band in ext_pmt.lte_bands:
+                for band in ext_pmt.lte_ca_bands:  # '7C'
                     self.tech = tech
                     self.tx_path = tx_path
-                    self.band_lte = band
+                    self.band_lte = int(band[0])  # '7C' -> 7
                     self.bw_lte = 10  # for sync
                     self.rx_freq_lte = cm_pmt_ftm.dl_freq_selected('LTE', self.band_lte, self.bw_lte)[1]  # for sync use
                     self.loss_rx = get_loss(self.rx_freq_lte)  # for sync use
                     # [(chan, combo_rb, cc1_rb_size, cc2_rb_size, cc1_chan, cc2_chan), ...]
-                    self.combo_list = ca_combo_load_excel(band)
+                    self.combo_dict = ca_combo_load_excel(band)
 
                     for chan in self.chan:  # L, M, H
                         for combo_bw in ext_pmt.lte_bandwidths_ca_combo:  # bw '20+20'
-                            self.bw_cc1, self.bw_cc2 = combo_bw.split('+')  # '100+100'
-                            combo_rb = f'{int(eval(self.bw_cc1)) * 5}+{int(eval(self.bw_cc2)) * 5}'
+                            self.bw_combo_lte = combo_bw
+                            self.bw_cc1, self.bw_cc2 = combo_bw.split('+')  # 20, 20
+                            combo_rb = f'{int(eval(self.bw_cc1)) * 5}+{int(eval(self.bw_cc2)) * 5}'  # rb_combo '100+100'
                             for mcs in ext_pmt.mcs_lte:
                                 self.mcs_cc1_lte = self.mcs_cc2_lte = mcs
-                                for d in self.combo_list:  # 'LOW', 'MID', 'HIGH' in combo_list
-                                    if d[0][0] == chan and d[1] == combo_rb:  # this is for judge the combo_rb group
-                                        # self.ca_bw_combo_seperate_lte(d[2], d[3])
-                                        self.set_rb_location(d[2], d[3])  # for set rb_size_cc1/cc2_lte
-                                        self.band_cc1_channel_lte = d[4]
-                                        self.bw_combo_lte = f'{int(d[2] / 5)}+{int(d[3] / 5)}'
-                                        self.tx_power_aclr_ca_process_lte()
+                                for data in self.combo_dict:  # 'LOW', 'MID', 'HIGH' in combo_dict
+                                    # if d[0] == chan and d[1] == combo_rb:  # this is for judge the combo_rb group
+                                    #     self.set_rb_location(d[2], d[3])  # for set rb_size_cc1/cc2_lte
+                                    #     self.band_cc1_channel_lte = d[4]
+                                    #     self.band_cc2_channel_lte = d[5]
+                                    #     self.bw_combo_lte = f'{int(d[2] / 5)}+{int(d[3] / 5)}'
+                                    #     self.tx_power_aclr_ca_process_lte()
+                                    for combo_list in data[chan]:
+                                        if combo_list[0] == combo_rb:
+                                            self.set_rb_size(d[1], d[2])  # for set rb_size_cc1/cc2_lte
+                                            self.band_cc1_channel_lte = d[3]
+                                            self.band_cc2_channel_lte = d[4]
+                                            self.tx_power_aclr_ca_process_lte()
                                     else:
                                         continue
 
