@@ -17,7 +17,7 @@ condition:
   hthv: false
   htlv: false
   hv: false
-  lthv: true
+  lthv: false
   ltlv: false
   lv: false
   mv: false
