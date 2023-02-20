@@ -122,6 +122,9 @@ class TxTestCa(AtCmd, CMW100):
                                             self.band_cc1_channel_lte = d[3]
                                             self.band_cc2_channel_lte = d[4]
                                             self.tx_power_aclr_ca_process_lte()
+                                        else:
+                                            continue
+
                                     else:
                                         continue
 
