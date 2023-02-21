@@ -11,6 +11,7 @@ from utils.excel_handler import txp_aclr_evm_current_plot_ftm, tx_power_relative
 from utils.channel_handler import channel_freq_select
 import utils.parameters.rb_parameters as rb_pmt
 from utils.ca_combo_handler import ca_combo_load_excel
+from utils.parameters.rb_parameters import ULCA_LTE
 
 logger = log_set('tx_lmh')
 
@@ -40,26 +41,28 @@ class TxTestCa(AtCmd, CMW100):
     #     self.bw_cc1_lte = int(bw_cc1)
     #     self.bw_cc2_lte = int(bw_cc2)
 
-    def set_rb_size(self, cc1_rb_size, cc2_rb_size):
-        self.rb_size_cc1_lte = cc1_rb_size
-        self.rb_size_cc2_lte = cc2_rb_size
-        self.rb_start_cc1_lte = 0
-        self.rb_start_cc2_lte = 0
+    def set_rb_allocation(self, cc1, cc2):
+        self.rb_size_cc1_lte, self.rb_start_cc1_lte = cc1
+        self.rb_size_cc2_lte, self.rb_start_cc2_lte = cc2
 
     def tx_set_ca_lte(self):
-        # self.select_mode_fdd_tdd(self.band_lte)
-        # self.set_ca_mode('INTRaband')
-        # self.set_band_lte(self.band_lte)
-        # self.set_cc_bw_lte(1, self.bw_cc1)
-        # self.set_cc_bw_lte(2, self.bw_cc2)
-        # self.set_cc_channel_lte(1, self.band_cc1_channel_lte)
-        # self.set_ca_spacing()
+        # this steps are to set on CMW100 and get center freq and then to give the parameter to AT CMD
+        self.select_mode_fdd_tdd(self.band_lte)
+        self.set_ca_mode('INTRaband')
+        self.set_band_lte(self.band_lte)
+        self.set_cc_bw_lte(1, self.bw_cc1)
+        self.set_cc_bw_lte(2, self.bw_cc2)
+        self.set_cc_channel_lte(1, self.band_cc1_channel_lte)
+        self.set_cc_channel_lte(2, self.band_cc2_channel_lte)
+        self.set_ca_spacing()
         # self.get_cc2_freq_query()
         # self.get_ca_freq_low_query()
         # self.get_ca_freq_high_query()
-        # self.tx_freq_lte = self.get_ca_freq_center_query()
-        # self.loss_tx = get_loss(self.tx_freq_lte)
-        self.set_ca_combo_lte()  # this is at command
+        self.tx_freq_lte = self.get_ca_freq_center_query()
+        self.loss_tx = get_loss(self.tx_freq_lte)
+
+        # this is at command, real to tx set
+        self.set_ca_combo_lte()
 
     def tx_power_aclr_ca_process_lte(self):
         self.set_test_mode_lte()  # modem open by band
@@ -75,20 +78,6 @@ class TxTestCa(AtCmd, CMW100):
         self.port_tx = ext_pmt.port_tx
         self.chan = ext_pmt.channel
         self.rx_level = -70
-        # items = [
-        #     (tech, tx_path, band, bw_combo, mcs)
-        #     for tech in ext_pmt.tech
-        #     for tx_path in ext_pmt.tx_paths
-        #     for band in ext_pmt.lte_bands
-        #     for bw_combo in ext_pmt.lte_bandwidths_ca_combo
-        #     for mcs in ext_pmt.mcs_lte
-        # ]
-        # self.tech = item[0]
-        # self.tx_path = item[1]
-        # self.band_lte = item[2]
-        # self.bw_combo_lte = item[3]
-        # self.mcs_cc1_lte = self.mcs_cc2_lte = item[4]
-        # self.ca_bw_combo_seperate_lte(self.bw_combo_lte)  # to separate bw for cc1 and cc2
 
         for tech in ext_pmt.tech:
             for tx_path in ext_pmt.tx_paths:
@@ -99,7 +88,8 @@ class TxTestCa(AtCmd, CMW100):
                     self.bw_lte = 10  # for sync
                     self.rx_freq_lte = cm_pmt_ftm.dl_freq_selected('LTE', self.band_lte, self.bw_lte)[1]  # for sync use
                     self.loss_rx = get_loss(self.rx_freq_lte)  # for sync use
-                    # [(chan, combo_rb, cc1_rb_size, cc2_rb_size, cc1_chan, cc2_chan), ...]
+
+                    # {chan: combo_rb: (cc1_rb_size, cc2_rb_size, cc1_chan, cc2_chan), ...}
                     self.combo_dict = ca_combo_load_excel(band)
 
                     for chan in self.chan:  # L, M, H
@@ -109,24 +99,21 @@ class TxTestCa(AtCmd, CMW100):
                             combo_rb = f'{int(eval(self.bw_cc1)) * 5}+{int(eval(self.bw_cc2)) * 5}'  # rb_combo '100+100'
                             for mcs in ext_pmt.mcs_lte:
                                 self.mcs_cc1_lte = self.mcs_cc2_lte = mcs
-                                for data in self.combo_dict:  # 'LOW', 'MID', 'HIGH' in combo_dict
-                                    # if d[0] == chan and d[1] == combo_rb:  # this is for judge the combo_rb group
-                                    #     self.set_rb_location(d[2], d[3])  # for set rb_size_cc1/cc2_lte
-                                    #     self.band_cc1_channel_lte = d[4]
-                                    #     self.band_cc2_channel_lte = d[5]
-                                    #     self.bw_combo_lte = f'{int(d[2] / 5)}+{int(d[3] / 5)}'
-                                    #     self.tx_power_aclr_ca_process_lte()
-                                    for combo_list in data[chan]:
-                                        if combo_list[0] == combo_rb:
-                                            self.set_rb_size(d[1], d[2])  # for set rb_size_cc1/cc2_lte
-                                            self.band_cc1_channel_lte = d[3]
-                                            self.band_cc2_channel_lte = d[4]
-                                            self.tx_power_aclr_ca_process_lte()
-                                        else:
-                                            continue
+                                bw_cc1, bw_cc2, chan_cc1, chan_cc2 = self.combo_dict[chan][combo_rb]
+                                self.bw_cc1 = bw_cc1
+                                self.bw_cc2 = bw_cc2
+                                self.band_cc1_channel_lte = chan_cc1
+                                self.band_cc2_channel_lte = chan_cc2
+                                try:
+                                    for cc1, cc2 in ULCA_LTE[combo_rb][mcs]:
+                                        self.set_rb_allocation(cc1, cc2)
+                                        self.tx_power_aclr_ca_process_lte()
+                                except Exception as err:
+                                    logger.debug(err)
+                                    logger.info(f"It might {band} doesn't have this combo {combo_rb}, {mcs}")
 
-                                    else:
-                                        continue
+
+
 
     def run(self):
         self.tx_power_aclr_ca_pipline_lte()
