@@ -88,7 +88,7 @@ class TxTestCa(AtCmd, CMW100):
                 for band in ext_pmt.lte_ca_bands:  # '7C'
                     self.tech = tech
                     self.tx_path = tx_path
-                    self.band_lte = int(band[0])  # '7C' -> 7
+                    self.band_lte = int(band[:-1])  # '7C' -> 7, '41C' -> 41
                     self.bw_lte = 10  # for sync
                     # self.rx_freq_lte = cm_pmt_ftm.dl_freq_selected('LTE', self.band_lte, self.bw_lte)[1]  # for sync use
                     # self.loss_rx = get_loss(self.rx_freq_lte)  # for sync use

@@ -3020,9 +3020,10 @@ class MainApp:
                     inst.ser.com_close()
 
                 if self.wanted_test['tx_ca'] and ext_pmt.sa_nsa == 0:
-                    inst = TxTestCa()
-                    inst.run()
-                    inst.ser.com_close()
+                    if self.script == 'ULCA':
+                        inst = TxTestCa()
+                        inst.run()
+                        inst.ser.com_close()
 
 
             elif self.instrument.get() == 'Cmw+Fsw':
