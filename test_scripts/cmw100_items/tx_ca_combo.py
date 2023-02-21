@@ -45,7 +45,7 @@ class TxTestCa(AtCmd, CMW100):
         self.rb_size_cc1_lte, self.rb_start_cc1_lte = cc1
         self.rb_size_cc2_lte, self.rb_start_cc2_lte = cc2
 
-    def tx_set_ca_lte(self):
+    def set_center_freq_tx_rx_loss(self):
         # this steps are to set on CMW100 and get center freq and then to give the parameter to AT CMD
         self.select_mode_fdd_tdd(self.band_lte)
         self.set_ca_mode('INTRaband')
@@ -59,13 +59,17 @@ class TxTestCa(AtCmd, CMW100):
         # self.get_ca_freq_low_query()
         # self.get_ca_freq_high_query()
         self.tx_freq_lte = self.get_ca_freq_center_query()
+        self.rx_freq_lte = cm_pmt_ftm.transfer_freq_tx2rx_lte(self.band_lte, self.tx_freq_lte)
         self.loss_tx = get_loss(self.tx_freq_lte)
+        self.loss_rx = get_loss(self.rx_freq_lte)
 
+    def tx_set_ca_lte(self):
         # this is at command, real to tx set
         self.set_ca_combo_lte()
 
     def tx_power_aclr_ca_process_lte(self):
         self.set_test_mode_lte()  # modem open by band
+        self.set_center_freq_tx_rx_loss()  # this is to set basic tx/rx/loss
         self.sig_gen_lte()
         self.sync_lte()
         self.tx_set_ca_lte()
@@ -86,8 +90,8 @@ class TxTestCa(AtCmd, CMW100):
                     self.tx_path = tx_path
                     self.band_lte = int(band[0])  # '7C' -> 7
                     self.bw_lte = 10  # for sync
-                    self.rx_freq_lte = cm_pmt_ftm.dl_freq_selected('LTE', self.band_lte, self.bw_lte)[1]  # for sync use
-                    self.loss_rx = get_loss(self.rx_freq_lte)  # for sync use
+                    # self.rx_freq_lte = cm_pmt_ftm.dl_freq_selected('LTE', self.band_lte, self.bw_lte)[1]  # for sync use
+                    # self.loss_rx = get_loss(self.rx_freq_lte)  # for sync use
 
                     # {chan: combo_rb: (cc1_rb_size, cc2_rb_size, cc1_chan, cc2_chan), ...}
                     self.combo_dict = ca_combo_load_excel(band)
@@ -99,9 +103,9 @@ class TxTestCa(AtCmd, CMW100):
                             combo_rb = f'{int(eval(self.bw_cc1)) * 5}+{int(eval(self.bw_cc2)) * 5}'  # rb_combo '100+100'
                             for mcs in ext_pmt.mcs_lte:
                                 self.mcs_cc1_lte = self.mcs_cc2_lte = mcs
-                                bw_cc1, bw_cc2, chan_cc1, chan_cc2 = self.combo_dict[chan][combo_rb]
-                                self.bw_cc1 = bw_cc1
-                                self.bw_cc2 = bw_cc2
+                                bw_rb_cc1, bw_rb_cc2, chan_cc1, chan_cc2 = self.combo_dict[chan][combo_rb]
+                                self.bw_rb_cc1 = bw_rb_cc1
+                                self.bw_rb_cc2 = bw_rb_cc2
                                 self.band_cc1_channel_lte = chan_cc1
                                 self.band_cc2_channel_lte = chan_cc2
                                 try:
@@ -109,7 +113,7 @@ class TxTestCa(AtCmd, CMW100):
                                         self.set_rb_allocation(cc1, cc2)
                                         self.tx_power_aclr_ca_process_lte()
                                 except Exception as err:
-                                    logger.debug(err)
+                                    logger.info(err)
                                     logger.info(f"It might {band} doesn't have this combo {combo_rb}, {mcs}")
 
 

@@ -836,6 +836,30 @@ class MainApp:
             elif band_lte == 71:
                 self.B71.set(band_lte)
 
+        for band_ca_lte in ui_init['band']['bands_ca_lte']:
+            if band_ca_lte == '5B':
+                self.B5B.set('5B')
+            elif band_ca_lte == '1C':
+                self.B1C.set('1C')
+            elif band_ca_lte == '3C':
+                self.B3C.set('3C')
+            elif band_ca_lte == '7C':
+                self.B7C.set('7C')
+            elif band_ca_lte == '66B':
+                self.B66B.set('66B')
+            elif band_ca_lte == '66C':
+                self.B66C.set('66C')
+            elif band_ca_lte == '40C':
+                self.B40C.set('40C')
+            elif band_ca_lte == '38C':
+                self.B38C.set('38C')
+            elif band_ca_lte == '41C':
+                self.B41C.set('41C')
+            elif band_ca_lte == '42C':
+                self.B42C.set('42C')
+            elif band_ca_lte == '48C':
+                self.B48C.set('48C')
+
         for band_wcdma in ui_init['band']['bands_wcdma']:
             if band_wcdma == 1:
                 self.W1.set(band_wcdma)
@@ -952,6 +976,40 @@ class MainApp:
             elif bw == "15+5":
                 self.bw15_5.set(True)
             elif bw == "40":
+                self.bw40.set(True)
+
+        for bw_ca in ui_init['bw']['bw_ca_lte']:
+            if bw_ca == '20+5':
+                self.bw20_5.set(True)
+            elif bw_ca == '20+10':
+                self.bw20_10.set(True)
+            elif bw_ca == '20+15':
+                self.bw20_15.set(True)
+            elif bw_ca == '20+20':
+                self.bw20_20.set(True)
+            elif bw_ca == '15+15':
+                self.bw15_15.set(True)
+            elif bw_ca == '15+10':
+                self.bw15_10.set(True)
+            elif bw_ca == '15+20':
+                self.bw15_20.set(True)
+            elif bw_ca == '10+20':
+                self.bw10_20.set(True)
+            elif bw_ca == '10+15':
+                self.bw10_15.set(True)
+            elif bw_ca == '5+20':
+                self.bw5_20.set(True)
+            elif bw_ca == '5+10':
+                self.bw5_10.set(True)
+            elif bw_ca == '10+10':
+                self.bw10_10.set(True)
+            elif bw_ca == '10+5':
+                self.bw10_5.set(True)
+            elif bw_ca == '5+15':
+                self.bw5_15.set(True)
+            elif bw_ca == '15+5':
+                self.bw15_5.set(True)
+            elif bw_ca == '40':
                 self.bw40.set(True)
 
         for bw in ui_init['bw']['bw_fr1']:
@@ -1098,9 +1156,11 @@ class MainApp:
         tech = self.wanted_tech()
         bw_lte = self.wanted_bw()
         bw_fr1 = self.wanted_bw_fr1()
+        bw_ca_lte = self.wanted_bw_ca()
         ue_power = self.wanted_ue_pwr()
         bands_fr1 = self.wanted_band_FR1()
         bands_lte = self.wanted_band_LTE()
+        bands_ca_lte = self.wanted_band_ca_LTE()
         bands_wcdma = self.wanted_band_WCDMA()
         bands_hsupa = self.wanted_band_HSUPA()
         bands_hsdpa = self.wanted_band_HSDPA()
@@ -1190,6 +1250,7 @@ class MainApp:
             'band': {
                 'bands_fr1': bands_fr1,
                 'bands_lte': bands_lte,
+                'bands_ca_lte': bands_ca_lte,
                 'bands_wcdma': bands_wcdma,
                 'bands_hsupa': bands_hsupa,
                 'bands_hsdpa': bands_hsdpa,
@@ -1201,6 +1262,7 @@ class MainApp:
             'bw': {
                 'bw_fr1': bw_fr1,
                 'bw_lte': bw_lte,
+                'bw_ca': bw_ca_lte,
             },
             'power': {
                 'lb_gsm_pcl': pcl_lb_gsm,
@@ -2922,7 +2984,7 @@ class MainApp:
                 from test_scripts.cmw100_items.tx_freq_sweep import TxTestFreqSweep
                 from test_scripts.cmw100_items.tx_1rb_sweep import TxTest1RbSweep
                 from test_scripts.cmw100_items.tx_power_fcc_ce import TxTestFccCe
-                # this is placeholder for tx_ca import from
+                from test_scripts.cmw100_items.tx_ca_combo import TxTestCa
 
                 excel_folder_create()
                 # self.test_pipeline(inst_class_dict)
@@ -2958,7 +3020,9 @@ class MainApp:
                     inst.ser.com_close()
 
                 if self.wanted_test['tx_ca'] and ext_pmt.sa_nsa == 0:
-                    pass
+                    inst = TxTestCa()
+                    inst.run()
+                    inst.ser.com_close()
 
 
             elif self.instrument.get() == 'Cmw+Fsw':

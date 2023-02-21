@@ -1,6 +1,7 @@
 band:
   band_segment: A
   band_segment_fr1: A
+  bands_ca_lte: []
   bands_endc: []
   bands_fr1: []
   bands_gsm: []
@@ -9,6 +10,7 @@ band:
   bands_lte: []
   bands_wcdma: []
 bw:
+  bw_ca: []
   bw_fr1: []
   bw_lte: []
 channel:
@@ -28,7 +30,7 @@ external_inst:
   psu: false
   record_current: false
   tempchb: false
-  wait_time: 300
+  wait_time: 0
 instrument:
   instrument: Cmw100
 mcs:
@@ -60,7 +62,7 @@ rx_set:
   ue_power: []
 scripts:
   scripts: []
-tab: 0
+tab: 7
 tech:
   tech: []
 test_items:

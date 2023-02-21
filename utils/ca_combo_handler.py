@@ -3,8 +3,8 @@ from pathlib import Path
 
 
 FILE_NAME = 'CA_36508.xlsx'
-# FILE_PATH = Path.cwd() / Path('utils') / Path('parameters') / Path(FILE_NAME)  # formal use
-FILE_PATH = Path.cwd() / Path('parameters') / Path(FILE_NAME)  # test use
+FILE_PATH = Path.cwd() / Path('utils') / Path('parameters') / Path(FILE_NAME)  # formal use
+# FILE_PATH = Path.cwd().parents[1] / Path('utils') / Path('parameters') / Path(FILE_NAME)  # test use
 
 
 def ca_combo_load_excel(band, file_path=FILE_PATH):

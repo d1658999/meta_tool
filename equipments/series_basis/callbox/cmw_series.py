@@ -3442,6 +3442,7 @@ class CMW:
         Queries the center frequency of the aggregated bandwidth.
         Return values:
         <FrequencyLow> Default unit: Hz
+        return unit: kHz
         """
         freq_str = self.cmw_query(f'CONFigure:LTE:MEASurement:CAGGregation:FREQuency:AGGRegated:CENTer?')
         freq_int = int(eval(freq_str) / 1000)
