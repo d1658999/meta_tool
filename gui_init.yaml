@@ -1,7 +1,8 @@
 band:
   band_segment: A
   band_segment_fr1: A
-  bands_ca_lte: []
+  bands_ca_lte:
+  - 41C
   bands_endc: []
   bands_fr1: []
   bands_gsm: []
@@ -10,11 +11,26 @@ band:
   bands_lte: []
   bands_wcdma: []
 bw:
-  bw_ca_lte: []
+  bw_ca_lte:
+  - 20+5
+  - 20+10
+  - 20+15
+  - 20+20
+  - 15+15
+  - 15+10
+  - 15+20
+  - 10+20
+  - 10+15
+  - 5+20
+  - 5+10
+  - 10+10
+  - 10+5
+  - 5+15
+  - 15+5
   bw_fr1: []
   bw_lte: []
 channel:
-  chan: ''
+  chan: L
 condition:
   hthv: false
   htlv: false
@@ -35,17 +51,22 @@ instrument:
   instrument: Cmw100
 mcs:
   mcs_fr1: []
-  mcs_lte: []
+  mcs_lte:
+  - QPSK
+  - Q16
+  - Q64
+  - Q256
   modulaiton_gsm: GMSK
 path:
   asw_path: 0
-  asw_path_enable: false
+  asw_path_enable: true
   rx_paths: []
   sa_nsa: 0
   srs_path: 0
   srs_path_enable: false
   sync_path: Main
-  tx_paths: []
+  tx_paths:
+  - TX1
 port:
   port_tx: 1
   port_tx_fr1: 1
@@ -61,17 +82,19 @@ rb_set:
 rx_set:
   ue_power: []
 scripts:
-  scripts: []
+  scripts:
+  - ULCA
 tab: 7
 tech:
-  tech: []
+  tech:
+  - LTE
 test_items:
   rx: false
   rx_freq_sweep: false
   rx_quick_enable: false
   tx: false
   tx_1rb_sweep: false
-  tx_ca: false
+  tx_ca: true
   tx_ca_cbe: false
   tx_cbe: false
   tx_freq_sweep: false

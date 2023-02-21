@@ -1262,7 +1262,7 @@ class MainApp:
             'bw': {
                 'bw_fr1': bw_fr1,
                 'bw_lte': bw_lte,
-                'bw_ca': bw_ca_lte,
+                'bw_ca_lte': bw_ca_lte,
             },
             'power': {
                 'lb_gsm_pcl': pcl_lb_gsm,
