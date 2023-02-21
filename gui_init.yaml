@@ -10,7 +10,7 @@ band:
   bands_lte: []
   bands_wcdma: []
 bw:
-  bw_ca: []
+  bw_ca_lte: []
   bw_fr1: []
   bw_lte: []
 channel:
