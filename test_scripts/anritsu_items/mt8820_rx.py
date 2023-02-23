@@ -149,7 +149,7 @@ class RxTestGenre(AtCmd, Anritsu8820):
                                         ch_list = channel_freq_select(ext_pmt.channel, band_ch_list)
 
                                         # this is used for the handover smoothly by Mch when calling
-                                        self.m_dl_ch = ch_list[1]
+                                        self.m_dl_ch = band_ch_list[1]
                                         self.set_dl_chan(self.m_dl_ch)
 
                                         logger.debug(f'Test Channel List: {band}, {bw}MHZ, '

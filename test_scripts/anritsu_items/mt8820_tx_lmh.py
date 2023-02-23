@@ -120,7 +120,7 @@ class TxTestGenre(AtCmd, Anritsu8820):
                             self.set_test_parameter_normal()
                             dl_chan_list = cm_pmt_anritsu.dl_ch_selected(standard, band, bw)
                             ch_list = channel_freq_select(ext_pmt.channel, dl_chan_list)
-                            self.m_dl_ch = ch_list[1]  # this is used for the handover smoothly by Mch when calling
+                            self.m_dl_ch = dl_chan_list[1]  # this is used for the handover smoothly by Mch when calling
                             self.set_dl_chan(self.m_dl_ch)
                             logger.debug(f'Test Channel List: {band}, {bw}MHZ, downlink channel list:{ch_list}')
                             for dl_ch in ch_list:
