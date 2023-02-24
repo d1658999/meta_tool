@@ -20,7 +20,7 @@ def ca_combo_load_excel(band, file_path=FILE_PATH):
     chan_ca_combo_dict.setdefault('L', {})
     chan_ca_combo_dict.setdefault('M', {})
     chan_ca_combo_dict.setdefault('H', {})
-    if band in [38, 39, 40, 41, 42, 48, 46, ]:
+    if band in ['38C', '39C', '40C', '41C', '42C', '48C', ]:
         for row in range(3, max_row):
             chan = ws.cell(row, 1).value
             combo = ws.cell(row, 2).value

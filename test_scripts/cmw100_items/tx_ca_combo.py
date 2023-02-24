@@ -60,6 +60,7 @@ class TxTestCa(AtCmd, CMW100):
         # self.get_ca_freq_high_query()
         self.tx_freq_lte = self.get_ca_freq_center_query()
         self.rx_freq_lte = cm_pmt_ftm.transfer_freq_tx2rx_lte(self.band_lte, self.tx_freq_lte)
+        self.rx_freq_lte = int(self.rx_freq_lte / 100) * 100  # this is for sync use due to problem with detailed freq
         self.loss_tx = get_loss(self.tx_freq_lte)
         self.loss_rx = get_loss(self.rx_freq_lte)
 
@@ -102,18 +103,19 @@ class TxTestCa(AtCmd, CMW100):
                             self.bw_cc1, self.bw_cc2 = combo_bw.split('+')  # 20, 20
                             combo_rb = f'{int(eval(self.bw_cc1)) * 5}+{int(eval(self.bw_cc2)) * 5}'  # rb_combo '100+100'
                             for mcs in ext_pmt.mcs_lte:
-                                self.mcs_cc1_lte = self.mcs_cc2_lte = mcs
-                                bw_rb_cc1, bw_rb_cc2, chan_cc1, chan_cc2 = self.combo_dict[chan][combo_rb]
-                                self.bw_rb_cc1 = bw_rb_cc1
-                                self.bw_rb_cc2 = bw_rb_cc2
-                                self.band_cc1_channel_lte = chan_cc1
-                                self.band_cc2_channel_lte = chan_cc2
                                 try:
+                                    self.mcs_cc1_lte = self.mcs_cc2_lte = mcs
+                                    bw_rb_cc1, bw_rb_cc2, chan_cc1, chan_cc2 = self.combo_dict[chan][combo_rb]
+                                    self.bw_rb_cc1 = bw_rb_cc1
+                                    self.bw_rb_cc2 = bw_rb_cc2
+                                    self.band_cc1_channel_lte = chan_cc1
+                                    self.band_cc2_channel_lte = chan_cc2
+
                                     for cc1, cc2 in ULCA_LTE[combo_rb][mcs]:
                                         self.set_rb_allocation(cc1, cc2)
                                         self.tx_power_aclr_ca_process_lte()
                                 except Exception as err:
-                                    logger.info(err)
+                                    logger.info(f'Exception message: {err}')
                                     logger.info(f"It might {band} doesn't have this combo {combo_rb}, {mcs}")
 
 
