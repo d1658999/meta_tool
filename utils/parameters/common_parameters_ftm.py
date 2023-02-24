@@ -2,37 +2,37 @@
 def bandwidths_selected_fr1(band):
     band = int(band)
     bandwidths = {
-        'N1': [5, 10, 15, 20, 25, 40, 50, ],  # remove 30
+        'N1': [5, 10, 15, 20, ],  # remove 30
         'N2': [5, 10, 15, 20, ],
-        'N3': [5, 10, 15, 20, 25, 40, ],  # remove 30
+        'N3': [5, 10, 15, 20, 25, 30, 40, ],  # remove 30
         'N5': [5, 10, 15, 20, ],
-        'N7': [5, 10, 15, 20, 25, 40, 50, ],  # remove 30
+        'N7': [5, 10, 15, 20, 25, 30, 40, 50, ],  # remove 30
         'N8': [5, 10, 15, 20, ],
         'N12': [5, 10, 15, ],
         'N13': [5, 10, ],
         'N14': [5, 10, ],
-        'N18': [5, 10, 15],
+        'N18': [5, 10, 15, ],
         'N20': [5, 10, 15, 20, ],
         'N24': [5, 10, ],
-        'N25': [5, 10, 15, 20, ],
-        'N26': [5, 10, 15, 20],
-        'N28': [5, 10, 15, 20],
-        'N29': [5, 10],
-        'N30': [5, 10],
+        'N25': [5, 10, 15, 20, 30, 40, ],
+        'N26': [5, 10, 15, 20, 25, 30, ],
+        'N28': [5, 10, 15, 20, ],
+        'N29': [5, 10, ],
+        'N30': [5, 10, ],
         'N34': [5, 10, 15, ],
-        'N38': [10, 15, 20, 25, 40, ],
+        'N38': [10, 15, 20, ],
         'N39': [10, 15, 20, 25, 40, ],
-        'N40': [10, 15, 20, 25, 40, 50, 60, 80, ],
-        'N41': [10, 15, 20, 40, 50, 60, 80, 100, ],
-        'N48': [10, 15, 20, 40, 50, 60, 70, 80, 90, 100, ],
+        'N40': [10, 15, 20, 25, 40, 50, 60, 80, 100, ],
+        'N41': [10, 15, 20, 30, 40, 50, 60, 80, 90, 100, 70, ],
+        'N48': [10, 15, 20, 40, 50, 60, 80, 90, 100, ],
         'N66': [5, 10, 15, 20, 25, 30, 40, ],
         'N70': [5, 10, 15, 20, 25, ],
         'N71': [5, 10, 15, 20, ],
         'N75': [5, 10, 15, 20, 25, 30, 40, 50, ],
         'N76': [5, 10, ],
-        'N77': [10, 15, 20, 25, 40, 50, 60, 70, 80, 90, 100, ],
-        'N78': [10, 15, 20, 25, 40, 50, 60, 70, 80, 90, 100, ],
-        'N79': [10, 20, 40, 50, 60, 80, 90, 100, ],
+        'N77': [10, 15, 20, 25, 40, 50, 60, 80, 90, 100, 70, ],
+        'N78': [10, 15, 20, 25, 40, 50, 60, 80, 90, 100, 70, ],
+        'N79': [10, 20, 40, 50, 60, 80, 100, ],
     }
 
     return bandwidths[f'N{band}']
@@ -1070,6 +1070,8 @@ def special_uplink_config_sensitivity_fr1(band, scs, bw):
                 return 128, 0
             elif bw == 60:
                 return 162, 0
+            elif bw == 70:
+                return 180, 0
             elif bw == 80:
                 return 216, 0
             elif bw == 90:
@@ -1126,6 +1128,8 @@ def special_uplink_config_sensitivity_fr1(band, scs, bw):
                 return 128, 0
             elif bw == 60:
                 return 162, 0
+            elif bw == 70:
+                return 180, 0
             elif bw == 80:
                 return 216, 0
             elif bw == 90:
@@ -1147,6 +1151,8 @@ def special_uplink_config_sensitivity_fr1(band, scs, bw):
                 return 64, 0
             elif bw == 60:
                 return 75, 0
+            elif bw == 70:
+                return 90, 0
             elif bw == 80:
                 return 100, 0
             elif bw == 90:
@@ -1375,6 +1381,8 @@ def special_uplink_config_sensitivity_fr1(band, scs, bw):
                 return 128, 0
             elif bw == 60:
                 return 162, 0
+            elif bw == 70:
+                return 180, 0
             elif bw == 80:
                 return 216, 0
             elif bw == 90:
@@ -1396,6 +1404,8 @@ def special_uplink_config_sensitivity_fr1(band, scs, bw):
                 return 64, 0
             elif bw == 60:
                 return 75, 0
+            elif bw == 70:
+                return 90, 0
             elif bw == 80:
                 return 100, 0
             elif bw == 90:
@@ -1431,6 +1441,8 @@ def special_uplink_config_sensitivity_fr1(band, scs, bw):
                 return 128, 0
             elif bw == 60:
                 return 162, 0
+            elif bw == 70:
+                return 180, 0
             elif bw == 80:
                 return 216, 0
             elif bw == 90:
@@ -1452,6 +1464,8 @@ def special_uplink_config_sensitivity_fr1(band, scs, bw):
                 return 64, 0
             elif bw == 60:
                 return 75, 0
+            elif bw == 70:
+                return 90, 0
             elif bw == 80:
                 return 100, 0
             elif bw == 90:
@@ -1475,6 +1489,8 @@ def special_uplink_config_sensitivity_fr1(band, scs, bw):
                 return 128, 0
             elif bw == 60:
                 return 162, 0
+            elif bw == 70:
+                return 180, 0
             elif bw == 80:
                 return 216, 0
             elif bw == 90:
