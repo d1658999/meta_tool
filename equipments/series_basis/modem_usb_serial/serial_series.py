@@ -453,7 +453,7 @@ class AtCmd:
         elif self.asw_on_off == 1:
             logger.info('Antenna Switch ON')
 
-    def antenna_switch_v2(self, asw_en=ext_pmt.asw_path_enable):
+    def antenna_switch_v2(self):
         """
         this is to place on the first to activate
         AT+ANTSWSEL=P0,P1	//Set Tx DPDT switch
@@ -463,6 +463,7 @@ class AtCmd:
         tech:
         ant_path:
         """
+        asw_en = ext_pmt.asw_path_enable
         if asw_en:
             self.asw_tech = self.tech
             logger.info('---------Antenna Switch----------')
@@ -711,7 +712,7 @@ class AtCmd:
     def set_chan_request_lte(self):
         self.command(f'AT+LTXCHNSDREQ')
 
-    def set_ca_combo_lte(self):
+    def set_ulca_combo_lte(self):
         bw_ca_index = {
             '20+5': 6,
             '20+10': 7,

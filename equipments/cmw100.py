@@ -582,7 +582,7 @@ class CMW100(CMW):
         logger.debug(aclr_results + mod_results)
         return aclr_results + mod_results  # U_-2, U_-1, NR_-1, Pwr, NR_+1, U_+1, U_+2, EVM, Freq_Err, IQ_OFFSET
 
-    def tx_measure_ca_lte(self):
+    def tx_measure_ulca_lte(self):
         # measurement like tx measure button
         self.set_mcs_lte(self.mcs_cc1_lte)
         self.set_type_cyclic_prefix_lte('NORM')
@@ -611,12 +611,14 @@ class CMW100(CMW):
         self.set_rf_tx_port_lte(self.port_tx)
         self.cmw_query('*OPC?')
         self.set_select_carrier('CC1')
-        self.get_modulation_avgerage_lte()
+        mod_results_cc1 = self.get_modulation_avgerage_lte()
         self.set_select_carrier('CC2')
-        self.get_modulation_avgerage_lte()
+        mod_results_cc2 = self.get_modulation_avgerage_lte()
         self.set_measure_start_on_lte()
         self.cmw_query('*OPC?')
-        self.get_aclr_average_lte()
+        aclr_results_2cc = self.get_aclr_average_lte()
+
+        return aclr_results_2cc + mod_results_cc1 + mod_results_cc2
 
     def tx_measure_lte(self):
         logger.info('---------Tx Measure----------')

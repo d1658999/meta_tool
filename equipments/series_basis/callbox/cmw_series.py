@@ -1205,7 +1205,7 @@ class CMW:
         B200: 20 MHz
         *RST:  B200
         """
-        bw10 = f'0{int(bw * 10)}' if eval(bw) < 10 else f'{int(eval(bw) * 10)}'
+        bw10 = f'0{int(eval(bw) * 10)}' if eval(bw) < 10 else f'{int(eval(bw) * 10)}'
         self.cmw_write(f'CONFigure:LTE:MEASurement:CC{carrier_num}:CBANdwidth B{bw10}')
 
     def set_cc_channel_lte(self, carrier_num, channel=19300):

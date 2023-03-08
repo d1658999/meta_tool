@@ -2984,7 +2984,7 @@ class MainApp:
             from test_scripts.cmw100_items.tx_freq_sweep import TxTestFreqSweep
             from test_scripts.cmw100_items.tx_1rb_sweep import TxTest1RbSweep
             from test_scripts.cmw100_items.tx_power_fcc_ce import TxTestFccCe
-            from test_scripts.cmw100_items.tx_ca_combo import TxTestCa
+            from test_scripts.cmw100_items.tx_ulca_combo import TxTestCa
 
             excel_folder_create()
             # self.test_pipeline(inst_class_dict)

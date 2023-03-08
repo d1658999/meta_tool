@@ -13,7 +13,7 @@ import utils.parameters.rb_parameters as rb_pmt
 from utils.ca_combo_handler import ca_combo_load_excel
 from utils.parameters.rb_parameters import ULCA_LTE
 
-logger = log_set('tx_lmh')
+logger = log_set('tx_ulca_lmh')
 
 
 class TxTestCa(AtCmd, CMW100):
@@ -64,31 +64,65 @@ class TxTestCa(AtCmd, CMW100):
         self.loss_tx = get_loss(self.tx_freq_lte)
         self.loss_rx = get_loss(self.rx_freq_lte)
 
-    def tx_set_ca_lte(self):
+    def tx_set_ulca_lte(self):
         # this is at command, real to tx set
-        self.set_ca_combo_lte()
+        self.set_ulca_combo_lte()
 
-    def tx_power_aclr_ca_process_lte(self):
+    def tx_power_aclr_ulca_process_lte(self):
         self.set_test_mode_lte()  # modem open by band
+        self.antenna_switch_v2()
         self.set_center_freq_tx_rx_loss()  # this is to set basic tx/rx/loss
         self.sig_gen_lte()
         self.sync_lte()
-        self.tx_set_ca_lte()
-        self.tx_measure_ca_lte()
+        self.tx_set_ulca_lte()
+        ulca_combo = [
+            self.band_ulca_lte, self.chan_lmh,
+            self.bw_cc1, self.bw_cc2, self.band_cc1_channel_lte, self.band_cc2_channel_lte,
+            ]
+        ulca_rb_setting = [
+            self.rb_size_cc1_lte, self.rb_start_cc1_lte,
+            self.rb_size_cc2_lte, self.rb_start_cc2_lte,
+        ]
+
+        mcs_path_setting = [self.mcs_cc1_lte, self.tx_path, self.sync_path, self.asw_srs_path]
+
+        # [6 items] + [U_-2, U_-1, E_-1, Pwr, E_+1, U_+1, U_+2] + [Power, EVM, Freq_Err, IQ]*2 + [4 items] +
+        # path_setting(4 items)
+        # total 29
+        ulca_results = ulca_combo + self.tx_measure_ulca_lte() + ulca_rb_setting + mcs_path_setting
+
+        # export to excel holder
+
+        logger.debug(ulca_results)
+
         self.set_test_end_lte()
 
-    def tx_power_aclr_ca_pipline_lte(self):
+    def tx_power_aclr_ulca_pipline_lte(self):
         self.preset_instrument()
         self.set_test_end_lte()
         self.port_tx = ext_pmt.port_tx
         self.chan = ext_pmt.channel
         self.rx_level = -70
 
-        for tech in ext_pmt.tech:
-            for tx_path in ext_pmt.tx_paths:
+        # this is for now only 'LTE'
+        if ext_pmt.tech:
+            tech_list = ['LTE']
+        else:
+            tech_list = []
+
+        for tech in tech_list:
+            # this is for now only 'TX1'
+            if 'TX2' in ext_pmt.tx_paths:
+                tx_path_list = ext_pmt.tx_paths
+                tx_path_list.remove('TX2')
+            else:
+                tx_path_list = ext_pmt.tx_paths
+
+            for tx_path in tx_path_list:
                 for band in ext_pmt.lte_ca_bands:  # '7C'
                     self.tech = tech
                     self.tx_path = tx_path
+                    self.band_ulca_lte = band  # '7C'
                     self.band_lte = int(band[:-1])  # '7C' -> 7, '41C' -> 41
                     self.bw_lte = 10  # for sync
                     # self.rx_freq_lte = cm_pmt_ftm.dl_freq_selected('LTE', self.band_lte, self.bw_lte)[1]  # for sync use
@@ -98,6 +132,7 @@ class TxTestCa(AtCmd, CMW100):
                     self.combo_dict = ca_combo_load_excel(band)
 
                     for chan in self.chan:  # L, M, H
+                        self.chan_lmh = chan
                         for combo_bw in ext_pmt.lte_bandwidths_ca_combo:  # bw '20+20'
                             self.bw_combo_lte = combo_bw
                             self.bw_cc1, self.bw_cc2 = combo_bw.split('+')  # 20, 20
@@ -113,17 +148,15 @@ class TxTestCa(AtCmd, CMW100):
 
                                     for cc1, cc2 in ULCA_LTE[combo_rb][mcs]:
                                         self.set_rb_allocation(cc1, cc2)
-                                        self.tx_power_aclr_ca_process_lte()
+                                        self.tx_power_aclr_ulca_process_lte()
                                 except Exception as err:
                                     logger.info(f'Exception message: {err}')
                                     logger.info(f"It might {band} doesn't have this combo {combo_rb}, {mcs}")
 
-
-
-
     def run(self):
-        self.tx_power_aclr_ca_pipline_lte()
-
+        for tech in ext_pmt.tech:
+            if tech == 'LTE':
+                self.tx_power_aclr_ulca_pipline_lte()
 
 def main():
     test = TxTestCa()
