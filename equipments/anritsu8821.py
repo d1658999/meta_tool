@@ -357,8 +357,9 @@ class Anritsu8821(Anritsu):
             # logger.info('START CALL')
             # self.inst.write('CALLSA')
             logger.info('Connected')
-            time.sleep(1)
             conn_state = int(self.get_calling_state_query())
+            time.sleep(1)
+
 
     def set_registration_calling_wcdma(self):
         """
