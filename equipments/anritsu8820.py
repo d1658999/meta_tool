@@ -328,6 +328,7 @@ class Anritsu8820(Anritsu):
         self.set_lvl_status('ON')
         self.set_test_mode()
         conn_state = int(self.get_calling_state_query())
+        self.anritsu_query('*OPC?')
         while conn_state != cm_pmt_anritsu.ANRITSU_CONNECTED:  # this is for waiting connection
             self.set_calling_clear()
             while conn_state == cm_pmt_anritsu.ANRITSU_IDLE:
@@ -347,6 +348,7 @@ class Anritsu8820(Anritsu):
             # self.inst.write('CALLSA')
             logger.info('Connected')
             time.sleep(1)
+            conn_state = int(self.get_calling_state_query())
 
     def set_registration_calling_wcdma(self):
         """
