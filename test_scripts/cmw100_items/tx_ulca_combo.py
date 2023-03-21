@@ -12,6 +12,7 @@ from utils.channel_handler import channel_freq_select
 import utils.parameters.rb_parameters as rb_pmt
 from utils.ca_combo_handler import ca_combo_load_excel
 from utils.parameters.rb_parameters import ULCA_LTE
+from utils.excel_handler import tx_ulca_power_relative_test_export_excel_ftm
 
 logger = log_set('tx_ulca_lmh')
 
@@ -75,23 +76,30 @@ class TxTestCa(AtCmd, CMW100):
         self.sig_gen_lte()
         self.sync_lte()
         self.tx_set_ulca_lte()
+
+        # ulca combo info
         ulca_combo = [
             self.band_ulca_lte, self.chan_lmh,
             self.bw_cc1, self.bw_cc2, self.band_cc1_channel_lte, self.band_cc2_channel_lte,
             ]
+
+        # ulca rb setting info
         ulca_rb_setting = [
             self.rb_size_cc1_lte, self.rb_start_cc1_lte,
             self.rb_size_cc2_lte, self.rb_start_cc2_lte,
         ]
 
+        # mcs and path setting info
         mcs_path_setting = [self.mcs_cc1_lte, self.tx_path, self.sync_path, self.asw_srs_path]
 
-        # [6 items] + [U_-2, U_-1, E_-1, Pwr, E_+1, U_+1, U_+2] + [Power, EVM, Freq_Err, IQ]*2 + [4 items] +
+        # [6 items] + [U_-2, U_-1, E_-1, Pwr, E_+1, U_+1, U_+2] + [Power, EVM, Freq_Err, IQ]*2 + [4 items] + \
         # path_setting(4 items)
-        # total 29
+        # total 29 information
         ulca_results = ulca_combo + self.tx_measure_ulca_lte() + ulca_rb_setting + mcs_path_setting
+        logger.debug(ulca_results)
 
-        # export to excel holder
+        # export to excel
+        tx_ulca_power_relative_test_export_excel_ftm(self.tech, ulca_results)
 
         logger.debug(ulca_results)
 

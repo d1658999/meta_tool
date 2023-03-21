@@ -1,5 +1,5 @@
 lte_bands = [3]  # 1,2,3,4,7,25,66,38,39,40,41,5,8,12,13,14,17,18,19,20,28,71,42,48
-lte_ca_bands = ['3C']  # '1C', '3C', '7C', '41C'
+lte_ca_bands = ['7C']  # '1C', '3C', '7C', '41C'
 wcdma_bands = [5,8]
 gsm_bands = [900, 850]  # 900, 1800, 1900, 850
 hsupa_bands = [1]
@@ -45,6 +45,7 @@ record_current_enable = False
 psu_enable = True
 psu_voltage = 4.0
 psu_current = 5.0
+vol_typ = 3.85
 current_count = 1
 temp = 25
 srs_path_enable = False

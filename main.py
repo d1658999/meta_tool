@@ -18,7 +18,7 @@ from equipments.temp_chamber import TempChamber
 logger = log_set('GUI')
 
 PROJECT_PATH = pathlib.Path(__file__).parent
-PROJECT_UI = PROJECT_PATH / pathlib.Path('gui') / "main_v2_12.ui"
+PROJECT_UI = PROJECT_PATH / pathlib.Path('gui') / "main_v2_13.ui"
 
 
 class MainApp:
@@ -294,6 +294,15 @@ class MainApp:
         self.freq_sweep_start = None
         self.freq_sweep_stop = None
         self.tpchb = None
+        self.ht_arg = None
+        self.nt_arg = None
+        self.lt_arg = None
+        self.hv_arg = None
+        self.nv_arg = None
+        self.lv_arg = None
+        self.vol_typ = None
+        self.tx_level_start = None
+        self.tx_level_stop = None
         builder.import_variables(
             self,
             [
@@ -544,6 +553,14 @@ class MainApp:
                 "freq_sweep_step",
                 "freq_sweep_start",
                 "freq_sweep_stop",
+                "ht_arg",
+                "nt_arg",
+                "lt_arg",
+                "hv_arg",
+                "nv_arg",
+                "lv_arg",
+                "tx_level_start",
+                "tx_level_stop",
             ],
         )
 
@@ -571,14 +588,14 @@ class MainApp:
         start = datetime.datetime.now()
 
         temp_dict = {
-            'HT': 55,
-            'NT': 25,
-            'LT': -10,
+            'HT': int(self.ht_arg.get()),
+            'NT': int(self.nt_arg.get()),
+            'LT': int(self.lt_arg.get()),
         }
         volts_dict = {
-            'HV': 4.4,
-            'NV': 3.85,
-            'LV': 3.6,
+            'HV': float(self.hv_arg.get()),
+            'NV': float(self.nv_arg.get()),
+            'LV': float(self.lv_arg.get()),
         }
         if self.tempcham_enable.get():  # with temp chamber and PSU
             self.tpchb = TempChamber()
@@ -587,6 +604,7 @@ class MainApp:
                 self.condition = temp_volt  # HVHV, HTLV, NVNV, LTHV, LVLV
                 temp = temp_dict[temp_volt[:2]]
                 volt = volts_dict[temp_volt[2:]]
+                self.vol_typ = volt
                 wait = self.wait_time.get()
                 self.tpchb.tpchb_init(temp, wait)
                 self.psu.psu_init(volt)
@@ -596,9 +614,11 @@ class MainApp:
             for volt in self.want_temp_psu_combination():
                 self.condition = volt  # HV, NV, LV
                 self.psu.psu_init(volts_dict[volt])
+                self.vol_typ = volts_dict[volt]
                 self.measure()
         else:  # wtih anything
             self.condition = None
+            self.vol_typ = 3.85
             self.measure()
 
         stop = datetime.datetime.now()
@@ -2935,6 +2955,9 @@ class MainApp:
         ext_pmt.freq_sweep_step = self.freq_sweep_step.get()
         ext_pmt.freq_sweep_start = self.freq_sweep_start.get()
         ext_pmt.freq_sweep_stop = self.freq_sweep_stop.get()
+        ext_pmt.vol_typ = self.vol_typ
+        ext_pmt.tx_level_range_list[0] = self.tx_level_start.get()
+        ext_pmt.tx_level_range_list[1] = self.tx_level_stop.get()
 
         if self.instrument.get() == 'Anritsu8820':
             from test_scripts.anritsu_items.mt8820_tx_lmh import TxTestGenre
