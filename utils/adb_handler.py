@@ -22,7 +22,6 @@ def record_current(count=10):
     cpu3_rail = 5
     time = 1
     vol_typ = ext_pmt.vol_typ
-    print(vol_typ)
     avg_count = count
     while True:
         rffe_ma_lst = []
