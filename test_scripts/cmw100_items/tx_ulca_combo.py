@@ -124,8 +124,8 @@ class TxTestCa(AtCmd, CMW100):
         # mcs and path setting info
         mcs_path_setting = [self.mcs_cc1_lte, self.tx_path, self.sync_path, self.asw_srs_path]
 
-        # [6 items] + [U_-2, U_-1, E_-1, Pwr, E_+1, U_+1, U_+2] + [Power, EVM, Freq_Err, IQ]*2 + [4 items] + \
-        # path_setting(4 items)
+        # [6 items] + [OBW, sem_pwr] + [U_-2, U_-1, E_-1, Pwr, E_+1, U_+1, U_+2] + [Power, EVM, Freq_Err, IQ]*2 + \
+        # [4 items] + path_setting(4 items)
         # total 29 information
         ulca_results = ulca_combo + self.tx_measure_ulca_lte() + ulca_rb_setting + mcs_path_setting
         logger.debug(ulca_results)

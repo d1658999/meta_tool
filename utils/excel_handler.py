@@ -211,8 +211,8 @@ def tx_power_fcc_ce_export_excel_ftm(data, parameters_dict):
 def tx_ulca_power_relative_test_export_excel_ftm(tech, data, sub_info):
     """
     input data:
-    [6 items] + [U_-2, U_-1, E_-1, Pwr, E_+1, U_+1, U_+2] + [Power, EVM, Freq_Err, IQ]*2 + [4 items] + \
-    path_setting(4 items)
+    [6 items] + [OBW, sem_pwr]+ [U_-2, U_-1, E_-1, Pwr, E_+1, U_+1, U_+2] + [Power, EVM, Freq_Err, IQ]*2 +
+    [4 items] + path_setting(4 items)
     total 29 information
     """
     logger.info('----------save to excel----------')
@@ -255,35 +255,37 @@ def tx_ulca_power_relative_test_export_excel_ftm(tech, data, sub_info):
                     ws['E1'] = 'CC2_BW'
                     ws['F1'] = 'CC1_chan'
                     ws['G1'] = 'CC2_chan'
-                    ws['H1'] = 'Carrier Power'
-                    ws['I1'] = 'E_-1'
-                    ws['J1'] = 'E_+1'
-                    ws['K1'] = 'U_-1'
-                    ws['L1'] = 'U_+1'
-                    ws['M1'] = 'U_-2'
-                    ws['N1'] = 'U_+2'
-                    ws['O1'] = 'CC1_PWR'
-                    ws['P1'] = 'CC1_EVM'
-                    ws['Q1'] = 'CC1_Freq_Err'
-                    ws['R1'] = 'CC1_IQ_OFFSET'
-                    ws['S1'] = 'CC2_PWR'
-                    ws['T1'] = 'CC2_EVM'
-                    ws['U1'] = 'CC2_Freq_Err'
-                    ws['V1'] = 'CC2_IQ_OFFSET'
-                    ws['W1'] = 'CC1_RB_num'
-                    ws['X1'] = 'CC1_RB_start'
-                    ws['Y1'] = 'CC2_RB_num'
-                    ws['Z1'] = 'CC2_RB_start'
-                    ws['AA1'] = 'MCS'
-                    ws['AB1'] = 'Tx_Path'
-                    ws['AC1'] = 'CC1_RB_STATE'
-                    ws['AD1'] = 'CC2_RB_STATE'
-                    ws['AE1'] = 'Sync_Path'
-                    ws['AF1'] = 'AS_Path'
-                    ws['AG1'] = 'Current(mA)'
-                    ws['AH1'] = 'Condition'
-                    ws['AI1'] = 'Temp0'
-                    ws['AJ1'] = 'Temp1'
+                    ws['H1'] = 'OBW(MHz)'
+                    ws['I1'] = 'SEM Power'
+                    ws['J1'] = 'Carrier Power'
+                    ws['K1'] = 'E_-1'
+                    ws['L1'] = 'E_+1'
+                    ws['M1'] = 'U_-1'
+                    ws['N1'] = 'U_+1'
+                    ws['O1'] = 'U_-2'
+                    ws['P1'] = 'U_+2'
+                    ws['Q1'] = 'CC1_PWR'
+                    ws['R1'] = 'CC1_EVM'
+                    ws['S1'] = 'CC1_Freq_Err'
+                    ws['T1'] = 'CC1_IQ_OFFSET'
+                    ws['U1'] = 'CC2_PWR'
+                    ws['V1'] = 'CC2_EVM'
+                    ws['W1'] = 'CC2_Freq_Err'
+                    ws['X1'] = 'CC2_IQ_OFFSET'
+                    ws['Y1'] = 'CC1_RB_num'
+                    ws['Z1'] = 'CC1_RB_start'
+                    ws['AA1'] = 'CC2_RB_num'
+                    ws['AB1'] = 'CC2_RB_start'
+                    ws['AC1'] = 'MCS'
+                    ws['AD1'] = 'Tx_Path'
+                    ws['AE1'] = 'CC1_RB_STATE'
+                    ws['AF1'] = 'CC2_RB_STATE'
+                    ws['AG1'] = 'Sync_Path'
+                    ws['AH1'] = 'AS_Path'
+                    ws['AI1'] = 'Current(mA)'
+                    ws['AJ1'] = 'Condition'
+                    ws['AK1'] = 'Temp0'
+                    ws['AL1'] = 'Temp1'
 
                 else:  # to pass the dashboard
                     pass
@@ -342,7 +344,7 @@ def tx_ulca_power_relative_test_export_excel_ftm(tech, data, sub_info):
     wb = openpyxl.load_workbook(file_path)
     ws = None
     if tech == 'LTE':
-        mcs = data[25]
+        mcs = data[27]
         ws = wb[f'Raw_Data_{mcs}']
     # elif tech == 'FR1':  this is not use for ULCA
     #     ws = wb[f'Raw_Data_{mcs}']
@@ -358,40 +360,37 @@ def tx_ulca_power_relative_test_export_excel_ftm(tech, data, sub_info):
         ws.cell(row, 5).value = data[3]   # cc2_bw
         ws.cell(row, 6).value = data[4]   # cc1_channel
         ws.cell(row, 7).value = data[5]   # cc2_channel
-        ws.cell(row, 8).value = data[9]   # carrier power
-        ws.cell(row, 9).value = data[8]   # E_-1
-        ws.cell(row, 10).value = data[10]   # E_+1
-        ws.cell(row, 11).value = data[7]  # U_-1
-        ws.cell(row, 12).value = data[11]  # U_+1
-        ws.cell(row, 13).value = data[6]  # U_-2
-        ws.cell(row, 14).value = data[12]  # U_+2
-        ws.cell(row, 15).value = data[16]  # cc1_pwr
-        ws.cell(row, 16).value = data[13]  # cc1_evm
-        ws.cell(row, 17).value = data[14]  # cc1_freq_err
-        ws.cell(row, 18).value = data[15]  # cc1_iq
-        ws.cell(row, 19).value = data[20]  # cc2_pwr
-        ws.cell(row, 20).value = data[17]  # cc2_evm
-        ws.cell(row, 21).value = data[18]  # cc2_freq_err
-        ws.cell(row, 22).value = data[19]  # cc2_iq
-        ws.cell(row, 23).value = data[21]  # cc1_rb_num
-        ws.cell(row, 24).value = data[22]  # cc1_rb_start
-        ws.cell(row, 25).value = data[23]  # cc2_rb_num
-        ws.cell(row, 26).value = data[24]  # cc2_iq
-        ws.cell(row, 27).value = data[25]  # mcs
-        ws.cell(row, 28).value = data[26]  # tx_path
-        ws.cell(row, 29).value = sub_info['cc1_alloc']   # cc1_rb_state
-        ws.cell(row, 30).value = sub_info['cc2_alloc']   # cc2_rb_state
-        ws.cell(row, 31).value = data[27]  # Sync_Path
-        ws.cell(row, 32).value = data[28]  # AS_Path
-        ws.cell(row, 33).value = None      # Current(mA)
-        ws.cell(row, 34).value = None      # Condition
-        ws.cell(row, 35).value = sub_info['temp0']      # Temp0
-        ws.cell(row, 36).value = sub_info['temp1']      # Temp1
-
-
-
-
-
+        ws.cell(row, 8).value = data[6] / 1000000   # OBW
+        ws.cell(row, 9).value = data[7]   # sem power
+        ws.cell(row, 10).value = data[11]   # carrier power
+        ws.cell(row, 11).value = data[10]   # E_-1
+        ws.cell(row, 12).value = data[12]   # E_+1
+        ws.cell(row, 13).value = data[9]    # U_-1
+        ws.cell(row, 14).value = data[13]   # U_+1
+        ws.cell(row, 15).value = data[8]    # U_-2
+        ws.cell(row, 16).value = data[14]  # U_+2
+        ws.cell(row, 17).value = data[18]  # cc1_pwr
+        ws.cell(row, 18).value = data[15]  # cc1_evm
+        ws.cell(row, 19).value = data[16]  # cc1_freq_err
+        ws.cell(row, 20).value = data[17]  # cc1_iq
+        ws.cell(row, 21).value = data[22]  # cc2_pwr
+        ws.cell(row, 22).value = data[19]  # cc2_evm
+        ws.cell(row, 23).value = data[20]  # cc2_freq_err
+        ws.cell(row, 24).value = data[21]  # cc2_iq
+        ws.cell(row, 25).value = data[23]  # cc1_rb_num
+        ws.cell(row, 26).value = data[24]  # cc1_rb_start
+        ws.cell(row, 27).value = data[25]  # cc2_rb_num
+        ws.cell(row, 28).value = data[26]  # cc2_iq
+        ws.cell(row, 29).value = data[27]  # mcs
+        ws.cell(row, 30).value = data[28]  # tx_path
+        ws.cell(row, 31).value = sub_info['cc1_alloc']   # cc1_rb_state
+        ws.cell(row, 32).value = sub_info['cc2_alloc']   # cc2_rb_state
+        ws.cell(row, 33).value = data[29]  # Sync_Path
+        ws.cell(row, 34).value = data[30]  # AS_Path
+        ws.cell(row, 35).value = None      # Current(mA)
+        ws.cell(row, 36).value = None      # Condition
+        ws.cell(row, 37).value = sub_info['temp0']      # Temp0
+        ws.cell(row, 38).value = sub_info['temp1']      # Temp1
 
     # elif tech == 'FR1':  # this is not for FR1
     #     max_row = ws.max_row

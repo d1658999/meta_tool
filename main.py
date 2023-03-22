@@ -3116,27 +3116,27 @@ class MainApp:
                         inst.run(script)
                         inst.ser.com_close()
 
-            if self.wanted_test['rx']:
+            if self.wanted_test['rx'] and 'GENERAL' in ext_pmt.scripts:
                 inst = RxTestGenre()
                 inst.run()
                 inst.ser.com_close()
 
-            if self.wanted_test['tx_level_sweep'] and ext_pmt.sa_nsa == 0:
+            if self.wanted_test['tx_level_sweep'] and ext_pmt.sa_nsa == 0 and 'GENERAL' in ext_pmt.scripts:
                 inst = TxTestLevelSweep()
                 inst.run()
                 inst.ser.com_close()
 
-            if self.wanted_test['tx_freq_sweep'] and ext_pmt.sa_nsa == 0:
+            if self.wanted_test['tx_freq_sweep'] and ext_pmt.sa_nsa == 0 and 'GENERAL' in ext_pmt.scripts:
                 inst = TxTestFreqSweep()
                 inst.run()
                 inst.ser.com_close()
 
-            if self.wanted_test['tx_1rb_sweep'] and ext_pmt.sa_nsa == 0:
+            if self.wanted_test['tx_1rb_sweep'] and ext_pmt.sa_nsa == 0 and 'GENERAL' in ext_pmt.scripts:
                 inst = TxTest1RbSweep()
                 inst.run()
                 inst.ser.com_close()
 
-            if self.wanted_test['tx_ca'] and ext_pmt.sa_nsa == 0:
+            if self.wanted_test['tx_ca'] and ext_pmt.sa_nsa == 0 and 'ULCA' in ext_pmt.scripts:
                 # for script in ext_pmt.scripts:
                 # if script == 'ULCA':
                 if self.ulca.get():

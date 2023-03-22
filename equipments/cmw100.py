@@ -617,8 +617,10 @@ class CMW100(CMW):
         self.set_measure_start_on_lte()
         self.cmw_query('*OPC?')
         aclr_results_2cc = self.get_aclr_average_lte()
+        sem_result_2cc = self.get_sem_average_query_lte().split(',')[-2:]
+        sem_result_2cc = [eval(r) for r in sem_result_2cc]
 
-        return aclr_results_2cc + mod_results_cc1 + mod_results_cc2
+        return sem_result_2cc + aclr_results_2cc + mod_results_cc1 + mod_results_cc2
 
     def tx_measure_lte(self):
         logger.info('---------Tx Measure----------')
