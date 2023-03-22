@@ -1,6 +1,8 @@
 band:
   band_segment: A
   band_segment_fr1: A
+  bands_ca_lte:
+  - 41C
   bands_endc: []
   bands_fr1: []
   bands_gsm: []
@@ -9,6 +11,7 @@ band:
   bands_lte: []
   bands_wcdma: []
 bw:
+  bw_ca_lte: []
   bw_fr1: []
   bw_lte: []
 channel:
@@ -22,15 +25,17 @@ condition:
   lv: false
   mv: false
   ntnv: false
+criteria:
+  ulca_lte: 0
 external_inst:
   count: 10
   odpm: false
   psu: false
   record_current: false
   tempchb: false
-  wait_time: 300
+  wait_time: 0
 instrument:
-  instrument: Cmw+Fsw
+  instrument: Cmw100
 mcs:
   mcs_fr1: []
   mcs_lte: []
@@ -56,11 +61,12 @@ power:
 rb_set:
   rb_ftm_fr1: []
   rb_ftm_lte: []
+  rb_ftm_ulca_lte: []
 rx_set:
   ue_power: []
 scripts:
   scripts: []
-tab: 6
+tab: 0
 tech:
   tech: []
 test_items:
@@ -69,6 +75,9 @@ test_items:
   rx_quick_enable: false
   tx: false
   tx_1rb_sweep: false
+  tx_ca: false
+  tx_ca_cbe: false
+  tx_cbe: false
   tx_freq_sweep: false
   tx_harmonics: false
   tx_level_sweep: false

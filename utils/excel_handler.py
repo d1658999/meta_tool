@@ -208,6 +208,234 @@ def tx_power_fcc_ce_export_excel_ftm(data, parameters_dict):
     wb.close()
     return file_path
 
+def tx_ulca_power_relative_test_export_excel_ftm(tech, data, sub_info):
+    """
+    input data:
+    [6 items] + [U_-2, U_-1, E_-1, Pwr, E_+1, U_+1, U_+2] + [Power, EVM, Freq_Err, IQ]*2 + [4 items] + \
+    path_setting(4 items)
+    total 29 information
+    """
+    logger.info('----------save to excel----------')
+
+    # filename choosen
+    if ext_pmt.part_number == "":
+        filename = f'Tx_ulca_{tech}.xlsx'
+    else:
+        filename = f'Tx_ulca_{tech}_{ext_pmt.part_number}.xlsx'
+
+    # file path by combinating the path and filename
+    file_path = Path(excel_folder_path()) / Path(filename)
+
+    if Path(file_path).exists() is False:
+        logger.info('----------file does not exist----------')
+        wb = openpyxl.Workbook()
+        wb.remove(wb['Sheet'])
+        # to create sheet
+        if tech == 'LTE':
+            # create dashboard
+            for _ in ['QPSK', 'Q16', 'Q64', 'Q256']:  # some cmw100 might not have licesnse of Q256
+                wb.create_sheet(f'Dashboard_{_}')
+                # wb.create_sheet(f'Dashboard_{_}_PRB')
+                # wb.create_sheet(f'Dashboard_{_}_FRB')
+
+            # create the Raw data sheets
+            for _ in ['QPSK', 'Q16', 'Q64', 'Q256']:  # some cmw100 might not have licesnse of Q256
+                wb.create_sheet(f'Raw_Data_{_}')
+                # wb.create_sheet(f'Raw_Data_{_}_PRB')
+                # wb.create_sheet(f'Raw_Data_{_}_FRB')
+
+            # create the title for every sheets
+            for sheetname in wb.sheetnames:
+                if 'Raw_Data' in sheetname:
+                    ws = wb[sheetname]
+                    ws['A1'] = 'Band'
+                    ws['B1'] = 'Chan_LMH'
+                    ws['C1'] = 'Tx_level'
+                    ws['D1'] = 'CC1_BW'
+                    ws['E1'] = 'CC2_BW'
+                    ws['F1'] = 'CC1_chan'
+                    ws['G1'] = 'CC2_chan'
+                    ws['H1'] = 'Carrier Power'
+                    ws['I1'] = 'E_-1'
+                    ws['J1'] = 'E_+1'
+                    ws['K1'] = 'U_-1'
+                    ws['L1'] = 'U_+1'
+                    ws['M1'] = 'U_-2'
+                    ws['N1'] = 'U_+2'
+                    ws['O1'] = 'CC1_PWR'
+                    ws['P1'] = 'CC1_EVM'
+                    ws['Q1'] = 'CC1_Freq_Err'
+                    ws['R1'] = 'CC1_IQ_OFFSET'
+                    ws['S1'] = 'CC2_PWR'
+                    ws['T1'] = 'CC2_EVM'
+                    ws['U1'] = 'CC2_Freq_Err'
+                    ws['V1'] = 'CC2_IQ_OFFSET'
+                    ws['W1'] = 'CC1_RB_num'
+                    ws['X1'] = 'CC1_RB_start'
+                    ws['Y1'] = 'CC2_RB_num'
+                    ws['Z1'] = 'CC2_RB_start'
+                    ws['AA1'] = 'MCS'
+                    ws['AB1'] = 'Tx_Path'
+                    ws['AC1'] = 'CC1_RB_STATE'
+                    ws['AD1'] = 'CC2_RB_STATE'
+                    ws['AE1'] = 'Sync_Path'
+                    ws['AF1'] = 'AS_Path'
+                    ws['AG1'] = 'Current(mA)'
+                    ws['AH1'] = 'Condition'
+                    ws['AI1'] = 'Temp0'
+                    ws['AJ1'] = 'Temp1'
+
+                else:  # to pass the dashboard
+                    pass
+
+        # elif tech == 'FR1':  # this is not used for ulca
+        #     # create dashboard
+        #     for _ in ['QPSK', 'Q16', 'Q64', 'Q256', 'BPSK']:  # some cmw100 might not have licesnse of Q256
+        #         wb.create_sheet(f'Dashboard_{_}')
+        #
+        #     # create the Raw data sheets
+        #     for _ in ['QPSK', 'Q16', 'Q64', 'Q256', 'BPSK']:  # some cmw100 might not have licesnse of Q256
+        #         wb.create_sheet(f'Raw_Data_{_}')
+        #
+        #     # create the title for every sheets
+        #     for sheetname in wb.sheetnames:
+        #         if 'Raw_Data' in sheetname:
+        #             ws = wb[sheetname]
+        #             ws['A1'] = 'Band'
+        #             ws['B1'] = 'BW'
+        #             ws['C1'] = 'Tx_Freq'
+        #             ws['D1'] = 'Chan'
+        #             ws['E1'] = 'Tx_level'
+        #             ws['F1'] = 'Measured_Power'
+        #             ws['G1'] = 'E_-1'
+        #             ws['H1'] = 'E_+1'
+        #             ws['I1'] = 'U_-1'
+        #             ws['J1'] = 'U_+1'
+        #             ws['K1'] = 'U_-2'
+        #             ws['L1'] = 'U_+2'
+        #             ws['M1'] = 'EVM'
+        #             ws['N1'] = 'Freq_Err'
+        #             ws['O1'] = 'IQ_OFFSET'
+        #             ws['P1'] = 'RB_num'
+        #             ws['Q1'] = 'RB_start'
+        #             ws['R1'] = 'MCS'
+        #             ws['S1'] = 'Type'
+        #             ws['T1'] = 'Tx_Path'
+        #             ws['U1'] = 'SCS(KHz)'
+        #             ws['V1'] = 'RB_STATE'
+        #             ws['W1'] = 'Sync_Path'
+        #             ws['X1'] = 'AS_SRS_Path'
+        #             ws['Y1'] = 'Current(mA)'
+        #             ws['Z1'] = 'Condition'
+        #             ws['AA1'] = 'Temp0'
+        #             ws['AB1'] = 'Temp1'
+        #             ws['AC1'] = '2f0' if test_item == 'harmonics' else None
+        #             ws['AD1'] = '3f0' if test_item == 'harmonics' else None
+        #         else:  # to pass the dashboard
+        #             pass
+
+        # save and close file
+        wb.save(file_path)
+        wb.close()
+
+    logger.info('----------file exist----------')
+    wb = openpyxl.load_workbook(file_path)
+    ws = None
+    if tech == 'LTE':
+        mcs = data[25]
+        ws = wb[f'Raw_Data_{mcs}']
+    # elif tech == 'FR1':  this is not use for ULCA
+    #     ws = wb[f'Raw_Data_{mcs}']
+
+    if tech == 'LTE':
+        max_row = ws.max_row
+        row = max_row + 1
+
+        ws.cell(row, 1).value = data[0]   # band
+        ws.cell(row, 2).value = data[1]   # chan_lmh
+        ws.cell(row, 3).value = ext_pmt.tx_level  # Tx_level
+        ws.cell(row, 4).value = data[2]   # cc1_bw
+        ws.cell(row, 5).value = data[3]   # cc2_bw
+        ws.cell(row, 6).value = data[4]   # cc1_channel
+        ws.cell(row, 7).value = data[5]   # cc2_channel
+        ws.cell(row, 8).value = data[9]   # carrier power
+        ws.cell(row, 9).value = data[8]   # E_-1
+        ws.cell(row, 10).value = data[10]   # E_+1
+        ws.cell(row, 11).value = data[7]  # U_-1
+        ws.cell(row, 12).value = data[11]  # U_+1
+        ws.cell(row, 13).value = data[6]  # U_-2
+        ws.cell(row, 14).value = data[12]  # U_+2
+        ws.cell(row, 15).value = data[16]  # cc1_pwr
+        ws.cell(row, 16).value = data[13]  # cc1_evm
+        ws.cell(row, 17).value = data[14]  # cc1_freq_err
+        ws.cell(row, 18).value = data[15]  # cc1_iq
+        ws.cell(row, 19).value = data[20]  # cc2_pwr
+        ws.cell(row, 20).value = data[17]  # cc2_evm
+        ws.cell(row, 21).value = data[18]  # cc2_freq_err
+        ws.cell(row, 22).value = data[19]  # cc2_iq
+        ws.cell(row, 23).value = data[21]  # cc1_rb_num
+        ws.cell(row, 24).value = data[22]  # cc1_rb_start
+        ws.cell(row, 25).value = data[23]  # cc2_rb_num
+        ws.cell(row, 26).value = data[24]  # cc2_iq
+        ws.cell(row, 27).value = data[25]  # mcs
+        ws.cell(row, 28).value = data[26]  # tx_path
+        ws.cell(row, 29).value = sub_info['cc1_alloc']   # cc1_rb_state
+        ws.cell(row, 30).value = sub_info['cc2_alloc']   # cc2_rb_state
+        ws.cell(row, 31).value = data[27]  # Sync_Path
+        ws.cell(row, 32).value = data[28]  # AS_Path
+        ws.cell(row, 33).value = None      # Current(mA)
+        ws.cell(row, 34).value = None      # Condition
+        ws.cell(row, 35).value = sub_info['temp0']      # Temp0
+        ws.cell(row, 36).value = sub_info['temp1']      # Temp1
+
+
+
+
+
+
+    # elif tech == 'FR1':  # this is not for FR1
+    #     max_row = ws.max_row
+    #     row = max_row + 1
+    #
+    #     for tx_freq, measured_data in data.items():
+    #         chan = chan_judge_fr1(band, bw, tx_freq) if test_item != 'freq_sweep' else None
+    #         ws.cell(row, 1).value = band
+    #         ws.cell(row, 2).value = bw
+    #         ws.cell(row, 3).value = tx_freq
+    #         ws.cell(row, 4).value = chan  # LMH
+    #         ws.cell(row, 5).value = tx_freq_level  # this tx_level
+    #         ws.cell(row, 6).value = measured_data[3]
+    #         ws.cell(row, 7).value = measured_data[2]
+    #         ws.cell(row, 8).value = measured_data[4]
+    #         ws.cell(row, 9).value = measured_data[1]
+    #         ws.cell(row, 10).value = measured_data[5]
+    #         ws.cell(row, 11).value = measured_data[0]
+    #         ws.cell(row, 12).value = measured_data[6]
+    #         ws.cell(row, 13).value = measured_data[7]
+    #         ws.cell(row, 14).value = measured_data[8]
+    #         ws.cell(row, 15).value = measured_data[9]
+    #         ws.cell(row, 16).value = rb_size
+    #         ws.cell(row, 17).value = rb_start
+    #         ws.cell(row, 18).value = mcs
+    #         ws.cell(row, 19).value = type_
+    #         ws.cell(row, 20).value = tx_path
+    #         ws.cell(row, 21).value = scs
+    #         ws.cell(row, 22).value = rb_state
+    #         ws.cell(row, 23).value = sync_path
+    #         ws.cell(row, 24).value = asw_srs_path
+    #         ws.cell(row, 25).value = measured_data[10] if test_item == 'lmh' else None
+    #         ws.cell(row, 26).value = ext_pmt.condition if test_item == 'lmh' else None
+    #         ws.cell(row, 27).value = measured_data[11] if test_item == 'lmh' else None
+    #         ws.cell(row, 28).value = measured_data[12] if test_item == 'lmh' else None
+    #         ws.cell(row, 29).value = measured_data[13][1] if test_item == 'harmonics' else None  # 2f0
+    #         ws.cell(row, 30).value = measured_data[14][1] if test_item == 'harmonics' else None  # 3f0
+    #         row += 1
+
+    wb.save(file_path)
+    wb.close()
+
+    return file_path
+
 
 def tx_power_relative_test_export_excel_ftm(data, parameters_dict):
     """
