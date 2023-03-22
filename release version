@@ -1,3 +1,7 @@
+release v2.13:
+1. add ULCA for LTE nonsignaling, but this is used to debug use because the MPR cannot work for some band(38/41)
+2. add the entry of voltage and temperature
+3. fix some bugs
 release v2.11:
 add freq sweep start and stop, add temp chamber off button
 release v2.10:
