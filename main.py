@@ -50,6 +50,7 @@ class MainApp:
         self.cse = None
         self.ulca = None
         self.sa_nsa = None
+        self.criteria_ulca_lte = None
         self.port_tx = None
         self.port_tx_lte = None
         self.port_tx_fr1 = None
@@ -303,6 +304,12 @@ class MainApp:
         self.vol_typ = None
         self.tx_level_start = None
         self.tx_level_stop = None
+        self.one_rb0_null = None
+        self.prb_null = None
+        self.frb_null = None
+        self.frb_frb = None
+        self.one_rb0_one_rbmax = None
+        self.one_rbmax_one_rb0 = None
         builder.import_variables(
             self,
             [
@@ -311,6 +318,7 @@ class MainApp:
                 "cse",
                 "ulca",
                 "sa_nsa",
+                "criteria_ulca_lte",
                 "port_tx",
                 "port_tx_lte",
                 "port_tx_fr1",
@@ -561,6 +569,12 @@ class MainApp:
                 "lv_arg",
                 "tx_level_start",
                 "tx_level_stop",
+                "one_rb0_null",
+                "prb_null",
+                "frb_null",
+                "frb_frb",
+                "one_rb0_one_rbmax",
+                "one_rbmax_one_rb0",
             ],
         )
 
@@ -584,8 +598,26 @@ class MainApp:
         print('Crtrl C')
         os.kill(signal.CTRL_C_EVENT, 0)
 
+    def fool_proof_vol(self):
+        vol_cap = 4.5
+        logger.info('check the voltage setting')
+
+        if float(self.hv_arg.get()) >= vol_cap:
+            self.hv_arg.set(vol_cap)
+            logger.info(f'HV is limited on {vol_cap}')
+
+        if float(self.nv_arg.get()) >= vol_cap:
+            self.nv_arg.set(vol_cap)
+            logger.info(f'NV is limited on {vol_cap}')
+
+        if float(self.hv_arg.get()) >= vol_cap:
+            self.lv_arg.set(vol_cap)
+            logger.info(f'LV is limited on {vol_cap}')
+
     def mega_measure(self):
         start = datetime.datetime.now()
+
+        self.fool_proof_vol()  # this is to avoid of mistake voltage higher than vol_cap
 
         temp_dict = {
             'HT': int(self.ht_arg.get()),
@@ -671,6 +703,7 @@ class MainApp:
         self.rx_quick_enable.set(ui_init['test_items']['rx_quick_enable'])
         self.sync_path.set(ui_init['path']['sync_path'])
         self.sa_nsa.set(ui_init['path']['sa_nsa'])
+        self.criteria_ulca_lte.set(ui_init['criteria']['ulca_lte'])
         self.pcl_lb.set(ui_init['power']['lb_gsm_pcl'])
         self.pcl_mb.set(ui_init['power']['mb_gsm_pcl'])
         self.mod_gsm.set(ui_init['mcs']['modulaiton_gsm'])
@@ -1102,6 +1135,20 @@ class MainApp:
             elif rb_ftm == '1RB_0':
                 self.one_rb0_lte.set(True)
 
+        for rb_ftm in ui_init['rb_set']['rb_ftm_ulca_lte']:
+            if rb_ftm == '1RB_N':
+                self.one_rb0_null.set(True)
+            elif rb_ftm == 'PRB_N':
+                self.prb_null.set(True)
+            elif rb_ftm == 'FRB_0':
+                self.frb_null.set(True)
+            elif rb_ftm == 'FRB_FRB':
+                self.frb_frb.set(True)
+            elif rb_ftm == '1RB0_1RBmax':
+                self.one_rb0_one_rbmax.set(True)
+            elif rb_ftm == '1RBmax_1RB0':
+                self.one_rbmax_one_rb0.set(True)
+
         for rb_ftm in ui_init['rb_set']['rb_ftm_fr1']:
             if rb_ftm == 'INNER_FULL':
                 self.inner_full_fr1.set(True)
@@ -1191,6 +1238,7 @@ class MainApp:
         mcs_lte = self.wanted_mcs_lte()
         mcs_fr1 = self.wanted_mcs_fr1()
         rb_ftm_lte = self.wanted_ftm_rb_lte()
+        rb_ftm_ulca_lte = self.wanted_ftm_rb_ulca_lte()
         rb_ftm_fr1 = self.wanted_ftm_rb_fr1()
         tx_paths = self.wanted_tx_path()
         rx_paths = self.wanted_rx_path()
@@ -1207,6 +1255,7 @@ class MainApp:
         port_tx_lte = self.port_tx_lte.get()
         port_tx_fr1 = self.port_tx_fr1.get()
         sa_nsa = self.sa_nsa.get()
+        critera_ulca_lte = self.criteria_ulca_lte.get()
         asw_path = self.asw_path.get()
         srs_path = self.srs_path.get()
         srs_path_enable = self.srs_path_enable.get()
@@ -1311,6 +1360,7 @@ class MainApp:
             },
             'rb_set': {
                 'rb_ftm_lte': rb_ftm_lte,
+                'rb_ftm_ulca_lte': rb_ftm_ulca_lte,
                 'rb_ftm_fr1': rb_ftm_fr1,
             },
             'external_inst': {
@@ -1331,6 +1381,9 @@ class MainApp:
                 'mv': nv,
                 'lv': lv,
             },
+            'criteria': {
+                'ulca_lte': critera_ulca_lte,
+            }
         }
 
         with open(yaml_file, 'w', encoding='utf-8') as outfile:
@@ -1417,6 +1470,7 @@ class MainApp:
         self.chan_M.set(True)
         self.chan_H.set(True)
         self.sa_nsa.set(0)
+        self.criteria_ulca_lte.set(0)
 
         logger.info(f'default instrument: {self.instrument.get()}')
 
@@ -2663,10 +2717,16 @@ class MainApp:
 
     def fr1_mode_select(self):
         if self.sa_nsa.get() == 0:
-            logger.info('selct mode: SA')
+            logger.info('select mode: SA')
         elif self.sa_nsa.get() == 1:
-            logger.info('selct mode: NSA')
+            logger.info('select mode: NSA')
         # return self.instrument.get()
+
+    def criteria_ulca_lte_select(self):
+        if self.criteria_ulca_lte.get() == 0:
+            logger.info('select ULCA LTE criteria: 3GPP')
+        elif self.criteria_ulca_lte.get() == 1:
+            logger.info('select ULCA LTE criteria: FCC')
 
     def wanted_scs(self):
         pass
@@ -2842,6 +2902,38 @@ class MainApp:
         logger.info(f'RB setting for LTE to select: {self.ftm_rb_lte}')
         return self.ftm_rb_lte
 
+    def wanted_ftm_rb_ulca_lte(self):
+        self.ftm_rb_ulca_lte = []
+        if self.one_rb0_null.get():
+            logger.debug('1RB0_NULL')
+            self.ftm_rb_ulca_lte.append('1RB_N')
+
+        if self.prb_null.get():
+            logger.debug('PRB_NULL')
+            self.ftm_rb_ulca_lte.append('PRB_N')
+
+        if self.frb_null.get():
+            logger.debug('FRB_NULL')
+            self.ftm_rb_ulca_lte.append('FRB_N')
+
+        if self.frb_frb.get():
+            logger.debug('FRB_FRB')
+            self.ftm_rb_ulca_lte.append('FRB_FRB')
+
+        if self.one_rb0_one_rbmax.get():
+            logger.debug('1RB0_1RBmax')
+            self.ftm_rb_ulca_lte.append('1RB0_1RBmax')
+
+        if self.one_rbmax_one_rb0.get():
+            logger.debug('1RBmax_1RB0')
+            self.ftm_rb_ulca_lte.append('1RBmax_1RB0')
+
+        if self.ftm_rb_ulca_lte == []:
+            logger.debug('Nothing to select on RB setting for ULCA LTE')
+
+        logger.info(f'RB setting for ULCA LTE to select: {self.ftm_rb_ulca_lte}')
+        return self.ftm_rb_ulca_lte
+
     def wanted_ftm_rb_fr1(self):
         self.ftm_rb_fr1 = []
         if self.inner_full_fr1.get():
@@ -2920,6 +3012,7 @@ class MainApp:
         ext_pmt.channel = self.wanted_chan()
         ext_pmt.tx_max_pwr_sensitivity = self.wanted_ue_pwr()
         ext_pmt.rb_ftm_lte = self.wanted_ftm_rb_lte()
+        ext_pmt.rb_ftm_ulca_lte = self.wanted_ftm_rb_ulca_lte()
         ext_pmt.rb_ftm_fr1 = self.wanted_ftm_rb_fr1()
         ext_pmt.tx_paths = self.wanted_tx_path()
         ext_pmt.rx_paths = self.wanted_rx_path()
@@ -2941,6 +3034,7 @@ class MainApp:
         ext_pmt.rx_fast_test_enable = self.rx_quick_enable.get()
         ext_pmt.sync_path = self.sync_path.get()
         ext_pmt.sa_nsa = self.sa_nsa.get()
+        ext_pmt.criteria_ulca_lte = self.criteria_ulca_lte.get()
         ext_pmt.mod_gsm = self.mod_gsm.get()
         ext_pmt.tx_pcl_lb = self.pcl_lb.get()
         ext_pmt.tx_pcl_mb = self.pcl_mb.get()
@@ -3043,11 +3137,12 @@ class MainApp:
                 inst.ser.com_close()
 
             if self.wanted_test['tx_ca'] and ext_pmt.sa_nsa == 0:
-                for script in ext_pmt.scripts:
-                    if script == 'ULCA':
-                        inst = TxTestCa()
-                        inst.run()
-                        inst.ser.com_close()
+                # for script in ext_pmt.scripts:
+                # if script == 'ULCA':
+                if self.ulca.get():
+                    inst = TxTestCa()
+                    inst.run()
+                    inst.ser.com_close()
 
 
         elif self.instrument.get() == 'Cmw+Fsw':
@@ -3065,7 +3160,7 @@ class MainApp:
                         inst.ser.com_close()
                     elif self.wanted_test['tx_cbe'] and ext_pmt.sa_nsa == 0:
                         pass
-                elif scriop == 'CA':
+                elif script == 'CA':
                     if slef.wanted_test['tx_ca_cbe'] and ext_pmt.sa_nsa == 0:
                         pass
                 else:
