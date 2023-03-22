@@ -11,7 +11,8 @@ from utils.excel_handler import txp_aclr_evm_current_plot_ftm, tx_power_relative
 from utils.channel_handler import channel_freq_select
 import utils.parameters.rb_parameters as rb_pmt
 from utils.ca_combo_handler import ca_combo_load_excel
-from utils.parameters.rb_parameters import ULCA_LTE
+from utils.parameters.rb_parameters import ULCA_3GPP_LTE
+from utils.parameters.rb_parameters import ulca_fcc_lte
 from utils.excel_handler import tx_ulca_power_relative_test_export_excel_ftm
 
 logger = log_set('tx_ulca_lmh')
@@ -42,9 +43,40 @@ class TxTestCa(AtCmd, CMW100):
     #     self.bw_cc1_lte = int(bw_cc1)
     #     self.bw_cc2_lte = int(bw_cc2)
 
+    def get_temperature(self):
+        """
+        for P22, AT+GOOGTHERMISTOR=1,1 for MHB LPAMid/ MHB Rx1 LFEM, AT+GOOGTHERMISTOR=0,1
+        for LB LPAMid, MHB ENDC LPAMid, UHB(n77/n79 LPAF)
+        :return:
+        """
+        res0 = self.query_thermister0()
+        res1 = self.query_thermister1()
+        res_list = [res0, res1]
+        therm_list = []
+        for res in res_list:
+            for r in res:
+                if 'TEMPERATURE' in r.decode().strip():
+                    try:
+                        temp = eval(r.decode().strip().split(':')[1]) / 1000
+                        therm_list.append(temp)
+                    except Exception as err:
+                        logger.debug(err)
+                        therm_list.append(None)
+        logger.info(f'thermistor0 get temp: {therm_list[0]}')
+        logger.info(f'thermistor1 get temp: {therm_list[1]}')
+        return therm_list
+
     def set_rb_allocation(self, cc1, cc2):
         self.rb_size_cc1_lte, self.rb_start_cc1_lte = cc1
         self.rb_size_cc2_lte, self.rb_start_cc2_lte = cc2
+
+    def criteria_rb_selector_ulca_lte(self, combo_rb, mcs, allocation):
+        if ext_pmt.criteria_ulca_lte == 0:
+            cc1, cc2 = ULCA_3GPP_LTE[combo_rb][mcs][allocation]
+            return cc1, cc2
+        elif ext_pmt.criteria_ulca_lte == 1:
+            cc1, cc2 = ulca_fcc_lte(self.bw_cc1, self.bw_cc2, allocation)
+            return cc1, cc2
 
     def set_center_freq_tx_rx_loss(self):
         # this steps are to set on CMW100 and get center freq and then to give the parameter to AT CMD
@@ -98,8 +130,20 @@ class TxTestCa(AtCmd, CMW100):
         ulca_results = ulca_combo + self.tx_measure_ulca_lte() + ulca_rb_setting + mcs_path_setting
         logger.debug(ulca_results)
 
+        # measure temp
+        therm_list = self.get_temperature()
+
+        # sub-information
+        sub_info = {
+            'cc1_alloc': self.alloc_cc[0],
+            'cc2_alloc': self.alloc_cc[1],
+            'temp0': therm_list[0],
+            'temp1': therm_list[1],
+        }
+
+
         # export to excel
-        tx_ulca_power_relative_test_export_excel_ftm(self.tech, ulca_results)
+        tx_ulca_power_relative_test_export_excel_ftm(self.tech, ulca_results, sub_info)
 
         logger.debug(ulca_results)
 
@@ -133,6 +177,7 @@ class TxTestCa(AtCmd, CMW100):
                     self.band_ulca_lte = band  # '7C'
                     self.band_lte = int(band[:-1])  # '7C' -> 7, '41C' -> 41
                     self.bw_lte = 10  # for sync
+                    allocation = None
                     # self.rx_freq_lte = cm_pmt_ftm.dl_freq_selected('LTE', self.band_lte, self.bw_lte)[1]  # for sync use
                     # self.loss_rx = get_loss(self.rx_freq_lte)  # for sync use
 
@@ -143,23 +188,28 @@ class TxTestCa(AtCmd, CMW100):
                         self.chan_lmh = chan
                         for combo_bw in ext_pmt.lte_bandwidths_ca_combo:  # bw '20+20'
                             self.bw_combo_lte = combo_bw
-                            self.bw_cc1, self.bw_cc2 = combo_bw.split('+')  # 20, 20
-                            combo_rb = f'{int(eval(self.bw_cc1)) * 5}+{int(eval(self.bw_cc2)) * 5}'  # rb_combo '100+100'
+                            self.bw_cc1, self.bw_cc2 = combo_bw.split('+')  # '20', '20'
+                            combo_rb = f'{int(self.bw_cc1) * 5}+{int(self.bw_cc2) * 5}'  # rb_combo '100+100'
                             for mcs in ext_pmt.mcs_lte:
-                                try:
-                                    self.mcs_cc1_lte = self.mcs_cc2_lte = mcs
-                                    bw_rb_cc1, bw_rb_cc2, chan_cc1, chan_cc2 = self.combo_dict[chan][combo_rb]
-                                    self.bw_rb_cc1 = bw_rb_cc1
-                                    self.bw_rb_cc2 = bw_rb_cc2
-                                    self.band_cc1_channel_lte = chan_cc1
-                                    self.band_cc2_channel_lte = chan_cc2
+                                self.mcs_cc1_lte = self.mcs_cc2_lte = mcs
+                                bw_rb_cc1, bw_rb_cc2, chan_cc1, chan_cc2 = self.combo_dict[chan][combo_rb]
+                                self.bw_rb_cc1 = bw_rb_cc1
+                                self.bw_rb_cc2 = bw_rb_cc2
+                                self.band_cc1_channel_lte = chan_cc1
+                                self.band_cc2_channel_lte = chan_cc2
 
-                                    for cc1, cc2 in ULCA_LTE[combo_rb][mcs]:
+                                for allocation in ext_pmt.rb_ftm_ulca_lte:
+                                    try:
+                                        self.alloc_cc = allocation.split('_')
+                                        # this is return rb allocation to cc1 and cc2
+                                        cc1, cc2 = self.criteria_rb_selector_ulca_lte(combo_rb, mcs, allocation)
+
                                         self.set_rb_allocation(cc1, cc2)
                                         self.tx_power_aclr_ulca_process_lte()
-                                except Exception as err:
-                                    logger.info(f'Exception message: {err}')
-                                    logger.info(f"It might {band} doesn't have this combo {combo_rb}, {mcs}")
+                                    except Exception as err:
+                                        logger.info(f'Exception message: {err}')
+                                        logger.info(f"It might {band} doesn't have this combo {combo_rb}, {mcs}, "
+                                                    f"{allocation}")
 
     def run(self):
         for tech in ext_pmt.tech:

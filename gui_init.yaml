@@ -1,7 +1,8 @@
 band:
   band_segment: A
   band_segment_fr1: A
-  bands_ca_lte: []
+  bands_ca_lte:
+  - 41C
   bands_endc: []
   bands_fr1: []
   bands_gsm: []
@@ -24,6 +25,8 @@ condition:
   lv: false
   mv: false
   ntnv: false
+criteria:
+  ulca_lte: 0
 external_inst:
   count: 10
   odpm: false
@@ -58,11 +61,12 @@ power:
 rb_set:
   rb_ftm_fr1: []
   rb_ftm_lte: []
+  rb_ftm_ulca_lte: []
 rx_set:
   ue_power: []
 scripts:
   scripts: []
-tab: 7
+tab: 0
 tech:
   tech: []
 test_items:

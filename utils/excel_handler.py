@@ -208,7 +208,7 @@ def tx_power_fcc_ce_export_excel_ftm(data, parameters_dict):
     wb.close()
     return file_path
 
-def tx_ulca_power_relative_test_export_excel_ftm(tech, data):
+def tx_ulca_power_relative_test_export_excel_ftm(tech, data, sub_info):
     """
     input data:
     [6 items] + [U_-2, U_-1, E_-1, Pwr, E_+1, U_+1, U_+2] + [Power, EVM, Freq_Err, IQ]*2 + [4 items] + \
@@ -379,14 +379,14 @@ def tx_ulca_power_relative_test_export_excel_ftm(tech, data):
         ws.cell(row, 26).value = data[24]  # cc2_iq
         ws.cell(row, 27).value = data[25]  # mcs
         ws.cell(row, 28).value = data[26]  # tx_path
-        ws.cell(row, 29).value = None      # cc1_rb_state
-        ws.cell(row, 30).value = None      # cc2_rb_state
+        ws.cell(row, 29).value = sub_info['cc1_alloc']   # cc1_rb_state
+        ws.cell(row, 30).value = sub_info['cc2_alloc']   # cc2_rb_state
         ws.cell(row, 31).value = data[27]  # Sync_Path
         ws.cell(row, 32).value = data[28]  # AS_Path
         ws.cell(row, 33).value = None      # Current(mA)
         ws.cell(row, 34).value = None      # Condition
-        ws.cell(row, 35).value = None      # Temp0
-        ws.cell(row, 36).value = None      # Temp1
+        ws.cell(row, 35).value = sub_info['temp0']      # Temp0
+        ws.cell(row, 36).value = sub_info['temp1']      # Temp1
 
 
 

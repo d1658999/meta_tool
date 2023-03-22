@@ -15399,9 +15399,9 @@ Disable</property>
                     </layout>
                     <child>
                       <object class="ttk.Checkbutton" id="checkbutton550">
-                        <property name="command" type="command" cbtype="simple">wanted_ftm_rb_lte</property>
-                        <property name="text" translatable="yes">PRB</property>
-                        <property name="variable">boolean:prb_lte</property>
+                        <property name="command" type="command" cbtype="simple">wanted_ftm_rb_ulca_lte</property>
+                        <property name="text" translatable="yes">1RB0_NULL</property>
+                        <property name="variable">boolean:one_rb0_null</property>
                         <layout manager="grid">
                           <property name="column">0</property>
                           <property name="padx">5</property>
@@ -15413,9 +15413,9 @@ Disable</property>
                     </child>
                     <child>
                       <object class="ttk.Checkbutton" id="checkbutton551">
-                        <property name="command" type="command" cbtype="simple">wanted_ftm_rb_lte</property>
-                        <property name="text" translatable="yes">FRB</property>
-                        <property name="variable">boolean:frb_lte</property>
+                        <property name="command" type="command" cbtype="simple">wanted_ftm_rb_ulca_lte</property>
+                        <property name="text" translatable="yes">PRB_NULL</property>
+                        <property name="variable">boolean:prb_null</property>
                         <layout manager="grid">
                           <property name="column">0</property>
                           <property name="padx">5</property>
@@ -15427,14 +15427,93 @@ Disable</property>
                     </child>
                     <child>
                       <object class="ttk.Checkbutton" id="checkbutton552">
-                        <property name="command" type="command" cbtype="simple">wanted_ftm_rb_lte</property>
-                        <property name="text" translatable="yes">1RB_0</property>
-                        <property name="variable">boolean:one_rb0_lte</property>
+                        <property name="command" type="command" cbtype="simple">wanted_ftm_rb_ulca_lte</property>
+                        <property name="text" translatable="yes">FRB_NULL</property>
+                        <property name="variable">boolean:frb_null</property>
                         <layout manager="grid">
                           <property name="column">0</property>
                           <property name="padx">5</property>
                           <property name="pady">5</property>
                           <property name="row">2</property>
+                          <property name="sticky">nw</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Checkbutton" id="checkbutton394">
+                        <property name="command" type="command" cbtype="simple">wanted_ftm_rb_ulca_lte</property>
+                        <property name="text" translatable="yes">FRB_FRB</property>
+                        <property name="variable">boolean:frb_frb</property>
+                        <layout manager="grid">
+                          <property name="column">0</property>
+                          <property name="padx">5</property>
+                          <property name="pady">5</property>
+                          <property name="row">3</property>
+                          <property name="sticky">nw</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Checkbutton" id="checkbutton526">
+                        <property name="command" type="command" cbtype="simple">wanted_ftm_rb_ulca_lte</property>
+                        <property name="text" translatable="yes">1RB0_1RBmax</property>
+                        <property name="variable">boolean:one_rb0_one_rbmax</property>
+                        <layout manager="grid">
+                          <property name="column">0</property>
+                          <property name="padx">5</property>
+                          <property name="pady">5</property>
+                          <property name="row">4</property>
+                          <property name="sticky">nw</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Checkbutton" id="checkbutton527">
+                        <property name="command" type="command" cbtype="simple">wanted_ftm_rb_ulca_lte</property>
+                        <property name="text" translatable="yes">1RBmax_1RB0</property>
+                        <property name="variable">boolean:one_rbmax_one_rb0</property>
+                        <layout manager="grid">
+                          <property name="column">0</property>
+                          <property name="padx">5</property>
+                          <property name="pady">5</property>
+                          <property name="row">5</property>
+                          <property name="sticky">nw</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Label" id="label56">
+                        <layout manager="grid">
+                          <property name="row">6</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Radiobutton" id="radiobutton23">
+                        <property name="command" type="command" cbtype="simple">criteria_ulca_lte_select</property>
+                        <property name="text" translatable="yes">3GPP</property>
+                        <property name="value">0</property>
+                        <property name="variable">int:criteria_ulca_lte</property>
+                        <layout manager="grid">
+                          <property name="column">0</property>
+                          <property name="padx">5</property>
+                          <property name="pady">5</property>
+                          <property name="row">9</property>
+                          <property name="sticky">nw</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Radiobutton" id="radiobutton24">
+                        <property name="command" type="command" cbtype="simple">criteria_ulca_lte_select</property>
+                        <property name="text" translatable="yes">FCC</property>
+                        <property name="value">1</property>
+                        <property name="variable">int:criteria_ulca_lte</property>
+                        <layout manager="grid">
+                          <property name="column">0</property>
+                          <property name="padx">5</property>
+                          <property name="pady">5</property>
+                          <property name="row">10</property>
                           <property name="sticky">nw</property>
                         </layout>
                       </object>
