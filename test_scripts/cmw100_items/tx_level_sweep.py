@@ -27,6 +27,7 @@ class TxTestLevelSweep(AtCmd, CMW100):
         self.file_path = None
         self.srs_path_enable = ext_pmt.srs_path_enable
         self.chan = None
+        self.odpm2 = RecordCurrent()
 
     def select_asw_srs_path(self):
         if self.srs_path_enable:
@@ -36,8 +37,7 @@ class TxTestLevelSweep(AtCmd, CMW100):
 
     def measure_current_select(self, n=1):
         if ext_pmt.record_current_enable:
-            odpm2 = RecordCurrent
-            return odpm2.record_current(n)
+            return self.odpm2.record_current(n)
         elif ext_pmt.odpm_enable:
             return get_odpm_current(n)
         elif ext_pmt.psu_enable:

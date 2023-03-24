@@ -20,6 +20,7 @@ class RecordCurrent:
         self.pmic = f'device{self.device_num}/energy_value '
 
     def record_current_index_search(self):
+        sp.run(r'adb root')
         uwatt_all = sp.run(self.shl + self.cat + self.cd + self.pmic_search, capture_output=True).stdout.decode()
         uwatt_all_list = re.split('\r\n', uwatt_all)
 
@@ -93,7 +94,7 @@ class RecordCurrent:
         # avg_modem = round(sum(modem_ma_lst) / len(modem_ma_lst), 2)
         # avg_panel = round(sum(panel_ma_lst) / len(panel_ma_lst), 2)
         # avg_cpu = round(sum(cpu_ma_lst) / len(cpu_ma_lst), 2)
-        print(f'Get the record current: {avg_rffe} mA')
+        logger.info(f'Get the record current: {avg_rffe} mA')
 
         return avg_rffe
 
@@ -178,7 +179,7 @@ def get_odpm_current(count=1):
 
 
 def main():
-    record_current_index_search()
+    pass
     # current = get_odpm_current()
     # print(current)
 

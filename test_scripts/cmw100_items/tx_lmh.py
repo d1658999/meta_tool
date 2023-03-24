@@ -27,6 +27,7 @@ class TxTestGenre(AtCmd, CMW100):
         self.script = None
         self.chan = None
         self.srs_path_enable = ext_pmt.srs_path_enable
+        self.odpm2 = RecordCurrent()
 
     def get_temperature(self):
         """
@@ -53,8 +54,7 @@ class TxTestGenre(AtCmd, CMW100):
 
     def measure_current_select(self, n=1):
         if ext_pmt.record_current_enable:
-            odpm2 = RecordCurrent()
-            return odpm2.record_current(n)
+            return self.odpm2.record_current(n)
         elif ext_pmt.odpm_enable:
             return get_odpm_current(n)
         elif ext_pmt.psu_enable:
