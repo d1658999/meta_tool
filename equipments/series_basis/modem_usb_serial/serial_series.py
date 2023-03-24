@@ -735,3 +735,19 @@ class AtCmd:
                      f'{self.rb_size_cc1_lte},{self.rb_start_cc1_lte},{self.mcs_lte_dict[self.mcs_cc1_lte]},'
                      f'{self.rb_size_cc2_lte},{self.rb_start_cc2_lte},{self.mcs_lte_dict[self.mcs_cc2_lte]},'
                      f'2,2,{self.tx_level},0')
+
+    def query_voltage_fr1(self):
+        res = self.command(f'AT+NMIPIREAD=2,b,0', delay=0.2)
+        for line in res:
+            if '+NMIPIREAD:' in line.decode():
+                vol_hex = line.decode().split(':')[1].strip()
+                vol_real = (int(vol_hex, 16) * 0.0256) + 0.2
+                return [vol_real]
+
+    def query_voltage_lte(self):
+        res = self.command(f'AT+MIPIREAD=2,11,0', delay=0.2)
+        for line in res:
+            if '+MIPIREAD:' in line.decode():
+                vol_hex = line.decode().split(':')[1].strip()
+                vol_real = (int(vol_hex, 16) * 0.0256) + 0.2
+                return [vol_real]

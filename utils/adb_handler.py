@@ -2,37 +2,62 @@ import subprocess as sp
 import re
 from time import sleep
 import utils.parameters.external_paramters as ext_pmt
+from utils.log_init import log_set
 
-SHL = 'adb shell '
-CAT = '"cat" '
-CD = '/sys/bus/iio/devices/iio\:'
-PMIC = 'device1/energy_value '  #  after 202303: device1
-grep = '"| grep" '
+logger = log_set('Adb')
 
 
 # cat_cmd = SHL + CAT + CD + PMIC + grep
 
+class RecordCurrent:
+    def __init__(self):
+        self.shl = 'adb shell '
+        self.cat = '"cat" '
+        self.cd = '/sys/bus/iio/devices/iio\:'
+        self.pmic_search = 'device*/energy_value '
+        self.grep = '"| grep" '
+        self.device_num, self.index = self.record_current_index_search()
+        self.pmic = f'device{self.device_num}/energy_value '
 
-def record_current(count=10):
-    rffe_rail = 25
-    modem_rail = 23
-    panel_rail = 19
-    cpu1_rail = 9
-    cpu2_rail = 7
-    cpu3_rail = 5
-    time = 1
-    vol_typ = ext_pmt.vol_typ
-    avg_count = count
-    while True:
+    def record_current_index_search(self):
+        uwatt_all = sp.run(self.shl + self.cat + self.cd + self.pmic_search, capture_output=True).stdout.decode()
+        uwatt_all_list = re.split('\r\n', uwatt_all)
+
+        t_count = 0
+        row = 0
+        for info in uwatt_all_list:
+            if 't' in info:  # this is to count the t time
+                t_count += 1
+
+            if 'RFFE' in info:
+                row = uwatt_all_list.index(info)
+
+        index = int((row + 1) / t_count * 2 - 1)  # this is the key to auto-search
+        device_num = t_count - 1
+        logger.info(f'Record device_num for RFFE: {device_num}, Record index for RFFE: {index}')
+        return device_num, index
+
+    def record_current(self, count=10):
+        rffe_rail = self.index
+        # modem_rail = 23
+        # panel_rail = 19
+        # cpu1_rail = 9
+        # cpu2_rail = 7
+        # cpu3_rail = 5
+        time = 1
+        vol_typ = ext_pmt.vol_typ
+        avg_count = count
+
+        # start to the main process the current calculation progress
         rffe_ma_lst = []
         cpu_ma_lst = []
         modem_ma_lst = []
         panel_ma_lst = []
         for i in range(0, avg_count):
-            get_pwr = sp.run(SHL + CAT + CD + PMIC, capture_output=True).stdout.decode()
+            get_pwr = sp.run(self.shl + self.cat + self.cd + self.pmic, capture_output=True).stdout.decode()
             uwatta = re.split(', |\r\n|t=', get_pwr)
             sleep(0.1)
-            get_pwr = sp.run(SHL + CAT + CD + PMIC, capture_output=True).stdout.decode()
+            get_pwr = sp.run(self.shl + self.cat + self.cd + self.pmic, capture_output=True).stdout.decode()
             uwattb = re.split(', |\r\n|t=', get_pwr)
 
             time_msa = int(uwatta[time])
@@ -72,7 +97,6 @@ def record_current(count=10):
 
         return avg_rffe
 
-
 def thermal_charger_disable():
     sp.run(r'adb root')
     print('adb root')
@@ -84,8 +108,6 @@ def thermal_charger_disable():
     print('adb shell "setprop persist.vendor.disable.thermal.control 1"')
     sp.run(r'adb shell "setprop persist.vendor.disable.thermal.tj.control 1"')
     print('adb shell "setprop persist.vendor.disable.thermal.tj.control 1"')
-    sp.run(r'adb shell dumpsys battery set level 100')
-    print('adb shell dumpsys battery set level 100')
     # sp.run(r'adb shell setprop sys.retaildemo.enabled 1')
     # print('adb shell setprop sys.retaildemo.enabled 1')
     # sp.run(r'adb shell setprop vendor.disable.usb.overheat.mitigation.control 1')
@@ -156,7 +178,7 @@ def get_odpm_current(count=1):
 
 
 def main():
-    record_current()
+    record_current_index_search()
     # current = get_odpm_current()
     # print(current)
 

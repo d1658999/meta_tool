@@ -5,7 +5,7 @@ from utils.log_init import log_set
 import utils.parameters.external_paramters as ext_pmt
 import utils.parameters.common_parameters_ftm as cm_pmt_ftm
 from utils.loss_handler import get_loss
-from utils.adb_handler import get_odpm_current, record_current
+from utils.adb_handler import get_odpm_current, RecordCurrent
 from equipments.power_supply import Psu
 from utils.excel_handler import txp_aclr_evm_current_plot_ftm, tx_power_relative_test_export_excel_ftm
 from utils.channel_handler import channel_freq_select
