@@ -6,7 +6,7 @@ import utils.parameters.external_paramters as ext_pmt
 SHL = 'adb shell '
 CAT = '"cat" '
 CD = '/sys/bus/iio/devices/iio\:'
-PMIC = 'device0/energy_value '
+PMIC = 'device1/energy_value '  #  after 202303: device1
 grep = '"| grep" '
 
 
