@@ -1,5 +1,6 @@
 import subprocess as sp
 import re
+import time
 from time import sleep
 import utils.parameters.external_paramters as ext_pmt
 from utils.log_init import log_set
@@ -10,17 +11,22 @@ logger = log_set('Adb')
 # cat_cmd = SHL + CAT + CD + PMIC + grep
 
 class RecordCurrent:
+    """
+    Before use this RecordCurrent, disable charge firstly. Otherwise, it will have error that jump out.
+    Becasue we wiil use adb root when disable charge, the permission on device will be open, and then  we can
+    use adb shell command. this is fool-proof mechanism.
+    """
     def __init__(self):
         self.shl = 'adb shell '
         self.cat = '"cat" '
         self.cd = '/sys/bus/iio/devices/iio\:'
         self.pmic_search = 'device*/energy_value '
         self.grep = '"| grep" '
-        self.device_num, self.index = self.record_current_index_search()
+        self.device_num = None
+        self.index = None
         self.pmic = f'device{self.device_num}/energy_value '
 
     def record_current_index_search(self):
-        sp.run(r'adb root')
         uwatt_all = sp.run(self.shl + self.cat + self.cd + self.pmic_search, capture_output=True).stdout.decode()
         uwatt_all_list = re.split('\r\n', uwatt_all)
 
@@ -33,10 +39,9 @@ class RecordCurrent:
             if 'RFFE' in info:
                 row = uwatt_all_list.index(info)
 
-        index = int((row + 1) / t_count * 2 - 1)  # this is the key to auto-search
-        device_num = t_count - 1
+        self.index = int((row + 1) / t_count * 2 - 1)  # this is the key to auto-search
+        self.device_num = t_count - 1
         logger.info(f'Record device_num for RFFE: {device_num}, Record index for RFFE: {index}')
-        return device_num, index
 
     def record_current(self, count=10):
         rffe_rail = self.index
@@ -109,6 +114,8 @@ def thermal_charger_disable():
     print('adb shell "setprop persist.vendor.disable.thermal.control 1"')
     sp.run(r'adb shell "setprop persist.vendor.disable.thermal.tj.control 1"')
     print('adb shell "setprop persist.vendor.disable.thermal.tj.control 1"')
+    sp.run(r'adb shell dumpsys battery set level 100')
+    print('adb shell dumpsys battery set level 100')
     # sp.run(r'adb shell setprop sys.retaildemo.enabled 1')
     # print('adb shell setprop sys.retaildemo.enabled 1')
     # sp.run(r'adb shell setprop vendor.disable.usb.overheat.mitigation.control 1')
