@@ -23,7 +23,7 @@ class RecordCurrent:
         self.grep = '"| grep" '
         self.device_num = None
         self.index = None
-        self.pmic = f'device{self.device_num}/energy_value '
+        self.pmic = None
 
     def record_current_index_search(self):
         uwatt_all = sp.run(self.shl + self.cat + self.cd + self.pmic_search, capture_output=True).stdout.decode()
@@ -40,7 +40,9 @@ class RecordCurrent:
 
         self.index = int((row + 1) / t_count * 2 - 1)  # this is the key to auto-search
         self.device_num = t_count - 1
-        logger.info(f'Record device_num for RFFE: {device_num}, Record index for RFFE: {index}')
+        self.pmic = f'device{self.device_num}/energy_value '
+        logger.info(f'Record device_num for RFFE: {self.device_num}, Record index for RFFE: {self.index}')
+        logger.debug(self.pmic)
 
     def record_current(self, count=10):
         rffe_rail = self.index

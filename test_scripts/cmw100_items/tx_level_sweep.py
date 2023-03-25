@@ -40,9 +40,9 @@ class TxTestLevelSweep(AtCmd, CMW100):
             if self.odpm2 is None:
                 self.odpm2 = RecordCurrent()
                 self.odpm2.record_current_index_search()
-                return self.odpm2.record_current()
+                return self.odpm2.record_current(n)
             else:
-                return self.odpm2.record_current()
+                return self.odpm2.record_current(n)
         elif ext_pmt.odpm_enable:
             return get_odpm_current(n)
         elif ext_pmt.psu_enable:
