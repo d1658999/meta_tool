@@ -11,8 +11,8 @@ logger = log_set('Adb')
 
 class RecordCurrent:
     """
-    Before use this RecordCurrent, disable charge firstly. Otherwise, it will have error that jump out.
-    Becasue we wiil use adb root when disable charge, the permission on device will be open, and then  we can
+    When using this RecordCurrent, disable charge firstly. Otherwise, it will have error that jump out.
+    Because we will use adb root when disable charge, the permission on device will be open in advance, and then we can
     use adb shell command. this is fool-proof mechanism.
     """
     def __init__(self):
