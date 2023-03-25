@@ -54,7 +54,7 @@ class TxTestGenre(AtCmd, CMW100):
 
     def measure_current_select(self, n=1):
         if ext_pmt.record_current_enable:
-            if self.odpm is None:
+            if self.odpm2 is None:
                 self.odpm2 = RecordCurrent()
                 self.odpm2.record_current_index_search()
                 return self.odpm2.record_current()

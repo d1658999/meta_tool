@@ -1,6 +1,5 @@
 import subprocess as sp
 import re
-import time
 from time import sleep
 import utils.parameters.external_paramters as ext_pmt
 from utils.log_init import log_set
