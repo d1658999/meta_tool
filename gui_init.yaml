@@ -1,9 +1,11 @@
 band:
   band_segment: A
   band_segment_fr1: A
-  bands_ca_lte: []
+  bands_ca_lte:
+  - 41C
   bands_endc: []
-  bands_fr1: []
+  bands_fr1:
+  - 41
   bands_gsm: []
   bands_hsdpa: []
   bands_hsupa: []
@@ -27,7 +29,7 @@ condition:
 criteria:
   ulca_lte: 0
 external_inst:
-  count: 10
+  count: 1
   odpm: false
   psu: false
   record_current: false
@@ -57,14 +59,21 @@ power:
   lb_gsm_pcl: 5
   mb_gsm_pcl: 0
   tx_level: 26
+  tx_level_endc_fr1: 26
+  tx_level_endc_lte: 20
 rb_set:
   rb_ftm_fr1: []
   rb_ftm_lte: []
-  rb_ftm_ulca_lte: []
+  rb_ftm_ulca_lte:
+  - 1RB_N
+  - PRB_N
+  - FRB_FRB
+  - 1RB0_1RBmax
 rx_set:
   ue_power: []
 scripts:
-  scripts: []
+  scripts:
+  - ENDC
 tab: 0
 tech:
   tech: []

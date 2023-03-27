@@ -18,7 +18,7 @@ from equipments.temp_chamber import TempChamber
 logger = log_set('GUI')
 
 PROJECT_PATH = pathlib.Path(__file__).parent
-PROJECT_UI = PROJECT_PATH / pathlib.Path('gui') / "main_v2_13.ui"
+PROJECT_UI = PROJECT_PATH / pathlib.Path('gui') / "main_v2_14.ui"
 
 
 class MainApp:
@@ -61,6 +61,8 @@ class MainApp:
         self.asw_path_enable = None
         self.srs_path = None
         self.tx_level = None
+        self.tx_level_endc_lte = None
+        self.tx_level_endc_fr1 = None
         self.tx1 = None
         self.tx2 = None
         self.ulmimo = None
@@ -325,6 +327,8 @@ class MainApp:
                 "rfout_anritsu",
                 "sync_path",
                 "tx_level",
+                "tx_level_endc_lte",
+                "tx_level_endc_fr1",
                 "asw_path",
                 "srs_path_enable",
                 "asw_path_enable",
@@ -708,6 +712,8 @@ class MainApp:
         self.pcl_mb.set(ui_init['power']['mb_gsm_pcl'])
         self.mod_gsm.set(ui_init['mcs']['modulaiton_gsm'])
         self.tx_level.set(ui_init['power']['tx_level'])
+        self.tx_level_endc_lte.set(ui_init['power']['tx_level_endc_lte'])
+        self.tx_level_endc_fr1.set(ui_init['power']['tx_level_endc_fr1'])
         self.wait_time.set(ui_init['external_inst']['wait_time'])
         self.count.set(ui_init['external_inst']['count'])
         self.tempcham_enable.set(ui_init['external_inst']['tempchb'])
@@ -1248,6 +1254,8 @@ class MainApp:
         pcl_lb_gsm = self.pcl_lb.get()
         pcl_mb_gsm = self.pcl_mb.get()
         tx_level = self.tx_level.get()
+        tx_level_endc_lte = self.tx_level_endc_lte.get()
+        tx_leve_endc_fr1 = self.tx_level_endc_fr1.get()
         wait_time = self.wait_time.get()
         count = self.count.get()
         mod_gsm = self.mod_gsm.get()
@@ -1337,6 +1345,8 @@ class MainApp:
                 'lb_gsm_pcl': pcl_lb_gsm,
                 'mb_gsm_pcl': pcl_mb_gsm,
                 'tx_level': tx_level,
+                'tx_level_endc_lte': tx_level_endc_lte,
+                'tx_level_endc_fr1': tx_leve_endc_fr1,
             },
             'channel': {
                 'chan': chan,
@@ -2859,6 +2869,9 @@ class MainApp:
     def select_tx_level(self, option):
         logger.info(f'select TX Level {self.tx_level.get()}')
 
+    def select_tx_level_endc(self, option):
+        logger.info(f'select TX Level ENDC LTE: {self.tx_level_endc_lte.get()}, FR1: {self.tx_level_endc_fr1.get()}')
+
     def select_wait_time(self, option):
         logger.info(f'select Wait Time {self.wait_time.get()}')
 
@@ -3039,6 +3052,8 @@ class MainApp:
         ext_pmt.tx_pcl_lb = self.pcl_lb.get()
         ext_pmt.tx_pcl_mb = self.pcl_mb.get()
         ext_pmt.tx_level = self.tx_level.get()
+        ext_pmt.tx_level_endc_lte = self.tx_level_endc_lte.get()
+        ext_pmt.tx_level_endc_fr1 = self.tx_level_endc_fr1.get()
         # ext_pmt.wait_time = self.wait_time.get()  # obsolete
         ext_pmt.current_count = self.count.get()
         ext_pmt.psu_enable = self.psu_enable.get()
@@ -3116,7 +3131,7 @@ class MainApp:
                         inst.run(script)
                         inst.ser.com_close()
 
-            if self.wanted_test['rx'] and 'GENERAL' in ext_pmt.scripts:
+            if self.wanted_test['rx']:
                 inst = RxTestGenre()
                 inst.run()
                 inst.ser.com_close()
