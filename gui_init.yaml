@@ -45,7 +45,7 @@ path:
   asw_path: 0
   asw_path_enable: false
   rx_paths: []
-  sa_nsa: 0
+  sa_nsa: 1
   srs_path: 0
   srs_path_enable: false
   sync_path: Main
@@ -72,8 +72,7 @@ rb_set:
 rx_set:
   ue_power: []
 scripts:
-  scripts:
-  - ENDC
+  scripts: []
 tab: 0
 tech:
   tech: []
