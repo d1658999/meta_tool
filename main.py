@@ -3116,7 +3116,7 @@ class MainApp:
                         inst.run(script)
                         inst.ser.com_close()
 
-            if self.wanted_test['rx'] and 'GENERAL' in ext_pmt.scripts:
+            if self.wanted_test['rx']:
                 inst = RxTestGenre()
                 inst.run()
                 inst.ser.com_close()
