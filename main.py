@@ -18,7 +18,7 @@ from equipments.temp_chamber import TempChamber
 logger = log_set('GUI')
 
 PROJECT_PATH = pathlib.Path(__file__).parent
-PROJECT_UI = PROJECT_PATH / pathlib.Path('gui') / "main_v2_14.ui"
+PROJECT_UI = PROJECT_PATH / pathlib.Path('gui') / "main_v2_14_2.ui"
 
 
 class MainApp:
@@ -312,6 +312,22 @@ class MainApp:
         self.frb_frb = None
         self.one_rb0_one_rbmax = None
         self.one_rbmax_one_rb0 = None
+        self.endc_tx_path_lte = None
+        self.endc_tx_path_fr1 = None
+        self.rx0_endc_lte = None
+        self.rx1_endc_lte = None
+        self.rx2_endc_lte = None
+        self.rx3_endc_lte = None
+        self.rx0_rx1_endc_lte = None
+        self.rx2_rx3_endc_lte = None
+        self.rx_all_path_endc_lte = None
+        self.rx0_endc_fr1 = None
+        self.rx1_endc_fr1 = None
+        self.rx2_endc_fr1 = None
+        self.rx3_endc_fr1 = None
+        self.rx0_rx1_endc_fr1 = None
+        self.rx2_rx3_endc_fr1 = None
+        self.rx_all_path_endc_fr1 = None
         builder.import_variables(
             self,
             [
@@ -579,6 +595,24 @@ class MainApp:
                 "frb_frb",
                 "one_rb0_one_rbmax",
                 "one_rbmax_one_rb0",
+                "endc_tx_path_lte",
+                "endc_tx_path_fr1",
+                "rx0_endc_lte",
+                "rx1_endc_lte",
+                "rx2_endc_lte",
+                "rx3_endc_lte",
+                "rx0_rx1_endc_lte",
+                "rx2_rx3_endc_lte",
+                "rx_all_path_endc_lte",
+                "endc_tx_path_lte",
+                "endc_tx_path_fr1",
+                "rx0_endc_fr1",
+                "rx1_endc_fr1",
+                "rx2_endc_fr1",
+                "rx3_endc_fr1",
+                "rx0_rx1_endc_fr1",
+                "rx2_rx3_endc_fr1",
+                "rx_all_path_endc_fr1",
             ],
         )
 
@@ -587,6 +621,8 @@ class MainApp:
         # self.import_ui_setting()
         log_clear()
         self.import_ui_setting_yaml()
+        self.endc_tx_path_lte.set('TX1')
+        self.endc_tx_path_fr1.set('TX1')
         # self.inst_to_tech()
 
     def run(self):
@@ -2788,6 +2824,14 @@ class MainApp:
     def select_pcl_gsm(self, option):
         logger.info(f'LB: PCL{self.pcl_lb.get()}, MB: PCL{self.pcl_mb.get()}')
 
+    def wanted_endc_tx_path_lte(self):
+        logger.info(f'Switch to endc LTE tx path: {self.endc_tx_path_lte.get()}')
+        return self.endc_tx_path_lte.get()
+
+    def wanted_endc_tx_path_fr1(self):
+        logger.info(f'Switch to endc FR1 tx path: {self.endc_tx_path_fr1.get()}')
+        return self.endc_tx_path_fr1.get()
+
     def wanted_tx_path(self):
         self.tx_path = []
         if self.tx1.get():
@@ -2805,8 +2849,84 @@ class MainApp:
         if self.tx_path == []:
             logger.debug('Nothing to select for tx path')
 
-        logger.info(f'script select BW: {self.tx_path}')
+        logger.info(f'script select tx path: {self.tx_path}')
         return self.tx_path
+
+    def wanted_endc_rx_path_lte(self):
+        rx_path = []
+        rx_path_show = []
+        if self.rx0_endc_lte.get():
+            rx_path_show.append('RX0')
+            rx_path.append(2)
+
+        if self.rx1_endc_lte.get():
+            rx_path_show.append('RX1')
+            rx_path.append(1)
+
+        if self.rx2_endc_lte.get():
+            rx_path_show.append('RX2')
+            rx_path.append(4)
+
+        if self.rx3_endc_lte.get():
+            rx_path_show.append('RX3')
+            rx_path.append(8)
+
+        if self.rx0_rx1_endc_lte.get():
+            rx_path_show.append('RX0+RX1')
+            rx_path.append(3)
+
+        if self.rx2_rx3_endc_lte.get():
+            rx_path_show.append('RX2+RX3')
+            rx_path.append(12)
+
+        if self.rx_all_path_endc_lte.get():
+            rx_path_show.append('ALL PATH')
+            rx_path.append(15)
+
+        if rx_path == []:
+            logger.debug('Nothing to select for endc LTE rx path')
+
+        logger.info(f'RX path select ENDC LTE: {rx_path_show}')
+
+        return rx_path
+
+    def wanted_endc_rx_path_fr1(self):
+        rx_path = []
+        rx_path_show = []
+        if self.rx0_endc_fr1.get():
+            rx_path_show.append('RX0')
+            rx_path.append(2)
+
+        if self.rx1_endc_fr1.get():
+            rx_path_show.append('RX1')
+            rx_path.append(1)
+
+        if self.rx2_endc_fr1.get():
+            rx_path_show.append('RX2')
+            rx_path.append(4)
+
+        if self.rx3_endc_fr1.get():
+            rx_path_show.append('RX3')
+            rx_path.append(8)
+
+        if self.rx0_rx1_endc_fr1.get():
+            rx_path_show.append('RX0+RX1')
+            rx_path.append(3)
+
+        if self.rx2_rx3_endc_fr1.get():
+            rx_path_show.append('RX2+RX3')
+            rx_path.append(12)
+
+        if self.rx_all_path_endc_fr1.get():
+            rx_path_show.append('ALL PATH')
+            rx_path.append(15)
+
+        if rx_path == []:
+            logger.debug('Nothing to select for endc LTE rx path')
+
+        logger.info(f'RX path select ENDC FR1: {rx_path_show}')
+
+        return rx_path
 
     def wanted_rx_path(self):
         self.rx_path = []
@@ -3028,7 +3148,11 @@ class MainApp:
         ext_pmt.rb_ftm_ulca_lte = self.wanted_ftm_rb_ulca_lte()
         ext_pmt.rb_ftm_fr1 = self.wanted_ftm_rb_fr1()
         ext_pmt.tx_paths = self.wanted_tx_path()
+        ext_pmt.tx_path_endc_lte = self.wanted_endc_tx_path_lte()
+        ext_pmt.tx_path_endc_fr1 = self.wanted_endc_tx_path_fr1()
         ext_pmt.rx_paths = self.wanted_rx_path()
+        ext_pmt.rx_paths_endc_lte = self.wanted_endc_rx_path_lte()
+        ext_pmt.rx_paths_endc_fr1 = self.wanted_endc_rx_path_fr1()
         ext_pmt.mcs_lte = self.wanted_mcs_lte()
         ext_pmt.mcs_fr1 = self.wanted_mcs_fr1()
         ext_pmt.type_fr1 = self.wanted_type()

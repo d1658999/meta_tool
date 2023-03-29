@@ -37,6 +37,7 @@ class RecordCurrent:
 
             if 'RFFE' in info:
                 row = uwatt_all_list.index(info)
+                break
 
         self.index = int((row + 1) / t_count * 2 - 1)  # this is the key to auto-search
         self.device_num = t_count - 1

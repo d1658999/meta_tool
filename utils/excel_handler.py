@@ -1672,8 +1672,8 @@ def rx_power_relative_test_export_excel_ftm(data, parameters_dict):
 
 def rx_power_endc_test_export_excel_ftm(data):
     """
-    :param data:  data = [int(band_lte), int(band_fr1), power_monitor_endc_lte, power_endc_fr1,
-    rx_level, bw_lte, bw_fr1, tx_freq_lte, tx_freq_fr1, tx_level_endc_lte,
+    :param data:  data = [int(band_lte), int(band_fr1), power_endc_lte, power_endc_fr1,
+    rxs_lte, rxs_fr1, bw_lte, bw_fr1, tx_freq_lte, tx_freq_fr1, tx_level_endc_lte,
     tx_level_endc_fr1, rb_size_lte, rb_start_lte, rb_size_fr1, rb_start_fr1]
     :return:
     """
@@ -1699,17 +1699,18 @@ def rx_power_endc_test_export_excel_ftm(data):
                 ws['B1'] = 'Band_FR1'
                 ws['C1'] = 'Power_LTE_measured'
                 ws['D1'] = 'Power_FR1_measured'
-                ws['E1'] = 'Sensitivity_FR1'
-                ws['F1'] = 'BW_LTE'
-                ws['G1'] = 'BW_FR1'
-                ws['H1'] = 'Freq_tx_LTE'
-                ws['I1'] = 'Freq_tx_FR1'
-                ws['J1'] = 'Tx_level_LTE'
-                ws['K1'] = 'Tx_level_FR1'
-                ws['L1'] = 'rb_size_LTE'
-                ws['M1'] = 'rb_start_LTE'
-                ws['N1'] = 'rb_size_FR1'
-                ws['O1'] = 'rb_start_FR1'
+                ws['E1'] = 'Sensitivity_LTE'
+                ws['F1'] = 'Sensitivity_FR1'
+                ws['G1'] = 'BW_LTE'
+                ws['H1'] = 'BW_FR1'
+                ws['I1'] = 'Freq_tx_LTE'
+                ws['J1'] = 'Freq_tx_FR1'
+                ws['K1'] = 'Tx_level_LTE'
+                ws['L1'] = 'Tx_level_FR1'
+                ws['M1'] = 'rb_size_LTE'
+                ws['N1'] = 'rb_start_LTE'
+                ws['O1'] = 'rb_size_FR1'
+                ws['P1'] = 'rb_start_FR1'
             else:
                 pass
 
@@ -1722,7 +1723,8 @@ def rx_power_endc_test_export_excel_ftm(data):
         ws['D1'] = 'BW_FR1'
         ws['E1'] = 'Freq_tx_LTE'
         ws['F1'] = 'Freq_tx_FR1'
-        ws['G1'] = 'Diff'
+        ws['G1'] = 'Diff_LTE'
+        ws['H1'] = 'Diff_FR1'
 
         wb.save(file_path)
         wb.close()
@@ -1730,14 +1732,13 @@ def rx_power_endc_test_export_excel_ftm(data):
     logger.info('----------file exist----------')
     wb = openpyxl.load_workbook(file_path)
 
-    for d in data:
-        sheetname = f'Raw_Data_ENDC_FR1_TxMax' if d[2] > 0 else f'Raw_Data_ENDC_FR1_-10dBm'
-        ws = wb[sheetname]
-        max_row = ws.max_row
-        max_col = ws.max_column
-        row = max_row + 1
-        for col in range(max_col):
-            ws.cell(row, col + 1).value = d[col]
+    sheetname = f'Raw_Data_ENDC_FR1_TxMax' if data[2] > 0 else f'Raw_Data_ENDC_FR1_-10dBm'
+    ws = wb[sheetname]
+    max_row = ws.max_row
+    max_col = ws.max_column
+    row = max_row + 1
+    for col in range(max_col):
+        ws.cell(row, col + 1).value = data[col]
 
     wb.save(file_path)
     wb.close()
@@ -1770,13 +1771,14 @@ def rx_desense_endc_process_ftm(file_path):
     ws_txmin = wb[f'Raw_Data_ENDC_FR1_-10dBm']
     ws_desens = wb[f'Desens_ENDC']
     for row in range(2, ws_txmax.max_row + 1):
-        ws_desens.cell(row, 1).value = ws_txmax.cell(row, 1).value
-        ws_desens.cell(row, 2).value = ws_txmax.cell(row, 2).value
-        ws_desens.cell(row, 3).value = ws_txmax.cell(row, 6).value
-        ws_desens.cell(row, 4).value = ws_txmax.cell(row, 7).value
-        ws_desens.cell(row, 5).value = ws_txmax.cell(row, 8).value
-        ws_desens.cell(row, 6).value = ws_txmax.cell(row, 9).value
-        ws_desens.cell(row, 7).value = ws_txmax.cell(row, 5).value - ws_txmin.cell(row, 5).value
+        ws_desens.cell(row, 1).value = ws_txmax.cell(row, 1).value  # 'Band_LTE'
+        ws_desens.cell(row, 2).value = ws_txmax.cell(row, 2).value  # 'Band_FR1'
+        ws_desens.cell(row, 3).value = ws_txmax.cell(row, 7).value  # 'BW_LTE'
+        ws_desens.cell(row, 4).value = ws_txmax.cell(row, 8).value  # 'BW_FR1'
+        ws_desens.cell(row, 5).value = ws_txmax.cell(row, 9).value  # 'Freq_tx_LTE'
+        ws_desens.cell(row, 6).value = ws_txmax.cell(row, 10).value  # 'Freq_tx_FR1'
+        ws_desens.cell(row, 7).value = ws_txmax.cell(row, 5).value - ws_txmin.cell(row, 5).value  # desens lte
+        ws_desens.cell(row, 8).value = ws_txmax.cell(row, 6).value - ws_txmin.cell(row, 6).value  # desens fr1
 
     wb.save(file_path)
     wb.close()
@@ -1931,7 +1933,7 @@ def rxs_relative_plot_ftm(file_path, parameters_dict):
 
 
 def rxs_endc_plot_ftm(file_path):
-    logger.info('----------Plot Chart---------')
+    logger.info('----------Plot Chart LTE ---------')
     wb = openpyxl.load_workbook(file_path)
     ws_dashboard = wb[f'Dashboard']
     ws_desens = wb[f'Desens_ENDC']
@@ -1951,6 +1953,46 @@ def rxs_endc_plot_ftm(file_path):
     y_data_txmax = Reference(ws_txmax, min_col=5, min_row=2, max_col=5, max_row=ws_txmax.max_row)
     y_data_txmin = Reference(ws_txmin, min_col=5, min_row=2, max_col=5, max_row=ws_txmin.max_row)
     y_data_desens = Reference(ws_desens, min_col=7, min_row=1, max_col=7, max_row=ws_desens.max_row)
+    x_data = Reference(ws_desens, min_col=1, min_row=2, max_col=6, max_row=ws_desens.max_row)
+
+    series_txmax = Series(y_data_txmax, title="Tx_Max")
+    series_txmin = Series(y_data_txmin, title="Tx_-10dBm")
+
+    chart1.append(series_txmax)
+    chart1.append(series_txmin)
+    chart1.set_categories(x_data)
+    chart1.y_axis.majorGridlines = None
+
+    chart2 = BarChart()
+    chart2.add_data(y_data_desens, titles_from_data=True)
+    chart2.y_axis.axId = 200
+    chart2.y_axis.title = 'Diff(dB)'
+
+    chart1.y_axis.crosses = "max"
+    chart1 += chart2
+
+    ws_dashboard.add_chart(chart1, "A1")
+
+    logger.info('----------Plot Chart FR1 ---------')
+    wb = openpyxl.load_workbook(file_path)
+    ws_dashboard = wb[f'Dashboard']
+    ws_desens = wb[f'Desens_ENDC']
+    ws_txmax = wb[f'Raw_Data_ENDC_FR1_TxMax']
+    ws_txmin = wb[f'Raw_Data_ENDC_FR1_-10dBm']
+
+    if ws_dashboard._charts:  # if there is charts, delete it
+        ws_dashboard._charts.clear()
+
+    chart1 = LineChart()
+    chart1.title = 'Sensitivity'
+    chart1.y_axis.title = 'Rx_Level(dBm)'
+    chart1.x_axis.title = 'Band'
+    chart1.x_axis.tickLblPos = 'low'
+    chart1.height = 20
+    chart1.width = 32
+    y_data_txmax = Reference(ws_txmax, min_col=6, min_row=2, max_col=6, max_row=ws_txmax.max_row)
+    y_data_txmin = Reference(ws_txmin, min_col=6, min_row=2, max_col=6, max_row=ws_txmin.max_row)
+    y_data_desens = Reference(ws_desens, min_col=8, min_row=1, max_col=8, max_row=ws_desens.max_row)
     x_data = Reference(ws_desens, min_col=1, min_row=2, max_col=6, max_row=ws_desens.max_row)
 
     series_txmax = Series(y_data_txmax, title="Tx_Max")

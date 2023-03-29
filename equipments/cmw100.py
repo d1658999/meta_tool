@@ -680,7 +680,7 @@ class CMW100(CMW):
         self.set_measure_stop_lte()
         self.cmw_query('*OPC?')
         logger.debug(aclr_results + mod_results)
-        return aclr_results + mod_results  # U_-2, U_-1, E_-1, E_+1, U_+1, U_+2, Power,EVM, Freq_Err, IQ_OFFSET
+        return aclr_results + mod_results  # U_-2, U_-1, E_-1, Pwr, E_+1, U_+1, U_+2, EVM, Freq_Err, IQ_OFFSET
 
     def tx_measure_wcdma(self):
         logger.info('---------Tx Measure----------')

@@ -4,8 +4,7 @@ band:
   bands_ca_lte:
   - 41C
   bands_endc: []
-  bands_fr1:
-  - 41
+  bands_fr1: []
   bands_gsm: []
   bands_hsdpa: []
   bands_hsupa: []
@@ -29,7 +28,7 @@ condition:
 criteria:
   ulca_lte: 0
 external_inst:
-  count: 1
+  count: 10
   odpm: false
   psu: false
   record_current: false
@@ -45,7 +44,7 @@ path:
   asw_path: 0
   asw_path_enable: false
   rx_paths: []
-  sa_nsa: 1
+  sa_nsa: 0
   srs_path: 0
   srs_path_enable: false
   sync_path: Main
@@ -53,13 +52,13 @@ path:
 port:
   port_tx: 1
   port_tx_fr1: 1
-  port_tx_lte: 1
+  port_tx_lte: 3
   rfout_anritsu: MAIN
 power:
   lb_gsm_pcl: 5
   mb_gsm_pcl: 0
   tx_level: 26
-  tx_level_endc_fr1: 26
+  tx_level_endc_fr1: 20
   tx_level_endc_lte: 20
 rb_set:
   rb_ftm_fr1: []
