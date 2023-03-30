@@ -9029,6 +9029,7 @@ Disable</property>
                     <child>
                       <object class="ttk.Checkbutton" id="checkbutton351">
                         <property name="command" type="command" cbtype="simple">srs_enable</property>
+                        <property name="state">disabled</property>
                         <property name="text" translatable="yes">SRS Path</property>
                         <property name="variable">boolean:srs_path_enable</property>
                         <layout manager="pack">

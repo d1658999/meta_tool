@@ -838,18 +838,20 @@ class RxTestGenre(AtCmd, CMW100):
 
     def run(self):
         for tech in ext_pmt.tech:
-            if tech == 'LTE':
-                self.search_sensitivity_pipline_lte()
-            elif tech == 'FR1':
-                for script in ext_pmt.scripts:
-                    if script == 'GENERAL' and self.sa_nsa_mode == 0:
+            for script in ext_pmt.scripts:
+                if script == 'GENERAL' and self.sa_nsa_mode == 0:
+                    if tech == 'LTE':
+                        self.search_sensitivity_pipline_lte()
+                    elif tech == 'FR1':
                         self.search_sensitivity_pipline_fr1()
-                    elif script == 'ENDC' and self.sa_nsa_mode == 1:
+                    elif tech == 'WCDMA':
+                        self.search_sensitivity_pipline_wcdma()
+                    elif tech == 'GSM':
+                        self.search_sensitivity_pipline_gsm()
+
+                elif script == 'ENDC' and self.sa_nsa_mode == 1:
+                    if tech == 'FR1':
                         self.search_sensitivity_pipline_endc()
-            elif tech == 'WCDMA':
-                self.search_sensitivity_pipline_wcdma()
-            elif tech == 'GSM':
-                self.search_sensitivity_pipline_gsm()
 
 
 def main():
