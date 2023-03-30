@@ -276,7 +276,9 @@ class TxTestLevelSweep(AtCmd, CMW100):
                                 aclr_mod_current_results = aclr_mod_results = aclr_results + mod_results
                                 logger.debug(aclr_mod_results)
                                 aclr_mod_current_results.append(self.measure_current(self.band_fr1))
-                                data[tx_level] = aclr_mod_current_results
+                                results = aclr_mod_current_results + self.query_voltage_selector(
+                                    self.tech, self.band_fr1, self.tx_path)
+                                data[tx_level] = results
                             logger.debug(data)
                             self.parameters = {
                                 'script': self.script,
@@ -378,7 +380,9 @@ class TxTestLevelSweep(AtCmd, CMW100):
                                 aclr_mod_current_results = aclr_mod_results = aclr_results + mod_results
                                 logger.debug(aclr_mod_results)
                                 aclr_mod_current_results.append(self.measure_current(self.band_lte))
-                                data[tx_level] = aclr_mod_current_results
+                                results = aclr_mod_current_results + self.query_voltage_selector(
+                                    self.tech, self.band_lte, self.tx_path)
+                                data[tx_level] = results
                             logger.debug(data)
                             self.parameters = {
                                 'script': self.script,
@@ -472,8 +476,9 @@ class TxTestLevelSweep(AtCmd, CMW100):
                         spectrum_mod_current_results = spectrum_results + mod_results
                         logger.debug(spectrum_mod_current_results)
                         spectrum_mod_current_results.append(self.measure_current(self.band_wcdma))
-
-                        data[tx_level] = spectrum_mod_current_results
+                        results = spectrum_mod_current_results + self.query_voltage_selector(
+                            self.tech, self.band_wcdma, None)
+                        data[tx_level] = results
                     logger.debug(data)
                     self.parameters = {
                         'script': self.script,

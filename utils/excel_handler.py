@@ -517,6 +517,7 @@ def tx_power_relative_test_export_excel_ftm(data, parameters_dict):
                         ws['Z1'] = 'Temp1'
                         ws['AA1'] = '2f0' if test_item == 'harmonics' else None
                         ws['AB1'] = '3f0' if test_item == 'harmonics' else None
+                        ws['AA1'] = 'voltage' if test_item in ['lmh', 'level_sweep'] else None
                     else:  # to pass the dashboard
                         pass
 
@@ -563,6 +564,7 @@ def tx_power_relative_test_export_excel_ftm(data, parameters_dict):
                         ws['AB1'] = 'Temp1'
                         ws['AC1'] = '2f0' if test_item == 'harmonics' else None
                         ws['AD1'] = '3f0' if test_item == 'harmonics' else None
+                        ws['AC1'] = 'voltage' if test_item in ['lmh', 'level_sweep'] else None
                     else:  # to pass the dashboard
                         pass
 
@@ -599,6 +601,7 @@ def tx_power_relative_test_export_excel_ftm(data, parameters_dict):
                         ws['T1'] = 'Temp1'
                         ws['U1'] = '2f0' if test_item == 'harmonics' else None
                         ws['V1'] = '3f0' if test_item == 'harmonics' else None
+                        ws['U1'] = 'voltage' if test_item in ['lmh', 'level_sweep'] else None
                     else:  # to pass the dashboard
                         pass
 
@@ -692,6 +695,7 @@ def tx_power_relative_test_export_excel_ftm(data, parameters_dict):
                     ws.cell(row, 22).value = asw_srs_path
                     ws.cell(row, 23).value = measured_data[10]
                     ws.cell(row, 24).value = ext_pmt.condition
+                    ws.cell(row, 27).value = measured_data[11]  # volt
                     row += 1
 
             elif tx_freq_level <= 100:  # 1rb_sweep, lmh, freq_sweep
@@ -725,6 +729,7 @@ def tx_power_relative_test_export_excel_ftm(data, parameters_dict):
                     ws.cell(row, 26).value = measured_data[12] if test_item == 'lmh' else None
                     ws.cell(row, 27).value = measured_data[13][1] if test_item == 'harmonics' else None  # 2f0
                     ws.cell(row, 28).value = measured_data[14][1] if test_item == 'harmonics' else None  # 3f0
+                    ws.cell(row, 27).value = measured_data[13] if test_item == 'lmh' else None  # volt
                     row += 1
 
         elif tech == 'FR1':
@@ -759,6 +764,7 @@ def tx_power_relative_test_export_excel_ftm(data, parameters_dict):
                     ws.cell(row, 24).value = asw_srs_path
                     ws.cell(row, 25).value = measured_data[10]
                     ws.cell(row, 26).value = ext_pmt.condition
+                    ws.cell(row, 29).value = measured_data[11]  # volt
                     row += 1
 
             elif tx_freq_level <= 100:  # 1rb_sweep, lmh, freq_sweep
@@ -794,6 +800,7 @@ def tx_power_relative_test_export_excel_ftm(data, parameters_dict):
                     ws.cell(row, 28).value = measured_data[12] if test_item == 'lmh' else None
                     ws.cell(row, 29).value = measured_data[13][1] if test_item == 'harmonics' else None  # 2f0
                     ws.cell(row, 30).value = measured_data[14][1] if test_item == 'harmonics' else None  # 3f0
+                    ws.cell(row, 29).value = measured_data[13] if test_item == 'lmh' else None  # volt
                     row += 1
 
         elif tech == 'WCDMA':
@@ -821,6 +828,7 @@ def tx_power_relative_test_export_excel_ftm(data, parameters_dict):
                     ws.cell(row, 16).value = asw_srs_path
                     ws.cell(row, 17).value = measured_data[9]
                     ws.cell(row, 18).value = ext_pmt.condition
+                    ws.cell(row, 21).value = measured_data[10]  # volt
                     row += 1
 
             elif tx_freq_level <= 100:  # 1rb_sweep, lmh, freq_sweep
@@ -848,6 +856,7 @@ def tx_power_relative_test_export_excel_ftm(data, parameters_dict):
                     ws.cell(row, 20).value = measured_data[11] if test_item == 'lmh' else None
                     ws.cell(row, 21).value = measured_data[12][1] if test_item == 'harmonics' else None  # 2f0
                     ws.cell(row, 22).value = measured_data[13][1] if test_item == 'harmonics' else None  # 3f0
+                    ws.cell(row, 21).value = measured_data[12] if test_item == 'lmh' else None  # volt
                     row += 1
 
         elif tech == 'GSM':

@@ -736,18 +736,88 @@ class AtCmd:
                      f'{self.rb_size_cc2_lte},{self.rb_start_cc2_lte},{self.mcs_lte_dict[self.mcs_cc2_lte]},'
                      f'2,2,{self.tx_level},0')
 
-    def query_voltage_fr1(self):
-        res = self.command(f'AT+NMIPIREAD=2,b,0', delay=0.2)
+    @staticmethod
+    def set_mipi_voltage(tech, band, tx_path):
+        mipi_num = None
+        usid = None
+        addr = None
+
+        if tech in ['LTE', 'FR1']:
+            if tx_path == 'TX1':
+                if band in [26, 8, 12, 13, 14, 20, 28, 29, 71, ]:
+                    mipi_num, usid, addr = 2, 'b', 0
+                elif band in [1, 2, 3, 4, 66, 7, 25, 30, 41, 40, 39, 34, 70, 75, 76, ]:
+                    mipi_num, usid, addr = 0, 'b', 0
+                elif band in [42, 48, 77, 79, ]:
+                    mipi_num, usid, addr = 4, 'b', 0
+
+            elif tx_path == 'TX2':
+                if band in [1, 2, 3, 4, 66, 7, 25, 30, 41, 40, 39, 34, 70, 75, 76, ]:
+                    mipi_num, usid, addr = 2, 'b', 0
+                elif band in [42, 48, 77, 79, ]:
+                    mipi_num, usid, addr = 0, 'b', 0
+        elif tech in ['WCDMA']:
+            if band in [1, 2, 4]:
+                mipi_num, usid, addr = 0, 'b', 0
+            elif band in [5, 8, 6, 19]:
+                mipi_num, usid, addr = 2, 'b', 0
+
+        return mipi_num, usid, addr
+
+    def query_voltage_fr1(self, band, tx_path):
+        """
+        P23:
+        MIPI 0 = MHB/ UHB Sub
+        MIPI 2 = LB / MHB ENDC
+        MIPI 4 = UHB Main
+        """
+        mipi_num, usid, addr = self.set_mipi_voltage('FR1', band, tx_path)
+
+        res = self.command(f'AT+NMIPIREAD={mipi_num},{usid},{addr}', delay=0.2)
         for line in res:
             if '+NMIPIREAD:' in line.decode():
                 vol_hex = line.decode().split(':')[1].strip()
                 vol_real = (int(vol_hex, 16) * 0.0256) + 0.2
                 return [vol_real]
 
-    def query_voltage_lte(self):
-        res = self.command(f'AT+MIPIREAD=2,11,0', delay=0.2)
+    def query_voltage_lte(self, band, tx_path):
+        """
+        P23:
+        MIPI 0 = MHB/ UHB Sub
+        MIPI 2 = LB / MHB ENDC
+        MIPI 4 = UHB Main
+        """
+        mipi_num, usid, addr = self.set_mipi_voltage('LTE', band, tx_path)
+
+        res = self.command(f'AT+MIPIREAD={mipi_num},{int(usid, 16)},{addr}', delay=0.2)
         for line in res:
             if '+MIPIREAD:' in line.decode():
                 vol_hex = line.decode().split(':')[1].strip()
                 vol_real = (int(vol_hex, 16) * 0.0256) + 0.2
                 return [vol_real]
+
+    def query_voltage_wcdma(self, band, tx_path=None):
+        """
+        P23:
+        MIPI 0 = MHB/ UHB Sub
+        MIPI 2 = LB / MHB ENDC
+        MIPI 4 = UHB Main
+        """
+        mipi_num, usid, addr = self.set_mipi_voltage('WCDMA', band, tx_path)
+
+        res = self.command(f'AT+HREADMIPI={mipi_num},{usid},{addr}', delay=0.2)
+        for line in res:
+            if 'Data' in line.decode():
+                vol_hex = line.decode().split('x')[1].strip()
+                vol_real = (int(vol_hex, 16) * 0.0256) + 0.2
+                return [vol_real]
+
+    def query_voltage_selector(self, tech, band, tx_path):
+        if tech == 'FR1':
+            return self.query_voltage_fr1(band, tx_path)
+        elif tech == 'LTE':
+            return self.query_voltage_lte(band, tx_path)
+        elif tech == 'WCDMA':
+            return self.query_voltage_wcdma(band)
+
+
