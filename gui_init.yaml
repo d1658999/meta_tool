@@ -33,6 +33,7 @@ external_inst:
   psu: false
   record_current: false
   tempchb: false
+  volt_mipi: false
   wait_time: 0
 instrument:
   instrument: Cmw100
@@ -63,11 +64,7 @@ power:
 rb_set:
   rb_ftm_fr1: []
   rb_ftm_lte: []
-  rb_ftm_ulca_lte:
-  - 1RB_N
-  - PRB_N
-  - FRB_FRB
-  - 1RB0_1RBmax
+  rb_ftm_ulca_lte: []
 rx_set:
   ue_power: []
 scripts:

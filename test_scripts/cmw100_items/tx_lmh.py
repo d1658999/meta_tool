@@ -52,6 +52,25 @@ class TxTestGenre(AtCmd, CMW100):
         logger.info(f'thermistor1 get temp: {therm_list[1]}')
         return therm_list
 
+    def results_combination_nlw(self, volt_enable):
+        results = None
+        if volt_enable:
+            if self.tech == 'FR1':
+                results = self.aclr_mod_current_results + self.get_temperature() + self.query_voltage_selector(
+                    self.tech, self.band_fr1, self.tx_path)
+            elif self.tech == 'LTE':
+                results = self.aclr_mod_current_results + self.get_temperature() + self.query_voltage_selector(
+                    self.tech, self.band_lte, self.tx_path)
+            elif self.tech == 'WCDMA':
+                results = self.aclr_mod_current_results + self.get_temperature() + self.query_voltage_selector(
+                    self.tech, self.band_wcdma, self.tx_path)
+
+            return results
+
+        else:
+            results = self.aclr_mod_current_results + self.get_temperature()
+            return results
+
     def measure_current_select(self, n=1):
         if ext_pmt.record_current_enable:
             if self.odpm2 is None:
@@ -144,12 +163,10 @@ class TxTestGenre(AtCmd, CMW100):
                             # self.sig_gen_fr1()  # temp
                             # self.sync_fr1()  # temp
                             self.tx_set_fr1()
-                            aclr_mod_current_results = aclr_mod_results = self.tx_measure_fr1()
+                            self.aclr_mod_current_results = aclr_mod_results = self.tx_measure_fr1()
                             logger.debug(aclr_mod_results)
-                            aclr_mod_current_results.append(self.measure_current(self.band_fr1))
-                            results = aclr_mod_current_results + self.get_temperature() + self.query_voltage_selector(
-                                self.tech, self.band_fr1, self.tx_path)
-                            data_freq[self.tx_freq_fr1] = results
+                            self.aclr_mod_current_results.append(self.measure_current(self.band_fr1))
+                            data_freq[self.tx_freq_fr1] = self.results_combination_nlw(ext_pmt.volt_mipi_en)
                         logger.debug(data_freq)
                         # ready to export to excel
                         self.parameters = {
@@ -213,12 +230,10 @@ class TxTestGenre(AtCmd, CMW100):
                             self.tx_freq_lte = tx_freq_lte
                             self.loss_tx = get_loss(self.tx_freq_lte)
                             self.tx_set_lte()
-                            aclr_mod_current_results = aclr_mod_results = self.tx_measure_lte()
+                            self.aclr_mod_current_results = aclr_mod_results = self.tx_measure_lte()
                             logger.debug(aclr_mod_results)
-                            aclr_mod_current_results.append(self.measure_current(self.band_lte))
-                            results = aclr_mod_current_results + self.get_temperature() + self.query_voltage_selector(
-                                self.tech, self.band_lte, self.tx_path)
-                            data_freq[self.tx_freq_lte] = results
+                            self.aclr_mod_current_results.append(self.measure_current(self.band_lte))
+                            data_freq[self.tx_freq_lte] = self.results_combination_nlw(ext_pmt.volt_mipi_en)
                         logger.debug(data_freq)
                         # ready to export to excel
                         self.parameters = {
@@ -280,13 +295,11 @@ class TxTestGenre(AtCmd, CMW100):
                     self.tx_chan_wcdma = tx_rx_chan_wcdma[0]
                     self.tx_set_wcdma()
                     self.antenna_switch_v2()
-                    aclr_mod_current_results = aclr_mod_results = self.tx_measure_wcdma()
+                    self.aclr_mod_current_results = aclr_mod_results = self.tx_measure_wcdma()
                     logger.debug(aclr_mod_results)
-                    aclr_mod_current_results.append(self.measure_current(self.band_wcdma))
+                    self.aclr_mod_current_results.append(self.measure_current(self.band_wcdma))
                     tx_freq_wcdma = cm_pmt_ftm.transfer_chan2freq_wcdma(self.band_wcdma, self.tx_chan_wcdma)
-                    results = aclr_mod_current_results + self.get_temperature() + self.query_voltage_selector(
-                        self.tech, self.band_wcdma, None)
-                    data_chan[tx_freq_wcdma] = results
+                    data_chan[tx_freq_wcdma] = self.results_combination_nlw(ext_pmt.volt_mipi_en)
                 logger.debug(data_chan)
                 # ready to export to excel
                 self.parameters = {

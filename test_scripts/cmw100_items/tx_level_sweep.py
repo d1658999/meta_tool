@@ -29,6 +29,25 @@ class TxTestLevelSweep(AtCmd, CMW100):
         self.chan = None
         self.odpm2 = None
 
+    def results_combination_nlw(self, volt_enable):
+        results = None
+        if volt_enable:
+            if self.tech == 'FR1':
+                results = self.aclr_mod_current_results + self.query_voltage_selector(
+                    self.tech, self.band_fr1, self.tx_path)
+            elif self.tech == 'LTE':
+                results = self.aclr_mod_current_results + self.query_voltage_selector(
+                    self.tech, self.band_lte, self.tx_path)
+            elif self.tech == 'WCDMA':
+                results = self.aclr_mod_current_results + self.query_voltage_selector(
+                    self.tech, self.band_wcdma, self.tx_path)
+
+            return results
+
+        else:
+            results = self.aclr_mod_current_results
+            return results
+
     def select_asw_srs_path(self):
         if self.srs_path_enable:
             self.srs_switch()
@@ -273,12 +292,10 @@ class TxTestLevelSweep(AtCmd, CMW100):
                                 self.get_sem_average_and_margin_fr1()
                                 self.set_measure_stop_fr1()
                                 self.cmw_query('*OPC?')
-                                aclr_mod_current_results = aclr_mod_results = aclr_results + mod_results
+                                self.aclr_mod_current_results = aclr_mod_results = aclr_results + mod_results
                                 logger.debug(aclr_mod_results)
-                                aclr_mod_current_results.append(self.measure_current(self.band_fr1))
-                                results = aclr_mod_current_results + self.query_voltage_selector(
-                                    self.tech, self.band_fr1, self.tx_path)
-                                data[tx_level] = results
+                                self.aclr_mod_current_results.append(self.measure_current(self.band_fr1))
+                                data[tx_level] = self.results_combination_nlw(ext_pmt.volt_mipi_en)
                             logger.debug(data)
                             self.parameters = {
                                 'script': self.script,
@@ -377,12 +394,10 @@ class TxTestLevelSweep(AtCmd, CMW100):
                                 self.get_sem_average_and_margin_lte()
                                 self.set_measure_stop_lte()
                                 self.cmw_query('*OPC?')
-                                aclr_mod_current_results = aclr_mod_results = aclr_results + mod_results
+                                self.aclr_mod_current_results = aclr_mod_results = aclr_results + mod_results
                                 logger.debug(aclr_mod_results)
-                                aclr_mod_current_results.append(self.measure_current(self.band_lte))
-                                results = aclr_mod_current_results + self.query_voltage_selector(
-                                    self.tech, self.band_lte, self.tx_path)
-                                data[tx_level] = results
+                                self.aclr_mod_current_results.append(self.measure_current(self.band_lte))
+                                data[tx_level] = self.results_combination_nlw(ext_pmt.volt_mipi_en)
                             logger.debug(data)
                             self.parameters = {
                                 'script': self.script,
@@ -473,12 +488,10 @@ class TxTestLevelSweep(AtCmd, CMW100):
                         spectrum_results = self.get_aclr_average_wcdma()
                         self.set_measure_stop_wcdma()
 
-                        spectrum_mod_current_results = spectrum_results + mod_results
-                        logger.debug(spectrum_mod_current_results)
-                        spectrum_mod_current_results.append(self.measure_current(self.band_wcdma))
-                        results = spectrum_mod_current_results + self.query_voltage_selector(
-                            self.tech, self.band_wcdma, None)
-                        data[tx_level] = results
+                        self.aclr_mod_current_results = spectrum_results + mod_results
+                        logger.debug(self.aclr_mod_current_results)
+                        self.aclr_mod_current_results.append(self.measure_current(self.band_wcdma))
+                        data[tx_level] = self.results_combination_nlw(ext_pmt.volt_mipi_en)
                     logger.debug(data)
                     self.parameters = {
                         'script': self.script,
