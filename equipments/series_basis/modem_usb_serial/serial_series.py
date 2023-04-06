@@ -746,13 +746,13 @@ class AtCmd:
             if tx_path == 'TX1':
                 if band in [26, 5, 8, 12, 13, 14, 17, 18, 19, 20, 28, 29, 71, 24]:
                     mipi_num, usid, addr = 2, 'b', 0
-                elif band in [1, 2, 3, 4, 66, 7, 25, 30, 41, 40, 39, 34, 70, 75, 76, ]:
+                elif band in [1, 2, 3, 4, 66, 7, 25, 30, 38, 41, 40, 39, 34, 70, 75, 76, ]:
                     mipi_num, usid, addr = 0, 'b', 0
                 elif band in [42, 48, 77, 78, 79, ]:
                     mipi_num, usid, addr = 4, 'b', 0
 
             elif tx_path == 'TX2':
-                if band in [1, 2, 3, 4, 66, 7, 25, 30, 41, 40, 39, 34, 70, 75, 76, ]:
+                if band in [1, 2, 3, 4, 66, 7, 25, 30, 38, 41, 40, 39, 34, 70, 75, 76, ]:
                     mipi_num, usid, addr = 2, 'b', 0
                 elif band in [42, 48, 77, 78, 79, ]:
                     mipi_num, usid, addr = 0, 'b', 0
