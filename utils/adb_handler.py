@@ -118,6 +118,8 @@ def thermal_charger_disable():
     print('adb shell "setprop persist.vendor.disable.thermal.tj.control 1"')
     sp.run(r'adb shell dumpsys battery set level 100')
     print('adb shell dumpsys battery set level 100')
+    sp.run(r'adb shell setprop sys.retaildemo.enabled 1')
+    print('adb shell setprop sys.retaildemo.enabled 1')
     # sp.run(r'adb shell setprop sys.retaildemo.enabled 1')
     # print('adb shell setprop sys.retaildemo.enabled 1')
     # sp.run(r'adb shell setprop vendor.disable.usb.overheat.mitigation.control 1')
