@@ -81,9 +81,13 @@ class TxTestGenre(AtCmd, CMW100):
                 return self.odpm2.record_current(n)
         elif ext_pmt.odpm_enable:
             return get_odpm_current(n)
+
         elif ext_pmt.psu_enable:
-            self.psu = Psu()
-            return self.psu.psu_current_average(n)
+            if self.psu is None:
+                self.psu = Psu()
+                return self.psu.psu_current_average(n)
+            else:
+                return self.psu.psu_current_average(n)
 
     def measure_current(self, band):
         count = ext_pmt.current_count
