@@ -145,7 +145,7 @@ class TxTestGenre(AtCmd, CMW100):
         # self.scs = scs  # temp
 
         tx_freq_lmh_list = [cm_pmt_ftm.transfer_freq_rx2tx_fr1(self.band_fr1, rx_freq) for rx_freq in rx_freq_list]
-        tx_freq_select_list = channel_freq_select(self.chan, tx_freq_lmh_list)
+        tx_freq_select_list = set(channel_freq_select(self.chan, tx_freq_lmh_list))
 
         for mcs in ext_pmt.mcs_fr1:
             self.mcs_fr1 = mcs
@@ -219,7 +219,7 @@ class TxTestGenre(AtCmd, CMW100):
         self.sync_lte()
 
         tx_freq_lmh_list = [cm_pmt_ftm.transfer_freq_rx2tx_lte(self.band_lte, rx_freq) for rx_freq in rx_freq_list]
-        tx_freq_select_list = channel_freq_select(self.chan, tx_freq_lmh_list)
+        tx_freq_select_list = set(channel_freq_select(self.chan, tx_freq_lmh_list))
 
         for mcs in ext_pmt.mcs_lte:
             self.mcs_lte = mcs

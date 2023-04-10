@@ -29,7 +29,7 @@ def bandwidths_selected_fr1(band):
         'N70': [5, 10, 15, 20, 25, ],
         'N71': [5, 10, 15, 20, ],
         'N75': [5, 10, 15, 20, 25, 30, 40, 50, ],
-        'N76': [5, 10, ],
+        'N76': [5, ],
         'N77': [10, 15, 20, 25, 40, 50, 60, 80, 90, 100, 70, ],
         'N78': [10, 15, 20, 25, 40, 50, 60, 80, 90, 100, 70, ],
         'N79': [10, 20, 40, 50, 60, 80, 100, ],
@@ -87,7 +87,7 @@ def bandwidths_selected_lte_ulca(band_combo):
             '10+5',
             '10+10',
         ],
-        '1C':[
+        '1C': [
             '15+15',
             '20+20',
         ],
@@ -162,6 +162,7 @@ def bandwidths_selected_lte_ulca(band_combo):
     }
 
     return bandwidths_ulca[band_combo]
+
 
 # DL Freq
 def dl_freq_selected(standard, band, bw=5):

@@ -6,6 +6,7 @@ from connection_interface.connection_serial import ModemComport
 
 
 logger = log_set('AtCmd')
+TDD_BANDS = [34, 38, 39, 40, 41, 42, 48, 77, 78, 79, ]
 
 
 class AtCmd:
@@ -270,7 +271,7 @@ class AtCmd:
         """
         For now FDD is forced to 15KHz and TDD is to be 30KHz
         """
-        if band in [34, 38, 39, 40, 41, 42, 48, 75, 76, 77, 78, 79, ]:
+        if band in TDD_BANDS:
             scs = 1
         else:
             scs = 0
@@ -325,7 +326,7 @@ class AtCmd:
 
     def sync_fr1(self):
         logger.info('---------Sync----------')
-        scs = 1 if self.band_fr1 in [34, 38, 39, 40, 41, 42, 48, 75, 76, 77, 78, 79] else 0
+        scs = 1 if self.band_fr1 in TDD_BANDS else 0
         response = self.command(
             f'AT+NRFSYNC={self.sync_path_dict[self.sync_path]},{self.sync_mode},{scs},'
             f'{self.bw_fr1_dict[self.bw_fr1]},0,{self.rx_freq_fr1}',
@@ -413,7 +414,7 @@ class AtCmd:
 
     def set_duty_cycle(self):
         logger.info(f'----------Set duty cycle: {ext_pmt.duty_cycle}----------')
-        if self.band_fr1 in [34, 38, 39, 40, 41, 42, 48, 75, 76, 77, 78, 79]:
+        if self.band_fr1 in TDD_BANDS:
             self.uldl_period = self.duty_cycle_dict[ext_pmt.duty_cycle][0]
             self.dl_slot = self.duty_cycle_dict[ext_pmt.duty_cycle][1]
             self.dl_symbol = self.duty_cycle_dict[ext_pmt.duty_cycle][2]
@@ -434,7 +435,7 @@ class AtCmd:
 
     def tx_set_no_sync_fr1(self):
         logger.info('---------Tx No Sync----------')
-        self.scs = 30 if self.band_fr1 in [34, 38, 39, 40, 41, 42, 48, 75, 76, 77, 78, 79] else 15
+        self.scs = 30 if self.band_fr1 in TDD_BANDS else 15
         self.command(
             f'AT+NRFACTREQ={self.tx_path_dict[self.tx_path]},{self.tx_freq_fr1},{self.bw_fr1_dict[self.bw_fr1]},'
             f'{self.scs_dict[self.scs]},{self.rb_size_fr1},{self.rb_start_fr1},{self.mcs_fr1_dict[self.mcs_fr1]},'

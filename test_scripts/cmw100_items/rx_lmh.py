@@ -14,6 +14,7 @@ from utils.excel_handler import rx_desense_endc_process_ftm, select_file_name_rx
 from utils.channel_handler import channel_freq_select
 
 logger = log_set('rx_lmh')
+SDL_BANDS = [29, 32, 46, 75, 76]
 
 
 class RxTestGenre(AtCmd, CMW100):
@@ -528,7 +529,7 @@ class RxTestGenre(AtCmd, CMW100):
         # [L_rx_freq, M_rx_ferq, H_rx_freq]
         rx_freq_list = cm_pmt_ftm.dl_freq_selected('FR1', self.band_fr1, self.bw_fr1)
 
-        rx_freq_select_list = channel_freq_select(self.chan, rx_freq_list)
+        rx_freq_select_list = set(channel_freq_select(self.chan, rx_freq_list))
 
         for rx_path in ext_pmt.rx_paths:
             self.rx_path_fr1 = rx_path
@@ -548,12 +549,12 @@ class RxTestGenre(AtCmd, CMW100):
                 self.sig_gen_fr1()
                 self.sync_fr1()
                 self.rx_path_setting_fr1()
-                self.rb_size_fr1, self.rb_start_fr1 = cm_pmt_ftm.special_uplink_config_sensitivity_fr1(
-                    self.band_fr1,
-                    self.scs,
-                    self.bw_fr1)  # for RB set(including special tx setting)
-                self.antenna_switch_v2()
-                if self.band_fr1 not in [29, 75, 76]:
+                if self.band_fr1 not in SDL_BANDS:
+                    self.rb_size_fr1, self.rb_start_fr1 = cm_pmt_ftm.special_uplink_config_sensitivity_fr1(
+                        self.band_fr1,
+                        self.scs,
+                        self.bw_fr1)  # for RB set(including special tx setting)
+                    self.antenna_switch_v2()
                     self.tx_set_fr1()
                     # aclr_results + mod_results  # U_-2, U_-1, E_-1, Pwr, E_+1, U_+1, U_+2, EVM, Freq_Err, IQ_OFFSET
                     aclr_mod_results = self.tx_measure_fr1()
@@ -585,7 +586,7 @@ class RxTestGenre(AtCmd, CMW100):
         rx_freq_list = cm_pmt_ftm.dl_freq_selected('LTE', self.band_lte,
                                                    self.bw_lte)  # [L_rx_freq, M_rx_ferq, H_rx_freq]
 
-        rx_freq_select_list = channel_freq_select(self.chan, rx_freq_list)
+        rx_freq_select_list = set(channel_freq_select(self.chan, rx_freq_list))
 
         for rx_path in ext_pmt.rx_paths:
             self.rx_path_lte = rx_path
@@ -605,11 +606,11 @@ class RxTestGenre(AtCmd, CMW100):
                 self.sig_gen_lte()
                 self.sync_lte()
                 self.rx_path_setting_lte()
-                self.rb_size_lte, self.rb_start_lte = cm_pmt_ftm.special_uplink_config_sensitivity_lte(
-                    self.band_lte,
-                    self.bw_lte)  # for RB set
-                self.antenna_switch_v2()
-                if self.band_lte not in [29, 32, 46]:
+                if self.band_lte not in SDL_BANDS:
+                    self.rb_size_lte, self.rb_start_lte = cm_pmt_ftm.special_uplink_config_sensitivity_lte(
+                        self.band_lte,
+                        self.bw_lte)  # for RB set
+                    self.antenna_switch_v2()
                     self.tx_set_lte()
                     aclr_mod_results = self.tx_measure_lte()  # aclr_results + mod_results  # U_-2, U_-1, E_-1, Pwr,
                     measured_power = round(aclr_mod_results[3], 1)

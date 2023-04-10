@@ -235,6 +235,9 @@ class MainApp:
         self.N30 = None
         self.N25 = None
         self.N66 = None
+        self.N70 = None
+        self.N75 = None
+        self.N76 = None
         # self.N39 = None
         self.N40 = None
         self.N38 = None
@@ -522,6 +525,9 @@ class MainApp:
                 "N30",
                 "N25",
                 "N66",
+                "N70",
+                "N75",
+                "N76",
                 # "N39",
                 "N40",
                 "N38",
@@ -863,6 +869,12 @@ class MainApp:
                 self.N48.set(band_fr1)
             elif band_fr1 == 66:
                 self.N66.set(band_fr1)
+            elif band_fr1 == 70:
+                self.N70.set(band_fr1)
+            elif band_fr1 == 75:
+                self.N75.set(band_fr1)
+            elif band_fr1 == 76:
+                self.N76.set(band_fr1)
             elif band_fr1 == 71:
                 self.N71.set(band_fr1)
             elif band_fr1 == 77:
@@ -1642,6 +1654,15 @@ class MainApp:
         if self.N66.get() == 66:
             logger.debug(self.N66.get())
             self.band_fr1.append(self.N66.get())
+        if self.N70.get() == 70:
+            logger.debug(self.N70.get())
+            self.band_fr1.append(self.N70.get())
+        if self.N75.get() == 75:
+            logger.debug(self.N75.get())
+            self.band_fr1.append(self.N75.get())
+        if self.N76.get() == 76:
+            logger.debug(self.N76.get())
+            self.band_fr1.append(self.N76.get())
         if self.N30.get() == 30:
             logger.debug(self.N30.get())
             self.band_fr1.append(self.N30.get())
@@ -2485,6 +2506,9 @@ class MainApp:
             self.N3.set(3)
             # self.N4.set(4)
             self.N66.set(66)
+            self.N70.set(70)
+            self.N75.set(75)
+            self.N76.set(76)
             self.N7.set(7)
             self.N30.set(30)
             # self.N39.set(39)
@@ -2501,6 +2525,9 @@ class MainApp:
             self.N3.set(0)
             # self.N4.set(0)
             self.N66.set(0)
+            self.N70.set(0)
+            self.N75.set(0)
+            self.N76.set(0)
             self.N7.set(0)
             self.N30.set(0)
             # self.N39.set(0)
