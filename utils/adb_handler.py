@@ -15,6 +15,7 @@ class RecordCurrent:
     Because we will use adb root when disable charge, the permission on device will be open in advance, and then we can
     use adb shell command. this is fool-proof mechanism.
     """
+
     def __init__(self):
         self.shl = 'adb shell '
         self.cat = '"cat" '
@@ -58,9 +59,9 @@ class RecordCurrent:
 
         # start to the main process the current calculation progress
         rffe_ma_lst = []
-        cpu_ma_lst = []
-        modem_ma_lst = []
-        panel_ma_lst = []
+        # cpu_ma_lst = []
+        # modem_ma_lst = []
+        # panel_ma_lst = []
         for i in range(0, avg_count):
             get_pwr = sp.run(self.shl + self.cat + self.cd + self.pmic, capture_output=True).stdout.decode()
             uwatta = re.split(', |\r\n|t=', get_pwr)
@@ -104,6 +105,7 @@ class RecordCurrent:
         logger.info(f'Get the record current: {avg_rffe} mA')
 
         return avg_rffe
+
 
 def thermal_charger_disable():
     sp.run(r'adb root')
@@ -180,7 +182,7 @@ def get_odpm_current(count=1):
     n = 0
     while n < count:
         odpm_current = sp.run(r'adb shell pmic s2mpg14 getcurrent 36 | grep mA',
-                      capture_output=True).stdout.decode().strip().split('=')[1]
+                              capture_output=True).stdout.decode().strip().split('=')[1]
         odpm_list.append(eval(odpm_current))
         sleep(0.1)
         n += 1
