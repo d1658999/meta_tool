@@ -3,10 +3,10 @@ import time
 from utils.log_init import log_set
 import utils.parameters.external_paramters as ext_pmt
 from connection_interface.connection_serial import ModemComport
+from utils.parameters.common_parameters_ftm import TDD_BANDS
 
 
 logger = log_set('AtCmd')
-TDD_BANDS = [34, 38, 39, 40, 41, 42, 48, 77, 78, 79, ]
 
 
 class AtCmd:

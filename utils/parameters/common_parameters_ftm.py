@@ -1,3 +1,5 @@
+TDD_BANDS = [34, 38, 39, 40, 41, 42, 48, 77, 78, 79, ]
+
 # bandwidth index
 def bandwidths_selected_fr1(band):
     band = int(band)

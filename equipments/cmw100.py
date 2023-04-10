@@ -2,7 +2,7 @@ import math
 import time
 
 from equipments.series_basis.callbox.cmw_series import CMW
-from equipments.series_basis.modem_usb_serial.serial_series import TDD_BANDS
+from utils.parameters.common_parameters_ftm import TDD_BANDS
 import utils.parameters.external_paramters as ext_pmt
 from utils.log_init import log_set
 
