@@ -1,12 +1,22 @@
+release v2.14:
+1. refactor ENDC tab
+2. optimize some method and test process and UI
+3. optimize the ODPM2 and add the function to auto-detect project
+4. add SDL bands and n70 and move B21 from LB to MB
+
 release v2.13:
 1. add ULCA for LTE nonsignaling, but this is used to debug use because the MPR cannot work for some band(38/41)
 2. add the entry of voltage and temperature
 3. fix some bugs
+
 release v2.11:
 add freq sweep start and stop, add temp chamber off button
+
 release v2.10:
 add 1RB_0 for LTE and add tab of Harmonics to test harmonics
+
 release v2.9:
 add PN and freq_sweep_step and modify relative files for nonsignaling
 and correct the at command of DRX on LTE for signaling
+
 release v2.8
