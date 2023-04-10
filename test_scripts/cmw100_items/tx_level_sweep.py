@@ -28,6 +28,7 @@ class TxTestLevelSweep(AtCmd, CMW100):
         self.srs_path_enable = ext_pmt.srs_path_enable
         self.chan = None
         self.odpm2 = None
+        self.psu = None
 
     def results_combination_nlw(self, volt_enable):
         results = None

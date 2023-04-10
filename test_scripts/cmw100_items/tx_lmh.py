@@ -28,6 +28,7 @@ class TxTestGenre(AtCmd, CMW100):
         self.chan = None
         self.srs_path_enable = ext_pmt.srs_path_enable
         self.odpm2 = None
+        self.psu = None
 
     def get_temperature(self):
         """
