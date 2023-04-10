@@ -1,8 +1,7 @@
 band:
   band_segment: A
   band_segment_fr1: A
-  bands_ca_lte:
-  - 41C
+  bands_ca_lte: []
   bands_endc: []
   bands_fr1: []
   bands_gsm: []
