@@ -18,7 +18,7 @@ from equipments.temp_chamber import TempChamber
 logger = log_set('GUI')
 
 PROJECT_PATH = pathlib.Path(__file__).parent
-PROJECT_UI = PROJECT_PATH / pathlib.Path('gui') / "main_v2_14_3.ui"
+PROJECT_UI = PROJECT_PATH / pathlib.Path('gui') / "main_v2_14_4.ui"
 
 
 class MainApp:
@@ -2349,7 +2349,6 @@ class MainApp:
             self.B18.set(18)
             self.B19.set(19)
             self.B20.set(20)
-            self.B21.set(21)
             self.B24.set(24)
             self.B26.set(26)
             self.B28.set(28)
@@ -2368,7 +2367,6 @@ class MainApp:
             self.B18.set(0)
             self.B19.set(0)
             self.B20.set(0)
-            self.B21.set(0)
             self.B24.set(0)
             self.B26.set(0)
             self.B28.set(0)
@@ -2426,6 +2424,7 @@ class MainApp:
             self.B3.set(3)
             self.B4.set(4)
             self.B66.set(66)
+            self.B21.set(21)
             self.B7.set(7)
             self.B30.set(30)
             self.B39.set(39)
@@ -2441,6 +2440,7 @@ class MainApp:
             self.B3.set(0)
             self.B4.set(0)
             self.B66.set(0)
+            self.B21.set(0)
             self.B7.set(0)
             self.B30.set(0)
             self.B39.set(0)
