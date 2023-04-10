@@ -3,6 +3,7 @@ import time
 from utils.log_init import log_set
 import utils.parameters.external_paramters as ext_pmt
 from connection_interface.connection_serial import ModemComport
+from utils.parameters.common_parameters_ftm import TDD_BANDS
 
 
 logger = log_set('AtCmd')
@@ -270,7 +271,7 @@ class AtCmd:
         """
         For now FDD is forced to 15KHz and TDD is to be 30KHz
         """
-        if band in [34, 38, 39, 40, 41, 42, 48, 75, 76, 77, 78, 79, ]:
+        if band in TDD_BANDS:
             scs = 1
         else:
             scs = 0
@@ -325,7 +326,7 @@ class AtCmd:
 
     def sync_fr1(self):
         logger.info('---------Sync----------')
-        scs = 1 if self.band_fr1 in [34, 38, 39, 40, 41, 42, 48, 75, 76, 77, 78, 79] else 0
+        scs = 1 if self.band_fr1 in TDD_BANDS else 0
         response = self.command(
             f'AT+NRFSYNC={self.sync_path_dict[self.sync_path]},{self.sync_mode},{scs},'
             f'{self.bw_fr1_dict[self.bw_fr1]},0,{self.rx_freq_fr1}',
@@ -413,7 +414,7 @@ class AtCmd:
 
     def set_duty_cycle(self):
         logger.info(f'----------Set duty cycle: {ext_pmt.duty_cycle}----------')
-        if self.band_fr1 in [34, 38, 39, 40, 41, 42, 48, 75, 76, 77, 78, 79]:
+        if self.band_fr1 in TDD_BANDS:
             self.uldl_period = self.duty_cycle_dict[ext_pmt.duty_cycle][0]
             self.dl_slot = self.duty_cycle_dict[ext_pmt.duty_cycle][1]
             self.dl_symbol = self.duty_cycle_dict[ext_pmt.duty_cycle][2]
@@ -434,7 +435,7 @@ class AtCmd:
 
     def tx_set_no_sync_fr1(self):
         logger.info('---------Tx No Sync----------')
-        self.scs = 30 if self.band_fr1 in [34, 38, 39, 40, 41, 42, 48, 75, 76, 77, 78, 79] else 15
+        self.scs = 30 if self.band_fr1 in TDD_BANDS else 15
         self.command(
             f'AT+NRFACTREQ={self.tx_path_dict[self.tx_path]},{self.tx_freq_fr1},{self.bw_fr1_dict[self.bw_fr1]},'
             f'{self.scs_dict[self.scs]},{self.rb_size_fr1},{self.rb_start_fr1},{self.mcs_fr1_dict[self.mcs_fr1]},'
@@ -736,18 +737,89 @@ class AtCmd:
                      f'{self.rb_size_cc2_lte},{self.rb_start_cc2_lte},{self.mcs_lte_dict[self.mcs_cc2_lte]},'
                      f'2,2,{self.tx_level},0')
 
-    def query_voltage_fr1(self):
-        res = self.command(f'AT+NMIPIREAD=2,b,0', delay=0.2)
+    @staticmethod
+    def set_mipi_voltage(tech, band, tx_path):
+        mipi_num = None
+        usid = None
+        addr = None
+
+        if tech in ['LTE', 'FR1']:
+            if tx_path == 'TX1':
+                if band in [26, 5, 8, 12, 13, 14, 17, 18, 19, 20, 28, 29, 71, 24]:
+                    mipi_num, usid, addr = 2, 'b', 0
+                elif band in [1, 2, 3, 4, 66, 7, 25, 30, 38, 41, 40, 39, 34, 70, 75, 76, ]:
+                    mipi_num, usid, addr = 0, 'b', 0
+                elif band in [42, 48, 77, 78, 79, ]:
+                    mipi_num, usid, addr = 4, 'b', 0
+
+            elif tx_path == 'TX2':
+                if band in [1, 2, 3, 4, 66, 7, 25, 30, 38, 41, 40, 39, 34, 70, 75, 76, ]:
+                    mipi_num, usid, addr = 2, 'b', 0
+                elif band in [42, 48, 77, 78, 79, ]:
+                    mipi_num, usid, addr = 0, 'b', 0
+
+        elif tech in ['WCDMA']:
+            if band in [1, 2, 4]:
+                mipi_num, usid, addr = 0, 'b', 0
+            elif band in [5, 8, 6, 19]:
+                mipi_num, usid, addr = 2, 'b', 0
+
+        return mipi_num, usid, addr
+
+    def query_voltage_fr1(self, band, tx_path):
+        """
+        P23:
+        MIPI 0 = MHB/ UHB Sub
+        MIPI 2 = LB / MHB ENDC
+        MIPI 4 = UHB Main
+        """
+        mipi_num, usid, addr = self.set_mipi_voltage('FR1', band, tx_path)
+
+        res = self.command(f'AT+NMIPIREAD={mipi_num},{usid},{addr}', delay=0.2)
         for line in res:
             if '+NMIPIREAD:' in line.decode():
                 vol_hex = line.decode().split(':')[1].strip()
                 vol_real = (int(vol_hex, 16) * 0.0256) + 0.2
                 return [vol_real]
 
-    def query_voltage_lte(self):
-        res = self.command(f'AT+MIPIREAD=2,11,0', delay=0.2)
+    def query_voltage_lte(self, band, tx_path):
+        """
+        P23:
+        MIPI 0 = MHB/ UHB Sub
+        MIPI 2 = LB / MHB ENDC
+        MIPI 4 = UHB Main
+        """
+        mipi_num, usid, addr = self.set_mipi_voltage('LTE', band, tx_path)
+
+        res = self.command(f'AT+MIPIREAD={mipi_num},{int(usid, 16)},{addr}', delay=0.2)
         for line in res:
             if '+MIPIREAD:' in line.decode():
                 vol_hex = line.decode().split(':')[1].strip()
                 vol_real = (int(vol_hex, 16) * 0.0256) + 0.2
                 return [vol_real]
+
+    def query_voltage_wcdma(self, band, tx_path=None):
+        """
+        P23:
+        MIPI 0 = MHB/ UHB Sub
+        MIPI 2 = LB / MHB ENDC
+        MIPI 4 = UHB Main
+        """
+        mipi_num, usid, addr = self.set_mipi_voltage('WCDMA', band, tx_path)
+
+        res = self.command(f'AT+HREADMIPI={mipi_num},{usid},{addr}', delay=0.2)
+        for line in res:
+            if 'Data' in line.decode():
+                vol_hex = line.decode().split('x')[1].strip()
+                vol_real = (int(vol_hex, 16) * 0.0256) + 0.2
+                return [vol_real]
+
+    def query_voltage_selector(self, tech, band, tx_path):
+        if tech == 'FR1':
+            return self.query_voltage_fr1(band, tx_path)
+        elif tech == 'LTE':
+            return self.query_voltage_lte(band, tx_path)
+        elif tech == 'WCDMA':
+            return self.query_voltage_wcdma(band)
+
+

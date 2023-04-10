@@ -22,8 +22,8 @@ fdd_tdd_cross_test = 0     # this is only for 8821,  0: only measure one of FDD 
 tx_max_pwr_sensitivity = [1, 0]  # 1: Txmax power, 0: -10dBm
 
 tx_level = 26
-tx_level_endc_lte = 26
-tx_level_endc_fr1 = 10
+tx_level_endc_lte = 20
+tx_level_endc_fr1 = 27
 tx_pcl_lb = 5  # GMSK_MB: 0 ~ 15, EPSK_MB 2~15:
 tx_pcl_mb = 0  # GMSK_MB: 0 ~ 15, EPSK_MB 2~15:
 sa_nsa = 0  # sa: 0, nsa: 1
@@ -41,6 +41,7 @@ rfout_anritsu = 'MAIN'
 
 asw_path = 0
 srs_path = 0
+volt_mipi_en = False
 odpm_enable = False
 record_current_enable = False
 psu_enable = True
@@ -54,6 +55,10 @@ asw_path_enable = False
 sync_path = 'Main'  # 'Main', 'CA#1', 'CA#2', 'CA#3'
 tx_paths = ['TX1']   # 'TX1' | 'TX2' | 'MIMO
 rx_paths = [15]  #  0: default(free run) | 1: DRX_ONLY | 2: PRX ONLY | 3: PRX+DRX | 4: 4RX_PRX(RX2) ONLY | 8: 4RX_DRX(RX3) ONLY | 12: 4RX_PRX(RX2) + 4RX_DRX(RX3) | 15: ALL PATH
+tx_path_endc_lte = 'TX1'
+tx_path_endc_fr1 = 'TX1'
+rx_paths_endc_lte = [15]
+rx_paths_endc_fr1 = [15]
 condition = 'NV'
 rx_fast_test_enable = False
 

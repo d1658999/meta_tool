@@ -1,3 +1,5 @@
+TDD_BANDS = [34, 38, 39, 40, 41, 42, 48, 77, 78, 79, ]
+
 # bandwidth index
 def bandwidths_selected_fr1(band):
     band = int(band)
@@ -29,7 +31,7 @@ def bandwidths_selected_fr1(band):
         'N70': [5, 10, 15, 20, 25, ],
         'N71': [5, 10, 15, 20, ],
         'N75': [5, 10, 15, 20, 25, 30, 40, 50, ],
-        'N76': [5, 10, ],
+        'N76': [5, ],
         'N77': [10, 15, 20, 25, 40, 50, 60, 80, 90, 100, 70, ],
         'N78': [10, 15, 20, 25, 40, 50, 60, 80, 90, 100, 70, ],
         'N79': [10, 20, 40, 50, 60, 80, 100, ],
@@ -87,7 +89,7 @@ def bandwidths_selected_lte_ulca(band_combo):
             '10+5',
             '10+10',
         ],
-        '1C':[
+        '1C': [
             '15+15',
             '20+20',
         ],
@@ -163,6 +165,7 @@ def bandwidths_selected_lte_ulca(band_combo):
 
     return bandwidths_ulca[band_combo]
 
+
 # DL Freq
 def dl_freq_selected(standard, band, bw=5):
     band = int(band)
@@ -192,7 +195,7 @@ def dl_freq_selected(standard, band, bw=5):
         'N41': [2496 + bw / 2, 2593, 2690 - bw / 2],
         'N48': [3550 + bw / 2, 3625, 3700 - bw / 2],
         'N66': [2110 + bw / 2, 2145, 2180 - bw / 2],
-        'N70': [1995 + bw / 2, 2007.5, 2020 - bw / 2],
+        'N70': [1995 + bw / 2, 2002.5, 2010 - bw / 2],
         'N71': [617 + bw / 2, 634.5, 652 - bw / 2],
         'N75': [1432 + bw / 2, 1474.5, 1517 - bw / 2],
         'N76': [1427 + bw / 2, 1429.5, 1432 - bw / 2],

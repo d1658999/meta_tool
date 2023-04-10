@@ -1,3 +1,5 @@
+import time
+
 from connection_interface.connection_visa import VisaComport
 from utils.log_init import log_set
 
@@ -3382,12 +3384,44 @@ class CMW:
         """
         self.cmw_write(f'CONFigure:LTE:MEAS:MEV:RES:PMONitor {on_off}')
 
+    def set_screen_update(self, enable='OFF'):
+        """
+        Defines whether the display is updated or not while the instrument is in the remote
+        state. If the display update is switched off, the normal GUI is replaced by a static image
+        while the instrument is in the remote state.
+        Switching off the display can speed up the measurement and is the recommended
+        state.
+        See also Chapter 7.1.4.1, "Using the Display during Remote Control", on page 101
+        Parameters:
+        <Enable> ON | OFF | 1 | 0
+                 ON | 1: Display is shown and updated during remote control.
+                 OFF | 0: Display shows static image during remote control.
+        """
+        self.cmw_write(f'SYSTem:DISPlay:UPDate {enable}')
+
+    def set_screen_captured_area(self, area='MWINdow'):
+        """
+        Selects the part of the screen to be captured
+        Parameters:
+        <Area> AWINdow | MWINdow | FSCReen
+               AWINdow: active window
+               MWINdow: main window
+               FSCReen: full screen
+               *RST:  AWIN
+        """
+        self.cmw_write(f'HCOPy:AREA {area}')
+
     def set_screenshot_format(self, f_format="PNG"):
         """
-        HCOPy:DEVice:FORMat <format>
-
-        :param f_format: BMP | JPG | PNG
-        :return:
+        Specifies the format of screenshots created via the commands HCOPy:FILE, HCOPy:
+        DATA?, HCOPy:INTerior:FILE or HCOPy:INTerior:DATA?.
+        Parameters:
+        <Format> BMP | JPG | PNG
+                 BMP: Windows bitmap format
+                 JPG: JPEG format
+                 PNG: PNG format
+                 Example:  HCOPy:DEVice:FORMat PNG
+                 Screenshots are created in PNG format.
         """
         self.cmw_write(f'HCOPy:DEVice:FORMat {f_format}')
         # if f_format in ["BMP", "JPG", "PNG"]:
@@ -3395,6 +3429,24 @@ class CMW:
         #     self._Send(cmd)
         # else:
         #     self._logger.error(f'HCOPy:DEVice:FORMat {f_format}, parameter error')
+
+    def get_screenshot_to_file(self, filepath):
+        """
+        Captures a screenshot and stores it to the specified file.
+        HCOPy:FILE captures the entire window, HCOPy:INTerior:FILE only the interior of
+        the window.
+        If a "Remote" dialog is displayed instead of the normal display contents, this command
+        switches on the display before taking a screenshot, and afterwards off again.
+        Parameters:
+        <FileName> string
+                   Absolute path and name of the file. The file name extension is
+                   added automatically according to the configured format (see
+                   HCOPy:DEVice:FORMat on page 239).
+                   Aliases are allowed (see MMEMory:ALIases? on page 168).
+        Wildcards are not allowed.
+        Example:  HCOPy:FILE '@PRINT\image1'
+        """
+        self.cmw_write(f'HCOPy:INTerior:FILE {filepath}')
 
     def query_screenshot(self):
         """
@@ -3459,8 +3511,12 @@ class CMW:
 
 def main():
     test = CMW('CMW100')
+    test.cmw_write('SYSTem:DISPlay:UPDate ON')
+    time.sleep(1)
+    test.set_screen_captured_area()
     test.set_screenshot_format()
-    fileData = test.query_screenshot()
+    filepath = f"'G:/My Drive/1_PJ/11_huskey/test'"
+    test.get_screenshot_to_file(filepath)
 
     # newFile = open('test.png', "wb")
     # newFile.write(fileData)

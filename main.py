@@ -18,7 +18,7 @@ from equipments.temp_chamber import TempChamber
 logger = log_set('GUI')
 
 PROJECT_PATH = pathlib.Path(__file__).parent
-PROJECT_UI = PROJECT_PATH / pathlib.Path('gui') / "main_v2_13.ui"
+PROJECT_UI = PROJECT_PATH / pathlib.Path('gui') / "main_v2_14_4.ui"
 
 
 class MainApp:
@@ -61,6 +61,8 @@ class MainApp:
         self.asw_path_enable = None
         self.srs_path = None
         self.tx_level = None
+        self.tx_level_endc_lte = None
+        self.tx_level_endc_fr1 = None
         self.tx1 = None
         self.tx2 = None
         self.ulmimo = None
@@ -233,6 +235,9 @@ class MainApp:
         self.N30 = None
         self.N25 = None
         self.N66 = None
+        self.N70 = None
+        self.N75 = None
+        self.N76 = None
         # self.N39 = None
         self.N40 = None
         self.N38 = None
@@ -310,6 +315,23 @@ class MainApp:
         self.frb_frb = None
         self.one_rb0_one_rbmax = None
         self.one_rbmax_one_rb0 = None
+        self.endc_tx_path_lte = None
+        self.endc_tx_path_fr1 = None
+        self.rx0_endc_lte = None
+        self.rx1_endc_lte = None
+        self.rx2_endc_lte = None
+        self.rx3_endc_lte = None
+        self.rx0_rx1_endc_lte = None
+        self.rx2_rx3_endc_lte = None
+        self.rx_all_path_endc_lte = None
+        self.rx0_endc_fr1 = None
+        self.rx1_endc_fr1 = None
+        self.rx2_endc_fr1 = None
+        self.rx3_endc_fr1 = None
+        self.rx0_rx1_endc_fr1 = None
+        self.rx2_rx3_endc_fr1 = None
+        self.rx_all_path_endc_fr1 = None
+        self.volt_mipi_en = None
         builder.import_variables(
             self,
             [
@@ -325,6 +347,8 @@ class MainApp:
                 "rfout_anritsu",
                 "sync_path",
                 "tx_level",
+                "tx_level_endc_lte",
+                "tx_level_endc_fr1",
                 "asw_path",
                 "srs_path_enable",
                 "asw_path_enable",
@@ -501,6 +525,9 @@ class MainApp:
                 "N30",
                 "N25",
                 "N66",
+                "N70",
+                "N75",
+                "N76",
                 # "N39",
                 "N40",
                 "N38",
@@ -575,6 +602,25 @@ class MainApp:
                 "frb_frb",
                 "one_rb0_one_rbmax",
                 "one_rbmax_one_rb0",
+                "endc_tx_path_lte",
+                "endc_tx_path_fr1",
+                "rx0_endc_lte",
+                "rx1_endc_lte",
+                "rx2_endc_lte",
+                "rx3_endc_lte",
+                "rx0_rx1_endc_lte",
+                "rx2_rx3_endc_lte",
+                "rx_all_path_endc_lte",
+                "endc_tx_path_lte",
+                "endc_tx_path_fr1",
+                "rx0_endc_fr1",
+                "rx1_endc_fr1",
+                "rx2_endc_fr1",
+                "rx3_endc_fr1",
+                "rx0_rx1_endc_fr1",
+                "rx2_rx3_endc_fr1",
+                "rx_all_path_endc_fr1",
+                "volt_mipi_en",
             ],
         )
 
@@ -583,6 +629,8 @@ class MainApp:
         # self.import_ui_setting()
         log_clear()
         self.import_ui_setting_yaml()
+        self.endc_tx_path_lte.set('TX1')
+        self.endc_tx_path_fr1.set('TX1')
         # self.inst_to_tech()
 
     def run(self):
@@ -708,11 +756,14 @@ class MainApp:
         self.pcl_mb.set(ui_init['power']['mb_gsm_pcl'])
         self.mod_gsm.set(ui_init['mcs']['modulaiton_gsm'])
         self.tx_level.set(ui_init['power']['tx_level'])
+        self.tx_level_endc_lte.set(ui_init['power']['tx_level_endc_lte'])
+        self.tx_level_endc_fr1.set(ui_init['power']['tx_level_endc_fr1'])
         self.wait_time.set(ui_init['external_inst']['wait_time'])
         self.count.set(ui_init['external_inst']['count'])
         self.tempcham_enable.set(ui_init['external_inst']['tempchb'])
         self.psu_enable.set(ui_init['external_inst']['psu'])
         self.odpm_enable.set(ui_init['external_inst']['odpm'])
+        self.volt_mipi_en.set(ui_init['external_inst']['volt_mipi'])
         self.record_current_enable.set(ui_init['external_inst']['record_current'])
         self.hthv.set(ui_init['condition']['hthv'])
         self.htlv.set(ui_init['condition']['htlv'])
@@ -818,6 +869,12 @@ class MainApp:
                 self.N48.set(band_fr1)
             elif band_fr1 == 66:
                 self.N66.set(band_fr1)
+            elif band_fr1 == 70:
+                self.N70.set(band_fr1)
+            elif band_fr1 == 75:
+                self.N75.set(band_fr1)
+            elif band_fr1 == 76:
+                self.N76.set(band_fr1)
             elif band_fr1 == 71:
                 self.N71.set(band_fr1)
             elif band_fr1 == 77:
@@ -1248,6 +1305,8 @@ class MainApp:
         pcl_lb_gsm = self.pcl_lb.get()
         pcl_mb_gsm = self.pcl_mb.get()
         tx_level = self.tx_level.get()
+        tx_level_endc_lte = self.tx_level_endc_lte.get()
+        tx_leve_endc_fr1 = self.tx_level_endc_fr1.get()
         wait_time = self.wait_time.get()
         count = self.count.get()
         mod_gsm = self.mod_gsm.get()
@@ -1271,6 +1330,7 @@ class MainApp:
         tpchb_enable = self.tempcham_enable.get()
         psu_enable = self.psu_enable.get()
         odpm_enable = self.odpm_enable.get()
+        volt_mipi_en = self.volt_mipi_en.get()
         record_current_enable = self.record_current_enable.get()
         hthv = self.hthv.get()
         htlv = self.htlv.get()
@@ -1337,6 +1397,8 @@ class MainApp:
                 'lb_gsm_pcl': pcl_lb_gsm,
                 'mb_gsm_pcl': pcl_mb_gsm,
                 'tx_level': tx_level,
+                'tx_level_endc_lte': tx_level_endc_lte,
+                'tx_level_endc_fr1': tx_leve_endc_fr1,
             },
             'channel': {
                 'chan': chan,
@@ -1367,6 +1429,7 @@ class MainApp:
                 'tempchb': tpchb_enable,
                 'psu': psu_enable,
                 'odpm': odpm_enable,
+                'volt_mipi': volt_mipi_en,
                 'record_current': record_current_enable,
                 'count': count,
                 'wait_time': wait_time,
@@ -1406,6 +1469,12 @@ class MainApp:
             logger.info('=====Enable ODPM=====')
         else:
             logger.info('=====Disable ODPM=====')
+
+    def volt_mipi_status(self):
+        if self.volt_mipi_en.get():
+            logger.info('=====Disable Volt_mipi=====')
+        else:
+            logger.info('=====Enable Volt_mipi=====')
 
     def record_current_enable_status(self):
         if self.record_current_enable.get():
@@ -1585,6 +1654,15 @@ class MainApp:
         if self.N66.get() == 66:
             logger.debug(self.N66.get())
             self.band_fr1.append(self.N66.get())
+        if self.N70.get() == 70:
+            logger.debug(self.N70.get())
+            self.band_fr1.append(self.N70.get())
+        if self.N75.get() == 75:
+            logger.debug(self.N75.get())
+            self.band_fr1.append(self.N75.get())
+        if self.N76.get() == 76:
+            logger.debug(self.N76.get())
+            self.band_fr1.append(self.N76.get())
         if self.N30.get() == 30:
             logger.debug(self.N30.get())
             self.band_fr1.append(self.N30.get())
@@ -2292,7 +2370,6 @@ class MainApp:
             self.B18.set(18)
             self.B19.set(19)
             self.B20.set(20)
-            self.B21.set(21)
             self.B24.set(24)
             self.B26.set(26)
             self.B28.set(28)
@@ -2311,7 +2388,6 @@ class MainApp:
             self.B18.set(0)
             self.B19.set(0)
             self.B20.set(0)
-            self.B21.set(0)
             self.B24.set(0)
             self.B26.set(0)
             self.B28.set(0)
@@ -2369,6 +2445,7 @@ class MainApp:
             self.B3.set(3)
             self.B4.set(4)
             self.B66.set(66)
+            self.B21.set(21)
             self.B7.set(7)
             self.B30.set(30)
             self.B39.set(39)
@@ -2384,6 +2461,7 @@ class MainApp:
             self.B3.set(0)
             self.B4.set(0)
             self.B66.set(0)
+            self.B21.set(0)
             self.B7.set(0)
             self.B30.set(0)
             self.B39.set(0)
@@ -2428,6 +2506,9 @@ class MainApp:
             self.N3.set(3)
             # self.N4.set(4)
             self.N66.set(66)
+            self.N70.set(70)
+            self.N75.set(75)
+            self.N76.set(76)
             self.N7.set(7)
             self.N30.set(30)
             # self.N39.set(39)
@@ -2444,6 +2525,9 @@ class MainApp:
             self.N3.set(0)
             # self.N4.set(0)
             self.N66.set(0)
+            self.N70.set(0)
+            self.N75.set(0)
+            self.N76.set(0)
             self.N7.set(0)
             self.N30.set(0)
             # self.N39.set(0)
@@ -2778,6 +2862,14 @@ class MainApp:
     def select_pcl_gsm(self, option):
         logger.info(f'LB: PCL{self.pcl_lb.get()}, MB: PCL{self.pcl_mb.get()}')
 
+    def wanted_endc_tx_path_lte(self):
+        logger.info(f'Switch to endc LTE tx path: {self.endc_tx_path_lte.get()}')
+        return self.endc_tx_path_lte.get()
+
+    def wanted_endc_tx_path_fr1(self):
+        logger.info(f'Switch to endc FR1 tx path: {self.endc_tx_path_fr1.get()}')
+        return self.endc_tx_path_fr1.get()
+
     def wanted_tx_path(self):
         self.tx_path = []
         if self.tx1.get():
@@ -2795,8 +2887,84 @@ class MainApp:
         if self.tx_path == []:
             logger.debug('Nothing to select for tx path')
 
-        logger.info(f'script select BW: {self.tx_path}')
+        logger.info(f'script select tx path: {self.tx_path}')
         return self.tx_path
+
+    def wanted_endc_rx_path_lte(self):
+        rx_path = []
+        rx_path_show = []
+        if self.rx0_endc_lte.get():
+            rx_path_show.append('RX0')
+            rx_path.append(2)
+
+        if self.rx1_endc_lte.get():
+            rx_path_show.append('RX1')
+            rx_path.append(1)
+
+        if self.rx2_endc_lte.get():
+            rx_path_show.append('RX2')
+            rx_path.append(4)
+
+        if self.rx3_endc_lte.get():
+            rx_path_show.append('RX3')
+            rx_path.append(8)
+
+        if self.rx0_rx1_endc_lte.get():
+            rx_path_show.append('RX0+RX1')
+            rx_path.append(3)
+
+        if self.rx2_rx3_endc_lte.get():
+            rx_path_show.append('RX2+RX3')
+            rx_path.append(12)
+
+        if self.rx_all_path_endc_lte.get():
+            rx_path_show.append('ALL PATH')
+            rx_path.append(15)
+
+        if rx_path == []:
+            logger.debug('Nothing to select for endc LTE rx path')
+
+        logger.info(f'RX path select ENDC LTE: {rx_path_show}')
+
+        return rx_path
+
+    def wanted_endc_rx_path_fr1(self):
+        rx_path = []
+        rx_path_show = []
+        if self.rx0_endc_fr1.get():
+            rx_path_show.append('RX0')
+            rx_path.append(2)
+
+        if self.rx1_endc_fr1.get():
+            rx_path_show.append('RX1')
+            rx_path.append(1)
+
+        if self.rx2_endc_fr1.get():
+            rx_path_show.append('RX2')
+            rx_path.append(4)
+
+        if self.rx3_endc_fr1.get():
+            rx_path_show.append('RX3')
+            rx_path.append(8)
+
+        if self.rx0_rx1_endc_fr1.get():
+            rx_path_show.append('RX0+RX1')
+            rx_path.append(3)
+
+        if self.rx2_rx3_endc_fr1.get():
+            rx_path_show.append('RX2+RX3')
+            rx_path.append(12)
+
+        if self.rx_all_path_endc_fr1.get():
+            rx_path_show.append('ALL PATH')
+            rx_path.append(15)
+
+        if rx_path == []:
+            logger.debug('Nothing to select for endc LTE rx path')
+
+        logger.info(f'RX path select ENDC FR1: {rx_path_show}')
+
+        return rx_path
 
     def wanted_rx_path(self):
         self.rx_path = []
@@ -2858,6 +3026,9 @@ class MainApp:
 
     def select_tx_level(self, option):
         logger.info(f'select TX Level {self.tx_level.get()}')
+
+    def select_tx_level_endc(self, option):
+        logger.info(f'select TX Level ENDC LTE: {self.tx_level_endc_lte.get()}, FR1: {self.tx_level_endc_fr1.get()}')
 
     def select_wait_time(self, option):
         logger.info(f'select Wait Time {self.wait_time.get()}')
@@ -3015,7 +3186,11 @@ class MainApp:
         ext_pmt.rb_ftm_ulca_lte = self.wanted_ftm_rb_ulca_lte()
         ext_pmt.rb_ftm_fr1 = self.wanted_ftm_rb_fr1()
         ext_pmt.tx_paths = self.wanted_tx_path()
+        ext_pmt.tx_path_endc_lte = self.wanted_endc_tx_path_lte()
+        ext_pmt.tx_path_endc_fr1 = self.wanted_endc_tx_path_fr1()
         ext_pmt.rx_paths = self.wanted_rx_path()
+        ext_pmt.rx_paths_endc_lte = self.wanted_endc_rx_path_lte()
+        ext_pmt.rx_paths_endc_fr1 = self.wanted_endc_rx_path_fr1()
         ext_pmt.mcs_lte = self.wanted_mcs_lte()
         ext_pmt.mcs_fr1 = self.wanted_mcs_fr1()
         ext_pmt.type_fr1 = self.wanted_type()
@@ -3039,10 +3214,13 @@ class MainApp:
         ext_pmt.tx_pcl_lb = self.pcl_lb.get()
         ext_pmt.tx_pcl_mb = self.pcl_mb.get()
         ext_pmt.tx_level = self.tx_level.get()
+        ext_pmt.tx_level_endc_lte = self.tx_level_endc_lte.get()
+        ext_pmt.tx_level_endc_fr1 = self.tx_level_endc_fr1.get()
         # ext_pmt.wait_time = self.wait_time.get()  # obsolete
         ext_pmt.current_count = self.count.get()
         ext_pmt.psu_enable = self.psu_enable.get()
         ext_pmt.odpm_enable = self.odpm_enable.get()
+        ext_pmt.volt_mipi_en = self.volt_mipi_en.get()
         ext_pmt.record_current_enable = self.record_current_enable.get()
         ext_pmt.condition = self.condition
         ext_pmt.part_number = self.part_number.get()

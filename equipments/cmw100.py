@@ -2,6 +2,7 @@ import math
 import time
 
 from equipments.series_basis.callbox.cmw_series import CMW
+from utils.parameters.common_parameters_ftm import TDD_BANDS
 import utils.parameters.external_paramters as ext_pmt
 from utils.log_init import log_set
 
@@ -519,7 +520,7 @@ class CMW100(CMW):
         """
         For now FDD is forced to 15KHz and TDD is to be 30KHz
         """
-        if band in [34, 38, 39, 40, 41, 42, 48, 75, 76, 77, 78, 79, ]:
+        if band in TDD_BANDS:
             scs = 1
         else:
             scs = 0
@@ -680,7 +681,7 @@ class CMW100(CMW):
         self.set_measure_stop_lte()
         self.cmw_query('*OPC?')
         logger.debug(aclr_results + mod_results)
-        return aclr_results + mod_results  # U_-2, U_-1, E_-1, E_+1, U_+1, U_+2, Power,EVM, Freq_Err, IQ_OFFSET
+        return aclr_results + mod_results  # U_-2, U_-1, E_-1, Pwr, E_+1, U_+1, U_+2, EVM, Freq_Err, IQ_OFFSET
 
     def tx_measure_wcdma(self):
         logger.info('---------Tx Measure----------')
