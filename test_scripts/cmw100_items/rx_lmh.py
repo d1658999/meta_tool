@@ -10,7 +10,7 @@ import utils.parameters.rb_parameters as scrpt_set
 from utils.loss_handler import get_loss
 from utils.excel_handler import rxs_relative_plot_ftm, rxs_endc_plot_ftm, rx_power_endc_test_export_excel_ftm
 from utils.excel_handler import rx_power_relative_test_export_excel_ftm, rx_desense_process_ftm
-from utils.excel_handler import rx_desense_endc_process_ftm, select_file_name_rx_ftm
+from utils.excel_handler import rx_desense_endc_process_ftm, select_file_name_rx_ftm, excel_folder_path
 from utils.channel_handler import channel_freq_select
 
 logger = log_set('rx_lmh')
@@ -250,12 +250,12 @@ class RxTestGenre(AtCmd, CMW100):
             try:
                 parameters = {
                     'script': self.script,
-                    'tech': self.tech,
+                    'tech': 'FR1',
                     'mcs': self.mcs_fr1,
                 }
-                self.bw_fr1 = bw
-                file_name = select_file_name_rx_ftm(bw, self.tech)
-                file_path = Path(self.file_path).parent / Path(file_name)
+                # self.bw_fr1 = bw
+                file_name = select_file_name_rx_ftm(bw, 'FR1')
+                file_path = Path(excel_folder_path()) / Path(file_name)
                 rx_desense_process_ftm(file_path, self.mcs_fr1)
                 rxs_relative_plot_ftm(file_path, parameters)
             except TypeError as err:
@@ -299,12 +299,12 @@ class RxTestGenre(AtCmd, CMW100):
             try:
                 parameters = {
                     'script': self.script,
-                    'tech': self.tech,
+                    'tech': 'LTE',
                     'mcs': self.mcs_lte,
                 }
-                self.bw_lte = bw
-                file_name = select_file_name_rx_ftm(bw, self.tech)
-                file_path = Path(self.file_path).parent / Path(file_name)
+                # self.bw_lte = bw
+                file_name = select_file_name_rx_ftm(bw, 'LTE')
+                file_path = Path(excel_folder_path()) / Path(file_name)
                 rx_desense_process_ftm(file_path, self.mcs_lte)
                 rxs_relative_plot_ftm(file_path, parameters)
             except TypeError as err:

@@ -5,7 +5,7 @@ from utils.log_init import log_set
 import utils.parameters.external_paramters as ext_pmt
 import utils.parameters.common_parameters_ftm as cm_pmt_ftm
 from utils.loss_handler_harmonic import get_loss_cmw100
-from utils.excel_handler import select_file_name_genre_tx_ftm
+from utils.excel_handler import select_file_name_genre_tx_ftm, excel_folder_path
 from utils.excel_handler import txp_aclr_evm_current_plot_ftm, tx_power_relative_test_export_excel_ftm
 from utils.channel_handler import channel_freq_select
 import utils.parameters.rb_parameters as rb_pmt
@@ -50,9 +50,9 @@ class TxHarmonics(TxTestGenre, FSW50):
                     logger.info(f'B{self.band_fr1} does not have BW {self.bw_fr1}MHZ')
         for bw in ext_pmt.fr1_bandwidths:
             try:
-                file_name = select_file_name_genre_tx_ftm(bw, self.tech, 'harmonics')
-                file_path = Path(self.file_path).parent / Path(file_name)
-                txp_aclr_evm_current_plot_ftm(file_path, self.parameters)
+                file_name = select_file_name_genre_tx_ftm(bw, 'FR1', 'harmonics')
+                file_path = Path(excel_folder_path()) / Path(file_name)
+                txp_aclr_evm_current_plot_ftm(file_path, {'script': 'CSE', 'tech': 'FR1'})
             except TypeError:
                 logger.info(f'there is no data to plot because the band does not have this BW ')
             except FileNotFoundError:
@@ -157,9 +157,9 @@ class TxHarmonics(TxTestGenre, FSW50):
                     logger.info(f'B{self.band_lte} does not have BW {self.bw_lte}MHZ')
         for bw in ext_pmt.lte_bandwidths:
             try:
-                file_name = select_file_name_genre_tx_ftm(bw, self.tech, 'harmonics')
-                file_path = Path(self.file_path).parent / Path(file_name)
-                txp_aclr_evm_current_plot_ftm(file_path, self.parameters)
+                file_name = select_file_name_genre_tx_ftm(bw, 'LTE', 'harmonics')
+                file_path = Path(excel_folder_path()) / Path(file_name)
+                txp_aclr_evm_current_plot_ftm(file_path, {'script': 'CSE', 'tech': 'LTE'})
             except TypeError:
                 logger.info(f'there is no data to plot because the band does not have this BW ')
             except FileNotFoundError:
