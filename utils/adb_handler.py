@@ -47,6 +47,7 @@ class RecordCurrent:
         logger.debug(self.pmic)
 
     def record_current(self, count=10):
+        logger.info('----------ODPM2 measuring----------')
         rffe_rail = self.index
         # modem_rail = 23
         # panel_rail = 19
