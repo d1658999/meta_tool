@@ -19,7 +19,7 @@ from equipments.temp_chamber import TempChamber
 logger = log_set('GUI')
 
 PROJECT_PATH = pathlib.Path(__file__).parent
-PROJECT_UI = PROJECT_PATH / pathlib.Path('gui') / "main_v2_15_1.ui"
+PROJECT_UI = PROJECT_PATH / pathlib.Path('gui') / "main_v2_15_2.ui"
 
 
 class MainApp:
@@ -334,6 +334,7 @@ class MainApp:
         self.rx_all_path_endc_fr1 = None
         self.volt_mipi_en = None
         self.port_table_enable = None
+        self.debug_enable = None
         builder.import_variables(
             self,
             [
@@ -624,6 +625,7 @@ class MainApp:
                 "rx_all_path_endc_fr1",
                 "volt_mipi_en",
                 "port_table_enable",
+                "debug_enable",
             ],
         )
 
@@ -752,6 +754,7 @@ class MainApp:
         self.srs_path_enable.set(ui_init['path']['srs_path_enable'])
         self.asw_path_enable.set(ui_init['path']['asw_path_enable'])
         self.port_table_enable.set(ui_init['port']['port_table_enable'])
+        self.debug_enable.set((ui_init['port']['debug_enable']))
         self.rx_quick_enable.set(ui_init['test_items']['rx_quick_enable'])
         self.sync_path.set(ui_init['path']['sync_path'])
         self.sa_nsa.set(ui_init['path']['sa_nsa'])
@@ -1324,6 +1327,7 @@ class MainApp:
         srs_path_enable = self.srs_path_enable.get()
         asw_path_enable = self.asw_path_enable.get()
         port_table_enable = self.port_table_enable.get()
+        debug_enable = self.debug_enable.get()
         rx_quick_enable = self.rx_quick_enable.get()
         sync_path = self.sync_path.get()
         rfout_anritsu = self.rfout_anritsu.get()
@@ -1354,6 +1358,7 @@ class MainApp:
                 'port_tx_fr1': port_tx_fr1,
                 'rfout_anritsu': rfout_anritsu,
                 'port_table_enable': port_table_enable,
+                'debug_enable': debug_enable
             },
             'path': {
                 'sa_nsa': sa_nsa,
@@ -3219,6 +3224,7 @@ class MainApp:
         ext_pmt.srs_path_enable = self.srs_path_enable.get()
         ext_pmt.asw_path_enable = self.asw_path_enable.get()
         ext_pmt.port_table_en = self.port_table_enable.get()
+        ext_pmt.debug_enable = self.debug_enable.get()
         ext_pmt.rx_fast_test_enable = self.rx_quick_enable.get()
         ext_pmt.sync_path = self.sync_path.get()
         ext_pmt.sa_nsa = self.sa_nsa.get()

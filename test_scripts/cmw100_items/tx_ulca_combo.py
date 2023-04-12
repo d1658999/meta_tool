@@ -42,6 +42,12 @@ class TxTestCa(AtCmd, CMW100):
     # def ca_bw_combo_seperate_lte(self, bw_cc1, bw_cc2):
     #     self.bw_cc1_lte = int(bw_cc1)
     #     self.bw_cc2_lte = int(bw_cc2)
+    @staticmethod
+    def debug_ulca():
+        if ext_pmt.debug_enable:
+            input(f'Stop, and press "Enter" key in CLI and keep going\n')
+        else:
+            pass
 
     def get_temperature(self):
         """
@@ -146,6 +152,9 @@ class TxTestCa(AtCmd, CMW100):
         tx_ulca_power_relative_test_export_excel_ftm(self.tech, ulca_results, sub_info)
 
         logger.debug(ulca_results)
+
+        # debug use
+        self.debug_ulca()
 
         self.set_test_end_lte()
 
