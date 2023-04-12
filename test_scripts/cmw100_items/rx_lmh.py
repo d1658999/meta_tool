@@ -38,6 +38,20 @@ class RxTestGenre(AtCmd, CMW100):
         self.script = None
         self.chan = None
         self.resolution = None
+        self.port_table = None
+
+    def port_table_selector(self, band, tx_path='TX1'):
+        """
+        This is used for multi-ports connection on Tx
+        """
+        if self.port_table is None:
+            self.port_table = self.port_tx_table()
+
+        if ext_pmt.port_table_en:
+            self.port_tx = int(self.port_table[tx_path][str(band)])
+
+        else:
+            pass
 
     def get_temperature(self):
         """
@@ -242,10 +256,16 @@ class RxTestGenre(AtCmd, CMW100):
                 self.ue_power_bool = item[3]
                 self.tx_level = ext_pmt.tx_level if self.ue_power_bool == 1 else -10
                 self.band_fr1 = item[4]
-                if self.bw_fr1 in cm_pmt_ftm.bandwidths_selected_fr1(self.band_fr1):
-                    self.search_sensitivity_lmh_process_fr1()
-                else:
-                    logger.info(f'B{self.band_fr1} does not have BW {self.bw_fr1}MHZ')
+                try:
+                    self.port_table_selector(self.band_fr1, self.tx_path)
+                    if self.bw_fr1 in cm_pmt_ftm.bandwidths_selected_fr1(self.band_fr1):
+                        self.search_sensitivity_lmh_process_fr1()
+                    else:
+                        logger.info(f'B{self.band_fr1} does not have BW {self.bw_fr1}MHZ')
+
+                except KeyError as err:
+                    logger.info(f'Band {self.band_fr1} does not have this tx path {self.tx_path}')
+
         for bw in ext_pmt.fr1_bandwidths:
             try:
                 parameters = {
@@ -291,10 +311,16 @@ class RxTestGenre(AtCmd, CMW100):
                 self.ue_power_bool = item[3]
                 self.tx_level = ext_pmt.tx_level if self.ue_power_bool == 1 else -10
                 self.band_lte = item[4]
-                if self.bw_lte in cm_pmt_ftm.bandwidths_selected_lte(self.band_lte):
-                    self.search_sensitivity_lmh_process_lte()
-                else:
-                    logger.info(f'B{self.band_lte} does not have BW {self.bw_lte}MHZ')
+                try:
+                    self.port_table_selector(self.band_lte, self.tx_path)
+                    if self.bw_lte in cm_pmt_ftm.bandwidths_selected_lte(self.band_lte):
+                        self.search_sensitivity_lmh_process_lte()
+                    else:
+                        logger.info(f'B{self.band_lte} does not have BW {self.bw_lte}MHZ')
+
+                except KeyError as err:
+                    logger.info(f'Band {self.band_lte} does not have this tx path {self.tx_path}')
+
         for bw in ext_pmt.lte_bandwidths:
             try:
                 parameters = {
@@ -335,6 +361,7 @@ class RxTestGenre(AtCmd, CMW100):
                 self.tech = item[0]
                 self.tx_path = item[1]
                 self.band_wcdma = item[2]
+                self.port_table_selector(self.band_wcdma)
                 self.search_sensitivity_lmh_process_wcdma()
         # file_name = f'Sensitivty_5MHZ_{self.tech}_LMH.xlsx'
         # file_path = Path(excel_folder_path()) / Path(file_name)
@@ -359,6 +386,7 @@ class RxTestGenre(AtCmd, CMW100):
             if item[0] == 'GSM' and ext_pmt.gsm_bands != []:
                 self.tech = item[0]
                 self.band_gsm = item[1]
+                self.port_table_selector(self.band_gsm)
                 self.pcl = ext_pmt.tx_pcl_lb if self.band_gsm in [850, 900] else ext_pmt.tx_pcl_mb
                 self.search_sensitivity_lmh_process_gsm()
         # file_name = f'Sensitivty_0MHZ_{self.tech}_LMH.xlsx'

@@ -25,6 +25,20 @@ class TxTest1RbSweep(AtCmd, CMW100):
         self.script = None
         self.rb_state = None
         self.chan = None
+        self.port_table = None
+
+    def port_table_selector(self, band, tx_path='TX1'):
+        """
+        This is used for multi-ports connection on Tx
+        """
+        if self.port_table is None:
+            self.port_table = self.port_tx_table()
+
+        if ext_pmt.port_table_en:
+            self.port_tx = int(self.port_table[tx_path][str(band)])
+
+        else:
+            pass
 
     def select_asw_srs_path(self):
         if self.srs_path_enable:
@@ -55,10 +69,16 @@ class TxTest1RbSweep(AtCmd, CMW100):
                 self.bw_fr1 = item[2]
                 self.band_fr1 = item[3]
                 self.type_fr1 = item[4]
-                if self.bw_fr1 in cm_pmt_ftm.bandwidths_selected_fr1(self.band_fr1):
-                    self.tx_1rb_sweep_process_fr1()
-                else:
-                    logger.info(f'B{self.band_fr1} does not have BW {self.bw_fr1}MHZ')
+                try:
+                    self.port_table_selector(self.band_fr1, self.tx_path)
+                    if self.bw_fr1 in cm_pmt_ftm.bandwidths_selected_fr1(self.band_fr1):
+                        self.tx_1rb_sweep_process_fr1()
+                    else:
+                        logger.info(f'B{self.band_fr1} does not have BW {self.bw_fr1}MHZ')
+
+                except KeyError as err:
+                    logger.info(f'Band {self.band_fr1} does not have this tx path {self.tx_path}')
+
         for bw in ext_pmt.fr1_bandwidths:
             try:
                 file_name = select_file_name_genre_tx_ftm(bw, 'FR1', '1rb_sweep')

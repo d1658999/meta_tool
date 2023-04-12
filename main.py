@@ -15,10 +15,11 @@ from utils.excel_handler import excel_folder_create
 from equipments.power_supply import Psu
 from equipments.temp_chamber import TempChamber
 
+
 logger = log_set('GUI')
 
 PROJECT_PATH = pathlib.Path(__file__).parent
-PROJECT_UI = PROJECT_PATH / pathlib.Path('gui') / "main_v2_14_4.ui"
+PROJECT_UI = PROJECT_PATH / pathlib.Path('gui') / "main_v2_15_1.ui"
 
 
 class MainApp:
@@ -332,6 +333,7 @@ class MainApp:
         self.rx2_rx3_endc_fr1 = None
         self.rx_all_path_endc_fr1 = None
         self.volt_mipi_en = None
+        self.port_table_enable = None
         builder.import_variables(
             self,
             [
@@ -621,6 +623,7 @@ class MainApp:
                 "rx2_rx3_endc_fr1",
                 "rx_all_path_endc_fr1",
                 "volt_mipi_en",
+                "port_table_enable",
             ],
         )
 
@@ -748,6 +751,7 @@ class MainApp:
         self.srs_path.set(ui_init['path']['srs_path'])
         self.srs_path_enable.set(ui_init['path']['srs_path_enable'])
         self.asw_path_enable.set(ui_init['path']['asw_path_enable'])
+        self.port_table_enable.set(ui_init['port']['port_table_enable'])
         self.rx_quick_enable.set(ui_init['test_items']['rx_quick_enable'])
         self.sync_path.set(ui_init['path']['sync_path'])
         self.sa_nsa.set(ui_init['path']['sa_nsa'])
@@ -1319,6 +1323,7 @@ class MainApp:
         srs_path = self.srs_path.get()
         srs_path_enable = self.srs_path_enable.get()
         asw_path_enable = self.asw_path_enable.get()
+        port_table_enable = self.port_table_enable.get()
         rx_quick_enable = self.rx_quick_enable.get()
         sync_path = self.sync_path.get()
         rfout_anritsu = self.rfout_anritsu.get()
@@ -1348,6 +1353,7 @@ class MainApp:
                 'port_tx_lte': port_tx_lte,
                 'port_tx_fr1': port_tx_fr1,
                 'rfout_anritsu': rfout_anritsu,
+                'port_table_enable': port_table_enable,
             },
             'path': {
                 'sa_nsa': sa_nsa,
@@ -3053,6 +3059,12 @@ class MainApp:
         else:
             logger.info('AS is disabled')
 
+    def pt_enable(self):
+        if self.port_table_enable.get():
+            logger.info('Port table enabled')
+        else:
+            logger.info('Port table disabled')
+
     def wanted_ftm_rb_lte(self):
         self.ftm_rb_lte = []
         if self.prb_lte.get():
@@ -3206,6 +3218,7 @@ class MainApp:
         ext_pmt.srs_path = self.srs_path.get()
         ext_pmt.srs_path_enable = self.srs_path_enable.get()
         ext_pmt.asw_path_enable = self.asw_path_enable.get()
+        ext_pmt.port_table_en = self.port_table_enable.get()
         ext_pmt.rx_fast_test_enable = self.rx_quick_enable.get()
         ext_pmt.sync_path = self.sync_path.get()
         ext_pmt.sa_nsa = self.sa_nsa.get()

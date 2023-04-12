@@ -21,6 +21,19 @@ class TxTestFccCe(AtCmd, CMW100):
         self.file_path = None
         self.srs_path_enable = ext_pmt.srs_path_enable
 
+    def port_table_selector(self, band, tx_path='TX1'):
+        """
+        This is used for multi-ports connection on Tx
+        """
+        if self.port_table is None:
+            self.port_table = self.port_tx_table()
+
+        if ext_pmt.port_table_en:
+            self.port_tx = int(self.port_table[tx_path][str(band)])
+
+        else:
+            pass
+
     def select_asw_srs_path(self):
         if self.srs_path_enable:
             self.srs_switch()
@@ -47,6 +60,7 @@ class TxTestFccCe(AtCmd, CMW100):
                 self.bw_fr1 = item[2]
                 self.band_fr1 = item[3]
                 self.type_fr1 = item[4]
+                self.port_table_selector(self.band_fr1, self.tx_path)
                 if self.bw_fr1 in cm_pmt_ftm.bandwidths_selected_fr1(self.band_fr1):
                     self.tx_power_fcc_fr1()
                 else:
@@ -134,6 +148,7 @@ class TxTestFccCe(AtCmd, CMW100):
                 self.bw_fr1 = item[2]
                 self.band_fr1 = item[3]
                 self.type_fr1 = item[4]
+                self.port_table_selector(self.band_fr1, self.tx_path)
                 if self.bw_fr1 in cm_pmt_ftm.bandwidths_selected_fr1(self.band_fr1):
                     self.tx_power_ce_fr1()
                 else:

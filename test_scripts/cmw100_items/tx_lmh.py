@@ -29,6 +29,20 @@ class TxTestGenre(AtCmd, CMW100):
         self.srs_path_enable = ext_pmt.srs_path_enable
         self.odpm2 = None
         self.psu = None
+        self.port_table = None
+
+    def port_table_selector(self, band, tx_path='TX1'):
+        """
+        This is used for multi-ports connection on Tx
+        """
+        if self.port_table is None:
+            self.port_table = self.port_tx_table()
+
+        if ext_pmt.port_table_en:
+            self.port_tx = int(self.port_table[tx_path][str(band)])
+
+        else:
+            pass
 
     def get_temperature(self):
         """
@@ -411,10 +425,16 @@ class TxTestGenre(AtCmd, CMW100):
                 self.bw_fr1 = item[2]
                 self.band_fr1 = item[3]
                 self.type_fr1 = item[4]
-                if self.bw_fr1 in cm_pmt_ftm.bandwidths_selected_fr1(self.band_fr1):
-                    self.tx_power_aclr_evm_lmh_process_fr1()
-                else:
-                    logger.info(f'B{self.band_fr1} does not have BW {self.bw_fr1}MHZ')
+                try:
+                    self.port_table_selector(self.band_fr1, self.tx_path)  # this is determined if using port table
+                    if self.bw_fr1 in cm_pmt_ftm.bandwidths_selected_fr1(self.band_fr1):
+                        self.tx_power_aclr_evm_lmh_process_fr1()
+                    else:
+                        logger.info(f'B{self.band_fr1} does not have BW {self.bw_fr1}MHZ')
+
+                except KeyError as err:
+                    logger.info(f'Band {self.band_fr1} does not have this tx path {self.tx_path}')
+
         for bw in ext_pmt.fr1_bandwidths:
             try:
                 file_name = select_file_name_genre_tx_ftm(bw, 'FR1', 'lmh')
@@ -442,10 +462,16 @@ class TxTestGenre(AtCmd, CMW100):
                 self.tx_path = item[1]
                 self.bw_lte = item[2]
                 self.band_lte = item[3]
-                if self.bw_lte in cm_pmt_ftm.bandwidths_selected_lte(self.band_lte):
-                    self.tx_power_aclr_evm_lmh_process_lte()
-                else:
-                    logger.info(f'B{self.band_lte} does not have BW {self.bw_lte}MHZ')
+                try:
+                    self.port_table_selector(self.band_lte, self.tx_path)  # this is determined if using port table
+                    if self.bw_lte in cm_pmt_ftm.bandwidths_selected_lte(self.band_lte):
+                        self.tx_power_aclr_evm_lmh_process_lte()
+                    else:
+                        logger.info(f'B{self.band_lte} does not have BW {self.bw_lte}MHZ')
+
+                except KeyError as err:
+                    logger.info(f'Band {self.band_lte} does not have this tx path {self.tx_path}')
+
         for bw in ext_pmt.lte_bandwidths:
             try:
                 file_name = select_file_name_genre_tx_ftm(bw, 'LTE', 'lmh')
@@ -465,6 +491,7 @@ class TxTestGenre(AtCmd, CMW100):
                 self.tech = 'WCDMA'
                 for band in ext_pmt.wcdma_bands:
                     self.band_wcdma = band
+                    self.port_table_selector(self.band_wcdma)  # this is determined if using port table
                     self.tx_power_aclr_evm_lmh_process_wcdma()
                 txp_aclr_evm_current_plot_ftm(self.file_path, self.parameters)
 
@@ -480,6 +507,7 @@ class TxTestGenre(AtCmd, CMW100):
                 for band in ext_pmt.gsm_bands:
                     self.pcl = ext_pmt.tx_pcl_lb if band in [850, 900] else ext_pmt.tx_pcl_mb
                     self.band_gsm = band
+                    self.port_table_selector(self.band_gsm)  # this is determined if using port table
                     self.tx_power_aclr_evm_lmh_process_gsm()
                 txp_aclr_evm_current_plot_ftm(self.file_path, self.parameters)
 

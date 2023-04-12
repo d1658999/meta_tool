@@ -33,7 +33,7 @@ external_inst:
   record_current: false
   tempchb: false
   volt_mipi: false
-  wait_time: 0
+  wait_time: 300
 instrument:
   instrument: Cmw100
 mcs:
@@ -50,6 +50,7 @@ path:
   sync_path: Main
   tx_paths: []
 port:
+  port_table_enable: false
   port_tx: 1
   port_tx_fr1: 1
   port_tx_lte: 3
