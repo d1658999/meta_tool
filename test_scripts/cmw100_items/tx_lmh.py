@@ -297,7 +297,6 @@ class TxTestGenre(AtCmd, CMW100):
                     self.cmw_query('*OPC?')
                     self.sig_gen_wcdma()
                     self.sync_wcdma()
-                    self.tx_chan_wcdma = tx_rx_chan_wcdma[0]
                     self.tx_set_wcdma()
                     self.antenna_switch_v2()
                     self.aclr_mod_current_results = aclr_mod_results = self.tx_measure_wcdma()
