@@ -1,3 +1,8 @@
+release v2.15:
+1. add multi port table, which can use every port by port table in advance
+2. add the MIMO tx path and refactor the process on tx_lmh and tx_level test items
+3. if unchecking the bands but only checking BW, it will replot the original raw data again
+
 release v2.14:
 1. refactor ENDC tab
 2. optimize some method and test process and UI
