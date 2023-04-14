@@ -45,7 +45,7 @@ class TxTestCa(AtCmd, CMW100):
     @staticmethod
     def debug_ulca():
         if ext_pmt.debug_enable:
-            input(f'Stop, and press "Enter" key in CLI and keep going\n')
+            input(f'Stop, and press "Enter" key in CLI and keep going')
         else:
             pass
 
