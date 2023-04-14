@@ -557,7 +557,7 @@ class RxTestGenre(AtCmd, CMW100):
         # [L_rx_freq, M_rx_ferq, H_rx_freq]
         rx_freq_list = cm_pmt_ftm.dl_freq_selected('FR1', self.band_fr1, self.bw_fr1)
 
-        rx_freq_select_list = set(channel_freq_select(self.chan, rx_freq_list))
+        rx_freq_select_list = sorted(set(channel_freq_select(self.chan, rx_freq_list)))
 
         for rx_path in ext_pmt.rx_paths:
             self.rx_path_fr1 = rx_path
@@ -614,7 +614,7 @@ class RxTestGenre(AtCmd, CMW100):
         rx_freq_list = cm_pmt_ftm.dl_freq_selected('LTE', self.band_lte,
                                                    self.bw_lte)  # [L_rx_freq, M_rx_ferq, H_rx_freq]
 
-        rx_freq_select_list = set(channel_freq_select(self.chan, rx_freq_list))
+        rx_freq_select_list = sorted(set(channel_freq_select(self.chan, rx_freq_list)))
 
         for rx_path in ext_pmt.rx_paths:
             self.rx_path_lte = rx_path

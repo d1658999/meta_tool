@@ -38,8 +38,12 @@ class TxTestGenre(AtCmd, CMW100):
         if self.port_table is None:
             self.port_table = self.port_tx_table()
 
-        if ext_pmt.port_table_en:
+        if ext_pmt.port_table_en and tx_path in ['TX1', 'TX2']:
             self.port_tx = int(self.port_table[tx_path][str(band)])
+
+        elif ext_pmt.port_table_en and tx_path in ['MIMO']:
+            self.port_mimo_tx1 = int(self.port_table['MIMO_TX1'][str(band)])
+            self.port_mimo_tx2 = int(self.port_table['MIMO_TX2'][str(band)])
 
         else:
             pass
@@ -159,7 +163,7 @@ class TxTestGenre(AtCmd, CMW100):
         # self.scs = scs  # temp
 
         tx_freq_lmh_list = [cm_pmt_ftm.transfer_freq_rx2tx_fr1(self.band_fr1, rx_freq) for rx_freq in rx_freq_list]
-        tx_freq_select_list = set(channel_freq_select(self.chan, tx_freq_lmh_list))
+        tx_freq_select_list = sorted(set(channel_freq_select(self.chan, tx_freq_lmh_list)))
 
         for mcs in ext_pmt.mcs_fr1:
             self.mcs_fr1 = mcs
@@ -170,43 +174,33 @@ class TxTestGenre(AtCmd, CMW100):
                         self.rb_size_fr1, self.rb_start_fr1 = \
                             rb_pmt.GENERAL_FR1[self.bw_fr1][self.scs][self.type_fr1][self.rb_alloc_fr1_dict[rb_ftm]]
                         self.rb_state = rb_ftm  # INNER_FULL, OUTER_FULL
-                        data_freq = {}
                         for tx_freq_fr1 in tx_freq_select_list:
                             self.tx_freq_fr1 = tx_freq_fr1
-                            self.rx_freq_fr1 = cm_pmt_ftm.transfer_freq_tx2rx_fr1(self.band_fr1, tx_freq_fr1)  # temp
-                            self.loss_tx = get_loss(self.tx_freq_fr1)
-                            # self.loss_rx = get_loss(rx_freq_list[1])  # temp
-                            # self.set_test_end_fr1()  # temp
-                            # self.set_test_mode_fr1()  # temp
-                            # self.select_asw_srs_path() # temp
-                            # self.sig_gen_fr1()  # temp
-                            # self.sync_fr1()  # temp
-                            self.tx_set_fr1()
-                            self.aclr_mod_current_results = aclr_mod_results = self.tx_measure_fr1()
-                            logger.debug(aclr_mod_results)
-                            self.aclr_mod_current_results.append(self.measure_current(self.band_fr1))
-                            data_freq[self.tx_freq_fr1] = self.results_combination_nlw(ext_pmt.volt_mipi_en)
-                        logger.debug(data_freq)
-                        # ready to export to excel
-                        self.parameters = {
-                            'script': self.script,
-                            'tech': self.tech,
-                            'band': self.band_fr1,
-                            'bw': self.bw_fr1,
-                            'tx_freq_level': self.tx_level,
-                            'mcs': self.mcs_fr1,
-                            'tx_path': self.tx_path,
-                            'mod': None,
-                            'rb_state': self.rb_state,
-                            'rb_size': self.rb_size_fr1,
-                            'rb_start': self.rb_start_fr1,
-                            'sync_path': self.sync_path,
-                            'asw_srs_path': self.asw_srs_path,
-                            'scs': self.scs,
-                            'type': self.type_fr1,
-                            'test_item': 'lmh',
-                        }
-                        self.file_path = tx_power_relative_test_export_excel_ftm(data_freq, self.parameters)
+                            self.tx_power_aclr_evm_lmh_subprocess_fr1()
+
+                            if self.tx_path in ['TX1', 'TX2']:  # this is for TX1, TX2, not MIMO
+                                # ready to export to excel
+                                self.parameters = {
+                                    'script': self.script,
+                                    'tech': self.tech,
+                                    'band': self.band_fr1,
+                                    'bw': self.bw_fr1,
+                                    'tx_freq_level': self.tx_level,
+                                    'mcs': self.mcs_fr1,
+                                    'tx_path': self.tx_path,
+                                    'mod': None,
+                                    'rb_state': self.rb_state,
+                                    'rb_size': self.rb_size_fr1,
+                                    'rb_start': self.rb_start_fr1,
+                                    'sync_path': self.sync_path,
+                                    'asw_srs_path': self.asw_srs_path,
+                                    'scs': self.scs,
+                                    'type': self.type_fr1,
+                                    'test_item': 'lmh',
+                                }
+                                self.file_path = tx_power_relative_test_export_excel_ftm(self.data_freq, self.parameters)
+
+
         self.set_test_end_fr1()
 
     def tx_power_aclr_evm_lmh_process_lte(self):
@@ -233,7 +227,7 @@ class TxTestGenre(AtCmd, CMW100):
         self.sync_lte()
 
         tx_freq_lmh_list = [cm_pmt_ftm.transfer_freq_rx2tx_lte(self.band_lte, rx_freq) for rx_freq in rx_freq_list]
-        tx_freq_select_list = set(channel_freq_select(self.chan, tx_freq_lmh_list))
+        tx_freq_select_list = sorted(set(channel_freq_select(self.chan, tx_freq_lmh_list)))
 
         for mcs in ext_pmt.mcs_lte:
             self.mcs_lte = mcs
@@ -254,6 +248,7 @@ class TxTestGenre(AtCmd, CMW100):
                             self.aclr_mod_current_results.append(self.measure_current(self.band_lte))
                             data_freq[self.tx_freq_lte] = self.results_combination_nlw(ext_pmt.volt_mipi_en)
                         logger.debug(data_freq)
+
                         # ready to export to excel
                         self.parameters = {
                             'script': self.script,
@@ -320,6 +315,7 @@ class TxTestGenre(AtCmd, CMW100):
                     tx_freq_wcdma = cm_pmt_ftm.transfer_chan2freq_wcdma(self.band_wcdma, self.tx_chan_wcdma)
                     data_chan[tx_freq_wcdma] = self.results_combination_nlw(ext_pmt.volt_mipi_en)
                 logger.debug(data_chan)
+
                 # ready to export to excel
                 self.parameters = {
                     'script': self.script,
@@ -382,6 +378,7 @@ class TxTestGenre(AtCmd, CMW100):
                     aclr_mod_current_results.append(self.measure_current(self.band_gsm))
                     data_chan[self.rx_freq_gsm] = aclr_mod_current_results + self.get_temperature()
                 logger.debug(data_chan)
+
                 # ready to export to excel
                 self.parameters = {
                     'script': self.script,
@@ -403,6 +400,60 @@ class TxTestGenre(AtCmd, CMW100):
                 }
                 self.file_path = tx_power_relative_test_export_excel_ftm(data_chan, self.parameters)  # mode=1: LMH mode
         self.set_test_end_gsm()
+
+    def tx_power_aclr_evm_lmh_subprocess_fr1(self):
+        self.data_freq = data_freq = {}
+        self.rx_freq_fr1 = cm_pmt_ftm.transfer_freq_tx2rx_fr1(self.band_fr1, self.tx_freq_fr1)  # temp
+        self.loss_tx = get_loss(self.tx_freq_fr1)
+        # self.loss_rx = get_loss(rx_freq_list[1])  # temp
+        # self.set_test_end_fr1()  # temp
+        # self.set_test_mode_fr1()  # temp
+        # self.select_asw_srs_path() # temp
+        # self.sig_gen_fr1()  # temp
+        # self.sync_fr1()  # temp
+        if self.tx_path in ['TX1', 'TX2']:
+            self.tx_set_fr1()
+            self.aclr_mod_current_results = aclr_mod_results = self.tx_measure_fr1()
+            logger.debug(aclr_mod_results)
+            self.aclr_mod_current_results.append(self.measure_current(self.band_fr1))
+            self.data_freq[self.tx_freq_fr1] = self.results_combination_nlw(ext_pmt.volt_mipi_en)
+            logger.debug(self.data_freq)
+
+
+        elif self.tx_path in ['MIMO']:  # measure two port
+            path_count = 1  # this is for mimo path to store tx_path
+            for port_tx in [self.port_mimo_tx1, self.port_mimo_tx2]:
+                self.port_tx = port_tx
+                self.tx_path_mimo = self.tx_path + f'_{path_count}'
+                self.tx_set_fr1()
+                self.aclr_mod_current_results = aclr_mod_results = self.tx_measure_fr1()
+                logger.debug(aclr_mod_results)
+                self.aclr_mod_current_results.append(self.measure_current(self.band_fr1))
+                data_freq[self.tx_freq_fr1] = self.results_combination_nlw(ext_pmt.volt_mipi_en)
+                logger.debug(data_freq)
+
+                # ready to export to excel
+                self.parameters = {
+                    'script': self.script,
+                    'tech': self.tech,
+                    'band': self.band_fr1,
+                    'bw': self.bw_fr1,
+                    'tx_freq_level': self.tx_level,
+                    'mcs': self.mcs_fr1,
+                    'tx_path': self.tx_path_mimo,
+                    'mod': None,
+                    'rb_state': self.rb_state,
+                    'rb_size': self.rb_size_fr1,
+                    'rb_start': self.rb_start_fr1,
+                    'sync_path': self.sync_path,
+                    'asw_srs_path': self.asw_srs_path,
+                    'scs': self.scs,
+                    'type': self.type_fr1,
+                    'test_item': 'lmh',
+                }
+                self.file_path = tx_power_relative_test_export_excel_ftm(data_freq, self.parameters)
+
+                path_count += 1
 
     def tx_power_aclr_evm_lmh_pipeline_fr1(self):
         self.tx_level = ext_pmt.tx_level
@@ -430,10 +481,10 @@ class TxTestGenre(AtCmd, CMW100):
                     if self.bw_fr1 in cm_pmt_ftm.bandwidths_selected_fr1(self.band_fr1):
                         self.tx_power_aclr_evm_lmh_process_fr1()
                     else:
-                        logger.info(f'B{self.band_fr1} does not have BW {self.bw_fr1}MHZ')
+                        logger.info(f'NR B{self.band_fr1} does not have BW {self.bw_fr1}MHZ')
 
-                except KeyError as err:
-                    logger.info(f'Band {self.band_fr1} does not have this tx path {self.tx_path}')
+                except KeyError:
+                    logger.info(f'NR Band {self.band_fr1} does not have this tx path {self.tx_path}')
 
         for bw in ext_pmt.fr1_bandwidths:
             try:
@@ -463,14 +514,17 @@ class TxTestGenre(AtCmd, CMW100):
                 self.bw_lte = item[2]
                 self.band_lte = item[3]
                 try:
-                    self.port_table_selector(self.band_lte, self.tx_path)  # this is determined if using port table
-                    if self.bw_lte in cm_pmt_ftm.bandwidths_selected_lte(self.band_lte):
-                        self.tx_power_aclr_evm_lmh_process_lte()
+                    if self.tx_path in ['TX1', 'TX2']:
+                        self.port_table_selector(self.band_lte, self.tx_path)  # this is determined if using port table
+                        if self.bw_lte in cm_pmt_ftm.bandwidths_selected_lte(self.band_lte):
+                            self.tx_power_aclr_evm_lmh_process_lte()
+                        else:
+                            logger.info(f'B{self.band_lte} does not have BW {self.bw_lte}MHZ')
                     else:
-                        logger.info(f'B{self.band_lte} does not have BW {self.bw_lte}MHZ')
+                        logger.info(f'LTE Band {self.band_lte} does not have this tx path {self.tx_path}!')
 
                 except KeyError as err:
-                    logger.info(f'Band {self.band_lte} does not have this tx path {self.tx_path}')
+                    logger.info(f'LTE Band {self.band_lte} does not have this tx path {self.tx_path}!!')
 
         for bw in ext_pmt.lte_bandwidths:
             try:
