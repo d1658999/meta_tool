@@ -10,7 +10,7 @@ import utils.parameters.rb_parameters as scrpt_set
 from utils.loss_handler import get_loss
 from utils.excel_handler import rxs_relative_plot_ftm, rxs_endc_plot_ftm, rx_power_endc_test_export_excel_ftm
 from utils.excel_handler import rx_power_relative_test_export_excel_ftm, rx_desense_process_ftm
-from utils.excel_handler import rx_desense_endc_process_ftm, select_file_name_rx_ftm
+from utils.excel_handler import rx_desense_endc_process_ftm, select_file_name_rx_ftm, excel_folder_path
 from utils.channel_handler import channel_freq_select
 
 logger = log_set('rx_lmh')
@@ -38,6 +38,20 @@ class RxTestGenre(AtCmd, CMW100):
         self.script = None
         self.chan = None
         self.resolution = None
+        self.port_table = None
+
+    def port_table_selector(self, band, tx_path='TX1'):
+        """
+        This is used for multi-ports connection on Tx
+        """
+        if self.port_table is None:
+            self.port_table = self.port_tx_table()
+
+        if ext_pmt.port_table_en:
+            self.port_tx = int(self.port_table[tx_path][str(band)])
+
+        else:
+            pass
 
     def get_temperature(self):
         """
@@ -242,20 +256,26 @@ class RxTestGenre(AtCmd, CMW100):
                 self.ue_power_bool = item[3]
                 self.tx_level = ext_pmt.tx_level if self.ue_power_bool == 1 else -10
                 self.band_fr1 = item[4]
-                if self.bw_fr1 in cm_pmt_ftm.bandwidths_selected_fr1(self.band_fr1):
-                    self.search_sensitivity_lmh_process_fr1()
-                else:
-                    logger.info(f'B{self.band_fr1} does not have BW {self.bw_fr1}MHZ')
+                try:
+                    self.port_table_selector(self.band_fr1, self.tx_path)
+                    if self.bw_fr1 in cm_pmt_ftm.bandwidths_selected_fr1(self.band_fr1):
+                        self.search_sensitivity_lmh_process_fr1()
+                    else:
+                        logger.info(f'B{self.band_fr1} does not have BW {self.bw_fr1}MHZ')
+
+                except KeyError as err:
+                    logger.info(f'Band {self.band_fr1} does not have this tx path {self.tx_path}')
+
         for bw in ext_pmt.fr1_bandwidths:
             try:
                 parameters = {
                     'script': self.script,
-                    'tech': self.tech,
+                    'tech': 'FR1',
                     'mcs': self.mcs_fr1,
                 }
-                self.bw_fr1 = bw
-                file_name = select_file_name_rx_ftm(bw, self.tech)
-                file_path = Path(self.file_path).parent / Path(file_name)
+                # self.bw_fr1 = bw
+                file_name = select_file_name_rx_ftm(bw, 'FR1')
+                file_path = Path(excel_folder_path()) / Path(file_name)
                 rx_desense_process_ftm(file_path, self.mcs_fr1)
                 rxs_relative_plot_ftm(file_path, parameters)
             except TypeError as err:
@@ -291,20 +311,26 @@ class RxTestGenre(AtCmd, CMW100):
                 self.ue_power_bool = item[3]
                 self.tx_level = ext_pmt.tx_level if self.ue_power_bool == 1 else -10
                 self.band_lte = item[4]
-                if self.bw_lte in cm_pmt_ftm.bandwidths_selected_lte(self.band_lte):
-                    self.search_sensitivity_lmh_process_lte()
-                else:
-                    logger.info(f'B{self.band_lte} does not have BW {self.bw_lte}MHZ')
+                try:
+                    self.port_table_selector(self.band_lte, self.tx_path)
+                    if self.bw_lte in cm_pmt_ftm.bandwidths_selected_lte(self.band_lte):
+                        self.search_sensitivity_lmh_process_lte()
+                    else:
+                        logger.info(f'B{self.band_lte} does not have BW {self.bw_lte}MHZ')
+
+                except KeyError as err:
+                    logger.info(f'Band {self.band_lte} does not have this tx path {self.tx_path}')
+
         for bw in ext_pmt.lte_bandwidths:
             try:
                 parameters = {
                     'script': self.script,
-                    'tech': self.tech,
+                    'tech': 'LTE',
                     'mcs': self.mcs_lte,
                 }
-                self.bw_lte = bw
-                file_name = select_file_name_rx_ftm(bw, self.tech)
-                file_path = Path(self.file_path).parent / Path(file_name)
+                # self.bw_lte = bw
+                file_name = select_file_name_rx_ftm(bw, 'LTE')
+                file_path = Path(excel_folder_path()) / Path(file_name)
                 rx_desense_process_ftm(file_path, self.mcs_lte)
                 rxs_relative_plot_ftm(file_path, parameters)
             except TypeError as err:
@@ -335,6 +361,7 @@ class RxTestGenre(AtCmd, CMW100):
                 self.tech = item[0]
                 self.tx_path = item[1]
                 self.band_wcdma = item[2]
+                self.port_table_selector(self.band_wcdma)
                 self.search_sensitivity_lmh_process_wcdma()
         # file_name = f'Sensitivty_5MHZ_{self.tech}_LMH.xlsx'
         # file_path = Path(excel_folder_path()) / Path(file_name)
@@ -359,6 +386,7 @@ class RxTestGenre(AtCmd, CMW100):
             if item[0] == 'GSM' and ext_pmt.gsm_bands != []:
                 self.tech = item[0]
                 self.band_gsm = item[1]
+                self.port_table_selector(self.band_gsm)
                 self.pcl = ext_pmt.tx_pcl_lb if self.band_gsm in [850, 900] else ext_pmt.tx_pcl_mb
                 self.search_sensitivity_lmh_process_gsm()
         # file_name = f'Sensitivty_0MHZ_{self.tech}_LMH.xlsx'
@@ -529,7 +557,7 @@ class RxTestGenre(AtCmd, CMW100):
         # [L_rx_freq, M_rx_ferq, H_rx_freq]
         rx_freq_list = cm_pmt_ftm.dl_freq_selected('FR1', self.band_fr1, self.bw_fr1)
 
-        rx_freq_select_list = set(channel_freq_select(self.chan, rx_freq_list))
+        rx_freq_select_list = sorted(set(channel_freq_select(self.chan, rx_freq_list)))
 
         for rx_path in ext_pmt.rx_paths:
             self.rx_path_fr1 = rx_path
@@ -586,7 +614,7 @@ class RxTestGenre(AtCmd, CMW100):
         rx_freq_list = cm_pmt_ftm.dl_freq_selected('LTE', self.band_lte,
                                                    self.bw_lte)  # [L_rx_freq, M_rx_ferq, H_rx_freq]
 
-        rx_freq_select_list = set(channel_freq_select(self.chan, rx_freq_list))
+        rx_freq_select_list = sorted(set(channel_freq_select(self.chan, rx_freq_list)))
 
         for rx_path in ext_pmt.rx_paths:
             self.rx_path_lte = rx_path

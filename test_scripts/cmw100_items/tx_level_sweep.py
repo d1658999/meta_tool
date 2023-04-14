@@ -8,7 +8,7 @@ from utils.loss_handler import get_loss
 from utils.adb_handler import get_odpm_current, RecordCurrent
 from equipments.power_supply import Psu
 from utils.excel_handler import txp_aclr_evm_current_plot_ftm, tx_power_relative_test_export_excel_ftm
-from utils.excel_handler import select_file_name_genre_tx_ftm
+from utils.excel_handler import select_file_name_genre_tx_ftm, excel_folder_path
 from utils.channel_handler import channel_freq_select
 import utils.parameters.rb_parameters as rb_pmt
 import time
@@ -29,6 +29,24 @@ class TxTestLevelSweep(AtCmd, CMW100):
         self.chan = None
         self.odpm2 = None
         self.psu = None
+        self.port_table = None
+
+    def port_table_selector(self, band, tx_path='TX1'):
+        """
+        This is used for multi-ports connection on Tx
+        """
+        if self.port_table is None:
+            self.port_table = self.port_tx_table()
+
+        if ext_pmt.port_table_en and tx_path in ['TX1', 'TX2']:
+            self.port_tx = int(self.port_table[tx_path][str(band)])
+
+        elif ext_pmt.port_table_en and tx_path in ['MIMO']:
+            self.port_mimo_tx1 = int(self.port_table['MIMO_TX1'][str(band)])
+            self.port_mimo_tx2 = int(self.port_table['MIMO_TX2'][str(band)])
+
+        else:
+            pass
 
     def results_combination_nlw(self, volt_enable):
         results = None
@@ -250,7 +268,7 @@ class TxTestLevelSweep(AtCmd, CMW100):
         self.sync_fr1()
 
         tx_freq_lmh_list = [cm_pmt_ftm.transfer_freq_rx2tx_fr1(self.band_fr1, rx_freq) for rx_freq in rx_freq_list]
-        tx_freq_select_list = set(channel_freq_select(self.chan, tx_freq_lmh_list))
+        tx_freq_select_list = sorted(set(channel_freq_select(self.chan, tx_freq_lmh_list)))
 
         for mcs in ext_pmt.mcs_fr1:
             self.mcs_fr1 = mcs
@@ -269,58 +287,29 @@ class TxTestLevelSweep(AtCmd, CMW100):
                             self.tx_set_fr1()
                             self.tx_power_relative_test_initial_fr1()
 
-                            tx_range_list = ext_pmt.tx_level_range_list  # [tx_level_1, tx_level_2]
-
-                            logger.info('----------TX Level Sweep progress---------')
-                            logger.info(f'----------from {tx_range_list[0]} dBm to {tx_range_list[1]} dBm----------')
-
-                            step = -1 if tx_range_list[0] > tx_range_list[1] else 1
-
                             #  following is real change tx level prgress
+                            self.tx_level_sweep_subprocess_fr1()
 
-                            data = {}
-                            for tx_level in range(tx_range_list[0], tx_range_list[1] + step, step):
-                                self.tx_level = tx_level
-                                logger.info(f'========Now Tx level = {self.tx_level} dBm========')
-                                self.set_level_fr1(self.tx_level)
-                                self.set_rf_setting_user_margin_fr1(10.00)
-                                self.set_expect_power_fr1(self.tx_level + 5)
-                                self.set_measure_start_on_fr1()
-                                self.cmw_query('*OPC?')
-                                mod_results = self.get_modulation_avgerage_fr1()
-                                aclr_results = self.get_aclr_average_fr1()
-                                aclr_results[3] = mod_results[-1]
-                                mod_results.pop()
-                                self.get_in_band_emissions_fr1()
-                                self.get_flatness_extreme_fr1()
-                                # time.sleep(0.2)
-                                self.get_sem_average_and_margin_fr1()
-                                self.set_measure_stop_fr1()
-                                self.cmw_query('*OPC?')
-                                self.aclr_mod_current_results = aclr_mod_results = aclr_results + mod_results
-                                logger.debug(aclr_mod_results)
-                                self.aclr_mod_current_results.append(self.measure_current(self.band_fr1))
-                                data[tx_level] = self.results_combination_nlw(ext_pmt.volt_mipi_en)
-                            logger.debug(data)
-                            self.parameters = {
-                                'script': self.script,
-                                'tech': self.tech,
-                                'band': self.band_fr1,
-                                'bw': self.bw_fr1,
-                                'tx_freq_level': self.tx_freq_fr1,
-                                'mcs': self.mcs_fr1,
-                                'tx_path': self.tx_path,
-                                'mod': None,
-                                'rb_state': self.rb_state,
-                                'rb_size': self.rb_size_fr1,
-                                'rb_start': self.rb_start_fr1,
-                                'sync_path': self.sync_path,
-                                'asw_srs_path': self.asw_srs_path,
-                                'scs': self.scs,
-                                'type': self.type_fr1,
-                                'test_item': 'level_sweep',
-                            }
-                            self.file_path = tx_power_relative_test_export_excel_ftm(data, self.parameters)
+                            if self.tx_path in ['TX1', 'TX2']:  # this is for TX1, TX2, not MIMO
+                                self.parameters = {
+                                    'script': self.script,
+                                    'tech': self.tech,
+                                    'band': self.band_fr1,
+                                    'bw': self.bw_fr1,
+                                    'tx_freq_level': self.tx_freq_fr1,
+                                    'mcs': self.mcs_fr1,
+                                    'tx_path': self.tx_path,
+                                    'mod': None,
+                                    'rb_state': self.rb_state,
+                                    'rb_size': self.rb_size_fr1,
+                                    'rb_start': self.rb_start_fr1,
+                                    'sync_path': self.sync_path,
+                                    'asw_srs_path': self.asw_srs_path,
+                                    'scs': self.scs,
+                                    'type': self.type_fr1,
+                                    'test_item': 'level_sweep',
+                                }
+                                self.file_path = tx_power_relative_test_export_excel_ftm(self.data, self.parameters)
         self.set_test_end_fr1()
 
     def tx_level_sweep_process_lte(self):
@@ -351,7 +340,7 @@ class TxTestLevelSweep(AtCmd, CMW100):
         self.sync_lte()
 
         tx_freq_lmh_list = [cm_pmt_ftm.transfer_freq_rx2tx_lte(self.band_lte, rx_freq) for rx_freq in rx_freq_list]
-        tx_freq_select_list = set(channel_freq_select(self.chan, tx_freq_lmh_list))
+        tx_freq_select_list = sorted(set(channel_freq_select(self.chan, tx_freq_lmh_list)))
 
         for mcs in ext_pmt.mcs_lte:
             self.mcs_lte = mcs
@@ -596,6 +585,91 @@ class TxTestLevelSweep(AtCmd, CMW100):
                     self.file_path = tx_power_relative_test_export_excel_ftm(data, self.parameters)
         self.set_test_end_gsm()
 
+    def tx_level_sweep_subprocess_fr1(self):
+        tx_range_list = ext_pmt.tx_level_range_list  # [tx_level_1, tx_level_2]
+
+        logger.info('----------TX Level Sweep progress---------')
+        logger.info(f'----------from {tx_range_list[0]} dBm to {tx_range_list[1]} dBm----------')
+
+        step = -1 if tx_range_list[0] > tx_range_list[1] else 1
+
+        self.data = data = {}
+        if self.tx_path in ['TX1', 'TX2']:
+            for tx_level in range(tx_range_list[0], tx_range_list[1] + step, step):
+                self.tx_level = tx_level
+                logger.info(f'========Now Tx level = {self.tx_level} dBm========')
+                self.set_level_fr1(self.tx_level)
+                self.set_rf_setting_user_margin_fr1(10.00)
+                self.set_expect_power_fr1(self.tx_level + 5)
+                self.set_measure_start_on_fr1()
+                self.cmw_query('*OPC?')
+                mod_results = self.get_modulation_avgerage_fr1()
+                aclr_results = self.get_aclr_average_fr1()
+                aclr_results[3] = mod_results[-1]
+                mod_results.pop()
+                self.get_in_band_emissions_fr1()
+                self.get_flatness_extreme_fr1()
+                # time.sleep(0.2)
+                self.get_sem_average_and_margin_fr1()
+                self.set_measure_stop_fr1()
+                self.cmw_query('*OPC?')
+                self.aclr_mod_current_results = aclr_mod_results = aclr_results + mod_results
+                logger.debug(aclr_mod_results)
+                self.aclr_mod_current_results.append(self.measure_current(self.band_fr1))
+                self.data[tx_level] = self.results_combination_nlw(ext_pmt.volt_mipi_en)
+            logger.debug(self.data)
+
+        elif self.tx_path in ['MIMO']:
+            for tx_level in range(tx_range_list[0], tx_range_list[1] + step, step):
+                path_count = 1  # this is for mimo path to store tx_path
+                for port_tx in [self.port_mimo_tx1, self.port_mimo_tx2]:
+                    self.port_tx = port_tx
+                    self.tx_path_mimo = self.tx_path + f'_{path_count}'
+                    self.tx_level = tx_level
+                    logger.info(f'========Now Tx level = {self.tx_level} dBm========')
+                    self.set_level_fr1(self.tx_level)
+                    self.set_rf_setting_user_margin_fr1(10.00)
+                    self.set_expect_power_fr1(self.tx_level + 5)
+                    self.set_measure_start_on_fr1()
+                    self.cmw_query('*OPC?')
+                    mod_results = self.get_modulation_avgerage_fr1()
+                    aclr_results = self.get_aclr_average_fr1()
+                    aclr_results[3] = mod_results[-1]
+                    mod_results.pop()
+                    self.get_in_band_emissions_fr1()
+                    self.get_flatness_extreme_fr1()
+                    # time.sleep(0.2)
+                    self.get_sem_average_and_margin_fr1()
+                    self.set_measure_stop_fr1()
+                    self.cmw_query('*OPC?')
+                    self.aclr_mod_current_results = aclr_mod_results = aclr_results + mod_results
+                    logger.debug(aclr_mod_results)
+                    self.aclr_mod_current_results.append(self.measure_current(self.band_fr1))
+                    data[tx_level] = self.results_combination_nlw(ext_pmt.volt_mipi_en)
+                    logger.debug(data)
+                    self.parameters = {
+                        'script': self.script,
+                        'tech': self.tech,
+                        'band': self.band_fr1,
+                        'bw': self.bw_fr1,
+                        'tx_freq_level': self.tx_freq_fr1,
+                        'mcs': self.mcs_fr1,
+                        'tx_path': self.tx_path_mimo,
+                        'mod': None,
+                        'rb_state': self.rb_state,
+                        'rb_size': self.rb_size_fr1,
+                        'rb_start': self.rb_start_fr1,
+                        'sync_path': self.sync_path,
+                        'asw_srs_path': self.asw_srs_path,
+                        'scs': self.scs,
+                        'type': self.type_fr1,
+                        'test_item': 'level_sweep',
+                    }
+                    self.file_path = tx_power_relative_test_export_excel_ftm(data, self.parameters)
+
+                    path_count += 1
+                    data = {}
+
     def tx_level_sweep_pipeline_fr1(self):
         self.rx_level = ext_pmt.init_rx_sync_level
         self.tx_level = ext_pmt.tx_level
@@ -618,15 +692,21 @@ class TxTestLevelSweep(AtCmd, CMW100):
                 self.bw_fr1 = item[2]
                 self.band_fr1 = item[3]
                 self.type_fr1 = item[4]
-                if self.bw_fr1 in cm_pmt_ftm.bandwidths_selected_fr1(self.band_fr1):
-                    self.tx_level_sweep_process_fr1()
-                else:
-                    logger.info(f'B{self.band_fr1} does not have BW {self.bw_fr1}MHZ')
+                try:
+                    self.port_table_selector(self.band_fr1, self.tx_path)
+                    if self.bw_fr1 in cm_pmt_ftm.bandwidths_selected_fr1(self.band_fr1):
+                        self.tx_level_sweep_process_fr1()
+                    else:
+                        logger.info(f'NR B{self.band_fr1} does not have BW {self.bw_fr1}MHZ')
+
+                except KeyError as err:
+                    logger.info(f'NR Band {self.band_fr1} does not have this tx path {self.tx_path}')
+
         for bw in ext_pmt.fr1_bandwidths:
             try:
-                file_name = select_file_name_genre_tx_ftm(bw, self.tech, 'level_sweep')
-                file_path = Path(self.file_path).parent / Path(file_name)
-                txp_aclr_evm_current_plot_ftm(file_path, self.parameters)
+                file_name = select_file_name_genre_tx_ftm(bw, 'FR1', 'level_sweep')
+                file_path = Path(excel_folder_path()) / Path(file_name)
+                txp_aclr_evm_current_plot_ftm(file_path, {'script': 'GENERAL', 'tech': 'FR1'})
             except TypeError:
                 logger.info(f'there is no data to plot because the band does not have this BW ')
             except FileNotFoundError:
@@ -651,15 +731,25 @@ class TxTestLevelSweep(AtCmd, CMW100):
                 self.tx_path = item[1]
                 self.bw_lte = item[2]
                 self.band_lte = item[3]
-                if self.bw_lte in cm_pmt_ftm.bandwidths_selected_lte(self.band_lte):
-                    self.tx_level_sweep_process_lte()
-                else:
-                    logger.info(f'B{self.band_lte} does not have BW {self.bw_lte}MHZ')
+                try:
+                    if self.tx_path in ['TX1, TX2']:
+                        self.port_table_selector(self.band_lte, self.tx_path)
+                        if self.bw_lte in cm_pmt_ftm.bandwidths_selected_lte(self.band_lte):
+                            self.tx_level_sweep_process_lte()
+                        else:
+                            logger.info(f'B{self.band_lte} does not have BW {self.bw_lte}MHZ')
+
+                    else:
+                        logger.info(f'LTE Band {self.band_lte} does not have this tx path {self.tx_path}!')
+
+                except KeyError as err:
+                    logger.info(f'LTE Band {self.band_lte} does not have this tx path {self.tx_path}!!')
+
         for bw in ext_pmt.lte_bandwidths:
             try:
-                file_name = select_file_name_genre_tx_ftm(bw, self.tech, 'level_sweep')
-                file_path = Path(self.file_path).parent / Path(file_name)
-                txp_aclr_evm_current_plot_ftm(file_path, self.parameters)
+                file_name = select_file_name_genre_tx_ftm(bw, 'LTE', 'level_sweep')
+                file_path = Path(excel_folder_path()) / Path(file_name)
+                txp_aclr_evm_current_plot_ftm(file_path, {'script': 'GENERAL', 'tech': 'LTE'})
             except TypeError:
                 logger.info(f'there is no data to plot because the band does not have this BW ')
             except FileNotFoundError:
@@ -677,6 +767,7 @@ class TxTestLevelSweep(AtCmd, CMW100):
                     self.tx_path = tx_path
                     for band in ext_pmt.wcdma_bands:
                         self.band_wcdma = band
+                        self.port_table_selector(self.band_wcdma)
                         self.tx_level_sweep_process_wcdma()
                     txp_aclr_evm_current_plot_ftm(self.file_path, self.parameters)
 
@@ -693,6 +784,7 @@ class TxTestLevelSweep(AtCmd, CMW100):
                 for band in ext_pmt.gsm_bands:
                     self.pcl = ext_pmt.tx_pcl_lb if band in [850, 900] else ext_pmt.tx_pcl_mb
                     self.band_gsm = band
+                    self.port_table_selector(self.band_gsm)
                     self.tx_level_sweep_process_gsm()
                 txp_aclr_evm_current_plot_ftm(self.file_path, self.parameters)
 

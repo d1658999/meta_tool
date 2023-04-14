@@ -4,6 +4,7 @@ import time
 from equipments.series_basis.callbox.cmw_series import CMW
 from utils.parameters.common_parameters_ftm import TDD_BANDS
 import utils.parameters.external_paramters as ext_pmt
+from utils.port_tx_handler import port_tx_table_transfer
 from utils.log_init import log_set
 
 
@@ -792,6 +793,11 @@ class CMW100(CMW):
         power = power_results.strip().split(',')[2]
         logger.info(f'LTE power by Tx monitor: {round(eval(power), 2)}')
         return round(eval(power), 2)
+
+    @staticmethod
+    def port_tx_table():
+        table = port_tx_table_transfer()
+        return table
 
 
 def main():

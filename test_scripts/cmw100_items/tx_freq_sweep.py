@@ -7,7 +7,7 @@ import utils.parameters.external_paramters as ext_pmt
 import utils.parameters.common_parameters_ftm as cm_pmt_ftm
 from utils.loss_handler import get_loss
 from utils.excel_handler import txp_aclr_evm_current_plot_ftm, tx_power_relative_test_export_excel_ftm
-from utils.excel_handler import select_file_name_genre_tx_ftm
+from utils.excel_handler import select_file_name_genre_tx_ftm, excel_folder_path
 import utils.parameters.rb_parameters as rb_pmt
 
 logger = log_set('freq_sweep')
@@ -24,6 +24,20 @@ class TxTestFreqSweep(AtCmd, CMW100):
         self.parameters = None
         self.srs_path_enable = ext_pmt.srs_path_enable
         self.chan = None
+        self.port_table = None
+
+    def port_table_selector(self, band, tx_path='TX1'):
+        """
+        This is used for multi-ports connection on Tx
+        """
+        if self.port_table is None:
+            self.port_table = self.port_tx_table()
+
+        if ext_pmt.port_table_en:
+            self.port_tx = int(self.port_table[tx_path][str(band)])
+
+        else:
+            pass
 
     def select_asw_srs_path(self):
         if self.srs_path_enable:
@@ -328,15 +342,21 @@ class TxTestFreqSweep(AtCmd, CMW100):
                 self.bw_fr1 = item[2]
                 self.band_fr1 = item[3]
                 self.type_fr1 = item[4]
-                if self.bw_fr1 in cm_pmt_ftm.bandwidths_selected_fr1(self.band_fr1):
-                    self.tx_freq_sweep_process_fr1()
-                else:
-                    logger.info(f'B{self.band_fr1} does not have BW {self.bw_fr1}MHZ')
+                try:
+                    self.port_table_selector(self.band_fr1, self.tx_path)
+                    if self.bw_fr1 in cm_pmt_ftm.bandwidths_selected_fr1(self.band_fr1):
+                        self.tx_freq_sweep_process_fr1()
+                    else:
+                        logger.info(f'B{self.band_fr1} does not have BW {self.bw_fr1}MHZ')
+
+                except KeyError as err:
+                    logger.info(f'Band {self.band_fr1} does not have this tx path {self.tx_path}')
+
         for bw in ext_pmt.fr1_bandwidths:
             try:
-                file_name = select_file_name_genre_tx_ftm(bw, self.tech, 'freq_sweep')
-                file_path = Path(self.file_path).parent / Path(file_name)
-                txp_aclr_evm_current_plot_ftm(file_path, self.parameters)
+                file_name = select_file_name_genre_tx_ftm(bw, 'FR1', 'freq_sweep')
+                file_path = Path(excel_folder_path()) / Path(file_name)
+                txp_aclr_evm_current_plot_ftm(file_path, {'script': 'GENERAL', 'tech': 'FR1'})
             except TypeError:
                 logger.info(f'there is no data to plot because the band does not have this BW ')
             except FileNotFoundError:
@@ -360,16 +380,21 @@ class TxTestFreqSweep(AtCmd, CMW100):
                 self.tx_path = item[1]
                 self.bw_lte = item[2]
                 self.band_lte = item[3]
-                if self.bw_lte in cm_pmt_ftm.bandwidths_selected_lte(self.band_lte):
-                    self.tx_freq_sweep_process_lte()
-                else:
-                    logger.info(f'B{self.band_lte} does not have BW {self.bw_lte}MHZ')
+                try:
+                    self.port_table_selector(self.band_lte, self.tx_path)
+                    if self.bw_lte in cm_pmt_ftm.bandwidths_selected_lte(self.band_lte):
+                        self.tx_freq_sweep_process_lte()
+                    else:
+                        logger.info(f'B{self.band_lte} does not have BW {self.bw_lte}MHZ')
+
+                except KeyError as err:
+                    logger.info(f'Band {self.band_lte} does not have this tx path {self.tx_path}')
 
         for bw in ext_pmt.lte_bandwidths:
             try:
-                file_name = select_file_name_genre_tx_ftm(bw, self.tech, 'freq_sweep')
-                file_path = Path(self.file_path).parent / Path(file_name)
-                txp_aclr_evm_current_plot_ftm(file_path, self.parameters)
+                file_name = select_file_name_genre_tx_ftm(bw, 'LTE', 'freq_sweep')
+                file_path = Path(excel_folder_path()) / Path(file_name)
+                txp_aclr_evm_current_plot_ftm(file_path, {'script': 'GENERAL', 'tech': 'LTE'})
             except TypeError:
                 logger.info(f'there is no data to plot because the band does not have this BW ')
             except FileNotFoundError:
@@ -385,6 +410,7 @@ class TxTestFreqSweep(AtCmd, CMW100):
                 self.tech = tech
                 for band in ext_pmt.wcdma_bands:
                     self.band_wcdma = band
+                    self.port_table_selector(self.band_wcdma)
                     self.tx_freq_sweep_process_wcdma()
                 txp_aclr_evm_current_plot_ftm(self.file_path, self.parameters)
 
@@ -401,6 +427,7 @@ class TxTestFreqSweep(AtCmd, CMW100):
                 for band in ext_pmt.gsm_bands:
                     self.pcl = ext_pmt.tx_pcl_lb if band in [850, 900] else ext_pmt.tx_pcl_mb
                     self.band_gsm = band
+                    self.port_table_selector(self.band_gsm)
                     self.tx_freq_sweep_process_gsm()
                 txp_aclr_evm_current_plot_ftm(self.file_path, self.parameters)
 
