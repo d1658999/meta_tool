@@ -135,7 +135,8 @@ class CMW100(CMW):
         mod_results = mod_results.split(',')
         mod_results = [mod_results[3], mod_results[15], mod_results[14], mod_results[17]]
         mod_results = [eval(m) for m in mod_results]
-        logger.info(f'Power: {mod_results[3]}, EVM: {mod_results[0]:.2f}, FREQ_ERR: {mod_results[1]:.2f}, IQ_OFFSET: {mod_results[2]:.2f}')
+        logger.info(f'Power: {mod_results[3]}, EVM: {mod_results[0]:.2f}, FREQ_ERR: {mod_results[1]:.2f}, '
+                    f'IQ_OFFSET: {mod_results[2]:.2f}')
         return mod_results
 
     def get_modulation_avgerage_wcdma(self):
@@ -495,7 +496,6 @@ class CMW100(CMW):
         elif bw > 15:
             self.set_spectrum_limit_lte(9, bw * 10, 'ON', 20, 25, -25, 'M1')
 
-
     def set_rx_level_search(self):
         logger.info(f'==========Search: {self.rx_level} dBm==========')
         self.set_rx_level_gprf(self.rx_level)
@@ -795,8 +795,8 @@ class CMW100(CMW):
         return round(eval(power), 2)
 
     @staticmethod
-    def port_tx_table():
-        table = port_tx_table_transfer()
+    def port_tx_table(txas_select):
+        table = port_tx_table_transfer(txas_select)
         return table
 
 

@@ -18,6 +18,8 @@ class TxTest1RbSweep(AtCmd, CMW100):
     def __init__(self):
         AtCmd.__init__(self)
         CMW100.__init__(self)
+        self.port_mimo_tx2 = None
+        self.port_mimo_tx1 = None
         self.parameters = None
         self.srs_path_enable = ext_pmt.srs_path_enable
         self.file_path = None
@@ -31,11 +33,19 @@ class TxTest1RbSweep(AtCmd, CMW100):
         """
         This is used for multi-ports connection on Tx
         """
-        if self.port_table is None:
-            self.port_table = self.port_tx_table()
+        if self.port_table is None:  # to initial port table at first time
+            if ext_pmt.asw_path_enable is False:
+                txas_select = 0
+                self.port_table = self.port_tx_table(txas_select)
+            else:
+                self.port_table = self.port_tx_table(self.asw_path)
 
-        if ext_pmt.port_table_en:
+        if ext_pmt.port_table_en and tx_path in ['TX1', 'TX2']:
             self.port_tx = int(self.port_table[tx_path][str(band)])
+
+        elif ext_pmt.port_table_en and tx_path in ['MIMO']:
+            self.port_mimo_tx1 = int(self.port_table['MIMO_TX1'][str(band)])
+            self.port_mimo_tx2 = int(self.port_table['MIMO_TX2'][str(band)])
 
         else:
             pass
@@ -76,7 +86,7 @@ class TxTest1RbSweep(AtCmd, CMW100):
                     else:
                         logger.info(f'B{self.band_fr1} does not have BW {self.bw_fr1}MHZ')
 
-                except KeyError as err:
+                except KeyError:
                     logger.info(f'Band {self.band_fr1} does not have this tx path {self.tx_path}')
 
         for bw in ext_pmt.fr1_bandwidths:

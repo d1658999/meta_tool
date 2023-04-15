@@ -19,6 +19,11 @@ class TxTestGenre(AtCmd, CMW100):
     def __init__(self):
         AtCmd.__init__(self)
         CMW100.__init__(self)
+        self.tx_path_mimo = None
+        self.data_freq = None
+        self.aclr_mod_current_results = None
+        self.port_mimo_tx2 = None
+        self.port_mimo_tx1 = None
         self.psu = None
         self.tx_freq_wcdma = None
         self.file_path = None
@@ -35,8 +40,12 @@ class TxTestGenre(AtCmd, CMW100):
         """
         This is used for multi-ports connection on Tx
         """
-        if self.port_table is None:
-            self.port_table = self.port_tx_table()
+        if self.port_table is None:  # to initial port table at first time
+            if ext_pmt.asw_path_enable is False:
+                txas_select = 0
+                self.port_table = self.port_tx_table(txas_select)
+            else:
+                self.port_table = self.port_tx_table(self.asw_path)
 
         if ext_pmt.port_table_en and tx_path in ['TX1', 'TX2']:
             self.port_tx = int(self.port_table[tx_path][str(band)])
@@ -198,8 +207,8 @@ class TxTestGenre(AtCmd, CMW100):
                                     'type': self.type_fr1,
                                     'test_item': 'lmh',
                                 }
-                                self.file_path = tx_power_relative_test_export_excel_ftm(self.data_freq, self.parameters)
-
+                                self.file_path = tx_power_relative_test_export_excel_ftm(self.data_freq,
+                                                                                         self.parameters)
 
         self.set_test_end_fr1()
 
@@ -418,7 +427,6 @@ class TxTestGenre(AtCmd, CMW100):
             self.data_freq[self.tx_freq_fr1] = self.results_combination_nlw(ext_pmt.volt_mipi_en)
             logger.debug(self.data_freq)
 
-
         elif self.tx_path in ['MIMO']:  # measure two port
             path_count = 1  # this is for mimo path to store tx_path
             for port_tx in [self.port_mimo_tx1, self.port_mimo_tx2]:
@@ -522,7 +530,7 @@ class TxTestGenre(AtCmd, CMW100):
                     else:
                         logger.info(f'LTE Band {self.band_lte} does not have this tx path {self.tx_path}!')
 
-                except KeyError as err:
+                except KeyError:
                     logger.info(f'LTE Band {self.band_lte} does not have this tx path {self.tx_path}!!')
 
         for bw in ext_pmt.lte_bandwidths:

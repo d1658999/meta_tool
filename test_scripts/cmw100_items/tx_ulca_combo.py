@@ -22,6 +22,12 @@ class TxTestCa(AtCmd, CMW100):
     def __init__(self):
         AtCmd.__init__(self)
         CMW100.__init__(self)
+        self.alloc_cc = None
+        self.bw_rb_cc2 = None
+        self.bw_rb_cc1 = None
+        self.chan_lmh = None
+        self.combo_dict = None
+        self.band_ulca_lte = None
         self.band_cc1_channel_lte = None
         self.band_cc2_channel_lte = None
         self.bw_cc2 = None
@@ -119,7 +125,7 @@ class TxTestCa(AtCmd, CMW100):
         ulca_combo = [
             self.band_ulca_lte, self.chan_lmh,
             self.bw_cc1, self.bw_cc2, self.band_cc1_channel_lte, self.band_cc2_channel_lte,
-            ]
+        ]
 
         # ulca rb setting info
         ulca_rb_setting = [
@@ -146,7 +152,6 @@ class TxTestCa(AtCmd, CMW100):
             'temp0': therm_list[0],
             'temp1': therm_list[1],
         }
-
 
         # export to excel
         tx_ulca_power_relative_test_export_excel_ftm(self.tech, ulca_results, sub_info)
@@ -186,7 +191,6 @@ class TxTestCa(AtCmd, CMW100):
                     self.band_ulca_lte = band  # '7C'
                     self.band_lte = int(band[:-1])  # '7C' -> 7, '41C' -> 41
                     self.bw_lte = 10  # for sync
-                    allocation = None
                     # self.rx_freq_lte = cm_pmt_ftm.dl_freq_selected('LTE', self.band_lte, self.bw_lte)[1]  # for sync use
                     # self.loss_rx = get_loss(self.rx_freq_lte)  # for sync use
 
@@ -225,10 +229,10 @@ class TxTestCa(AtCmd, CMW100):
             if tech == 'LTE':
                 self.tx_power_aclr_ulca_pipline_lte()
 
+
 def main():
     test = TxTestCa()
     test.run()
-
 
 
 if __name__ == '__main__':

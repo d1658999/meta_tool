@@ -20,6 +20,11 @@ class TxTestLevelSweep(AtCmd, CMW100):
     def __init__(self):
         AtCmd.__init__(self)
         CMW100.__init__(self)
+        self.port_mimo_tx2 = None
+        self.port_mimo_tx1 = None
+        self.tx_path_mimo = None
+        self.data = None
+        self.aclr_mod_current_results = None
         self.rb_state = None
         self.tx_freq_wcdma = None
         self.script = None
@@ -35,8 +40,12 @@ class TxTestLevelSweep(AtCmd, CMW100):
         """
         This is used for multi-ports connection on Tx
         """
-        if self.port_table is None:
-            self.port_table = self.port_tx_table()
+        if self.port_table is None:  # to initial port table at first time
+            if ext_pmt.asw_path_enable is False:
+                txas_select = 0
+                self.port_table = self.port_tx_table(txas_select)
+            else:
+                self.port_table = self.port_tx_table(self.asw_path)
 
         if ext_pmt.port_table_en and tx_path in ['TX1', 'TX2']:
             self.port_tx = int(self.port_table[tx_path][str(band)])
@@ -699,7 +708,7 @@ class TxTestLevelSweep(AtCmd, CMW100):
                     else:
                         logger.info(f'NR B{self.band_fr1} does not have BW {self.bw_fr1}MHZ')
 
-                except KeyError as err:
+                except KeyError:
                     logger.info(f'NR Band {self.band_fr1} does not have this tx path {self.tx_path}')
 
         for bw in ext_pmt.fr1_bandwidths:
@@ -742,7 +751,7 @@ class TxTestLevelSweep(AtCmd, CMW100):
                     else:
                         logger.info(f'LTE Band {self.band_lte} does not have this tx path {self.tx_path}!')
 
-                except KeyError as err:
+                except KeyError:
                     logger.info(f'LTE Band {self.band_lte} does not have this tx path {self.tx_path}!!')
 
         for bw in ext_pmt.lte_bandwidths:

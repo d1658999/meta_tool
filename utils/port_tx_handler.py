@@ -1,9 +1,11 @@
 from pathlib import Path
 
-FILE_PATH = Path('utils') / Path('port_table.txt')  # formal
-# FILE_PATH = Path('port_table.txt')  # test
 
-def port_tx_table_transfer():
+def port_tx_table_transfer(txas_select):  # txas_select = 0/1
+    # to determine the txas path
+    file_path = Path('utils') / Path(f'port_table_txas_{txas_select}.txt')  # formal
+    # FILE_PATH =  Path(f'port_table_txas_{txas_select}.txt')  # test
+
     # Create an empty dictionary to hold the port mappings
     port_table = {
         'TX1': {},
@@ -12,7 +14,7 @@ def port_tx_table_transfer():
         'MIMO_TX2': {},
     }
     # Open the txt file for reading
-    with open(FILE_PATH, 'r') as f:
+    with open(file_path, 'r') as f:
         rows = f.readlines()
     
         # Loop over each row in the file
@@ -34,7 +36,7 @@ def port_tx_table_transfer():
             
 
 def main():
-    port_table = port_tx_table_transfer()
+    port_table = port_tx_table_transfer(0)
     print(port_table)
             
 if __name__ == '__main__':
