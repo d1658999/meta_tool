@@ -16,6 +16,7 @@ class TxTestFccCe(AtCmd, CMW100):
     def __init__(self):
         AtCmd.__init__(self)
         CMW100.__init__(self)
+        self.chan_mark = None
         self.rb_state = None
         self.script = None
         self.file_path = None
@@ -71,11 +72,15 @@ class TxTestFccCe(AtCmd, CMW100):
                 self.bw_fr1 = item[2]
                 self.band_fr1 = item[3]
                 self.type_fr1 = item[4]
-                self.port_table_selector(self.band_fr1, self.tx_path)
-                if self.bw_fr1 in cm_pmt_ftm.bandwidths_selected_fr1(self.band_fr1):
-                    self.tx_power_fcc_fr1()
-                else:
-                    logger.info(f'B{self.band_fr1} does not have BW {self.bw_fr1}MHZ')
+                try:
+                    self.port_table_selector(self.band_fr1, self.tx_path)
+                    if self.bw_fr1 in cm_pmt_ftm.bandwidths_selected_fr1(self.band_fr1):
+                        self.tx_power_fcc_fr1()
+                    else:
+                        logger.info(f'B{self.band_fr1} does not have BW {self.bw_fr1}MHZ')
+
+                except KeyError:
+                    logger.info(f'NR Band {self.band_fr1} does not have this tx path {self.tx_path}')
 
     def tx_power_fcc_fr1(self):
         rx_freq_list = cm_pmt_ftm.dl_freq_selected('FR1', self.band_fr1,
@@ -107,31 +112,27 @@ class TxTestFccCe(AtCmd, CMW100):
                     try:
                         for self.rb_size_fr1, self.rb_start_fr1 in \
                                 rb_pmt.FCC_FR1[self.band_fr1][self.bw_fr1][self.mcs_fr1]:
-                            data = {}
+
                             for num, tx_freq_fr1 in enumerate(tx_freq_select_list):
-                                chan_mark = f'chan{num}'
+                                self.chan_mark = f'chan{num}'
                                 self.tx_freq_fr1 = tx_freq_fr1
-                                self.loss_tx = get_loss(self.tx_freq_fr1)
-                                self.set_tx_freq_gprf(self.tx_freq_fr1)
-                                self.set_duty_cycle()
-                                self.tx_set_no_sync_fr1()
-                                power_results = self.get_power_avgerage_gprf()
-                                data[self.tx_freq_fr1] = (
-                                    chan_mark, power_results)  # data = {tx_freq:(chan_mark, power)}
-                            logger.debug(data)
-                            # ready to export to excel
-                            parameters = {
-                                'script': self.script,
-                                'tech': self.tech,
-                                'band': self.band_fr1,
-                                'bw': self.bw_fr1,
-                                'rb_size': self.rb_size_fr1,
-                                'rb_start': self.rb_start_fr1,
-                                'tx_level': self.tx_level,
-                                'mcs': self.mcs_fr1,
-                                'tx_path': self.tx_path,
-                            }
-                            self.file_path = tx_power_fcc_ce_export_excel_ftm(data, parameters)
+                                self.tx_power_fcc_subprocess_fr1()
+
+                                if self.tx_path in ['TX1', 'TX2']:  # this is for TX1, TX2, not MIMO
+                                    # ready to export to excel
+                                    self.parameters = {
+                                        'script': self.script,
+                                        'tech': self.tech,
+                                        'band': self.band_fr1,
+                                        'bw': self.bw_fr1,
+                                        'rb_size': self.rb_size_fr1,
+                                        'rb_start': self.rb_start_fr1,
+                                        'tx_level': self.tx_level,
+                                        'mcs': self.mcs_fr1,
+                                        'tx_path': self.tx_path,
+                                    }
+                                    self.file_path = tx_power_fcc_ce_export_excel_ftm(self.data, self.parameters)
+
                     except KeyError as err:
                         logger.debug(f'show error: {err}')
                         logger.info(
@@ -159,11 +160,14 @@ class TxTestFccCe(AtCmd, CMW100):
                 self.bw_fr1 = item[2]
                 self.band_fr1 = item[3]
                 self.type_fr1 = item[4]
-                self.port_table_selector(self.band_fr1, self.tx_path)
-                if self.bw_fr1 in cm_pmt_ftm.bandwidths_selected_fr1(self.band_fr1):
-                    self.tx_power_ce_fr1()
-                else:
-                    logger.info(f'B{self.band_fr1} does not have BW {self.bw_fr1}MHZ')
+                try:
+                    self.port_table_selector(self.band_fr1, self.tx_path)
+                    if self.bw_fr1 in cm_pmt_ftm.bandwidths_selected_fr1(self.band_fr1):
+                        self.tx_power_ce_fr1()
+                    else:
+                        logger.info(f'B{self.band_fr1} does not have BW {self.bw_fr1}MHZ')
+                except KeyError:
+                    logger.info(f'NR Band {self.band_fr1} does not have this tx path {self.tx_path}')
 
     def tx_power_ce_fr1(self):
         rx_freq_list = cm_pmt_ftm.dl_freq_selected('FR1', self.band_fr1,
@@ -194,37 +198,108 @@ class TxTestFccCe(AtCmd, CMW100):
                     try:
                         for self.rb_size_fr1, self.rb_start_fr1 in \
                                 rb_pmt.CE_FR1[self.band_fr1][self.bw_fr1][self.mcs_fr1]:
-                            data = {}
+
                             for num, tx_freq_fr1 in enumerate(tx_freq_select_list):
-                                chan_mark = f'chan{num}'
+                                self.chan_mark = f'chan{num}'
                                 self.tx_freq_fr1 = tx_freq_fr1
-                                self.loss_tx = get_loss(self.tx_freq_fr1)
-                                self.set_tx_freq_gprf(self.tx_freq_fr1)
-                                self.set_duty_cycle()
-                                self.tx_set_no_sync_fr1()
-                                power_results = self.get_power_avgerage_gprf()
-                                data[self.tx_freq_fr1] = (
-                                    chan_mark, power_results)  # data = {tx_freq:(chan_mark, power)}
-                            logger.debug(data)
-                            # ready to export to excel
-                            parameters = {
-                                'script': self.script,
-                                'tech': self.tech,
-                                'band': self.band_fr1,
-                                'bw': self.bw_fr1,
-                                'rb_size': self.rb_size_fr1,
-                                'rb_start': self.rb_start_fr1,
-                                'tx_level': self.tx_level,
-                                'mcs': self.mcs_fr1,
-                                'tx_path': self.tx_path,
-                            }
-                            self.file_path = tx_power_fcc_ce_export_excel_ftm(data, parameters)
+                                self.tx_power_ce_subprocess_fr1()
+
+                                if self.tx_path in ['TX1', 'TX2']:  # this is for TX1, TX2, not MIMO
+                                    # ready to export to excel
+                                    self.parameters = {
+                                        'script': self.script,
+                                        'tech': self.tech,
+                                        'band': self.band_fr1,
+                                        'bw': self.bw_fr1,
+                                        'rb_size': self.rb_size_fr1,
+                                        'rb_start': self.rb_start_fr1,
+                                        'tx_level': self.tx_level,
+                                        'mcs': self.mcs_fr1,
+                                        'tx_path': self.tx_path,
+                                    }
+                                    self.file_path = tx_power_fcc_ce_export_excel_ftm(self.data, self.parameters)
                     except KeyError as err:
                         logger.debug(f'show error: {err}')
                         logger.info(
                             f"Band {self.band_fr1}, BW: {self.bw_fr1} don't need to test this MCS: "
                             f"{self.mcs_fr1} for CE")
         self.set_test_end_fr1()
+
+    def tx_power_fcc_subprocess_fr1(self):
+        self.data = data = {}
+        self.loss_tx = get_loss(self.tx_freq_fr1)
+        self.set_tx_freq_gprf(self.tx_freq_fr1)
+        self.set_duty_cycle()
+        if self.tx_path in ['TX1', 'TX2']:
+            self.tx_set_no_sync_fr1()
+            power_results = self.get_power_avgerage_gprf()
+            self.data[self.tx_freq_fr1] = (self.chan_mark, power_results)  # data = {tx_freq:(chan_mark, power)}
+            logger.debug(self.data)
+
+        elif self.tx_path in ['MIMO']:  # measure two port
+            path_count = 1  # this is for mimo path to store tx_path
+            for port_tx in [self.port_mimo_tx1, self.port_mimo_tx2]:
+                self.port_tx = port_tx
+                self.set_rf_tx_port_gprf(self.port_tx)
+                self.tx_path_mimo = self.tx_path + f'_{path_count}'
+                self.tx_set_no_sync_fr1()
+                power_results = self.get_power_avgerage_gprf()
+                data[self.tx_freq_fr1] = (self.chan_mark, power_results)  # data = {tx_freq:(chan_mark, power)}
+                logger.debug(data)
+
+                # ready to export to excel
+                self.parameters = {
+                    'script': self.script,
+                    'tech': self.tech,
+                    'band': self.band_fr1,
+                    'bw': self.bw_fr1,
+                    'rb_size': self.rb_size_fr1,
+                    'rb_start': self.rb_start_fr1,
+                    'tx_level': self.tx_level,
+                    'mcs': self.mcs_fr1,
+                    'tx_path': self.tx_path_mimo,
+                }
+                self.file_path = tx_power_fcc_ce_export_excel_ftm(self.data, self.parameters)
+
+                path_count += 1
+
+    def tx_power_ce_subprocess_fr1(self):
+        self.data = data = {}
+        self.loss_tx = get_loss(self.tx_freq_fr1)
+        self.set_tx_freq_gprf(self.tx_freq_fr1)
+        self.set_duty_cycle()
+        if self.tx_path in ['TX1', 'TX2']:
+            self.tx_set_no_sync_fr1()
+            power_results = self.get_power_avgerage_gprf()
+            self.data[self.tx_freq_fr1] = (self.chan_mark, power_results)  # data = {tx_freq:(chan_mark, power)}
+            logger.debug(self.data)
+
+        elif self.tx_path in ['MIMO']:  # measure two port
+            path_count = 1  # this is for mimo path to store tx_path
+            for port_tx in [self.port_mimo_tx1, self.port_mimo_tx2]:
+                self.port_tx = port_tx
+                self.set_rf_tx_port_gprf(self.port_tx)
+                self.tx_path_mimo = self.tx_path + f'_{path_count}'
+                self.tx_set_no_sync_fr1()
+                power_results = self.get_power_avgerage_gprf()
+                data[self.tx_freq_fr1] = (self.chan_mark, power_results)  # data = {tx_freq:(chan_mark, power)}
+                logger.debug(data)
+
+                # ready to export to excel
+                self.parameters = {
+                    'script': self.script,
+                    'tech': self.tech,
+                    'band': self.band_fr1,
+                    'bw': self.bw_fr1,
+                    'rb_size': self.rb_size_fr1,
+                    'rb_start': self.rb_start_fr1,
+                    'tx_level': self.tx_level,
+                    'mcs': self.mcs_fr1,
+                    'tx_path': self.tx_path_mimo,
+                }
+                self.file_path = tx_power_fcc_ce_export_excel_ftm(self.data, self.parameters)
+
+                path_count += 1
 
     def run(self, script):
         for tech in ext_pmt.tech:
