@@ -25,6 +25,8 @@ class VisaComport:
                 logger.info('Connect to CMW100')
                 logger.info('TCPIP0::127.0.0.1::INSTR')
 
+            self.inst.timeout = 5000  # set the default timeout
+
         elif '8820' in equipment_name or '8821' in equipment_name:
             gpib_wanted = None
             for gpib in self.get_gpib_usb():  # this is to search GPIB for 8820/8821
@@ -36,6 +38,8 @@ class VisaComport:
 
             self.inst = pyvisa.ResourceManager().open_resource(gpib_wanted)  # to build object of 'inst'
             logger.info(f"Connect to {self.inst.query('*IDN?').strip()}")
+
+            self.inst.timeout = 5000  # set the default timeout
 
         elif equipment_name in ['psu', 'PSU']:
             psu_list = ['E3631A', 'E3642A', 'E36313A']
@@ -60,6 +64,8 @@ class VisaComport:
                 logger.info(f'Connect to {psu_select} successfully')
                 self.inst = pyvisa.ResourceManager().open_resource(gpib_usb_wanted)  # to build object of 'inst'
 
+            self.inst.timeout = 5000  # set the default timeout
+
         elif equipment_name == 'temp_chamber':
             gpib_wanted = None
             try:
@@ -78,6 +84,8 @@ class VisaComport:
             else:
                 logger.info(f'Connect to temp_chamber successfully')
                 self.inst = pyvisa.ResourceManager().open_resource(gpib_wanted)  # to build object of 'inst'
+
+            self.inst.timeout = 5000  # set the default timeout
 
         elif 'FSW' in equipment_name or 'fsw' in equipment_name:
             try:
@@ -98,7 +106,7 @@ class VisaComport:
                 logger.info(f'Connect to FSW successfully')
                 self.inst = pyvisa.ResourceManager().open_resource(gpib_usb_wanted)  # to build object of 'inst'
 
-        self.inst.timeout = 5000  # set the default timeout
+            self.inst.timeout = 75000  # set the default timeout
 
     @staticmethod
     def get_gpib_usb():

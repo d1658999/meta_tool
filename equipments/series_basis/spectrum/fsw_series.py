@@ -60,9 +60,10 @@ class FSW:
 
     def set_suprious_emissions_measure(self):
         """
+        INITiate<n>:SPURious
         This command initiates a Spurious Emission measurement.
         """
-        self.fsw_write(f'INITiate:SPURious; WAI')
+        self.fsw_write(f'INITiate:SPURious; *WAI')
 
     def set_measurement_mode(self, mode='AUTO'):
         """
@@ -70,8 +71,7 @@ class FSW:
         This command selects the spurious emission and spectrum emission mask measurements.
         You can select other measurements with
         ● CALCulate<n>:MARKer<m>:FUNCtion:POWer<sb>[:STATe]
-        Parameters:
-                    <Mode> LIST | AUTO | ESPectrum
+        Parameters: <Mode> LIST | AUTO | ESPectrum
                     AUTO
                     Turns on basic spectrum measurements.
                     ESPectrum
