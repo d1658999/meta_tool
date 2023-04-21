@@ -165,3 +165,4 @@ class TxTest1RbSweep(AtCmd, CMW100):
                 pass
             else:
                 pass
+        self.cmw_close()

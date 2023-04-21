@@ -451,3 +451,4 @@ class TxTestFreqSweep(AtCmd, CMW100):
                 self.tx_freq_sweep_pipline_wcdma()
             elif tech == 'GSM':
                 self.tx_freq_sweep_pipline_gsm()
+        self.cmw_close()

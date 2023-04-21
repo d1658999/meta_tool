@@ -308,3 +308,4 @@ class TxTestFccCe(AtCmd, CMW100):
                     self.tx_power_pipline_fcc_fr1()
                 elif script == 'CE':
                     self.tx_power_pipline_ce_fr1()
+        self.cmw_close()

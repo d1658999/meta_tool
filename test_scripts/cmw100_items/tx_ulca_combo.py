@@ -228,6 +228,7 @@ class TxTestCa(AtCmd, CMW100):
         for tech in ext_pmt.tech:
             if tech == 'LTE':
                 self.tx_power_aclr_ulca_pipline_lte()
+        self.cmw_close()
 
 
 def main():

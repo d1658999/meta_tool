@@ -382,3 +382,5 @@ class TxHarmonics(TxTestGenre, FSW50):
                 self.tx_harmonics_pipline_wcdma()
             elif tech == 'GSM':
                 self.tx_harmonics_pipline_gsm()
+        self.cmw_close()
+        self.fsw_close()

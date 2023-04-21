@@ -24,6 +24,9 @@ class CMW:
         self.cmw.write(tcpip_command)
         logger.info(f'TCPIP::<<{tcpip_command}')
 
+    def cmw_close(self):
+        self.cmw.close()
+
     def system_preset_all(self):
         """
         A PRESet sets the parameters of all sub-instruments and the base settings to default

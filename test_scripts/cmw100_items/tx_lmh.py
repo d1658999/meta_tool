@@ -582,6 +582,7 @@ class TxTestGenre(AtCmd, CMW100):
                 self.tx_power_aclr_evm_lmh_pipeline_wcdma()
             elif tech == 'GSM':
                 self.tx_power_aclr_evm_lmh_pipeline_gsm()
+        self.cmw_close()
 
 
 def main():

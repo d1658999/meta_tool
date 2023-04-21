@@ -116,7 +116,10 @@ class VisaComport:
         return self.inst.query(command)
 
     def query_2(self, command):
-        return bytes(self.inst.query_binary_values(command, datatype='s'))
+        return self.inst.query_binary_values(command, datatype='B', container=bytes)
+
+    def close(self):
+        self.inst.close()
 
 
 def main():

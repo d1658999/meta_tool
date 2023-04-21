@@ -15,9 +15,18 @@ class FSW:
         logger.info(f'TCPIP::>>{tcpip_response}')
         return tcpip_response
 
+    def fsw_query_2(self, tcpip_command):
+        tcpip_response = self.fsw.query_2(tcpip_command).strip()
+        logger.info(f'TCPIP::<<{tcpip_command}')
+        logger.info(f'TCPIP::>>{tcpip_response}')
+        return tcpip_response
+
     def fsw_write(self, tcpip_command):
         self.fsw.write(tcpip_command)
         logger.info(f'TCPIP::<<{tcpip_command}')
+
+    def fsw_close(self):
+        self.fsw.close()
 
     def instrument_reset(self):
         self.fsw_write('*RST')
@@ -36,6 +45,42 @@ class FSW:
         SYSTem:PRESet:CHANnel[:EXEC] on page 1322
         """
         self.fsw_write(f'SYSTem:PRESet')
+
+    def system_display_update(self, state='OFF'):
+        """
+        This command turns the display during remote operation on and off.
+        If on, the R&S FSW updates the diagrams, traces and display fields only.
+        The best performance is obtained if the display is off during remote control operation.
+        Parameters:
+        <State> ON | OFF | 1 | 0
+                *RST: 0
+        Example: SYST:DISP:UPD ON
+        """
+        self.fsw_write(f'SYSTem:DISPlay:UPDate {state}')
+
+    def set_suprious_emissions_measure(self):
+        """
+        This command initiates a Spurious Emission measurement.
+        """
+        self.fsw_write(f'INITiate:SPURious; WAI')
+
+    def set_measurement_mode(self, mode='AUTO'):
+        """
+        [SENSe:]SWEep:MODE <Mode>
+        This command selects the spurious emission and spectrum emission mask measurements.
+        You can select other measurements with
+        ● CALCulate<n>:MARKer<m>:FUNCtion:POWer<sb>[:STATe]
+        Parameters:
+                    <Mode> LIST | AUTO | ESPectrum
+                    AUTO
+                    Turns on basic spectrum measurements.
+                    ESPectrum
+                    Turns on spectrum emission mask measurements.
+                    LIST
+                    Turns on spurious emission measurements.
+                    *RST: AUTO
+        """
+        self.fsw_write(f'SENSe:SWEep:MODE {mode}')
 
     def set_reference_level(self, level=30.0):
         """
@@ -74,6 +119,44 @@ class FSW:
         """
         offset += self.duty_factor(band)  # due to the loss is minus
         self.fsw_write(f'DISPlay:WINDow:TRACe:Y:SCALe:RLEVel:OFFSet {offset}')
+
+    def set_scale_range(self, range_=100):
+        """
+        DISPlay[:WINDow<n>][:SUBWindow<w>]:TRACe<t>:Y[:SCALe] <Range>
+        This command defines the display range of the y-axis (for all traces).
+        Note that the command works only for a logarithmic scaling. You can select the scaling
+        with DISPlay[:WINDow<n>][:SUBWindow<w>]:TRACe<t>:Y:SPACing.
+        Suffix:
+        <n> Window
+        <w> subwindow
+            Not supported by all applications
+        <t> irrelevant
+        Parameters:
+        <Range> Range: 1 dB to 200 dB
+        *RST: 100 dB
+        Default unit: HZ
+        """
+        self.fsw_write(f'DISPlay:WINDow:SUBWindow:TRACe:Y:SCALe:RPOSition {range_}')
+
+    def set_scale_reference_level_reposition(self, position_per=97):
+        """
+        DISPlay[:WINDow<n>][:SUBWindow<w>]:TRACe<t>:Y[:SCALe]:RPOSition <Position>
+        This command defines the vertical position of the reference level on the display grid
+        (for all traces).
+        The R&S FSW adjusts the scaling of the y-axis accordingly.
+        For measurements with the optional external generator control, the command defines
+        the position of the reference value.
+        Suffix:
+        <n>    Window
+        <w> subwindow
+            Not supported by all applications
+        <t> irrelevant
+        Parameters:
+        <Position> 0 PCT corresponds to the lower display border, 100% corresponds to the upper display border.
+                   *RST: 100 PCT = frequency display; 50 PCT = time display
+                   Default unit: PCT
+        """
+        self.fsw_write(f'DISPlay:WINDow:SUBWindow:TRACe:Y:SCALe:RPOSition {position_per}')
 
     def set_input_attenuation(self, att=30.0):
         """
@@ -245,6 +328,20 @@ class FSW:
         """
         [SENSe:]AVERage<n>:COUNt
         this is same as set_sweep_count
+        This command defines the number of sweeps that the application uses to average
+        traces.
+        In case of continuous sweep mode, the application calculates the moving average over
+        the average count.
+        In case of single sweep mode, the application stops the measurement and calculates
+        the average after the average count has been reached.
+        Suffix:
+        <n>    irrelevant
+        Parameters:
+        <AverageCount> If you set an average count of 0 or 1, the application performs
+                       one single sweep in single sweep mode.
+                       In continuous sweep mode, if the average count is set to 0, a
+                       moving average over 10 sweeps is performed.
+                       Range: 0 to
         """
         self.fsw_write(f'AVERage:COUNt {count}')
 
@@ -444,6 +541,26 @@ class FSW:
         """
         self.fsw_write(f'BANDwidth:VIDeo:TYPE {type_}')
 
+    def average_type(self, mode='PoWer'):
+        """
+        [SENSe:]AVERage<n>:TYPE <Mode>
+        This command selects the trace averaging mode.
+        Suffix:
+        <n>   1..n
+        Window
+        Parameters:
+        <Mode> LOGarithmic
+               The logarithmic power values are averaged.
+               LINear
+               The power values are averaged before they are converted to
+               logarithmic values.
+               POWer
+               The power level values are converted into unit Watt prior to
+               averaging. After the averaging, the data is converted back into
+               its original unit.
+        """
+        self.fsw_write(f'Average:Type {mode}')
+
     def set_detector(self, detector='RMS'):
         """
         This command selects the detector for a spurious emission measurement range.
@@ -528,6 +645,7 @@ class FSW:
 
     def set_display_trace_mode(self, trace=1, mode='AVERage'):
         """
+        DISPlay[:WINDow<n>][:SUBWindow<w>]:TRACe<t>:MODE <Mode>
         This command selects the trace mode. If necessary, the selected trace is also activa-
         ted.
         For max hold, min hold or average trace mode, you can set the number of single mea-
@@ -700,6 +818,193 @@ class FSW:
         """
         self.fsw_write(f'CALCulate:MARKer{mark}:MAXimum:PEAK')
 
+    def set_spur_list_range_freq_start(self, range_num, freq):
+        """
+        [SENSe:]LIST:RANGe<ri>[:FREQuency]:STARt <Frequency>
+        This command defines the start frequency of a spurious emission measurement range.
+        Make sure to set an appropriate span. If you set a span that is
+        ● smaller than the span the sweep list covers, the R&S FSW will not measure the
+        ranges that are outside the span - results may be invalid.
+        ● greater than the span the sweep list covers, the R&S FSW will adjust the start frequency of the first range and the stop frequency of the last range to the span
+        For more information seeChapter 6.7, "Spurious emissions measurement",
+        on page 274 .
+        Suffix:
+        <ri>    1..n
+        Selects the measurement range.
+        Parameters:
+        <Frequency> Numeric value.
+        *RST: -12.75 MHz (range 1), -2.515 MHz (range 2), 2.515
+        MHz (range 3)
+        Default unit: Hz
+        """
+        self.fsw_write(f'SENSe:LIST:RANGe{range_num}:FREQuency:STARt {freq}')
+
+    def set_spur_list_range_freq_stop(self, range_num, freq):
+        """
+        [SENSe:]LIST:RANGe<ri>[:FREQuency]:STOP <Frequency>
+        This command defines the stop frequency of a spurious emission measurement range.
+        Make sure to set an appropriate span. If you set a span that is
+        ● smaller than the span the sweep list covers, the R&S FSW will not measure the
+        ranges that are outside the span - results may be invalid.
+        greater than the span the sweep list covers, the R&S FSW will adjust the start frequency of the first range and the stop frequency of the last range to the span
+        For more information seeChapter 6.7, "Spurious emissions measurement",
+        on page 274 .
+        Suffix:
+        <ri>    1..n
+        Selects the measurement range.
+        Parameters:
+        <Frequency> Numeric value.
+        *RST: -2.52 MHz (range 1), 2.52 MHz (range 2), 250.0
+        MHz (range 3)
+        Default unit: Hz
+        """
+        self.fsw_write(f'SENSe:LIST:RANGe{range_num}:FREQuency:STOP {freq}')
+
+    def set_spur_list_range_filter_type(self, range_num, filter_type):
+        """
+        [SENSe:]LIST:RANGe<ri>:FILTer:TYPE <FilterType>
+        This command selects the filter type for a spurious emission measurement range.
+        The EMI-specific filter types are available if the EMI (R&S FSW-K54) measurement
+        option is installed, even if EMI measurement is not active. For details see Chapter 6.13.3.1, "Resolution bandwidth and filter types", on page 329.
+        Suffix:
+        <ri>    1..30
+        Selects the measurement range.
+        Parameters:
+        <FilterType> NORMal
+                     Gaussian filters
+                     CFILter
+                     channel filters
+                     RRC
+                     RRC filters
+                     CISPr | PULSe
+                     CISPR (6 dB) - requires EMI (R&S FSW-K54) option
+                     Return value for query is always PULS.
+                     MIL
+                     MIL Std (6 dB) - requires EMI (R&S FSW-K54) option
+                     P5
+                     5 Pole filters
+                     *RST: NORM
+                     The available bandwidths of the filters are specified in the data
+                     sheet.
+        """
+        self.fsw_write(f'SENSe:LIST:RANGe{range_num}:FILTer:TYPE {filter_type}')
+
+    def set_spur_list_range_band_rbw(self, range_num, rbw):
+        """
+        [SENSe:]LIST:RANGe<ri>:BANDwidth:RESolution <RBW>
+        This command defines the resolution bandwidth for a spurious emission measurement
+        range.
+        Suffix:
+        <ri>    1..n
+        Selects the measurement range.
+        Parameters:
+        <RBW> Resolution bandwidth.
+        Refer to the data sheet for available resolution bandwidths.
+        Default unit: Hz
+        """
+        self.fsw_write(f'SENSe:LIST:RANGe{range_num}:BANDwidth:RESolution {rbw}')
+
+    def set_spur_list_range_band_vbw(self, range_num, vbw):
+        """
+        [SENSe:]LIST:RANGe<ri>:BANDwidth:VIDeo <VBW>
+        This command defines the video bandwidth for a spurious emission measurement
+        range.
+        Suffix:
+        <ri>    1..n
+        Selects the measurement range.
+        Parameters:
+        <VBW> Video bandwidth.
+        Refer to the data sheet for available video bandwidths.
+        Default unit: Hz
+        """
+        self.fsw_write(f'SENSe:LIST:RANGe{range_num}:BANDwidth:VIDeo {vbw}')
+
+    def set_spur_list_range_sweep_point(self, range_num, points):
+        """
+        [SENSe:]LIST:RANGe<ri>:POINts[:VALue] <Points>
+        This command defines the number of sweep points in a spurious emission measurement range.
+        Suffix:
+        <ri>    1..n
+        Selects the measurement range.
+        Parameters:
+        <Points> For more information on sweep points see Chapter 7.5.1.8,
+        "How much data is measured: sweep points and sweep count",
+        on page 481.
+        *RST: 1001
+        """
+        self.fsw_write(f'SENSe:LIST:RANGe{range_num}:POINts:VALue {points}')
+
+    def set_spur_list_range_input_attenuation(self, range_num,att):
+        """
+        [SENSe:]LIST:RANGe<ri>:INPut:ATTenuation <Attenuation>
+        This command defines the input attenuation for a spurious emission measurement
+        range.
+        Suffix:
+        <ri>    1..n
+        Selects the measurement range.
+        Parameters:
+        <Attenuation> Numeric value.
+        Refer to the data sheet for the attenuation range.
+        *RST: 10 dB
+        Default unit: dB
+        """
+        self.fsw_write(f'SENSe:LIST:RANGe{range_num}:INPut:ATTenuation {att}')
+
+    def set_spur_list_range_limit_start(self, range_num, level):
+        """
+        [SENSe:]LIST:RANGe<ri>:LIMit:STARt <Level>
+        This command defines an absolute limit for a spurious emission measurement range.
+        Suffix:
+        <ri>    1..n
+        Selects the measurement range.
+        Parameters:
+        <Level> Absolute limit at the start frequency of a SEM range.
+        Range: -400 to 400
+        *RST: 13
+        Default unit: dBm
+        """
+        self.fsw_write(f'SENSe:LIST:RANGe{range_num}:LIMit:STARt {level}')
+
+    def set_spur_list_range_limit_stop(self, range_num, level):
+        """
+        [SENSe:]LIST:RANGe<ri>:LIMit:STOP <Level>
+        This command defines an absolute limit for a spurious emission measurement range.
+        Suffix:
+        <ri>    1..n
+        Selects the measurement range.
+        Parameters:
+        <Level> Absolute limit at the stop frequency of a SEM range.
+        Range: -400 to 400
+        *RST: 13
+        Default unit: dBm
+        """
+        self.fsw_write(f'SENSe:LIST:RANGe{range_num}:LIMit:STOP {level}')
+
+    def set_spur_list_range_limit_state(self, range_num, state=0):
+        """
+        [SENSe:]LIST:RANGe<ri>:LIMit:STATe <State>
+        This command turns the limit check for all spurious emission measurement ranges on
+        and off.
+        Suffix:
+        <ri>    irrelevant
+        Parameters:
+        <State> ON | OFF | 1 | 0
+        *RST: 0
+        """
+        self.fsw_write(f'SENSe:LIST:RANGe{range_num}:LIMit:STATe {state}')
+
+    def set_spur_list_range_delete(self, range_num):
+        """
+        [SENSe:]LIST:RANGe<ri>:DELete
+        This command removes a range from the sweep list.
+        Note that
+        ● you cannot delete the reference range
+        ● a minimum of three ranges is mandatory.
+        Suffix:
+        <ri>    1..n
+        Selects the measurement range.
+        """
+        self.fsw_write(f'SENSe:LIST:RANGe{range_num}:DELete')
     # def set_peak_search_number(self, number):
     #     """
     #     CALCulate<n>:PSEarch:SUBRanges <NumberPeaks>
@@ -883,6 +1188,17 @@ class FSW:
         """
         return self.fsw_query(f'CALCulate:MARKer:FUNCtion:FPEaks:Y?')
 
+    def get_spur_list_range_count(self):
+        """
+        [SENSe:]LIST:RANGe<ri>:COUNt?
+        This command queries the number of ranges in the sweep list.
+        Suffix:
+        <ri>    irrelevant
+        Return values:
+        <Ranges> Number of ranges in the sweep list.
+        """
+        self.fsw_query(f'LIST:RANGe:COUNt?')
+
     @staticmethod
     def duty_factor(band):
         """
@@ -902,6 +1218,172 @@ class FSW:
             return factor
         else:
             return 0
+
+    def print_screenshot(self):
+        """
+        HCOPy[:IMMediate<1|2>]
+        This command initiates a print job.
+        If you are printing to a file, the file name depends on MMEMory:NAME.
+        Suffix:
+        <1|2>    Printing device
+        """
+        self.fsw_write(f'HCOP:IMM')
+
+    def set_screenshot_format(self, form='PNG'):
+        """
+        HCOPy:DEVice:LANGuage<1|2> <arg0>
+        This command selects the file format for a print job or to store a screenshot to a file.
+        Suffix:
+        <1|2>    1|2
+        Printing device.
+        Parameters:
+        <arg0> BMP | JPG | PNG | PDF | SVG
+               Data format for output to files
+               DOC | PDF
+               File type for test reports
+               Available for HCOP:MODE REPort
+        Example: To print a screenshot to a PNG file:
+        //Destination: PNG file
+        HCOP:DEV:LANG PNG
+        //Define file name
+        MMEM:NAME 'C:\\R_S\\instr\\user\\MeasurementTestReport.png'
+        //Print
+        HCOP:IMM
+        """
+        self.fsw_write(f'HCOPy:DEVice:LANGuage {form}')
+
+    def set_hcopy_content(self, arg='HCOPy'):
+        """
+        HCOPy:CONTent <arg0>
+        This command determines the type of content included in the printout.
+        This setting is independent of the printing device.
+        Parameters:
+        <arg0> WINDows | HCOPy
+                WINDows
+                Includes only the selected windows in the printout. All currently
+                active windows for the current channel (or "MultiView") are available for selection. How many windows are printed on a each
+                page of the printout is defined by HCOPy:PAGE:WINDow<1|2>:
+                COUNt on page 1331.
+                This option is not available when copying to the clipboard
+                (HCOP:DEST 'SYST:COMM:CLIP' or an image file (see
+                HCOPy:DEVice:LANGuage<1|2> on page 1327).
+                If the destination is currently set to an image file or the clipboard,
+                it is automatically changed to be a PDF file for the currently
+                selected printing device.
+                HCOPy
+                Selects all measurement results displayed on the screen for the
+                current channel (or "MultiView"): diagrams, traces, markers,
+                marker lists, limit lines, etc., including the channel bar and status
+                bar, for printout on a single page. Displayed items belonging to
+                the software user interface (e.g. softkeys) are not included. The
+                size and position of the elements in the printout is identical to the
+                screen display.
+                *RST: HCOPy
+                Example: HCOP:DEST1 'SYST:COMM:CLIP'
+                HCOP:CONT WIND
+                HCOP:DEST1?
+                //Result: 'MMEM'
+                HCOP:DEV:LANG1?
+                //Result: 'PDF'
+                "Print to clipboard" is automatically switched to "print to PDF file"
+                when the contents are switched to "multiple windows".
+        """
+        self.fsw_write(f'HCOPy:CONTent {arg}')
+
+    def set_file_path(self, file_path):
+        """
+        MMEMory:NAME <FileName>
+        This command has several purposes, depending on the context it is used in.
+        ● It creates a new and empty file.
+        ● It defines the file name for screenshots taken with HCOPy[:IMMediate<1|2>].
+        Note that you have to route the printer output to a file.
+        Parameters:
+        <FileName> String containing the path and name of the target file.
+        Example: MMEM:NAME 'C:\\Data\\PRINT1.BMP'
+                 Selects the file name.
+        """
+        self.fsw_write(f'MMEM:NAME "{file_path}"')
+
+    def set_hcopy_destination(self, arg='SYST:COMM:CLIP'):
+        """
+        HCOPy:DESTination<1|2> <arg0>
+        This command selects the destination of a print job.
+        Note: To print a screenshot to a file, see HCOPy:DEVice:LANGuage<1|2>
+        on page 1327.
+        Suffix:
+        <1|2>    Printing device.
+        Parameters:
+        <arg0> 'MMEM'
+                Activates "Print to file". Thus, if the destination of the print function is set to "printer" (see HCOP:DEST1 'SYSTem:COMMuni
+                cate:PRINter' or HCOP:DEV:LANG GDI), the output is redirected to a .PRN file using the selected printer driver.
+                Select the file name with MMEMory:NAME.
+                Note: To save a screenshot to a file, see HCOPy:DEVice:
+                LANGuage<1|2> on page 1327.
+                'SYSTem:COMMunicate:PRINter'
+                Sends the hardcopy to a printer and deactivates "print to file".
+                Select the printer with SYSTem:COMMunicate:PRINter:
+                SELect<1|2> .
+                'SYSTem:COMMunicate:CLIPboard'
+                Sends the hardcopy to the clipboard.
+                *RST: 'SYST:COMM:CLIP'
+        Example: To print on a printer:
+                //Destination: printer, deactivate "print to file"
+                HCOP:DEST1 'SYSTem:COMMunicate:PRINter'
+                //Define the printer name
+                SYST:COMM:PRIN:SEL 'myFavoritePrinter'
+                //Print
+                HCOP:IMM
+        Example: To print to a *PRN file:
+                //Destination: printer
+                HCOP:DEV:LANG GDI
+                //Define the printer name
+                SYST:COMM:PRIN:SEL 'myFavoritePrinter'
+                //Redirect the printer output to a file
+                HCOP:DEST1 'MMEM'
+                //Define file name
+                MMEM:NAME 'C:\\R_S\\instr\\user\\MeasurementTestReport.png'
+                //Print
+                HCOP:IMM
+        """
+        self.fsw_write(f'HCOPy:DESTination {arg}')
+
+    def get_data_query(self, file_path):
+        """
+        MMEMory:DATA <FileName>[, <Data>]
+        MMEMory:DATA? <FileName>
+        This command writes block data into a file. The delimiter must be set to EOI to obtain
+        error-free data transfer.
+        When you query the contents of a file, you can save them in a file on the remote control computer.
+        The command is useful for reading stored settings files or trace data from the instrument or for transferring them to the instrument
+        Parameters:
+        <Data>  <block_data>
+                Data block with the following structure.
+                #
+                Hash sign.
+                <number>
+                Length of the length information.
+                <number>
+                Length information of the binary data (number of bytes).
+                <data>
+                Binary data with the indicated <number> of bytes.
+        Parameters for setting and query:
+        <FileName>
+        Example: MMEM:NAME '\\Public\\User\\Testfile.txt'
+                 Creates a new file called 'testfile.txt'.
+                 MMEM:DATA 'Testfile.txt',#220Contents of the
+                 file
+                 The parameter means:
+                 #2: hash sign and length of the length information (20 bytes = 2
+                 digits)
+                 20: indicates the number of subsequent binary data bytes.
+                 Contents of the file: store 20 binary bytes (characters) to the file.
+                 MMEM:DATA? 'Testfile.txt'
+                 Returns the contents of the file.
+        """
+        return self.fsw_query_2(f'MMEMory:DATA? "{file_path}"')
+
+    def get_data(self, file_path):
+        return self.fsw_query(f'MMEMory:DATA "{file_path}"')
 
 
 def main():

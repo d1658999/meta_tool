@@ -807,3 +807,4 @@ class TxTestLevelSweep(AtCmd, CMW100):
                 self.tx_level_sweep_pipeline_wcdma()
             elif tech == 'GSM':
                 self.tx_level_sweep_pipeline_gsm()
+        self.cmw_close()
