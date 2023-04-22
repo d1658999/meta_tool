@@ -125,10 +125,17 @@ class TxCBE(TxTestGenre, FSW50):
                             self.set_suprious_emissions_measure()
                             self.fsw_query('*OPC?')
 
+                            # show the pass or fail
+                            pass_fail_state = self.get_limits_state()
+                            if pass_fail_state == 0:
+                                logger.info('PASS')
+                            else:
+                                logger.info('FAIL')
+
                             # screenshot
                             file_name = f'{self.tech}_Band{self.band_fr1}_BE_{self.bw_fr1}_' \
                                         f'{zip_dict_chan[self.tx_freq_fr1]}_' \
-                                        f'{self.rb_state}_{self.mcs_fr1}_ftm' \
+                                        f'{self.rb_state}_{self.mcs_fr1}_ftm_' \
                                         f'{round(aclr_mod_results[3], 2)}dBm' \
                                         f'.png'  # this is power level
                             local_file_path = FILE_FOLDER / Path(file_name)
@@ -245,10 +252,17 @@ class TxCBE(TxTestGenre, FSW50):
                             self.set_suprious_emissions_measure()
                             self.fsw_query('*OPC?')
 
+                            # show the pass or fail
+                            pass_fail_state = self.get_limits_state()
+                            if pass_fail_state == 0:
+                                logger.info('PASS')
+                            else:
+                                logger.info('FAIL')
+
                             # screenshot
                             file_name = f'{self.tech}_Band{self.band_lte}_BE_{self.bw_lte}_' \
                                         f'{zip_dict_chan[self.tx_freq_lte]}_' \
-                                        f'{self.rb_state}_{self.mcs_lte}_ftm' \
+                                        f'{self.rb_state}_{self.mcs_lte}_ftm_' \
                                         f'{round(aclr_mod_results[3], 2)}dBm' \
                                         f'.png'  # this is power level
                             local_file_path = FILE_FOLDER / Path(file_name)

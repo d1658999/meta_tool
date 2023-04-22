@@ -1219,6 +1219,31 @@ class FSW:
         else:
             return 0
 
+    def get_limits_state(self):
+        """
+        CALCulate<n>:LIMit<li>:FAIL?
+        This command queries the result of a limit check in the specified window.
+        Note that for SEM measurements, the limit line suffix <li> is irrelevant,
+        as only one specific SEM limit line is checked for the currently relevant power class.
+        To get a valid result, you have to perform a complete measurement with synchronization to the end of the
+        measurement before reading out the result. This is only possible
+        for single sweep mode.
+        See also INITiate<n>:CONTinuous on page 886.
+        Suffix:
+        <n>        Window
+        <li>       Limit line
+        Return values:
+        <Result>   0
+                   PASS
+                   1
+                   FAIL
+                   Example: INIT;*WAI
+                   Starts a new sweep and waits for its end.
+                   CALC2:LIM3:FAIL?
+                   Queries the result of the check for limit line 3 in window 2.
+        """
+        self.fsw_query(f'CALCulate:LIMit:FAIL?')
+
     def print_screenshot(self):
         """
         HCOPy[:IMMediate<1|2>]
