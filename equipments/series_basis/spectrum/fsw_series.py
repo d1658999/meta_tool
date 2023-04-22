@@ -1242,7 +1242,46 @@ class FSW:
                    CALC2:LIM3:FAIL?
                    Queries the result of the check for limit line 3 in window 2.
         """
-        self.fsw_query(f'CALCulate:LIMit:FAIL?')
+        return self.fsw_query(f'CALCulate:LIMit:FAIL?')
+
+    def get_spur_trace_limit_data(self):
+        """
+        TRACe<n>[:DATA] <Trace>,<Data>
+        TRACe<n>[:DATA]? <ResultType>
+        This command queries current trace data and measurement results.
+        In the Spectrum application only, you can use it as a setting command to transfer trace
+        data from an external source to the R&S FSW.
+        The data format depends on FORMat[:DATA] on page 1217.
+        Suffix:
+        <n>        Window
+        Parameters:
+        <Trace> TRACE1 | TRACE2 | TRACE3 | TRACE4 | TRACE5 | TRACE6
+                Selects the trace to write the data to (Spectrum application only).
+        <Data> Contains the data to transfer (Spectrum application only).
+        Query parameters:
+        <ResultType> Selects the type of result to be returned.See Table 13-7.
+        Note that not all result types are available for all applications.
+        See the application-specific documentation for details.
+        Example: (Spectrum application only:)
+                TRAC TRACE1,+A$
+                Transfers trace data ('+A$') to trace 1.
+        Example: TRAC? TRACE3
+                Queries the data of trace 3.
+        Example: See Chapter 13.15.1, "Programming example: performing a
+                basic frequency sweep", on page 1487.
+        Example: See Chapter 13.5.7.11, "Example: SEM measurement",
+                on page 1004.
+        Manual operation: See "List Evaluation State (result summary)" on page 260
+        See "Diagram" on page 520
+        Peak list evaluation of Spurious Emission measurements.
+        """
+        return self.fsw_query(f'TRACe? SPURious')
+
+    def get_spur_limit_margin(self):
+        data = self.get_spur_trace_limit_data()
+        data_margin = [eval(d) for d in data.split(',')]
+        data_margin = data_margin[2::3]
+        return data_margin
 
     def print_screenshot(self):
         """

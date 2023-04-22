@@ -7,6 +7,7 @@ from utils.loss_handler_harmonic import get_loss_spectrum
 
 
 logger = log_set('FSW50')
+MARGIN = 1.5
 
 
 class FSW50(FSW):
@@ -49,7 +50,6 @@ class FSW50(FSW):
 
     def set_spur_initial(self):
         logger.info('----------select spurious emissions measurement----------')
-        self.system_preset()
         self.set_measurement_mode('LIST')
         self.average_type()
         self.set_display_trace_mode()
@@ -287,7 +287,7 @@ class FSW50(FSW):
                     self.set_spur_list_range_freq_stop(3, (824 + bw1 + bw2) * mhz)
 
                 # filter type
-                self.set_spur_list_range_filter_type(1, 'NORMal')
+                self.set_spur_list_range_filter_type(1, 'CFILter')
                 self.set_spur_list_range_filter_type(2, 'CFILter')
                 self.set_spur_list_range_filter_type(3, 'NORMal')
 
@@ -310,9 +310,9 @@ class FSW50(FSW):
                     self.set_spur_list_range_input_attenuation(r_num, 30)
 
                 # sweep points
-                self.set_spur_list_range_sweep_point(1, 404)
-                self.set_spur_list_range_sweep_point(2, 2001)
-                self.set_spur_list_range_sweep_point(3, 2001)
+                self.set_spur_list_range_sweep_point(1, 1001)
+                self.set_spur_list_range_sweep_point(2, 1001)
+                self.set_spur_list_range_sweep_point(3, 1001)
 
                 # Abs Limit
                 self.set_spur_list_range_limit_start(1, -13)
@@ -335,7 +335,7 @@ class FSW50(FSW):
                 # filter type
                 self.set_spur_list_range_filter_type(1, 'NORMal')
                 self.set_spur_list_range_filter_type(2, 'CFILter')
-                self.set_spur_list_range_filter_type(3, 'NORMal')
+                self.set_spur_list_range_filter_type(3, 'CFILter')
 
                 # rbw/vbw
                 self.set_spur_list_range_band_rbw(3, 100 * khz)
@@ -355,9 +355,9 @@ class FSW50(FSW):
                     self.set_spur_list_range_input_attenuation(r_num, 30)
 
                 # sweep points
-                self.set_spur_list_range_sweep_point(3, 404)
-                self.set_spur_list_range_sweep_point(2, 2001)
-                self.set_spur_list_range_sweep_point(1, 2001)
+                self.set_spur_list_range_sweep_point(3, 1001)
+                self.set_spur_list_range_sweep_point(2, 1001)
+                self.set_spur_list_range_sweep_point(1, 1001)
 
                 # Abs Limit
                 self.set_spur_list_range_limit_start(3, -13)
@@ -510,7 +510,7 @@ class FSW50(FSW):
                     self.set_spur_list_range_freq_stop(3, (699 + bw1) * mhz)
 
                 # filter type
-                self.set_spur_list_range_filter_type(1, 'NORMal')
+                self.set_spur_list_range_filter_type(1, 'CFILter')
                 self.set_spur_list_range_filter_type(2, 'CFILter')
                 self.set_spur_list_range_filter_type(3, 'NORMal')
 
@@ -528,9 +528,9 @@ class FSW50(FSW):
                     self.set_spur_list_range_input_attenuation(r_num, 30)
 
                 # sweep points
-                self.set_spur_list_range_sweep_point(1, 404)
-                self.set_spur_list_range_sweep_point(2, 2001)
-                self.set_spur_list_range_sweep_point(3, 2001)
+                self.set_spur_list_range_sweep_point(1, 1001)
+                self.set_spur_list_range_sweep_point(2, 1001)
+                self.set_spur_list_range_sweep_point(3, 1001)
 
                 # Abs Limit
                 self.set_spur_list_range_limit_start(1, -13)
@@ -553,7 +553,7 @@ class FSW50(FSW):
                 # filter type
                 self.set_spur_list_range_filter_type(3, 'NORMal')
                 self.set_spur_list_range_filter_type(2, 'CFILter')
-                self.set_spur_list_range_filter_type(1, 'NORMal')
+                self.set_spur_list_range_filter_type(1, 'CFILter')
 
                 # rbw/vbw
                 self.set_spur_list_range_band_rbw(3, 100 * khz)
@@ -569,9 +569,9 @@ class FSW50(FSW):
                     self.set_spur_list_range_input_attenuation(r_num, 30)
 
                 # sweep points
-                self.set_spur_list_range_sweep_point(3, 404)
-                self.set_spur_list_range_sweep_point(2, 2001)
-                self.set_spur_list_range_sweep_point(1, 2001)
+                self.set_spur_list_range_sweep_point(3, 1001)
+                self.set_spur_list_range_sweep_point(2, 1001)
+                self.set_spur_list_range_sweep_point(1, 1001)
 
                 # Abs Limit
                 self.set_spur_list_range_limit_start(3, -13)
@@ -597,11 +597,11 @@ class FSW50(FSW):
 
                 # filter type
                 self.set_spur_list_range_filter_type(1, 'NORMal')
-                self.set_spur_list_range_filter_type(2, 'NORMal')
+                self.set_spur_list_range_filter_type(2, 'CFILter')
                 self.set_spur_list_range_filter_type(3, 'CFILter')
                 self.set_spur_list_range_filter_type(4, 'Normal')
                 self.set_spur_list_range_filter_type(5, 'CFILter')
-                self.set_spur_list_range_filter_type(6, 'Normal')
+                self.set_spur_list_range_filter_type(6, 'CFILter')
                 self.set_spur_list_range_filter_type(7, 'Normal')
 
                 # rbw/vbw
@@ -626,13 +626,13 @@ class FSW50(FSW):
                     self.set_spur_list_range_input_attenuation(r_num, 30)
 
                 # sweep points
-                self.set_spur_list_range_sweep_point(1, 404)
-                self.set_spur_list_range_sweep_point(2, 404)
-                self.set_spur_list_range_sweep_point(3, 404)
-                self.set_spur_list_range_sweep_point(4, 2001)
-                self.set_spur_list_range_sweep_point(5, 2001)
-                self.set_spur_list_range_sweep_point(6, 2001)
-                self.set_spur_list_range_sweep_point(7, 404)
+                self.set_spur_list_range_sweep_point(1, 1001)
+                self.set_spur_list_range_sweep_point(2, 1001)
+                self.set_spur_list_range_sweep_point(3, 1001)
+                self.set_spur_list_range_sweep_point(4, 1001)
+                self.set_spur_list_range_sweep_point(5, 1001)
+                self.set_spur_list_range_sweep_point(6, 1001)
+                self.set_spur_list_range_sweep_point(7, 1001)
 
                 # Abs Limit
                 self.set_spur_list_range_limit_start(1, -35)
@@ -664,7 +664,7 @@ class FSW50(FSW):
 
                 # filter type
                 self.set_spur_list_range_filter_type(1, 'NORMal')
-                self.set_spur_list_range_filter_type(2, 'NORMal')
+                self.set_spur_list_range_filter_type(2, 'CFILter')
                 self.set_spur_list_range_filter_type(3, 'CFILter')
                 self.set_spur_list_range_filter_type(4, 'Normal')
                 self.set_spur_list_range_filter_type(5, 'CFILter')
@@ -687,11 +687,11 @@ class FSW50(FSW):
                     self.set_spur_list_range_input_attenuation(r_num, 30)
 
                 # sweep points
-                self.set_spur_list_range_sweep_point(1, 404)
-                self.set_spur_list_range_sweep_point(2, 404)
-                self.set_spur_list_range_sweep_point(3, 2001)
-                self.set_spur_list_range_sweep_point(4, 2001)
-                self.set_spur_list_range_sweep_point(5, 404)
+                self.set_spur_list_range_sweep_point(1, 1001)
+                self.set_spur_list_range_sweep_point(2, 2001)
+                self.set_spur_list_range_sweep_point(3, 1001)
+                self.set_spur_list_range_sweep_point(4, 1001)
+                self.set_spur_list_range_sweep_point(5, 1001)
 
                 # Abs Limit
                 self.set_spur_list_range_limit_start(1, -13)
@@ -716,7 +716,7 @@ class FSW50(FSW):
                 self.set_spur_list_range_freq_stop(3, (704 + bw1) * mhz)
 
                 # filter type
-                self.set_spur_list_range_filter_type(1, 'NORMal')
+                self.set_spur_list_range_filter_type(1, 'CFILter')
                 self.set_spur_list_range_filter_type(2, 'CFILter')
                 self.set_spur_list_range_filter_type(3, 'NORMal')
 
@@ -734,9 +734,9 @@ class FSW50(FSW):
                     self.set_spur_list_range_input_attenuation(r_num, 30)
 
                 # sweep points
-                self.set_spur_list_range_sweep_point(1, 404)
-                self.set_spur_list_range_sweep_point(2, 2001)
-                self.set_spur_list_range_sweep_point(3, 2001)
+                self.set_spur_list_range_sweep_point(1, 1001)
+                self.set_spur_list_range_sweep_point(2, 1001)
+                self.set_spur_list_range_sweep_point(3, 1001)
 
                 # Abs Limit
                 self.set_spur_list_range_limit_start(1, -13)
@@ -754,7 +754,7 @@ class FSW50(FSW):
                 self.set_spur_list_range_freq_stop(3, 725 * mhz)
 
                 # filter type
-                self.set_spur_list_range_filter_type(3, 'NORMal')
+                self.set_spur_list_range_filter_type(3, 'CFILter')
                 self.set_spur_list_range_filter_type(2, 'CFILter')
                 self.set_spur_list_range_filter_type(1, 'NORMal')
 
@@ -772,9 +772,9 @@ class FSW50(FSW):
                     self.set_spur_list_range_input_attenuation(r_num, 30)
 
                 # sweep points
-                self.set_spur_list_range_sweep_point(3, 404)
-                self.set_spur_list_range_sweep_point(2, 2001)
-                self.set_spur_list_range_sweep_point(1, 2001)
+                self.set_spur_list_range_sweep_point(3, 1001)
+                self.set_spur_list_range_sweep_point(2, 1001)
+                self.set_spur_list_range_sweep_point(1, 1001)
 
                 # Abs Limit
                 self.set_spur_list_range_limit_start(3, -13)
@@ -963,11 +963,11 @@ class FSW50(FSW):
                     self.set_spur_list_range_input_attenuation(r_num, 30)
 
                 # sweep points
-                self.set_spur_list_range_sweep_point(1, 404)
-                self.set_spur_list_range_sweep_point(2, 2001)
-                self.set_spur_list_range_sweep_point(3, 2001)
-                self.set_spur_list_range_sweep_point(4, 2001)
-                self.set_spur_list_range_sweep_point(5, 404)
+                self.set_spur_list_range_sweep_point(1, 1001)
+                self.set_spur_list_range_sweep_point(2, 1001)
+                self.set_spur_list_range_sweep_point(3, 1001)
+                self.set_spur_list_range_sweep_point(4, 1001)
+                self.set_spur_list_range_sweep_point(5, 1001)
 
                 # Abs Limit
                 self.set_spur_list_range_limit_start(1, -13)
@@ -1015,11 +1015,11 @@ class FSW50(FSW):
                     self.set_spur_list_range_input_attenuation(r_num, 30)
 
                 # sweep points
-                self.set_spur_list_range_sweep_point(1, 404)
-                self.set_spur_list_range_sweep_point(2, 2001)
-                self.set_spur_list_range_sweep_point(3, 2001)
-                self.set_spur_list_range_sweep_point(4, 2001)
-                self.set_spur_list_range_sweep_point(5, 404)
+                self.set_spur_list_range_sweep_point(1, 1001)
+                self.set_spur_list_range_sweep_point(2, 1001)
+                self.set_spur_list_range_sweep_point(3, 1001)
+                self.set_spur_list_range_sweep_point(4, 1001)
+                self.set_spur_list_range_sweep_point(5, 1001)
 
                 # Abs Limit
                 self.set_spur_list_range_limit_start(1, -13)
@@ -1067,11 +1067,11 @@ class FSW50(FSW):
                     self.set_spur_list_range_input_attenuation(r_num, 30)
 
                 # sweep points
-                self.set_spur_list_range_sweep_point(1, 404)
-                self.set_spur_list_range_sweep_point(2, 2001)
-                self.set_spur_list_range_sweep_point(3, 2001)
-                self.set_spur_list_range_sweep_point(4, 2001)
-                self.set_spur_list_range_sweep_point(5, 404)
+                self.set_spur_list_range_sweep_point(1, 1001)
+                self.set_spur_list_range_sweep_point(2, 1001)
+                self.set_spur_list_range_sweep_point(3, 1001)
+                self.set_spur_list_range_sweep_point(4, 1001)
+                self.set_spur_list_range_sweep_point(5, 1001)
 
                 # Abs Limit
                 self.set_spur_list_range_limit_start(1, -13)
@@ -1119,11 +1119,11 @@ class FSW50(FSW):
                     self.set_spur_list_range_input_attenuation(r_num, 30)
 
                 # sweep points
-                self.set_spur_list_range_sweep_point(1, 404)
-                self.set_spur_list_range_sweep_point(2, 2001)
-                self.set_spur_list_range_sweep_point(3, 2001)
-                self.set_spur_list_range_sweep_point(4, 2001)
-                self.set_spur_list_range_sweep_point(5, 404)
+                self.set_spur_list_range_sweep_point(1, 1001)
+                self.set_spur_list_range_sweep_point(2, 1001)
+                self.set_spur_list_range_sweep_point(3, 1001)
+                self.set_spur_list_range_sweep_point(4, 1001)
+                self.set_spur_list_range_sweep_point(5, 1001)
 
                 # Abs Limit
                 self.set_spur_list_range_limit_start(1, -13)
@@ -1171,11 +1171,11 @@ class FSW50(FSW):
                     self.set_spur_list_range_input_attenuation(r_num, 30)
 
                 # sweep points
-                self.set_spur_list_range_sweep_point(1, 404)
-                self.set_spur_list_range_sweep_point(2, 2001)
-                self.set_spur_list_range_sweep_point(3, 2001)
-                self.set_spur_list_range_sweep_point(4, 2001)
-                self.set_spur_list_range_sweep_point(5, 404)
+                self.set_spur_list_range_sweep_point(1, 1001)
+                self.set_spur_list_range_sweep_point(2, 1001)
+                self.set_spur_list_range_sweep_point(3, 1001)
+                self.set_spur_list_range_sweep_point(4, 1001)
+                self.set_spur_list_range_sweep_point(5, 1001)
 
                 # Abs Limit
                 self.set_spur_list_range_limit_start(1, -13)
@@ -1199,7 +1199,7 @@ class FSW50(FSW):
                 # filter type
                 self.set_spur_list_range_filter_type(1, 'NORMal')
                 self.set_spur_list_range_filter_type(2, 'CFILter')
-                self.set_spur_list_range_filter_type(3, 'NORMal')
+                self.set_spur_list_range_filter_type(3, 'CFILter')
 
                 # rbw/vbw
                 self.set_spur_list_range_band_rbw(3, 100 * khz)
@@ -1222,9 +1222,9 @@ class FSW50(FSW):
                     self.set_spur_list_range_input_attenuation(r_num, 30)
 
                 # sweep points
-                self.set_spur_list_range_sweep_point(3, 404)
-                self.set_spur_list_range_sweep_point(2, 2001)
-                self.set_spur_list_range_sweep_point(1, 2001)
+                self.set_spur_list_range_sweep_point(3, 1001)
+                self.set_spur_list_range_sweep_point(2, 1001)
+                self.set_spur_list_range_sweep_point(1, 1001)
 
                 # Abs Limit
                 self.set_spur_list_range_limit_start(3, -13)
@@ -1254,7 +1254,7 @@ class FSW50(FSW):
                 self.set_spur_list_range_filter_type(1, 'NORMal')
                 self.set_spur_list_range_filter_type(2, 'NORMal')
                 self.set_spur_list_range_filter_type(3, 'NORMal')
-                self.set_spur_list_range_filter_type(4, 'MORMal')
+                self.set_spur_list_range_filter_type(4, 'CFILter')
                 self.set_spur_list_range_filter_type(5, 'CFILter')
                 self.set_spur_list_range_filter_type(6, 'NORMmal')
                 self.set_spur_list_range_filter_type(7, 'CFILter')
@@ -1841,7 +1841,7 @@ class FSW50(FSW):
                 self.set_spur_list_range_freq_stop(3, (663 + bw1) * mhz)
 
                 # filter type
-                self.set_spur_list_range_filter_type(1, 'NORMal')
+                self.set_spur_list_range_filter_type(1, 'CFILter')
                 self.set_spur_list_range_filter_type(2, 'CFILter')
                 self.set_spur_list_range_filter_type(3, 'NORMal')
 
@@ -1863,9 +1863,9 @@ class FSW50(FSW):
                     self.set_spur_list_range_input_attenuation(r_num, 30)
 
                 # sweep points
-                self.set_spur_list_range_sweep_point(1, 404)
-                self.set_spur_list_range_sweep_point(2, 2001)
-                self.set_spur_list_range_sweep_point(3, 2001)
+                self.set_spur_list_range_sweep_point(1, 1001)
+                self.set_spur_list_range_sweep_point(2, 1001)
+                self.set_spur_list_range_sweep_point(3, 1001)
 
                 # Abs Limit
                 self.set_spur_list_range_limit_start(1, -13)
@@ -1888,7 +1888,7 @@ class FSW50(FSW):
                 # filter type
                 self.set_spur_list_range_filter_type(1, 'NORMal')
                 self.set_spur_list_range_filter_type(2, 'CFILter')
-                self.set_spur_list_range_filter_type(3, 'NORMal')
+                self.set_spur_list_range_filter_type(3, 'CFILter')
 
                 # rbw/vbw
                 self.set_spur_list_range_band_rbw(3, 100 * khz)
@@ -1908,9 +1908,9 @@ class FSW50(FSW):
                     self.set_spur_list_range_input_attenuation(r_num, 30)
 
                 # sweep points
-                self.set_spur_list_range_sweep_point(3, 404)
-                self.set_spur_list_range_sweep_point(2, 2001)
-                self.set_spur_list_range_sweep_point(1, 2001)
+                self.set_spur_list_range_sweep_point(3, 1001)
+                self.set_spur_list_range_sweep_point(2, 1001)
+                self.set_spur_list_range_sweep_point(1, 1001)
 
                 # Abs Limit
                 self.set_spur_list_range_limit_start(3, -13)
@@ -1943,11 +1943,11 @@ class FSW50(FSW):
                 # filter type
                 self.set_spur_list_range_filter_type(1, 'NORMal')
                 self.set_spur_list_range_filter_type(2, 'NORMal')
-                self.set_spur_list_range_filter_type(3, 'Normal')
+                self.set_spur_list_range_filter_type(3, 'CFILter')
                 self.set_spur_list_range_filter_type(4, 'CFILter')
                 self.set_spur_list_range_filter_type(5, 'NORMal')
                 self.set_spur_list_range_filter_type(6, 'CFILter')
-                self.set_spur_list_range_filter_type(7, 'NORMal')
+                self.set_spur_list_range_filter_type(7, 'CFILter')
                 self.set_spur_list_range_filter_type(8, 'NORMal')
 
                 # rbw/vbw
@@ -1982,14 +1982,14 @@ class FSW50(FSW):
                     self.set_spur_list_range_input_attenuation(r_num, 30)
 
                 # sweep points
-                self.set_spur_list_range_sweep_point(1, 404)
-                self.set_spur_list_range_sweep_point(2, 404)
-                self.set_spur_list_range_sweep_point(3, 404)
-                self.set_spur_list_range_sweep_point(4, 2001)
-                self.set_spur_list_range_sweep_point(5, 2001)
-                self.set_spur_list_range_sweep_point(6, 2001)
-                self.set_spur_list_range_sweep_point(7, 404)
-                self.set_spur_list_range_sweep_point(8, 404)
+                self.set_spur_list_range_sweep_point(1, 401)
+                self.set_spur_list_range_sweep_point(2, 401)
+                self.set_spur_list_range_sweep_point(3, 401)
+                self.set_spur_list_range_sweep_point(4, 1001)
+                self.set_spur_list_range_sweep_point(5, 1001)
+                self.set_spur_list_range_sweep_point(6, 1001)
+                self.set_spur_list_range_sweep_point(7, 401)
+                self.set_spur_list_range_sweep_point(8, 401)
 
                 # Abs Limit
                 self.set_spur_list_range_limit_start(1, -40)
@@ -2029,11 +2029,11 @@ class FSW50(FSW):
 
                 # filter type
                 self.set_spur_list_range_filter_type(1, 'NORMal')
-                self.set_spur_list_range_filter_type(2, 'NORMal')
+                self.set_spur_list_range_filter_type(2, 'CFILter')
                 self.set_spur_list_range_filter_type(3, 'CFILter')
                 self.set_spur_list_range_filter_type(4, 'NORMal')
                 self.set_spur_list_range_filter_type(5, 'CFILter')
-                self.set_spur_list_range_filter_type(6, 'NORMal')
+                self.set_spur_list_range_filter_type(6, 'CFILter')
                 self.set_spur_list_range_filter_type(7, 'NORMal')
                 self.set_spur_list_range_filter_type(8, 'NORMal')
 
@@ -2069,14 +2069,14 @@ class FSW50(FSW):
                     self.set_spur_list_range_input_attenuation(r_num, 30)
 
                 # sweep points
-                self.set_spur_list_range_sweep_point(8, 404)
-                self.set_spur_list_range_sweep_point(7, 404)
-                self.set_spur_list_range_sweep_point(6, 404)
-                self.set_spur_list_range_sweep_point(5, 2001)
-                self.set_spur_list_range_sweep_point(4, 2001)
-                self.set_spur_list_range_sweep_point(3, 2001)
-                self.set_spur_list_range_sweep_point(2, 404)
-                self.set_spur_list_range_sweep_point(1, 404)
+                self.set_spur_list_range_sweep_point(8, 401)
+                self.set_spur_list_range_sweep_point(7, 401)
+                self.set_spur_list_range_sweep_point(6, 401)
+                self.set_spur_list_range_sweep_point(5, 1001)
+                self.set_spur_list_range_sweep_point(4, 1001)
+                self.set_spur_list_range_sweep_point(3, 1001)
+                self.set_spur_list_range_sweep_point(2, 401)
+                self.set_spur_list_range_sweep_point(1, 401)
 
                 # Abs Limit
                 self.set_spur_list_range_limit_start(8, -40)

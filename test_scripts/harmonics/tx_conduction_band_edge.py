@@ -109,6 +109,7 @@ class TxCBE(TxTestGenre, FSW50):
                             # self.sync_fr1()  # temp
 
                             # spectrum setting for spurios emission
+                            self.system_preset()
                             self.set_reference_level_offset(self.band_fr1, self.loss_tx)
                             self.set_spur_initial()
                             self.set_spur_spec_limit_line(self.band_fr1, zip_dict_chan[self.tx_freq_fr1], self.bw_fr1)
@@ -124,19 +125,23 @@ class TxCBE(TxTestGenre, FSW50):
                             logger.info('----------Start to measure CBE----------')
                             self.set_suprious_emissions_measure()
                             self.fsw_query('*OPC?')
+                            worse_margin = max(self.get_spur_limit_margin())
 
                             # show the pass or fail
-                            pass_fail_state = self.get_limits_state()
+                            pass_fail_state = self.get_limits_state().strip()
                             if pass_fail_state == 0:
-                                logger.info('PASS')
+                                logger.info('For internal spec: PASS')
+                                spec_state = 'PASS'
                             else:
-                                logger.info('FAIL')
+                                logger.info('For internal spec: FAIL')
+                                spec_state = 'PASS'
 
                             # screenshot
                             file_name = f'{self.tech}_Band{self.band_fr1}_BE_{self.bw_fr1}_' \
                                         f'{zip_dict_chan[self.tx_freq_fr1]}_' \
                                         f'{self.rb_state}_{self.mcs_fr1}_ftm_' \
-                                        f'{round(aclr_mod_results[3], 2)}dBm' \
+                                        f'{round(aclr_mod_results[3], 2)}dBm_' \
+                                        f'margin_{worse_margin:.2f}dB_{spec_state}' \
                                         f'.png'  # this is power level
                             local_file_path = FILE_FOLDER / Path(file_name)
                             self.get_spur_screenshot(local_file_path)
@@ -236,6 +241,7 @@ class TxCBE(TxTestGenre, FSW50):
                             self.loss_tx = get_loss(self.tx_freq_lte)
 
                             # spectrum setting for spurios emission
+                            self.system_preset()
                             self.set_reference_level_offset(self.band_lte, self.loss_tx)
                             self.set_spur_initial()
                             self.set_spur_spec_limit_line(self.band_lte, zip_dict_chan[self.tx_freq_lte], self.bw_lte)
@@ -251,19 +257,25 @@ class TxCBE(TxTestGenre, FSW50):
                             logger.info('----------Start to measure CBE----------')
                             self.set_suprious_emissions_measure()
                             self.fsw_query('*OPC?')
+                            worse_margin = max(self.get_spur_limit_margin())
 
                             # show the pass or fail
+
                             pass_fail_state = self.get_limits_state()
-                            if pass_fail_state == 0:
-                                logger.info('PASS')
+                            if pass_fail_state == '0':
+                                logger.info('For internal spec: PASS')
+                                spec_state = 'PASS'
+
                             else:
-                                logger.info('FAIL')
+                                logger.info('For internal spec: FAIL')
+                                spec_state = 'FAIL'
 
                             # screenshot
                             file_name = f'{self.tech}_Band{self.band_lte}_BE_{self.bw_lte}_' \
                                         f'{zip_dict_chan[self.tx_freq_lte]}_' \
                                         f'{self.rb_state}_{self.mcs_lte}_ftm_' \
-                                        f'{round(aclr_mod_results[3], 2)}dBm' \
+                                        f'{round(aclr_mod_results[3], 2)}dBm_' \
+                                        f'margin_{worse_margin:.2f}dB_{spec_state}' \
                                         f'.png'  # this is power level
                             local_file_path = FILE_FOLDER / Path(file_name)
                             self.get_spur_screenshot(local_file_path)
