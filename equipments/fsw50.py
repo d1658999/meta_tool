@@ -17,7 +17,7 @@ class FSW50(FSW):
 
     def get_level_harmonics(self, band, harmonic_freq, loss):
         # basic environment setting
-        # self.set_reference_level(-30)
+        # self.set_reference_level(-30 - MARGIN)
         self.set_reference_level_offset(band, loss)
         self.set_input_attenuation(0)
         self.set_freq_center(harmonic_freq)
@@ -30,7 +30,7 @@ class FSW50(FSW):
         self.set_display_trace_mode(1, 'AVERage')
         self.set_sweep_mode('OFF')  # single sweep
         self.fsw.query('*OPC?')
-        self.set_reference_level(-30)
+        self.set_reference_level(-30 - MARGIN)
         self.set_measure()  # start to measure
 
         # mark the peak search
@@ -118,10 +118,10 @@ class FSW50(FSW):
                 self.set_spur_list_range_sweep_point(3, 1001)
 
                 # Abs Limit
-                self.set_spur_list_range_limit_start(1, -13)
-                self.set_spur_list_range_limit_stop(1, -13)
-                self.set_spur_list_range_limit_start(2, -13)
-                self.set_spur_list_range_limit_stop(2, -13)
+                self.set_spur_list_range_limit_start(1, -13 - MARGIN)
+                self.set_spur_list_range_limit_stop(1, -13 - MARGIN)
+                self.set_spur_list_range_limit_start(2, -13 - MARGIN)
+                self.set_spur_list_range_limit_stop(2, -13 - MARGIN)
                 self.set_spur_list_range_limit_start(3, 30)
                 self.set_spur_list_range_limit_stop(3, 30)
 
@@ -167,12 +167,16 @@ class FSW50(FSW):
                 self.set_spur_list_range_sweep_point(1, 1001)
 
                 # Abs Limit
-                self.set_spur_list_range_limit_start(3, -13)
-                self.set_spur_list_range_limit_stop(3, -13)
-                self.set_spur_list_range_limit_start(2, -13)
-                self.set_spur_list_range_limit_stop(2, -13)
+                self.set_spur_list_range_limit_start(3, -13 - MARGIN)
+                self.set_spur_list_range_limit_stop(3, -13 - MARGIN)
+                self.set_spur_list_range_limit_start(2, -13 - MARGIN)
+                self.set_spur_list_range_limit_stop(2, -13 - MARGIN)
                 self.set_spur_list_range_limit_start(1, 30)
                 self.set_spur_list_range_limit_stop(1, 30)
+
+            else:
+                logger.info(f'Band{band} does not in FCC request for {chan}chan and BW {bw1}')
+                return 1
 
         elif band == 4:
             self.set_spur_list_range_delete(4)
@@ -218,10 +222,10 @@ class FSW50(FSW):
                 self.set_spur_list_range_sweep_point(3, 1001)
 
                 # Abs Limit
-                self.set_spur_list_range_limit_start(1, -13)
-                self.set_spur_list_range_limit_stop(1, -13)
-                self.set_spur_list_range_limit_start(2, -13)
-                self.set_spur_list_range_limit_stop(2, -13)
+                self.set_spur_list_range_limit_start(1, -13 - MARGIN)
+                self.set_spur_list_range_limit_stop(1, -13 - MARGIN)
+                self.set_spur_list_range_limit_start(2, -13 - MARGIN)
+                self.set_spur_list_range_limit_stop(2, -13 - MARGIN)
                 self.set_spur_list_range_limit_start(3, 30)
                 self.set_spur_list_range_limit_stop(3, 30)
 
@@ -266,12 +270,16 @@ class FSW50(FSW):
                 self.set_spur_list_range_sweep_point(1, 1001)
 
                 # Abs Limit
-                self.set_spur_list_range_limit_start(3, -13)
-                self.set_spur_list_range_limit_stop(3, -13)
-                self.set_spur_list_range_limit_start(2, -13)
-                self.set_spur_list_range_limit_stop(2, -13)
+                self.set_spur_list_range_limit_start(3, -13 - MARGIN)
+                self.set_spur_list_range_limit_stop(3, -13 - MARGIN)
+                self.set_spur_list_range_limit_start(2, -13 - MARGIN)
+                self.set_spur_list_range_limit_stop(2, -13 - MARGIN)
                 self.set_spur_list_range_limit_start(1, 30)
                 self.set_spur_list_range_limit_stop(1, 30)
+
+            else:
+                logger.info(f'Band{band} does not in FCC request for {chan}chan and BW {bw1}')
+                return 1
 
         elif band == 5:
             self.set_spur_list_range_delete(4)
@@ -315,10 +323,10 @@ class FSW50(FSW):
                 self.set_spur_list_range_sweep_point(3, 1001)
 
                 # Abs Limit
-                self.set_spur_list_range_limit_start(1, -13)
-                self.set_spur_list_range_limit_stop(1, -13)
-                self.set_spur_list_range_limit_start(2, -13)
-                self.set_spur_list_range_limit_stop(2, -13)
+                self.set_spur_list_range_limit_start(1, -13 - MARGIN)
+                self.set_spur_list_range_limit_stop(1, -13 - MARGIN)
+                self.set_spur_list_range_limit_start(2, -13 - MARGIN)
+                self.set_spur_list_range_limit_stop(2, -13 - MARGIN)
                 self.set_spur_list_range_limit_start(3, 30)
                 self.set_spur_list_range_limit_stop(3, 30)
 
@@ -360,12 +368,16 @@ class FSW50(FSW):
                 self.set_spur_list_range_sweep_point(1, 1001)
 
                 # Abs Limit
-                self.set_spur_list_range_limit_start(3, -13)
-                self.set_spur_list_range_limit_stop(3, -13)
-                self.set_spur_list_range_limit_start(2, -13)
-                self.set_spur_list_range_limit_stop(2, -13)
+                self.set_spur_list_range_limit_start(3, -13 - MARGIN)
+                self.set_spur_list_range_limit_stop(3, -13 - MARGIN)
+                self.set_spur_list_range_limit_start(2, -13 - MARGIN)
+                self.set_spur_list_range_limit_stop(2, -13 - MARGIN)
                 self.set_spur_list_range_limit_start(1, 30)
                 self.set_spur_list_range_limit_stop(1, 30)
+
+            else:
+                logger.info(f'Band{band} does not in FCC request for {chan}chan and BW {bw1}')
+                return 1
 
         elif band == 7:
             self.set_sweep_type('SWE')
@@ -420,14 +432,14 @@ class FSW50(FSW):
                 self.set_spur_list_range_sweep_point(5, 2001)
 
                 # Abs Limit
-                self.set_spur_list_range_limit_start(1, -25)
-                self.set_spur_list_range_limit_stop(1, -25)
-                self.set_spur_list_range_limit_start(2, -13)
-                self.set_spur_list_range_limit_stop(2, -13)
-                self.set_spur_list_range_limit_start(3, -10)
-                self.set_spur_list_range_limit_stop(3, -10)
-                self.set_spur_list_range_limit_start(4, -10)
-                self.set_spur_list_range_limit_stop(4, -10)
+                self.set_spur_list_range_limit_start(1, -25 - MARGIN)
+                self.set_spur_list_range_limit_stop(1, -25 - MARGIN)
+                self.set_spur_list_range_limit_start(2, -13 - MARGIN)
+                self.set_spur_list_range_limit_stop(2, -13 - MARGIN)
+                self.set_spur_list_range_limit_start(3, -10 - MARGIN)
+                self.set_spur_list_range_limit_stop(3, -10 - MARGIN)
+                self.set_spur_list_range_limit_start(4, -10 - MARGIN)
+                self.set_spur_list_range_limit_stop(4, -10 - MARGIN)
                 self.set_spur_list_range_limit_start(5, 30)
                 self.set_spur_list_range_limit_stop(5, 30)
 
@@ -485,16 +497,20 @@ class FSW50(FSW):
                 self.set_spur_list_range_sweep_point(1, 2001)
 
                 # Abs Limit
-                self.set_spur_list_range_limit_start(5, -25)
-                self.set_spur_list_range_limit_stop(5, -25)
-                self.set_spur_list_range_limit_start(4, -13)
-                self.set_spur_list_range_limit_stop(4, -13)
-                self.set_spur_list_range_limit_start(3, -10)
-                self.set_spur_list_range_limit_stop(3, -10)
-                self.set_spur_list_range_limit_start(2, -10)
-                self.set_spur_list_range_limit_stop(2, -10)
+                self.set_spur_list_range_limit_start(5, -25 - MARGIN)
+                self.set_spur_list_range_limit_stop(5, -25 - MARGIN)
+                self.set_spur_list_range_limit_start(4, -13 - MARGIN)
+                self.set_spur_list_range_limit_stop(4, -13 - MARGIN)
+                self.set_spur_list_range_limit_start(3, -10 - MARGIN)
+                self.set_spur_list_range_limit_stop(3, -10 - MARGIN)
+                self.set_spur_list_range_limit_start(2, -10 - MARGIN)
+                self.set_spur_list_range_limit_stop(2, -10 - MARGIN)
                 self.set_spur_list_range_limit_start(1, 30)
                 self.set_spur_list_range_limit_stop(1, 30)
+
+            else:
+                logger.info(f'Band{band} does not in FCC request for {chan}chan and BW {bw1 + bw2}')
+                return 1
 
         elif band == 12:
             self.set_spur_list_range_delete(4)
@@ -533,10 +549,10 @@ class FSW50(FSW):
                 self.set_spur_list_range_sweep_point(3, 1001)
 
                 # Abs Limit
-                self.set_spur_list_range_limit_start(1, -13)
-                self.set_spur_list_range_limit_stop(1, -13)
-                self.set_spur_list_range_limit_start(2, -13)
-                self.set_spur_list_range_limit_stop(2, -13)
+                self.set_spur_list_range_limit_start(1, -13 - MARGIN)
+                self.set_spur_list_range_limit_stop(1, -13 - MARGIN)
+                self.set_spur_list_range_limit_start(2, -13 - MARGIN)
+                self.set_spur_list_range_limit_stop(2, -13 - MARGIN)
                 self.set_spur_list_range_limit_start(3, 30)
                 self.set_spur_list_range_limit_stop(3, 30)
 
@@ -574,12 +590,16 @@ class FSW50(FSW):
                 self.set_spur_list_range_sweep_point(1, 1001)
 
                 # Abs Limit
-                self.set_spur_list_range_limit_start(3, -13)
-                self.set_spur_list_range_limit_stop(3, -13)
-                self.set_spur_list_range_limit_start(2, -13)
-                self.set_spur_list_range_limit_stop(2, -13)
+                self.set_spur_list_range_limit_start(3, -13 - MARGIN)
+                self.set_spur_list_range_limit_stop(3, -13 - MARGIN)
+                self.set_spur_list_range_limit_start(2, -13 - MARGIN)
+                self.set_spur_list_range_limit_stop(2, -13 - MARGIN)
                 self.set_spur_list_range_limit_start(1, 30)
                 self.set_spur_list_range_limit_stop(1, 30)
+
+            else:
+                logger.info(f'Band{band} does not in FCC request for {chan}chan and BW {bw1}')
+                return 1
 
         elif band == 13:
             self.set_sweep_type('SWE')
@@ -637,16 +657,16 @@ class FSW50(FSW):
                 # Abs Limit
                 self.set_spur_list_range_limit_start(1, -35)
                 self.set_spur_list_range_limit_stop(1, -35)
-                self.set_spur_list_range_limit_start(2, -13)
-                self.set_spur_list_range_limit_stop(2, -13)
-                self.set_spur_list_range_limit_start(3, -13)
-                self.set_spur_list_range_limit_stop(3, -13)
+                self.set_spur_list_range_limit_start(2, -13 - MARGIN)
+                self.set_spur_list_range_limit_stop(2, -13 - MARGIN)
+                self.set_spur_list_range_limit_start(3, -13 - MARGIN)
+                self.set_spur_list_range_limit_stop(3, -13 - MARGIN)
                 self.set_spur_list_range_limit_start(4, 30)
                 self.set_spur_list_range_limit_stop(4, 30)
-                self.set_spur_list_range_limit_start(5, -13)
-                self.set_spur_list_range_limit_stop(5, -13)
-                self.set_spur_list_range_limit_start(6, -13)
-                self.set_spur_list_range_limit_stop(6, -13)
+                self.set_spur_list_range_limit_start(5, -13 - MARGIN)
+                self.set_spur_list_range_limit_stop(5, -13 - MARGIN)
+                self.set_spur_list_range_limit_start(6, -13 - MARGIN)
+                self.set_spur_list_range_limit_stop(6, -13 - MARGIN)
                 self.set_spur_list_range_limit_start(7, -35)
                 self.set_spur_list_range_limit_stop(7, -35)
 
@@ -694,16 +714,16 @@ class FSW50(FSW):
                 self.set_spur_list_range_sweep_point(5, 1001)
 
                 # Abs Limit
-                self.set_spur_list_range_limit_start(1, -13)
-                self.set_spur_list_range_limit_stop(1, -13)
+                self.set_spur_list_range_limit_start(1, -13 - MARGIN)
+                self.set_spur_list_range_limit_stop(1, -13 - MARGIN)
                 self.set_spur_list_range_limit_start(2, -35)
                 self.set_spur_list_range_limit_stop(2, -35)
-                self.set_spur_list_range_limit_start(3, -13)
-                self.set_spur_list_range_limit_stop(3, -13)
+                self.set_spur_list_range_limit_start(3, -13 - MARGIN)
+                self.set_spur_list_range_limit_stop(3, -13 - MARGIN)
                 self.set_spur_list_range_limit_start(4, 30)
                 self.set_spur_list_range_limit_stop(4, 30)
-                self.set_spur_list_range_limit_start(5, -13)
-                self.set_spur_list_range_limit_stop(5, -13)
+                self.set_spur_list_range_limit_start(5, -13 - MARGIN)
+                self.set_spur_list_range_limit_stop(5, -13 - MARGIN)
 
         elif band == 17:
             self.set_spur_list_range_delete(4)
@@ -739,10 +759,10 @@ class FSW50(FSW):
                 self.set_spur_list_range_sweep_point(3, 1001)
 
                 # Abs Limit
-                self.set_spur_list_range_limit_start(1, -13)
-                self.set_spur_list_range_limit_stop(1, -13)
-                self.set_spur_list_range_limit_start(2, -13)
-                self.set_spur_list_range_limit_stop(2, -13)
+                self.set_spur_list_range_limit_start(1, -13 - MARGIN)
+                self.set_spur_list_range_limit_stop(1, -13 - MARGIN)
+                self.set_spur_list_range_limit_start(2, -13 - MARGIN)
+                self.set_spur_list_range_limit_stop(2, -13 - MARGIN)
                 self.set_spur_list_range_limit_start(3, 30)
                 self.set_spur_list_range_limit_stop(3, 30)
 
@@ -777,12 +797,16 @@ class FSW50(FSW):
                 self.set_spur_list_range_sweep_point(1, 1001)
 
                 # Abs Limit
-                self.set_spur_list_range_limit_start(3, -13)
-                self.set_spur_list_range_limit_stop(3, -13)
-                self.set_spur_list_range_limit_start(2, -13)
-                self.set_spur_list_range_limit_stop(2, -13)
+                self.set_spur_list_range_limit_start(3, -13 - MARGIN)
+                self.set_spur_list_range_limit_stop(3, -13 - MARGIN)
+                self.set_spur_list_range_limit_start(2, -13 - MARGIN)
+                self.set_spur_list_range_limit_stop(2, -13 - MARGIN)
                 self.set_spur_list_range_limit_start(1, 30)
                 self.set_spur_list_range_limit_stop(1, 30)
+
+            else:
+                logger.info(f'Band{band} does not in FCC request for {chan}chan and BW {bw1}')
+                return 1
 
         elif band == 25:
             self.set_spur_list_range_delete(4)
@@ -825,10 +849,10 @@ class FSW50(FSW):
                 self.set_spur_list_range_sweep_point(3, 2001)
 
                 # Abs Limit
-                self.set_spur_list_range_limit_start(1, -13)
-                self.set_spur_list_range_limit_stop(1, -13)
-                self.set_spur_list_range_limit_start(2, -13)
-                self.set_spur_list_range_limit_stop(2, -13)
+                self.set_spur_list_range_limit_start(1, -13 - MARGIN)
+                self.set_spur_list_range_limit_stop(1, -13 - MARGIN)
+                self.set_spur_list_range_limit_start(2, -13 - MARGIN)
+                self.set_spur_list_range_limit_stop(2, -13 - MARGIN)
                 self.set_spur_list_range_limit_start(3, 30)
                 self.set_spur_list_range_limit_stop(3, 30)
 
@@ -870,12 +894,16 @@ class FSW50(FSW):
                 self.set_spur_list_range_sweep_point(1, 2001)
 
                 # Abs Limit
-                self.set_spur_list_range_limit_start(3, -13)
-                self.set_spur_list_range_limit_stop(3, -13)
-                self.set_spur_list_range_limit_start(2, -13)
-                self.set_spur_list_range_limit_stop(2, -13)
+                self.set_spur_list_range_limit_start(3, -13 - MARGIN)
+                self.set_spur_list_range_limit_stop(3, -13 - MARGIN)
+                self.set_spur_list_range_limit_start(2, -13 - MARGIN)
+                self.set_spur_list_range_limit_stop(2, -13 - MARGIN)
                 self.set_spur_list_range_limit_start(1, 30)
                 self.set_spur_list_range_limit_stop(1, 30)
+
+            else:
+                logger.info(f'Band{band} does not in FCC request for {chan}chan and BW {bw1}')
+                return 1
 
         elif band == 26:
             """
@@ -923,10 +951,10 @@ class FSW50(FSW):
             #     self.set_spur_list_range_sweep_point(3, 2001)
             #
             #     # Abs Limit
-            #     self.set_spur_list_range_limit_start(1, -13)
-            #     self.set_spur_list_range_limit_stop(1, -13)
-            #     self.set_spur_list_range_limit_start(2, -13)
-            #     self.set_spur_list_range_limit_stop(2, -13)
+            #     self.set_spur_list_range_limit_start(1, -13 - MARGIN)
+            #     self.set_spur_list_range_limit_stop(1, -13 - MARGIN)
+            #     self.set_spur_list_range_limit_start(2, -13 - MARGIN)
+            #     self.set_spur_list_range_limit_stop(2, -13 - MARGIN)
             #     self.set_spur_list_range_limit_start(3, 30)
             #     self.set_spur_list_range_limit_stop(3, 30)
             if chan == 'L' and bw1 == 15:
@@ -970,16 +998,16 @@ class FSW50(FSW):
                 self.set_spur_list_range_sweep_point(5, 1001)
 
                 # Abs Limit
-                self.set_spur_list_range_limit_start(1, -13)
-                self.set_spur_list_range_limit_stop(1, -13)
-                self.set_spur_list_range_limit_start(2, -20)
-                self.set_spur_list_range_limit_stop(2, -20)
+                self.set_spur_list_range_limit_start(1, -13 - MARGIN)
+                self.set_spur_list_range_limit_stop(1, -13 - MARGIN)
+                self.set_spur_list_range_limit_start(2, -20 - MARGIN)
+                self.set_spur_list_range_limit_stop(2, -20 - MARGIN)
                 self.set_spur_list_range_limit_start(3, 30)
                 self.set_spur_list_range_limit_stop(3, 30)
-                self.set_spur_list_range_limit_start(4, -20)
-                self.set_spur_list_range_limit_stop(4, -20)
-                self.set_spur_list_range_limit_start(5, -13)
-                self.set_spur_list_range_limit_stop(5, -13)
+                self.set_spur_list_range_limit_start(4, -20 - MARGIN)
+                self.set_spur_list_range_limit_stop(4, -20 - MARGIN)
+                self.set_spur_list_range_limit_start(5, -13 - MARGIN)
+                self.set_spur_list_range_limit_stop(5, -13 - MARGIN)
 
             elif chan == 'L' and bw1 == 10:
                 # range
@@ -1022,16 +1050,16 @@ class FSW50(FSW):
                 self.set_spur_list_range_sweep_point(5, 1001)
 
                 # Abs Limit
-                self.set_spur_list_range_limit_start(1, -13)
-                self.set_spur_list_range_limit_stop(1, -13)
-                self.set_spur_list_range_limit_start(2, -20)
-                self.set_spur_list_range_limit_stop(2, -20)
+                self.set_spur_list_range_limit_start(1, -13 - MARGIN)
+                self.set_spur_list_range_limit_stop(1, -13 - MARGIN)
+                self.set_spur_list_range_limit_start(2, -20 - MARGIN)
+                self.set_spur_list_range_limit_stop(2, -20 - MARGIN)
                 self.set_spur_list_range_limit_start(3, 30)
                 self.set_spur_list_range_limit_stop(3, 30)
-                self.set_spur_list_range_limit_start(4, -20)
-                self.set_spur_list_range_limit_stop(4, -20)
-                self.set_spur_list_range_limit_start(5, -13)
-                self.set_spur_list_range_limit_stop(5, -13)
+                self.set_spur_list_range_limit_start(4, -20 - MARGIN)
+                self.set_spur_list_range_limit_stop(4, -20 - MARGIN)
+                self.set_spur_list_range_limit_start(5, -13 - MARGIN)
+                self.set_spur_list_range_limit_stop(5, -13 - MARGIN)
 
             elif chan == 'L' and bw1 == 5:
                 # range
@@ -1074,16 +1102,16 @@ class FSW50(FSW):
                 self.set_spur_list_range_sweep_point(5, 1001)
 
                 # Abs Limit
-                self.set_spur_list_range_limit_start(1, -13)
-                self.set_spur_list_range_limit_stop(1, -13)
-                self.set_spur_list_range_limit_start(2, -20)
-                self.set_spur_list_range_limit_stop(2, -20)
+                self.set_spur_list_range_limit_start(1, -13 - MARGIN)
+                self.set_spur_list_range_limit_stop(1, -13 - MARGIN)
+                self.set_spur_list_range_limit_start(2, -20 - MARGIN)
+                self.set_spur_list_range_limit_stop(2, -20 - MARGIN)
                 self.set_spur_list_range_limit_start(3, 30)
                 self.set_spur_list_range_limit_stop(3, 30)
-                self.set_spur_list_range_limit_start(4, -20)
-                self.set_spur_list_range_limit_stop(4, -20)
-                self.set_spur_list_range_limit_start(5, -13)
-                self.set_spur_list_range_limit_stop(5, -13)
+                self.set_spur_list_range_limit_start(4, -20 - MARGIN)
+                self.set_spur_list_range_limit_stop(4, -20 - MARGIN)
+                self.set_spur_list_range_limit_start(5, -13 - MARGIN)
+                self.set_spur_list_range_limit_stop(5, -13 - MARGIN)
 
             elif chan == 'L' and bw1 == 3:
                 # range
@@ -1126,16 +1154,16 @@ class FSW50(FSW):
                 self.set_spur_list_range_sweep_point(5, 1001)
 
                 # Abs Limit
-                self.set_spur_list_range_limit_start(1, -13)
-                self.set_spur_list_range_limit_stop(1, -13)
-                self.set_spur_list_range_limit_start(2, -20)
-                self.set_spur_list_range_limit_stop(2, -20)
+                self.set_spur_list_range_limit_start(1, -13 - MARGIN)
+                self.set_spur_list_range_limit_stop(1, -13 - MARGIN)
+                self.set_spur_list_range_limit_start(2, -20 - MARGIN)
+                self.set_spur_list_range_limit_stop(2, -20 - MARGIN)
                 self.set_spur_list_range_limit_start(3, 30)
                 self.set_spur_list_range_limit_stop(3, 30)
-                self.set_spur_list_range_limit_start(4, -20)
-                self.set_spur_list_range_limit_stop(4, -20)
-                self.set_spur_list_range_limit_start(5, -13)
-                self.set_spur_list_range_limit_stop(5, -13)
+                self.set_spur_list_range_limit_start(4, -20 - MARGIN)
+                self.set_spur_list_range_limit_stop(4, -20 - MARGIN)
+                self.set_spur_list_range_limit_start(5, -13 - MARGIN)
+                self.set_spur_list_range_limit_stop(5, -13 - MARGIN)
 
             elif chan == 'L' and bw1 == 1.4:
                 # range
@@ -1178,16 +1206,16 @@ class FSW50(FSW):
                 self.set_spur_list_range_sweep_point(5, 1001)
 
                 # Abs Limit
-                self.set_spur_list_range_limit_start(1, -13)
-                self.set_spur_list_range_limit_stop(1, -13)
-                self.set_spur_list_range_limit_start(2, -20)
-                self.set_spur_list_range_limit_stop(2, -20)
+                self.set_spur_list_range_limit_start(1, -13 - MARGIN)
+                self.set_spur_list_range_limit_stop(1, -13 - MARGIN)
+                self.set_spur_list_range_limit_start(2, -20 - MARGIN)
+                self.set_spur_list_range_limit_stop(2, -20 - MARGIN)
                 self.set_spur_list_range_limit_start(3, 30)
                 self.set_spur_list_range_limit_stop(3, 30)
-                self.set_spur_list_range_limit_start(4, -20)
-                self.set_spur_list_range_limit_stop(4, -20)
-                self.set_spur_list_range_limit_start(5, -13)
-                self.set_spur_list_range_limit_stop(5, -13)
+                self.set_spur_list_range_limit_start(4, -20 - MARGIN)
+                self.set_spur_list_range_limit_stop(4, -20 - MARGIN)
+                self.set_spur_list_range_limit_start(5, -13 - MARGIN)
+                self.set_spur_list_range_limit_stop(5, -13 - MARGIN)
 
             elif chan == 'H':
                 # range
@@ -1227,12 +1255,16 @@ class FSW50(FSW):
                 self.set_spur_list_range_sweep_point(1, 1001)
 
                 # Abs Limit
-                self.set_spur_list_range_limit_start(3, -13)
-                self.set_spur_list_range_limit_stop(3, -13)
-                self.set_spur_list_range_limit_start(2, -13)
-                self.set_spur_list_range_limit_stop(2, -13)
+                self.set_spur_list_range_limit_start(3, -13 - MARGIN)
+                self.set_spur_list_range_limit_stop(3, -13 - MARGIN)
+                self.set_spur_list_range_limit_start(2, -13 - MARGIN)
+                self.set_spur_list_range_limit_stop(2, -13 - MARGIN)
                 self.set_spur_list_range_limit_start(1, 30)
                 self.set_spur_list_range_limit_stop(1, 30)
+
+            else:
+                logger.info(f'Band{band} does not in FCC request for {chan}chan and BW {bw1}')
+                return 1
 
         elif band == 30:
             self.set_sweep_type('SWE')
@@ -1302,26 +1334,26 @@ class FSW50(FSW):
                 self.set_spur_list_range_sweep_point(10, 1001)
 
                 # Abs Limit
-                self.set_spur_list_range_limit_start(1, -37)
-                self.set_spur_list_range_limit_stop(1, -37)
-                self.set_spur_list_range_limit_start(2, -31)
-                self.set_spur_list_range_limit_stop(2, -31)
-                self.set_spur_list_range_limit_start(3, -25)
-                self.set_spur_list_range_limit_stop(3, -25)
-                self.set_spur_list_range_limit_start(4, -13)
-                self.set_spur_list_range_limit_stop(4, -13)
-                self.set_spur_list_range_limit_start(5, -13)
-                self.set_spur_list_range_limit_stop(5, -13)
+                self.set_spur_list_range_limit_start(1, -37 - MARGIN)
+                self.set_spur_list_range_limit_stop(1, -37 - MARGIN)
+                self.set_spur_list_range_limit_start(2, -31 - MARGIN)
+                self.set_spur_list_range_limit_stop(2, -31 - MARGIN)
+                self.set_spur_list_range_limit_start(3, -25 - MARGIN)
+                self.set_spur_list_range_limit_stop(3, -25 - MARGIN)
+                self.set_spur_list_range_limit_start(4, -13 - MARGIN)
+                self.set_spur_list_range_limit_stop(4, -13 - MARGIN)
+                self.set_spur_list_range_limit_start(5, -13 - MARGIN)
+                self.set_spur_list_range_limit_stop(5, -13 - MARGIN)
                 self.set_spur_list_range_limit_start(6, 30)
                 self.set_spur_list_range_limit_stop(6, 30)
-                self.set_spur_list_range_limit_start(7, -13)
-                self.set_spur_list_range_limit_stop(7, -13)
-                self.set_spur_list_range_limit_start(8, -13)
-                self.set_spur_list_range_limit_stop(8, -13)
-                self.set_spur_list_range_limit_start(9, -25)
-                self.set_spur_list_range_limit_stop(9, -25)
-                self.set_spur_list_range_limit_start(10, -31)
-                self.set_spur_list_range_limit_stop(10, -31)
+                self.set_spur_list_range_limit_start(7, -13 - MARGIN)
+                self.set_spur_list_range_limit_stop(7, -13 - MARGIN)
+                self.set_spur_list_range_limit_start(8, -13 - MARGIN)
+                self.set_spur_list_range_limit_stop(8, -13 - MARGIN)
+                self.set_spur_list_range_limit_start(9, -25 - MARGIN)
+                self.set_spur_list_range_limit_stop(9, -25 - MARGIN)
+                self.set_spur_list_range_limit_start(10, -31 - MARGIN)
+                self.set_spur_list_range_limit_stop(10, -31 - MARGIN)
 
             elif chan == 'H' and bw1 == 5:
                 # range
@@ -1389,26 +1421,26 @@ class FSW50(FSW):
                 self.set_spur_list_range_sweep_point(10, 1001)
 
                 # Abs Limit
-                self.set_spur_list_range_limit_start(1, -37)
-                self.set_spur_list_range_limit_stop(1, -37)
-                self.set_spur_list_range_limit_start(2, -31)
-                self.set_spur_list_range_limit_stop(2, -31)
-                self.set_spur_list_range_limit_start(3, -25)
-                self.set_spur_list_range_limit_stop(3, -25)
-                self.set_spur_list_range_limit_start(4, -13)
-                self.set_spur_list_range_limit_stop(4, -13)
-                self.set_spur_list_range_limit_start(5, -13)
-                self.set_spur_list_range_limit_stop(5, -13)
+                self.set_spur_list_range_limit_start(1, -37 - MARGIN)
+                self.set_spur_list_range_limit_stop(1, -37 - MARGIN)
+                self.set_spur_list_range_limit_start(2, -31 - MARGIN)
+                self.set_spur_list_range_limit_stop(2, -31 - MARGIN)
+                self.set_spur_list_range_limit_start(3, -25 - MARGIN)
+                self.set_spur_list_range_limit_stop(3, -25 - MARGIN)
+                self.set_spur_list_range_limit_start(4, -13 - MARGIN)
+                self.set_spur_list_range_limit_stop(4, -13 - MARGIN)
+                self.set_spur_list_range_limit_start(5, -13 - MARGIN)
+                self.set_spur_list_range_limit_stop(5, -13 - MARGIN)
                 self.set_spur_list_range_limit_start(6, 30)
                 self.set_spur_list_range_limit_stop(6, 30)
-                self.set_spur_list_range_limit_start(7, -13)
-                self.set_spur_list_range_limit_stop(7, -13)
-                self.set_spur_list_range_limit_start(8, -13)
-                self.set_spur_list_range_limit_stop(8, -13)
-                self.set_spur_list_range_limit_start(9, -25)
-                self.set_spur_list_range_limit_stop(9, -25)
-                self.set_spur_list_range_limit_start(10, -31)
-                self.set_spur_list_range_limit_stop(10, -31)
+                self.set_spur_list_range_limit_start(7, -13 - MARGIN)
+                self.set_spur_list_range_limit_stop(7, -13 - MARGIN)
+                self.set_spur_list_range_limit_start(8, -13 - MARGIN)
+                self.set_spur_list_range_limit_stop(8, -13 - MARGIN)
+                self.set_spur_list_range_limit_start(9, -25 - MARGIN)
+                self.set_spur_list_range_limit_stop(9, -25 - MARGIN)
+                self.set_spur_list_range_limit_start(10, -31 - MARGIN)
+                self.set_spur_list_range_limit_stop(10, -31 - MARGIN)
 
             elif chan == 'M' and bw1 == 10:
                 # range
@@ -1476,26 +1508,30 @@ class FSW50(FSW):
                 self.set_spur_list_range_sweep_point(10, 1001)
 
                 # Abs Limit
-                self.set_spur_list_range_limit_start(1, -37)
-                self.set_spur_list_range_limit_stop(1, -37)
-                self.set_spur_list_range_limit_start(2, -31)
-                self.set_spur_list_range_limit_stop(2, -31)
-                self.set_spur_list_range_limit_start(3, -25)
-                self.set_spur_list_range_limit_stop(3, -25)
-                self.set_spur_list_range_limit_start(4, -13)
-                self.set_spur_list_range_limit_stop(4, -13)
-                self.set_spur_list_range_limit_start(5, -13)
-                self.set_spur_list_range_limit_stop(5, -13)
+                self.set_spur_list_range_limit_start(1, -37 - MARGIN)
+                self.set_spur_list_range_limit_stop(1, -37 - MARGIN)
+                self.set_spur_list_range_limit_start(2, -31 - MARGIN)
+                self.set_spur_list_range_limit_stop(2, -31 - MARGIN)
+                self.set_spur_list_range_limit_start(3, -25 - MARGIN)
+                self.set_spur_list_range_limit_stop(3, -25 - MARGIN)
+                self.set_spur_list_range_limit_start(4, -13 - MARGIN)
+                self.set_spur_list_range_limit_stop(4, -13 - MARGIN)
+                self.set_spur_list_range_limit_start(5, -13 - MARGIN)
+                self.set_spur_list_range_limit_stop(5, -13 - MARGIN)
                 self.set_spur_list_range_limit_start(6, 30)
                 self.set_spur_list_range_limit_stop(6, 30)
-                self.set_spur_list_range_limit_start(7, -13)
-                self.set_spur_list_range_limit_stop(7, -13)
-                self.set_spur_list_range_limit_start(8, -13)
-                self.set_spur_list_range_limit_stop(8, -13)
-                self.set_spur_list_range_limit_start(9, -25)
-                self.set_spur_list_range_limit_stop(9, -25)
-                self.set_spur_list_range_limit_start(10, -31)
-                self.set_spur_list_range_limit_stop(10, -31)
+                self.set_spur_list_range_limit_start(7, -13 - MARGIN)
+                self.set_spur_list_range_limit_stop(7, -13 - MARGIN)
+                self.set_spur_list_range_limit_start(8, -13 - MARGIN)
+                self.set_spur_list_range_limit_stop(8, -13 - MARGIN)
+                self.set_spur_list_range_limit_start(9, -25 - MARGIN)
+                self.set_spur_list_range_limit_stop(9, -25 - MARGIN)
+                self.set_spur_list_range_limit_start(10, -31 - MARGIN)
+                self.set_spur_list_range_limit_stop(10, -31 - MARGIN)
+
+            else:
+                logger.info(f'Band{band} does not in FCC request for {chan}chan and BW {bw1}')
+                return 1
 
         elif band == 38:
             self.set_sweep_type('SWE')
@@ -1547,14 +1583,14 @@ class FSW50(FSW):
                 self.set_spur_list_range_sweep_point(5, 2001)
 
                 # Abs Limit
-                self.set_spur_list_range_limit_start(1, -25)
-                self.set_spur_list_range_limit_stop(1, -25)
-                self.set_spur_list_range_limit_start(2, -13)
-                self.set_spur_list_range_limit_stop(2, -13)
-                self.set_spur_list_range_limit_start(3, -10)
-                self.set_spur_list_range_limit_stop(3, -10)
-                self.set_spur_list_range_limit_start(4, -10)
-                self.set_spur_list_range_limit_stop(4, -10)
+                self.set_spur_list_range_limit_start(1, -25 - MARGIN)
+                self.set_spur_list_range_limit_stop(1, -25 - MARGIN)
+                self.set_spur_list_range_limit_start(2, -13 - MARGIN)
+                self.set_spur_list_range_limit_stop(2, -13 - MARGIN)
+                self.set_spur_list_range_limit_start(3, -10 - MARGIN)
+                self.set_spur_list_range_limit_stop(3, -10 - MARGIN)
+                self.set_spur_list_range_limit_start(4, -10 - MARGIN)
+                self.set_spur_list_range_limit_stop(4, -10 - MARGIN)
                 self.set_spur_list_range_limit_start(5, 30)
                 self.set_spur_list_range_limit_stop(5, 30)
 
@@ -1606,16 +1642,20 @@ class FSW50(FSW):
                 self.set_spur_list_range_sweep_point(1, 2001)
 
                 # Abs Limit
-                self.set_spur_list_range_limit_start(5, -25)
-                self.set_spur_list_range_limit_stop(5, -25)
-                self.set_spur_list_range_limit_start(4, -13)
-                self.set_spur_list_range_limit_stop(4, -13)
-                self.set_spur_list_range_limit_start(3, -10)
-                self.set_spur_list_range_limit_stop(3, -10)
-                self.set_spur_list_range_limit_start(2, -10)
-                self.set_spur_list_range_limit_stop(2, -10)
+                self.set_spur_list_range_limit_start(5, -25 - MARGIN)
+                self.set_spur_list_range_limit_stop(5, -25 - MARGIN)
+                self.set_spur_list_range_limit_start(4, -13 - MARGIN)
+                self.set_spur_list_range_limit_stop(4, -13 - MARGIN)
+                self.set_spur_list_range_limit_start(3, -10 - MARGIN)
+                self.set_spur_list_range_limit_stop(3, -10 - MARGIN)
+                self.set_spur_list_range_limit_start(2, -10 - MARGIN)
+                self.set_spur_list_range_limit_stop(2, -10 - MARGIN)
                 self.set_spur_list_range_limit_start(1, 30)
                 self.set_spur_list_range_limit_stop(1, 30)
+
+            else:
+                logger.info(f'Band{band} does not in FCC request for {chan}chan and BW {bw1 + bw2}')
+                return 1
 
         elif band == 41:
             self.set_sweep_type('SWE')
@@ -1659,12 +1699,12 @@ class FSW50(FSW):
                 self.set_spur_list_range_sweep_point(4, 2001)
 
                 # Abs Limit
-                self.set_spur_list_range_limit_start(1, -25)
-                self.set_spur_list_range_limit_stop(1, -25)
-                self.set_spur_list_range_limit_start(2, -13)
-                self.set_spur_list_range_limit_stop(2, -13)
-                self.set_spur_list_range_limit_start(3, -13)
-                self.set_spur_list_range_limit_stop(3, -13)
+                self.set_spur_list_range_limit_start(1, -25 - MARGIN)
+                self.set_spur_list_range_limit_stop(1, -25 - MARGIN)
+                self.set_spur_list_range_limit_start(2, -13 - MARGIN)
+                self.set_spur_list_range_limit_stop(2, -13 - MARGIN)
+                self.set_spur_list_range_limit_start(3, -13 - MARGIN)
+                self.set_spur_list_range_limit_stop(3, -13 - MARGIN)
                 self.set_spur_list_range_limit_start(4, 30)
                 self.set_spur_list_range_limit_stop(4, 30)
 
@@ -1719,16 +1759,20 @@ class FSW50(FSW):
                 self.set_spur_list_range_sweep_point(1, 2001)
 
                 # Abs Limit
-                self.set_spur_list_range_limit_start(5, -25)
-                self.set_spur_list_range_limit_stop(5, -25)
-                self.set_spur_list_range_limit_start(4, -13)
-                self.set_spur_list_range_limit_stop(4, -13)
-                self.set_spur_list_range_limit_start(3, -10)
-                self.set_spur_list_range_limit_stop(3, -10)
-                self.set_spur_list_range_limit_start(2, -10)
-                self.set_spur_list_range_limit_stop(2, -10)
+                self.set_spur_list_range_limit_start(5, -25 - MARGIN)
+                self.set_spur_list_range_limit_stop(5, -25 - MARGIN)
+                self.set_spur_list_range_limit_start(4, -13 - MARGIN)
+                self.set_spur_list_range_limit_stop(4, -13 - MARGIN)
+                self.set_spur_list_range_limit_start(3, -10 - MARGIN)
+                self.set_spur_list_range_limit_stop(3, -10 - MARGIN)
+                self.set_spur_list_range_limit_start(2, -10 - MARGIN)
+                self.set_spur_list_range_limit_stop(2, -10 - MARGIN)
                 self.set_spur_list_range_limit_start(1, 30)
                 self.set_spur_list_range_limit_stop(1, 30)
+
+            else:
+                logger.info(f'Band{band} does not in FCC request for {chan}chan and BW {bw1 + bw2}')
+                return 1
 
         elif band == 66:
             self.set_sweep_type('SWE')
@@ -1775,10 +1819,10 @@ class FSW50(FSW):
                 self.set_spur_list_range_sweep_point(3, 1001)
 
                 # Abs Limit
-                self.set_spur_list_range_limit_start(1, -13)
-                self.set_spur_list_range_limit_stop(1, -13)
-                self.set_spur_list_range_limit_start(2, -13)
-                self.set_spur_list_range_limit_stop(2, -13)
+                self.set_spur_list_range_limit_start(1, -13 - MARGIN)
+                self.set_spur_list_range_limit_stop(1, -13 - MARGIN)
+                self.set_spur_list_range_limit_start(2, -13 - MARGIN)
+                self.set_spur_list_range_limit_stop(2, -13 - MARGIN)
                 self.set_spur_list_range_limit_start(3, 30)
                 self.set_spur_list_range_limit_stop(3, 30)
 
@@ -1823,12 +1867,16 @@ class FSW50(FSW):
                 self.set_spur_list_range_sweep_point(1, 1001)
 
                 # Abs Limit
-                self.set_spur_list_range_limit_start(3, -13)
-                self.set_spur_list_range_limit_stop(3, -13)
-                self.set_spur_list_range_limit_start(2, -13)
-                self.set_spur_list_range_limit_stop(2, -13)
+                self.set_spur_list_range_limit_start(3, -13 - MARGIN)
+                self.set_spur_list_range_limit_stop(3, -13 - MARGIN)
+                self.set_spur_list_range_limit_start(2, -13 - MARGIN)
+                self.set_spur_list_range_limit_stop(2, -13 - MARGIN)
                 self.set_spur_list_range_limit_start(1, 30)
                 self.set_spur_list_range_limit_stop(1, 30)
+
+            else:
+                logger.info(f'Band{band} does not in FCC request for {chan}chan and BW {bw1 + bw2}')
+                return 1
 
         elif band == 71:
             self.set_sweep_type('SWE')
@@ -1868,10 +1916,10 @@ class FSW50(FSW):
                 self.set_spur_list_range_sweep_point(3, 1001)
 
                 # Abs Limit
-                self.set_spur_list_range_limit_start(1, -13)
-                self.set_spur_list_range_limit_stop(1, -13)
-                self.set_spur_list_range_limit_start(2, -13)
-                self.set_spur_list_range_limit_stop(2, -13)
+                self.set_spur_list_range_limit_start(1, -13 - MARGIN)
+                self.set_spur_list_range_limit_stop(1, -13 - MARGIN)
+                self.set_spur_list_range_limit_start(2, -13 - MARGIN)
+                self.set_spur_list_range_limit_stop(2, -13 - MARGIN)
                 self.set_spur_list_range_limit_start(3, 30)
                 self.set_spur_list_range_limit_stop(3, 30)
 
@@ -1913,12 +1961,16 @@ class FSW50(FSW):
                 self.set_spur_list_range_sweep_point(1, 1001)
 
                 # Abs Limit
-                self.set_spur_list_range_limit_start(3, -13)
-                self.set_spur_list_range_limit_stop(3, -13)
-                self.set_spur_list_range_limit_start(2, -13)
-                self.set_spur_list_range_limit_stop(2, -13)
+                self.set_spur_list_range_limit_start(3, -13 - MARGIN)
+                self.set_spur_list_range_limit_stop(3, -13 - MARGIN)
+                self.set_spur_list_range_limit_start(2, -13 - MARGIN)
+                self.set_spur_list_range_limit_stop(2, -13 - MARGIN)
                 self.set_spur_list_range_limit_start(1, 30)
                 self.set_spur_list_range_limit_stop(1, 30)
+
+            else:
+                logger.info(f'Band{band} does not in FCC request for {chan}chan and BW {bw1}')
+                return 1
 
         elif band == 48:
             self.set_sweep_type('SWE')
@@ -1992,22 +2044,22 @@ class FSW50(FSW):
                 self.set_spur_list_range_sweep_point(8, 401)
 
                 # Abs Limit
-                self.set_spur_list_range_limit_start(1, -40)
-                self.set_spur_list_range_limit_stop(1, -40)
-                self.set_spur_list_range_limit_start(2, -25)
-                self.set_spur_list_range_limit_stop(2, -25)
-                self.set_spur_list_range_limit_start(3, -13)
-                self.set_spur_list_range_limit_stop(3, -13)
-                self.set_spur_list_range_limit_start(4, -13)
-                self.set_spur_list_range_limit_stop(4, -13)
+                self.set_spur_list_range_limit_start(1, -40 - MARGIN)
+                self.set_spur_list_range_limit_stop(1, -40 - MARGIN)
+                self.set_spur_list_range_limit_start(2, -25 - MARGIN)
+                self.set_spur_list_range_limit_stop(2, -25 - MARGIN)
+                self.set_spur_list_range_limit_start(3, -13 - MARGIN)
+                self.set_spur_list_range_limit_stop(3, -13 - MARGIN)
+                self.set_spur_list_range_limit_start(4, -13 - MARGIN)
+                self.set_spur_list_range_limit_stop(4, -13 - MARGIN)
                 self.set_spur_list_range_limit_start(5, 30)
                 self.set_spur_list_range_limit_stop(5, 30)
-                self.set_spur_list_range_limit_start(6, -13)
-                self.set_spur_list_range_limit_stop(6, -13)
-                self.set_spur_list_range_limit_start(7, -13)
-                self.set_spur_list_range_limit_stop(7, -13)
-                self.set_spur_list_range_limit_start(8, -25)
-                self.set_spur_list_range_limit_stop(8, -25)
+                self.set_spur_list_range_limit_start(6, -13 - MARGIN)
+                self.set_spur_list_range_limit_stop(6, -13 - MARGIN)
+                self.set_spur_list_range_limit_start(7, -13 - MARGIN)
+                self.set_spur_list_range_limit_stop(7, -13 - MARGIN)
+                self.set_spur_list_range_limit_start(8, -25 - MARGIN)
+                self.set_spur_list_range_limit_stop(8, -25 - MARGIN)
 
             elif chan == 'H':
                 # range
@@ -2079,25 +2131,30 @@ class FSW50(FSW):
                 self.set_spur_list_range_sweep_point(1, 401)
 
                 # Abs Limit
-                self.set_spur_list_range_limit_start(8, -40)
-                self.set_spur_list_range_limit_stop(8, -40)
-                self.set_spur_list_range_limit_start(7, -25)
-                self.set_spur_list_range_limit_stop(7, -25)
-                self.set_spur_list_range_limit_start(6, -13)
-                self.set_spur_list_range_limit_stop(6, -13)
-                self.set_spur_list_range_limit_start(5, -13)
-                self.set_spur_list_range_limit_stop(5, -13)
+                self.set_spur_list_range_limit_start(8, -40 - MARGIN)
+                self.set_spur_list_range_limit_stop(8, -40 - MARGIN)
+                self.set_spur_list_range_limit_start(7, -25 - MARGIN)
+                self.set_spur_list_range_limit_stop(7, -25 - MARGIN)
+                self.set_spur_list_range_limit_start(6, -13 - MARGIN)
+                self.set_spur_list_range_limit_stop(6, -13 - MARGIN)
+                self.set_spur_list_range_limit_start(5, -13 - MARGIN)
+                self.set_spur_list_range_limit_stop(5, -13 - MARGIN)
                 self.set_spur_list_range_limit_start(4, 30)
                 self.set_spur_list_range_limit_stop(4, 30)
-                self.set_spur_list_range_limit_start(3, -13)
-                self.set_spur_list_range_limit_stop(3, -13)
-                self.set_spur_list_range_limit_start(2, -13)
-                self.set_spur_list_range_limit_stop(2, -13)
-                self.set_spur_list_range_limit_start(1, -25)
-                self.set_spur_list_range_limit_stop(1, -25)
+                self.set_spur_list_range_limit_start(3, -13 - MARGIN)
+                self.set_spur_list_range_limit_stop(3, -13 - MARGIN)
+                self.set_spur_list_range_limit_start(2, -13 - MARGIN)
+                self.set_spur_list_range_limit_stop(2, -13 - MARGIN)
+                self.set_spur_list_range_limit_start(1, -25 - MARGIN)
+                self.set_spur_list_range_limit_stop(1, -25 - MARGIN)
+
+            else:
+                logger.info(f'Band{band} does not in FCC request for {chan}chan and BW {bw1}')
+                return 1
 
         else:
             logger.info(f'Band{band} does not in FCC request')
+            return 1
 
     def get_spur_screenshot(self, local_file_path):
         temp_file_fsw = r"C:\temp\screenshot.png"
