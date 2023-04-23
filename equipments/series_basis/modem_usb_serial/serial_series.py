@@ -183,6 +183,7 @@ class AtCmd:
             'PRB': 0,
             'FRB': 1,
             '1RB_0': 2,
+            '1RB_MAX': 3,
         }
         self.type_dict = {
             'DFTS': 0,

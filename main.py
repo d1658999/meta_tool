@@ -19,7 +19,7 @@ from equipments.temp_chamber import TempChamber
 logger = log_set('GUI')
 
 PROJECT_PATH = pathlib.Path(__file__).parent
-PROJECT_UI = PROJECT_PATH / pathlib.Path('gui') / "main_v2_16_1.ui"
+PROJECT_UI = PROJECT_PATH / pathlib.Path('gui') / "main_v2_16_2.ui"
 
 
 class MainApp:
@@ -123,6 +123,7 @@ class MainApp:
         self.prb_lte = None
         self.frb_lte = None
         self.one_rb0_lte = None
+        self.one_rbmax_lte = None
         self.bw5_fr1 = None
         self.bw10_fr1 = None
         self.bw15_fr1 = None
@@ -415,6 +416,7 @@ class MainApp:
                 "prb_lte",
                 "frb_lte",
                 "one_rb0_lte",
+                "one_rbmax_lte",
                 "bw5_fr1",
                 "bw10_fr1",
                 "bw15_fr1",
@@ -1198,6 +1200,8 @@ class MainApp:
                 self.frb_lte.set(True)
             elif rb_ftm == '1RB_0':
                 self.one_rb0_lte.set(True)
+            elif rb_ftm == '1RB_MAX':
+                self.one_rbmax_lte.set(True)
 
         for rb_ftm in ui_init['rb_set']['rb_ftm_ulca_lte']:
             if rb_ftm == '1RB_N':
@@ -3083,6 +3087,10 @@ class MainApp:
         if self.one_rb0_lte.get():
             logger.debug('1RB_0')
             self.ftm_rb_lte.append('1RB_0')
+
+        if self.one_rbmax_lte.get():
+            logger.debug('1RB_MAX')
+            self.ftm_rb_lte.append('1RB_MAX')
 
         if self.ftm_rb_lte == []:
             logger.debug('Nothing to select on RB setting for LTE')
