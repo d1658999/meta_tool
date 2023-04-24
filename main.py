@@ -3352,7 +3352,7 @@ class MainApp:
 
         elif self.instrument.get() == 'Cmw+Fsw':
             from test_scripts.harmonics.tx_harmonics import TxHarmonics
-            from test_scripts.harmonics.tx_conduction_band_edge import TxCBE
+            from test_scripts.harmonics.tx_cbe import TxCBE
             # this is placeholder for tx_ca_cbe import from
 
             excel_folder_create()

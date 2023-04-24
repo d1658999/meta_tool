@@ -684,10 +684,10 @@ class FSW50(FSW):
 
                 # filter type
                 self.set_spur_list_range_filter_type(1, 'NORMal')
-                self.set_spur_list_range_filter_type(2, 'CFILter')
+                self.set_spur_list_range_filter_type(2, 'NORMal')
                 self.set_spur_list_range_filter_type(3, 'CFILter')
                 self.set_spur_list_range_filter_type(4, 'Normal')
-                self.set_spur_list_range_filter_type(5, 'CFILter')
+                self.set_spur_list_range_filter_type(5, 'Normal')
 
                 # rbw/vbw
                 self.set_spur_list_range_band_rbw(1, 100 * khz)
@@ -708,7 +708,7 @@ class FSW50(FSW):
 
                 # sweep points
                 self.set_spur_list_range_sweep_point(1, 1001)
-                self.set_spur_list_range_sweep_point(2, 2001)
+                self.set_spur_list_range_sweep_point(2, 1001)
                 self.set_spur_list_range_sweep_point(3, 1001)
                 self.set_spur_list_range_sweep_point(4, 1001)
                 self.set_spur_list_range_sweep_point(5, 1001)
@@ -975,7 +975,7 @@ class FSW50(FSW):
 
                 # rbw/vbw
                 self.set_spur_list_range_band_rbw(1, 100 * khz)
-                self.set_spur_list_range_band_vbw(1, 3 * 100 * mhz)
+                self.set_spur_list_range_band_vbw(1, 3 * 100 * khz)
                 self.set_spur_list_range_band_rbw(2, 300)
                 self.set_spur_list_range_band_vbw(2, 1 * khz)
                 self.set_spur_list_range_band_rbw(3, 100 * khz)
@@ -1027,7 +1027,7 @@ class FSW50(FSW):
 
                 # rbw/vbw
                 self.set_spur_list_range_band_rbw(1, 100 * khz)
-                self.set_spur_list_range_band_vbw(1, 3 * 100 * mhz)
+                self.set_spur_list_range_band_vbw(1, 3 * 100 * khz)
                 self.set_spur_list_range_band_rbw(2, 300)
                 self.set_spur_list_range_band_vbw(2, 1 * khz)
                 self.set_spur_list_range_band_rbw(3, 100 * khz)
@@ -1079,7 +1079,7 @@ class FSW50(FSW):
 
                 # rbw/vbw
                 self.set_spur_list_range_band_rbw(1, 100 * khz)
-                self.set_spur_list_range_band_vbw(1, 3 * 100 * mhz)
+                self.set_spur_list_range_band_vbw(1, 3 * 100 * khz)
                 self.set_spur_list_range_band_rbw(2, 300)
                 self.set_spur_list_range_band_vbw(2, 1 * khz)
                 self.set_spur_list_range_band_rbw(3, 100 * khz)
@@ -1131,7 +1131,7 @@ class FSW50(FSW):
 
                 # rbw/vbw
                 self.set_spur_list_range_band_rbw(1, 100 * khz)
-                self.set_spur_list_range_band_vbw(1, 3 * 100 * mhz)
+                self.set_spur_list_range_band_vbw(1, 3 * 100 * khz)
                 self.set_spur_list_range_band_rbw(2, 300)
                 self.set_spur_list_range_band_vbw(2, 1 * khz)
                 self.set_spur_list_range_band_rbw(3, 100 * khz)
@@ -1183,7 +1183,7 @@ class FSW50(FSW):
 
                 # rbw/vbw
                 self.set_spur_list_range_band_rbw(1, 100 * khz)
-                self.set_spur_list_range_band_vbw(1, 3 * 100 * mhz)
+                self.set_spur_list_range_band_vbw(1, 3 * 100 * khz)
                 self.set_spur_list_range_band_rbw(2, 300)
                 self.set_spur_list_range_band_vbw(2, 1 * khz)
                 self.set_spur_list_range_band_rbw(3, 100 * khz)
@@ -1231,7 +1231,7 @@ class FSW50(FSW):
 
                 # rbw/vbw
                 self.set_spur_list_range_band_rbw(3, 100 * khz)
-                self.set_spur_list_range_band_vbw(3, 3 * 100 * mhz)
+                self.set_spur_list_range_band_vbw(3, 3 * 100 * khz)
                 if (bw1 + bw2) > 10:
                     self.set_spur_list_range_band_rbw(2, 200 * khz)
                     self.set_spur_list_range_band_vbw(2, 3 * 200 * khz)
