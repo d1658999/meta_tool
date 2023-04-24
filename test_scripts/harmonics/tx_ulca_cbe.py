@@ -1,3 +1,4 @@
+import time
 from pathlib import Path
 from equipments.series_basis.modem_usb_serial.serial_series import AtCmd
 from equipments.cmw100 import CMW100
@@ -17,7 +18,7 @@ from utils.parameters.rb_parameters import ULCA_3GPP_LTE
 from utils.parameters.rb_parameters import ulca_fcc_lte
 from utils.excel_handler import tx_ulca_power_relative_test_export_excel_ftm
 
-logger = log_set('tx_ulca_lmh')
+logger = log_set('tx_ulca_cbe')
 FILE_FOLDER = Path(excel_folder_path())
 
 
@@ -254,6 +255,7 @@ class TxTestCaCBE(AtCmd, CMW100, FSW50):
                                     bw_rb_cc1, bw_rb_cc2, chan_cc1, chan_cc2 = self.combo_dict[chan][combo_rb]
                                 except KeyError:
                                     logger.info(f"It might {band} doesn't have this combo {combo_rb}!")
+                                    time.sleep(0.1)
                                     continue
                                 self.bw_rb_cc1 = bw_rb_cc1
                                 self.bw_rb_cc2 = bw_rb_cc2

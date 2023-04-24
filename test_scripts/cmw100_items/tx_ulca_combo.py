@@ -1,3 +1,4 @@
+import time
 from pathlib import Path
 from equipments.series_basis.modem_usb_serial.serial_series import AtCmd
 from equipments.cmw100 import CMW100
@@ -209,6 +210,7 @@ class TxTestCa(AtCmd, CMW100):
                                     bw_rb_cc1, bw_rb_cc2, chan_cc1, chan_cc2 = self.combo_dict[chan][combo_rb]
                                 except KeyError:
                                     logger.info(f"It might {band} doesn't have this combo {combo_rb}!")
+                                    time.sleep(0.1)
                                     continue
                                 self.bw_rb_cc1 = bw_rb_cc1
                                 self.bw_rb_cc2 = bw_rb_cc2
