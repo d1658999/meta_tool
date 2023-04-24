@@ -172,6 +172,7 @@ class TxTestCaCBE(AtCmd, CMW100, FSW50):
             'cc2_alloc': self.alloc_cc[1],
             'temp0': therm_list[0],
             'temp1': therm_list[1],
+            'test_item': 'cbe',
         }
 
         # start measure spurious
@@ -200,9 +201,9 @@ class TxTestCaCBE(AtCmd, CMW100, FSW50):
         self.get_spur_screenshot(local_file_path)
 
         # export to excel
-        # tx_ulca_power_relative_test_export_excel_ftm(self.tech, ulca_results, sub_info)
+        tx_ulca_power_relative_test_export_excel_ftm(self.tech, ulca_results, sub_info)
 
-        # logger.debug(ulca_results)
+        logger.debug(ulca_results)
 
         # debug use
         self.debug_ulca()

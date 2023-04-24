@@ -89,6 +89,8 @@ def select_file_name_genre_tx_ftm(bw, tech, test_item='lmh'):
             return f'Tx_1RB_sweep_{bw}MHZ_{tech}.xlsx'
         elif test_item == 'harmonics':
             return f'Tx_harmonics_{bw}MHZ_{tech}.xlsx'
+        elif test_item == 'cbe':
+            return f'Tx_cbe_{bw}MHZ_{tech}.xlsx'
 
     else:
         if test_item == 'level_sweep':
@@ -101,6 +103,8 @@ def select_file_name_genre_tx_ftm(bw, tech, test_item='lmh'):
             return f'Tx_1RB_sweep_{bw}MHZ_{tech}_{ext_pmt.part_number}.xlsx'
         elif test_item == 'harmonics':
             return f'Tx_harmonics_{bw}MHZ_{tech}_{ext_pmt.part_number}.xlsx'
+        elif test_item == 'cbe':
+            return f'Tx_cbe_{bw}MHZ_{tech}_{ext_pmt.part_number}.xlsx'
 
 
 def select_file_name_rx_sig(bw, tech):
@@ -208,6 +212,7 @@ def tx_power_fcc_ce_export_excel_ftm(data, parameters_dict):
     wb.close()
     return file_path
 
+
 def tx_ulca_power_relative_test_export_excel_ftm(tech, data, sub_info):
     """
     input data:
@@ -218,10 +223,15 @@ def tx_ulca_power_relative_test_export_excel_ftm(tech, data, sub_info):
     logger.info('----------save to excel----------')
 
     # filename choosen
-    if ext_pmt.part_number == "":
+    filename = None
+    if ext_pmt.part_number == "" and sub_info['test_item'] != 'cbe':
         filename = f'Tx_ulca_{tech}.xlsx'
-    else:
+    elif ext_pmt.part_number != "" and sub_info['test_item'] != 'cbe':
         filename = f'Tx_ulca_{tech}_{ext_pmt.part_number}.xlsx'
+    elif ext_pmt.part_number == "" and sub_info['test_item'] == 'cbe':
+        filename = f'Tx_ulca_cbe_{tech}_{ext_pmt.part_number}.xlsx'
+    elif ext_pmt.part_number != "" and sub_info['test_item'] == 'cbe':
+        filename = f'Tx_ulca_cbe_{tech}_{ext_pmt.part_number}.xlsx'
 
     # file path by combinating the path and filename
     file_path = Path(excel_folder_path()) / Path(filename)
@@ -698,7 +708,7 @@ def tx_power_relative_test_export_excel_ftm(data, parameters_dict):
                     ws.cell(row, 27).value = measured_data[11] if ext_pmt.volt_mipi_en else None # volt_mipi
                     row += 1
 
-            elif tx_freq_level <= 100:  # 1rb_sweep, lmh, freq_sweep
+            elif tx_freq_level <= 100:  # 1rb_sweep, lmh, freq_sweep, cbe
                 for tx_freq, measured_data in data.items():
                     chan = chan_judge_lte(band, bw, tx_freq) if test_item != 'freq_sweep' else None
                     ws.cell(row, 1).value = band
@@ -725,8 +735,8 @@ def tx_power_relative_test_export_excel_ftm(data, parameters_dict):
                     ws.cell(row, 22).value = asw_srs_path
                     ws.cell(row, 23).value = measured_data[10] if test_item == 'lmh' else None
                     ws.cell(row, 24).value = ext_pmt.condition if test_item == 'lmh' else None
-                    ws.cell(row, 25).value = measured_data[11] if test_item == 'lmh' else None
-                    ws.cell(row, 26).value = measured_data[12] if test_item == 'lmh' else None
+                    ws.cell(row, 25).value = measured_data[11] if test_item in ['lmh', 'cbe'] else None
+                    ws.cell(row, 26).value = measured_data[12] if test_item in ['lmh', 'cbe'] else None
                     ws.cell(row, 27).value = measured_data[13][1] if test_item == 'harmonics' else None  # 2f0
                     ws.cell(row, 28).value = measured_data[14][1] if test_item == 'harmonics' else None  # 3f0
                     # volt_mipi
@@ -768,7 +778,7 @@ def tx_power_relative_test_export_excel_ftm(data, parameters_dict):
                     ws.cell(row, 29).value = measured_data[11] if ext_pmt.volt_mipi_en else None  # volt_mipi
                     row += 1
 
-            elif tx_freq_level <= 100:  # 1rb_sweep, lmh, freq_sweep
+            elif tx_freq_level <= 100:  # 1rb_sweep, lmh, freq_sweep, cbe
                 for tx_freq, measured_data in data.items():
                     chan = chan_judge_fr1(band, bw, tx_freq) if test_item != 'freq_sweep' else None
                     ws.cell(row, 1).value = band
@@ -797,8 +807,8 @@ def tx_power_relative_test_export_excel_ftm(data, parameters_dict):
                     ws.cell(row, 24).value = asw_srs_path
                     ws.cell(row, 25).value = measured_data[10] if test_item == 'lmh' else None
                     ws.cell(row, 26).value = ext_pmt.condition if test_item == 'lmh' else None
-                    ws.cell(row, 27).value = measured_data[11] if test_item == 'lmh' else None
-                    ws.cell(row, 28).value = measured_data[12] if test_item == 'lmh' else None
+                    ws.cell(row, 27).value = measured_data[11] if test_item in ['lmh', 'cbe'] else None
+                    ws.cell(row, 28).value = measured_data[12] if test_item in ['lmh', 'cbe'] else None
                     ws.cell(row, 29).value = measured_data[13][1] if test_item == 'harmonics' else None  # 2f0
                     ws.cell(row, 30).value = measured_data[14][1] if test_item == 'harmonics' else None  # 3f0
 

@@ -49,15 +49,15 @@ class TxCBE(TxTestGenre, FSW50):
                     self.tx_cbe_process_fr1()
                 else:
                     logger.info(f'B{self.band_fr1} does not have BW {self.bw_fr1}MHZ')
-        # for bw in ext_pmt.fr1_bandwidths:
-        #     try:
-        #         file_name = select_file_name_genre_tx_ftm(bw, 'FR1', 'cbe')
-        #         file_path = Path(excel_folder_path()) / Path(file_name)
-        #         txp_aclr_evm_current_plot_ftm(file_path, {'script': 'CSE', 'tech': 'FR1'})
-        #     except TypeError:
-        #         logger.info(f'there is no data to plot because the band does not have this BW ')
-        #     except FileNotFoundError:
-        #         logger.info(f'there is not file to plot BW{bw} ')
+        for bw in ext_pmt.fr1_bandwidths:
+            try:
+                file_name = select_file_name_genre_tx_ftm(bw, 'FR1', 'cbe')
+                file_path = Path(excel_folder_path()) / Path(file_name)
+                txp_aclr_evm_current_plot_ftm(file_path, {'script': 'CSE', 'tech': 'FR1'})
+            except TypeError:
+                logger.info(f'there is no data to plot because the band does not have this BW ')
+            except FileNotFoundError:
+                logger.info(f'there is not file to plot BW{bw} ')
 
     def tx_cbe_process_fr1(self):
         rx_freq_list = cm_pmt_ftm.dl_freq_selected('FR1', self.band_fr1,
@@ -171,7 +171,7 @@ class TxCBE(TxTestGenre, FSW50):
                             'type': self.type_fr1,
                             'test_item': 'cbe',
                         }
-                        # self.file_path = tx_power_relative_test_export_excel_ftm(data_freq, self.parameters)
+                        self.file_path = tx_power_relative_test_export_excel_ftm(data_freq, self.parameters)
         self.set_test_end_fr1()
 
     def tx_cbe_pipline_lte(self):
@@ -198,15 +198,15 @@ class TxCBE(TxTestGenre, FSW50):
                     self.tx_cbe_process_lte()
                 else:
                     logger.info(f'B{self.band_lte} does not have BW {self.bw_lte}MHZ')
-        # for bw in ext_pmt.lte_bandwidths:
-        #     try:
-        #         file_name = select_file_name_genre_tx_ftm(bw, 'LTE', 'cbe')
-        #         file_path = Path(excel_folder_path()) / Path(file_name)
-        #         txp_aclr_evm_current_plot_ftm(file_path, {'script': 'CSE', 'tech': 'LTE'})
-        #     except TypeError:
-        #         logger.info(f'there is no data to plot because the band does not have this BW ')
-        #     except FileNotFoundError:
-        #         logger.info(f'there is not file to plot BW{bw} ')
+        for bw in ext_pmt.lte_bandwidths:
+            try:
+                file_name = select_file_name_genre_tx_ftm(bw, 'LTE', 'cbe')
+                file_path = Path(excel_folder_path()) / Path(file_name)
+                txp_aclr_evm_current_plot_ftm(file_path, {'script': 'CSE', 'tech': 'LTE'})
+            except TypeError:
+                logger.info(f'there is no data to plot because the band does not have this BW ')
+            except FileNotFoundError:
+                logger.info(f'there is not file to plot BW{bw} ')
 
     def tx_cbe_process_lte(self):
         rx_freq_list = cm_pmt_ftm.dl_freq_selected('LTE', self.band_lte,
@@ -310,7 +310,7 @@ class TxCBE(TxTestGenre, FSW50):
                             'type': None,
                             'test_item': 'cbe',
                         }
-                        # self.file_path = tx_power_relative_test_export_excel_ftm(data_freq, self.parameters)
+                        self.file_path = tx_power_relative_test_export_excel_ftm(data_freq, self.parameters)
         self.set_test_end_lte()
 
     # def tx_cbe_pipline_wcdma(self):

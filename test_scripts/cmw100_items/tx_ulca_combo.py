@@ -152,6 +152,7 @@ class TxTestCa(AtCmd, CMW100):
             'cc2_alloc': self.alloc_cc[1],
             'temp0': therm_list[0],
             'temp1': therm_list[1],
+            'test_item': 'lmh',
         }
 
         # export to excel
