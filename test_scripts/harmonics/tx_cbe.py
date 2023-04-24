@@ -142,11 +142,13 @@ class TxCBE(TxTestGenre, FSW50):
                                 spec_state = 'PASS'
 
                             # screenshot
+                            asw_path = 0 if self.asw_path != 1 else 1
                             file_name = f'{self.tech}_Band{self.band_fr1}_BE_{self.bw_fr1}_' \
                                         f'{zip_dict_chan[self.tx_freq_fr1]}_' \
                                         f'{self.rb_state}_{self.mcs_fr1}_ftm_' \
                                         f'{round(aclr_mod_results[3], 2)}dBm_' \
                                         f'margin_{worse_margin:.2f}dB_{spec_state}' \
+                                        f'{self.tx_path}_TxAS{asw_path}' \
                                         f'.png'  # this is power level
                             local_file_path = FILE_FOLDER / Path(file_name)
                             self.get_spur_screenshot(local_file_path)
@@ -281,11 +283,13 @@ class TxCBE(TxTestGenre, FSW50):
                                 spec_state = 'FAIL'
 
                             # screenshot
+                            asw_path = 0 if self.asw_path != 1 else 1
                             file_name = f'{self.tech}_Band{self.band_lte}_BE_{self.bw_lte}_' \
                                         f'{zip_dict_chan[self.tx_freq_lte]}_' \
                                         f'{self.rb_state}_{self.mcs_lte}_ftm_' \
                                         f'{round(aclr_mod_results[3], 2)}dBm_' \
                                         f'margin_{worse_margin:.2f}dB_{spec_state}' \
+                                        f'{self.tx_path}_TxAS{asw_path}' \
                                         f'.png'  # this is power level
                             local_file_path = FILE_FOLDER / Path(file_name)
                             self.get_spur_screenshot(local_file_path)

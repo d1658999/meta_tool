@@ -191,11 +191,13 @@ class TxTestCaCBE(AtCmd, CMW100, FSW50):
             spec_state = 'PASS'
 
         # screenshot
+        asw_path = 0 if self.asw_path != 1 else 1
         file_name = f'{self.tech}_Band{self.band_lte}_BE_{self.bw_cc1}_{self.bw_cc2}_' \
                     f'{self.chan_lmh}_' \
                     f'{sub_info["cc1_alloc"]}_{sub_info["cc2_alloc"]}_{self.mcs_cc1_lte}_ftm_' \
                     f'{round(ulca_results[7], 2)}dBm_' \
-                    f'margin_{worse_margin:.2f}dB_{spec_state}' \
+                    f'margin_{worse_margin:.2f}dB_{spec_state}_' \
+                    f'TxAS{asw_path}' \
                     f'.png'  # this is power level
         local_file_path = FILE_FOLDER / Path(file_name)
         self.get_spur_screenshot(local_file_path)
