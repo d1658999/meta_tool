@@ -1,6 +1,7 @@
 from pathlib import Path
 from equipments.series_basis.modem_usb_serial.serial_series import AtCmd
 from equipments.cmw100 import CMW100
+from equipments.fsw50 import FSW50
 from utils.log_init import log_set
 import utils.parameters.external_paramters as ext_pmt
 import utils.parameters.common_parameters_ftm as cm_pmt_ftm
@@ -8,6 +9,7 @@ from utils.loss_handler import get_loss
 from utils.adb_handler import get_odpm_current, RecordCurrent
 from equipments.power_supply import Psu
 from utils.excel_handler import txp_aclr_evm_current_plot_ftm, tx_power_relative_test_export_excel_ftm
+from utils.excel_handler import excel_folder_path
 from utils.channel_handler import channel_freq_select
 import utils.parameters.rb_parameters as rb_pmt
 from utils.ca_combo_handler import ca_combo_load_excel
@@ -16,12 +18,14 @@ from utils.parameters.rb_parameters import ulca_fcc_lte
 from utils.excel_handler import tx_ulca_power_relative_test_export_excel_ftm
 
 logger = log_set('tx_ulca_lmh')
+FILE_FOLDER = Path(excel_folder_path())
 
 
-class TxTestCa(AtCmd, CMW100):
+class TxTestCaCBE(AtCmd, CMW100, FSW50):
     def __init__(self):
         AtCmd.__init__(self)
         CMW100.__init__(self)
+        FSW50.__init__(self)
         self.alloc_cc = None
         self.bw_rb_cc2 = None
         self.bw_rb_cc1 = None
@@ -119,6 +123,22 @@ class TxTestCa(AtCmd, CMW100):
         self.set_center_freq_tx_rx_loss()  # this is to set basic tx/rx/loss
         self.sig_gen_lte()
         self.sync_lte()
+
+        # spectrum setting for spurios emission
+        self.system_preset()
+        self.set_reference_level_offset(self.band_lte, self.loss_tx)
+        self.set_spur_initial()
+        spur_state = self.set_spur_spec_limit_line(self.band_lte, self.chan_lmh,
+                                                   int(self.bw_cc1), int(self.bw_cc2))
+
+        # if the bands cannot go with FCC request, then skip it
+        if spur_state == 1:
+            logger.info(f'Band{self.band_lte} does not in FCC request')
+            raise Exception
+        else:
+            pass
+
+        # start to set tx
         self.tx_set_ulca_lte()
 
         # ulca combo info
@@ -153,10 +173,35 @@ class TxTestCa(AtCmd, CMW100):
             'temp1': therm_list[1],
         }
 
-        # export to excel
-        tx_ulca_power_relative_test_export_excel_ftm(self.tech, ulca_results, sub_info)
+        # start measure spurious
+        logger.info('----------Start to measure CBE----------')
+        self.set_suprious_emissions_measure()
+        self.fsw_query('*OPC?')
+        worse_margin = max(self.get_spur_limit_margin())
 
-        logger.debug(ulca_results)
+        # show the pass or fail
+        pass_fail_state = self.get_limits_state().strip()
+        if pass_fail_state == 0:
+            logger.info('For internal spec: PASS')
+            spec_state = 'PASS'
+        else:
+            logger.info('For internal spec: FAIL')
+            spec_state = 'PASS'
+
+        # screenshot
+        file_name = f'{self.tech}_Band{self.band_lte}_BE_{self.bw_cc1}_{self.bw_cc2}_' \
+                    f'{self.chan_lmh}_' \
+                    f'{sub_info["cc1_alloc"]}_{sub_info["cc2_alloc"]}_{self.mcs_cc1_lte}_ftm_' \
+                    f'{round(ulca_results[7], 2)}dBm_' \
+                    f'margin_{worse_margin:.2f}dB_{spec_state}' \
+                    f'.png'  # this is power level
+        local_file_path = FILE_FOLDER / Path(file_name)
+        self.get_spur_screenshot(local_file_path)
+
+        # export to excel
+        # tx_ulca_power_relative_test_export_excel_ftm(self.tech, ulca_results, sub_info)
+
+        # logger.debug(ulca_results)
 
         # debug use
         self.debug_ulca()

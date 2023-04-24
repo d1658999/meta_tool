@@ -28,6 +28,7 @@ class FSW50(FSW):
         self.set_sweep_time_auto('ON')  # auto sweep time dependent on span and RBW
         self.set_diplay_trace_detector()  # default use 'RMS'
         self.set_display_trace_mode(1, 'AVERage')
+        self.average_type()
         self.set_sweep_mode('OFF')  # single sweep
         self.fsw.query('*OPC?')
         self.set_reference_level(-30 - MARGIN)
@@ -1737,7 +1738,10 @@ class FSW50(FSW):
                 self.set_spur_list_range_band_vbw(4, 3 * mhz)
                 self.set_spur_list_range_band_rbw(3, 1 * mhz)
                 self.set_spur_list_range_band_vbw(3, 3 * mhz)
-                if (bw1 + bw2) > 15:
+                if (bw1 + bw2) > 35:
+                    self.set_spur_list_range_band_rbw(2, 1 * mhz)
+                    self.set_spur_list_range_band_vbw(2, 3 * 1 * mhz)
+                elif (bw1 + bw2) > 15:
                     self.set_spur_list_range_band_rbw(2, 500 * khz)
                     self.set_spur_list_range_band_vbw(2, 1500 * khz)
                 else:

@@ -541,7 +541,7 @@ class FSW:
         """
         self.fsw_write(f'BANDwidth:VIDeo:TYPE {type_}')
 
-    def average_type(self, mode='PoWer'):
+    def average_type(self, mode='POWer'):
         """
         [SENSe:]AVERage<n>:TYPE <Mode>
         This command selects the trace averaging mode.

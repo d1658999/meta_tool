@@ -15,7 +15,6 @@ from utils.excel_handler import excel_folder_create
 from equipments.power_supply import Psu
 from equipments.temp_chamber import TempChamber
 
-
 logger = log_set('GUI')
 
 PROJECT_PATH = pathlib.Path(__file__).parent
@@ -1208,7 +1207,7 @@ class MainApp:
                 self.one_rb0_null.set(True)
             elif rb_ftm == 'PRB_N':
                 self.prb_null.set(True)
-            elif rb_ftm == 'FRB_0':
+            elif rb_ftm == 'FRB_N':
                 self.frb_null.set(True)
             elif rb_ftm == 'FRB_FRB':
                 self.frb_frb.set(True)
@@ -3349,11 +3348,10 @@ class MainApp:
                     inst.run()
                     inst.ser.com_close()
 
-
         elif self.instrument.get() == 'Cmw+Fsw':
             from test_scripts.harmonics.tx_harmonics import TxHarmonics
             from test_scripts.harmonics.tx_cbe import TxCBE
-            # this is placeholder for tx_ca_cbe import from
+            from test_scripts.harmonics.tx_ulca_cbe import TxTestCaCBE
 
             excel_folder_create()
             # self.test_pipeline(inst_class_dict)
@@ -3367,9 +3365,11 @@ class MainApp:
                         inst = TxCBE()
                         inst.run()
                         inst.ser.com_close()
-                elif script == 'CA':
-                    if slef.wanted_test['tx_ca_cbe'] and ext_pmt.sa_nsa == 0:
-                        pass
+                elif script == 'ULCA':
+                    if self.wanted_test['tx_ca_cbe'] and ext_pmt.sa_nsa == 0:
+                        inst = TxTestCaCBE()
+                        inst.run()
+                        inst.ser.com_close()
                 else:
                     pass
 
