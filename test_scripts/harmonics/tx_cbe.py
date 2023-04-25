@@ -78,14 +78,18 @@ class TxCBE(TxTestGenre, FSW50):
         # self.scs = scs  # temp
 
         tx_freq_lmh_list = [cm_pmt_ftm.transfer_freq_rx2tx_fr1(self.band_fr1, rx_freq) for rx_freq in rx_freq_list]
-        tx_freq_select_list = channel_freq_select(self.chan, tx_freq_lmh_list)
+        tx_freq_select_list = sorted(set(channel_freq_select(self.chan, tx_freq_lmh_list)))
         chan_list = [ch for ch in self.chan]
 
         # create dict to reverse lookup
-        zipped_list = zip(tx_freq_select_list, chan_list)
         zip_dict_chan = {}
-        for fc in zipped_list:
-            zip_dict_chan[fc[0]] = fc[1]  # {freq: chan,...}
+        for tx_freq in tx_freq_select_list:
+            if tx_freq < tx_freq_lmh_list[1]:
+                zip_dict_chan[tx_freq] = 'L'
+            elif tx_freq == tx_freq_lmh_list[1]:
+                zip_dict_chan[tx_freq] = 'M'
+            elif tx_freq > tx_freq_lmh_list[1]:
+                zip_dict_chan[tx_freq] = 'H'
 
         for mcs in ext_pmt.mcs_fr1:
             self.mcs_fr1 = mcs
@@ -147,8 +151,9 @@ class TxCBE(TxTestGenre, FSW50):
                                         f'{zip_dict_chan[self.tx_freq_fr1]}_' \
                                         f'{self.rb_state}_{self.mcs_fr1}_ftm_' \
                                         f'{round(aclr_mod_results[3], 2)}dBm_' \
-                                        f'margin_{worse_margin:.2f}dB_{spec_state}' \
-                                        f'{self.tx_path}_TxAS{asw_path}' \
+                                        f'margin_{worse_margin:.2f}dB_' \
+                                        f'{self.tx_path}_TxAS{asw_path}_' \
+                                        f'{spec_state}' \
                                         f'.png'  # this is power level
                             local_file_path = FILE_FOLDER / Path(file_name)
                             self.get_spur_screenshot(local_file_path)
@@ -224,14 +229,18 @@ class TxCBE(TxTestGenre, FSW50):
         self.sync_lte()
 
         tx_freq_lmh_list = [cm_pmt_ftm.transfer_freq_rx2tx_lte(self.band_lte, rx_freq) for rx_freq in rx_freq_list]
-        tx_freq_select_list = channel_freq_select(self.chan, tx_freq_lmh_list)
+        tx_freq_select_list = sorted(set(channel_freq_select(self.chan, tx_freq_lmh_list)))
         chan_list = [ch for ch in self.chan]
 
         # create dict to reverse lookup
-        zipped_list = zip(tx_freq_select_list, chan_list)
         zip_dict_chan = {}
-        for fc in zipped_list:
-            zip_dict_chan[fc[0]] = fc[1]  # {freq: chan,...}
+        for tx_freq in tx_freq_select_list:
+            if tx_freq < tx_freq_lmh_list[1]:
+                zip_dict_chan[tx_freq] = 'L'
+            elif tx_freq == tx_freq_lmh_list[1]:
+                zip_dict_chan[tx_freq] = 'M'
+            elif tx_freq > tx_freq_lmh_list[1]:
+                zip_dict_chan[tx_freq] = 'H'
 
         for mcs in ext_pmt.mcs_lte:
             self.mcs_lte = mcs
@@ -288,8 +297,9 @@ class TxCBE(TxTestGenre, FSW50):
                                         f'{zip_dict_chan[self.tx_freq_lte]}_' \
                                         f'{self.rb_state}_{self.mcs_lte}_ftm_' \
                                         f'{round(aclr_mod_results[3], 2)}dBm_' \
-                                        f'margin_{worse_margin:.2f}dB_{spec_state}' \
-                                        f'{self.tx_path}_TxAS{asw_path}' \
+                                        f'margin_{worse_margin:.2f}dB_' \
+                                        f'{self.tx_path}_TxAS{asw_path}_' \
+                                        f'{spec_state}' \
                                         f'.png'  # this is power level
                             local_file_path = FILE_FOLDER / Path(file_name)
                             self.get_spur_screenshot(local_file_path)

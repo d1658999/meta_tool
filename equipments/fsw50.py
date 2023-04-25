@@ -55,7 +55,7 @@ class FSW50(FSW):
         self.average_type()
         self.set_display_trace_mode()
         self.set_average_count(100)
-        self.set_reference_level(30)
+        self.set_reference_level(40)
         self.set_display_trace_mode()
         self.set_sweep_mode('OFF')
         self.get_spur_list_range_count()
