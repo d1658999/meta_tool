@@ -138,18 +138,18 @@ class TxCBE(TxTestGenre, FSW50):
 
                             # show the pass or fail
                             pass_fail_state = self.get_limits_state().strip()
-                            if pass_fail_state == 0:
+                            if pass_fail_state == '0':
                                 logger.info('For internal spec: PASS')
                                 spec_state = 'PASS'
                             else:
                                 logger.info('For internal spec: FAIL')
-                                spec_state = 'PASS'
+                                spec_state = 'FAIL'
 
                             # screenshot
                             asw_path = 0 if self.asw_path != 1 else 1
                             file_name = f'{self.tech}_Band{self.band_fr1}_BE_{self.bw_fr1}_' \
                                         f'{zip_dict_chan[self.tx_freq_fr1]}_' \
-                                        f'{self.rb_state}_{self.mcs_fr1}_ftm_' \
+                                        f'{self.type_fr1}_{self.rb_state}_{self.mcs_fr1}_ftm_' \
                                         f'{round(aclr_mod_results[3], 2)}dBm_' \
                                         f'margin_{worse_margin:.2f}dB_' \
                                         f'{self.tx_path}_TxAS{asw_path}_' \

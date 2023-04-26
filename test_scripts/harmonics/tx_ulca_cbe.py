@@ -183,7 +183,7 @@ class TxTestCaCBE(AtCmd, CMW100, FSW50):
 
         # show the pass or fail
         pass_fail_state = self.get_limits_state().strip()
-        if pass_fail_state == 0:
+        if pass_fail_state == '0':
             logger.info('For internal spec: PASS')
             spec_state = 'PASS'
         else:
