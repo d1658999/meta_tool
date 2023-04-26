@@ -18,7 +18,7 @@ from equipments.temp_chamber import TempChamber
 logger = log_set('GUI')
 
 PROJECT_PATH = pathlib.Path(__file__).parent
-PROJECT_UI = PROJECT_PATH / pathlib.Path('gui') / "main_v2_16_2.ui"
+PROJECT_UI = PROJECT_PATH / pathlib.Path('gui') / "main_v2_16_3.ui"
 
 
 class MainApp:
@@ -297,6 +297,7 @@ class MainApp:
         self.rx_quick_enable = None
         self.wait_time = None
         self.part_number = None
+        self.cbe_limit_margin = None
         self.freq_sweep_step = None
         self.freq_sweep_start = None
         self.freq_sweep_stop = None
@@ -589,6 +590,7 @@ class MainApp:
                 "rx_quick_enable",
                 "wait_time",
                 "part_number",
+                "cbe_limit_margin",
                 "freq_sweep_step",
                 "freq_sweep_start",
                 "freq_sweep_stop",
@@ -781,6 +783,7 @@ class MainApp:
         self.hv.set(ui_init['condition']['hv'])
         self.nv.set(ui_init['condition']['mv'])
         self.lv.set(ui_init['condition']['lv'])
+        self.cbe_limit_margin.set(ui_init['margin']['cbe_limit_margin'])
 
         # reset all the check button
         self.off_all_reset_tech()
@@ -1352,6 +1355,7 @@ class MainApp:
         hv = self.hv.get()
         nv = self.nv.get()
         lv = self.lv.get()
+        cbe_limit_margin = self.cbe_limit_margin.get()
 
         content = {
             'tab': tab_index,
@@ -1460,7 +1464,11 @@ class MainApp:
             },
             'criteria': {
                 'ulca_lte': critera_ulca_lte,
-            }
+            },
+            'margin': {
+                'cbe_limit_margin': cbe_limit_margin,
+
+            },
         }
 
         with open(yaml_file, 'w', encoding='utf-8') as outfile:
@@ -3250,6 +3258,7 @@ class MainApp:
         ext_pmt.record_current_enable = self.record_current_enable.get()
         ext_pmt.condition = self.condition
         ext_pmt.part_number = self.part_number.get()
+        ext_pmt.cbe_limit_margin = self.cbe_limit_margin.get()
         ext_pmt.freq_sweep_step = self.freq_sweep_step.get()
         ext_pmt.freq_sweep_start = self.freq_sweep_start.get()
         ext_pmt.freq_sweep_stop = self.freq_sweep_stop.get()

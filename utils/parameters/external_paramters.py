@@ -31,6 +31,7 @@ criteria_ulca_lte = 0  # 3GPP: 0, FCC: 1
 duty_cycle = 100  # 100 for NR TDD PC3, 50: for NR TDD PC2
 init_rx_sync_level = -70
 wait_time = 300
+cbe_limit_margin = 1.5
 
 port_tx = 1
 port_tx_lte = 1  # 1 ~ 8 default is  1

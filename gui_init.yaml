@@ -25,7 +25,7 @@ condition:
   mv: false
   ntnv: false
 criteria:
-  ulca_lte: 0
+  ulca_lte: 1
 external_inst:
   count: 10
   odpm: false
@@ -36,6 +36,8 @@ external_inst:
   wait_time: 300
 instrument:
   instrument: Cmw100
+margin:
+  cbe_limit_margin: '1.5'
 mcs:
   mcs_fr1: []
   mcs_lte: []

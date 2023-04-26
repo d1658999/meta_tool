@@ -4,10 +4,11 @@ from test_scripts.cmw100_items.tx_lmh import TxTestGenre
 from equipments.series_basis.spectrum.fsw_series import FSW
 from utils.log_init import log_set
 from utils.loss_handler_harmonic import get_loss_spectrum
+import utils.parameters.external_paramters as ext_pmt
 
 
 logger = log_set('FSW50')
-MARGIN = 1.5
+MARGIN = eval(ext_pmt.cbe_limit_margin)
 
 
 class FSW50(FSW):
