@@ -3358,9 +3358,9 @@ class MainApp:
                     inst.ser.com_close()
 
         elif self.instrument.get() == 'Cmw+Fsw':
-            from test_scripts.harmonics.tx_harmonics import TxHarmonics
-            from test_scripts.harmonics.tx_cbe import TxCBE
-            from test_scripts.harmonics.tx_ulca_cbe import TxTestCaCBE
+            from test_scripts.harmonics_cbe.tx_harmonics import TxHarmonics
+            from test_scripts.harmonics_cbe.tx_cbe import TxCBE
+            from test_scripts.harmonics_cbe.tx_ulca_cbe import TxTestCaCBE
 
             excel_folder_create()
             # self.test_pipeline(inst_class_dict)
