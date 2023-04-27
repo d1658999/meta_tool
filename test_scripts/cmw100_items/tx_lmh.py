@@ -83,14 +83,15 @@ class TxTestGenre(AtCmd, CMW100):
     def results_combination_nlw(self, volt_enable):
         results = None
         if volt_enable:
+            volt_mipi_handler = self.query_voltage_collection(ext_pmt.et_tracker)
             if self.tech == 'FR1':
-                results = self.aclr_mod_current_results + self.get_temperature() + self.query_voltage_selector(
+                results = self.aclr_mod_current_results + self.get_temperature() + volt_mipi_handler(
                     self.tech, self.band_fr1, self.tx_path)
             elif self.tech == 'LTE':
-                results = self.aclr_mod_current_results + self.get_temperature() + self.query_voltage_selector(
+                results = self.aclr_mod_current_results + self.get_temperature() + volt_mipi_handler(
                     self.tech, self.band_lte, self.tx_path)
             elif self.tech == 'WCDMA':
-                results = self.aclr_mod_current_results + self.get_temperature() + self.query_voltage_selector(
+                results = self.aclr_mod_current_results + self.get_temperature() + volt_mipi_handler(
                     self.tech, self.band_wcdma, self.tx_path)
 
             return results
