@@ -917,7 +917,7 @@ class AtCmd:
 
     @staticmethod
     def query_rssi_scan(rssi_dict):
-        rat = rssi_dict["rat"]
+        rx_rat = rssi_dict["rx_rat"]
         rx_band = rssi_dict["rx_band"]
         rx_bw = rssi_dict["rx_bw"]
         scan_mode = rssi_dict["scan_mode"]
@@ -927,8 +927,8 @@ class AtCmd:
         antenna_selection = rssi_dict["antenna_selection"]
         sampling_count = rssi_dict["sampling_count"]
         tx1_enable = rssi_dict["tx1_enable"]
-        tx1_band = rssi_dict["tx1_band"]
         tx1_rat = rssi_dict["tx1_rat"]
+        tx1_band = rssi_dict["tx1_band"]
         tx1_bw = rssi_dict["tx1_bw"]
         tx1_freq = rssi_dict["tx1_freq"]
         tx1_pwr = rssi_dict["tx1_pwr"]
@@ -936,8 +936,8 @@ class AtCmd:
         tx1_rb_start = rssi_dict["tx1_rb_start"]
         tx1_mcs = rssi_dict["tx1_mcs"]
         tx2_enable = rssi_dict["tx2_enable"]
-        tx2_band = rssi_dict["tx2_band"]
         tx2_rat = rssi_dict["tx2_rat"]
+        tx2_band = rssi_dict["tx2_band"]
         tx2_bw = rssi_dict["tx2_bw"]
         tx2_freq = rssi_dict["tx2_freq"]
         tx2_pwr = rssi_dict["tx2_pwr"]
@@ -946,13 +946,13 @@ class AtCmd:
         tx2_mcs = rssi_dict["tx2_mcs"]
 
         result = f'AT+RSSISCAN=' \
-                 f'{rssi.RAT[rat]},' \
+                 f'{rssi.RAT[rx_rat]},' \
                  f'{rssi.rx_bands_collection(rat, rx_band)}' \
                  f'{rssi.RX_BW[rat][rx_bw]},' \
                  f'{rssi.SCAN_MODE[scan_mode]},' \
                  f'{start_rx_freq},' \
                  f'{stop_rx_freq},' \
-                 f'{rssi.STEP_FREQ[rat][step_freq]},' \
+                 f'{rssi.STEP_FREQ[rx_rat][step_freq]},' \
                  f'{rssi.ANTENNA_SELECTION[antenna_selection]},' \
                  f'{sampling_count},' \
                  f'0,' \

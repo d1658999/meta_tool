@@ -18,7 +18,7 @@ from equipments.temp_chamber import TempChamber
 logger = log_set('GUI')
 
 PROJECT_PATH = pathlib.Path(__file__).parent
-PROJECT_UI = PROJECT_PATH / pathlib.Path('gui') / "main_v2_16_3.ui"
+PROJECT_UI = PROJECT_PATH / pathlib.Path('gui') / "main_v2_17.ui"
 
 
 class MainApp:
@@ -336,6 +336,33 @@ class MainApp:
         self.volt_mipi_en = None
         self.port_table_enable = None
         self.debug_enable = None
+        self.rssi_rx_rat = None
+        self.rssi_rx_band = None
+        self.rssi_rx_bw = None
+        self.rssi_scan_mode = None
+        self.rssi_start_rx_freq = None
+        self.rssi_stop_rx_freq = None
+        self.rssi_step_freq = None
+        self.rssi_antenna_selection = None
+        self.rssi_sampling_count = None
+        self.rssi_tx1_rat = None
+        self.rssi_tx1_enable = None
+        self.rssi_tx1_band = None
+        self.rssi_tx1_bw = None
+        self.rssi_tx1_freq = None
+        self.rssi_tx1_power = None
+        self.rssi_tx1_rb_num = None
+        self.rssi_tx1_rb_start = None
+        self.rssi_tx1_mcs = None
+        self.rssi_tx2_rat = None
+        self.rssi_tx2_enable = None
+        self.rssi_tx2_band = None
+        self.rssi_tx2_bw = None
+        self.rssi_tx2_freq = None
+        self.rssi_tx2_power = None
+        self.rssi_tx2_rb_num = None
+        self.rssi_tx2_rb_start = None
+        self.rssi_tx2_mcs = None
         builder.import_variables(
             self,
             [
@@ -629,6 +656,33 @@ class MainApp:
                 "volt_mipi_en",
                 "port_table_enable",
                 "debug_enable",
+                "rssi_rx_rat",
+                "rssi_rx_band",
+                "rssi_rx_bw",
+                "rssi_scan_mode",
+                "rssi_start_rx_freq",
+                "rssi_stop_rx_freq",
+                "rssi_step_freq",
+                "rssi_antenna_selection",
+                "rssi_sampling_count",
+                "rssi_tx1_rat",
+                "rssi_tx1_enable",
+                "rssi_tx1_band",
+                "rssi_tx1_bw",
+                "rssi_tx1_freq",
+                "rssi_tx1_power",
+                "rssi_tx1_rb_num",
+                "rssi_tx1_rb_start",
+                "rssi_tx1_mcs",
+                "rssi_tx2_rat",
+                "rssi_tx2_enable",
+                "rssi_tx2_band",
+                "rssi_tx2_bw",
+                "rssi_tx2_freq",
+                "rssi_tx2_power",
+                "rssi_tx2_rb_num",
+                "rssi_tx2_rb_start",
+                "rssi_tx2_mcs",
             ],
         )
 
@@ -712,6 +766,43 @@ class MainApp:
         stop = datetime.datetime.now()
 
         logger.info(f'Timer: {stop - start}')
+
+
+    def rssi_scan(self):
+        from equipments.series_basis.modem_usb_serial.serial_series import AtCmd
+
+        rssi_dict = {
+            'rx_rat': self.rssi_rx_rat.get(),
+            'rx_band': self.rssi_rx_band.get(),
+            'rx_bw': self.rssi_rx_bw.get(),
+            'scan_mode': self.rssi_scan_mode.get(),
+            'start_rx_freq': self.rssi_start_rx_freq.get(),
+            'stop_rx_freq': self.rssi_stop_rx_freq.get(),
+            'step_freq': self.rssi_step_freq.get(),
+            'antenna_selection': self.rssi_antenna_selection.get(),
+            'sampling_count': self.rssi_sampling_count.get(),
+            'tx1_enable': self.rssi_tx1_enable.get(),
+            'tx1_rat': self.rssi_tx1_rat.get(),
+            'tx1_band': self.rssi_tx1_band.get(),
+            'tx1_bw': self.rssi_tx1_bw.get(),
+            'tx1_freq': self.rssi_tx1_freq.get(),
+            'tx1_pwr': self.rssi_tx1_power.get(),
+            'tx1_rb_num': self.rssi_tx1_rb_num.get(),
+            'tx1_rb_start': self.rssi_tx1_rb_start.get(),
+            'tx1_mcs': self.rssi_tx1_mcs.get(),
+            'tx2_enable': self.rssi_tx2_enable.get(),
+            'tx2_rat': self.rssi_tx2_rat.get(),
+            'tx2_band': self.rssi_tx2_band.get(),
+            'tx2_bw': self.rssi_tx2_bw.get(),
+            'tx2_freq': self.rssi_tx2_freq.get(),
+            'tx2_pwr': self.rssi_tx2_power.get(),
+            'tx2_rb_num': self.rssi_tx2_rb_num.get(),
+            'tx2_rb_start': self.rssi_tx2_rb_start.get(),
+            'tx2_mcs': self.rssi_tx2_mcs.get(),
+
+        }
+
+        AtCmd.query_rssi_scan(rssi_dict)
 
     def t_measure(self):
         t = threading.Thread(target=self.mega_measure, daemon=True)
