@@ -16696,17 +16696,17 @@ Disable</property>
                           <property name="column">1</property>
                           <property name="padx">5</property>
                           <property name="pady">5</property>
-                          <property name="row">0</property>
+                          <property name="row">1</property>
                           <property name="sticky">w</property>
                         </layout>
                       </object>
                     </child>
                     <child>
                       <object class="ttk.Label" id="label78">
-                        <property name="text" translatable="yes">RAT</property>
+                        <property name="text" translatable="yes">TX1 RAT</property>
                         <layout manager="grid">
                           <property name="column">0</property>
-                          <property name="row">0</property>
+                          <property name="row">1</property>
                           <property name="sticky">e</property>
                         </layout>
                       </object>
@@ -16720,7 +16720,7 @@ Disable</property>
                           <property name="column">1</property>
                           <property name="padx">5</property>
                           <property name="pady">5</property>
-                          <property name="row">1</property>
+                          <property name="row">0</property>
                           <property name="sticky">w</property>
                         </layout>
                       </object>
@@ -16730,7 +16730,7 @@ Disable</property>
                         <property name="text" translatable="yes">TX1 ENABLE</property>
                         <layout manager="grid">
                           <property name="column">0</property>
-                          <property name="row">1</property>
+                          <property name="row">0</property>
                           <property name="sticky">e</property>
                         </layout>
                       </object>
@@ -16926,17 +16926,17 @@ Disable</property>
                           <property name="column">1</property>
                           <property name="padx">5</property>
                           <property name="pady">5</property>
-                          <property name="row">0</property>
+                          <property name="row">1</property>
                           <property name="sticky">w</property>
                         </layout>
                       </object>
                     </child>
                     <child>
                       <object class="ttk.Label" id="label87">
-                        <property name="text" translatable="yes">RAT</property>
+                        <property name="text" translatable="yes">TX2 RAT</property>
                         <layout manager="grid">
                           <property name="column">0</property>
-                          <property name="row">0</property>
+                          <property name="row">1</property>
                           <property name="sticky">e</property>
                         </layout>
                       </object>
@@ -16950,17 +16950,17 @@ Disable</property>
                           <property name="column">1</property>
                           <property name="padx">5</property>
                           <property name="pady">5</property>
-                          <property name="row">1</property>
+                          <property name="row">0</property>
                           <property name="sticky">w</property>
                         </layout>
                       </object>
                     </child>
                     <child>
                       <object class="ttk.Label" id="label88">
-                        <property name="text" translatable="yes">TX1 ENABLE</property>
+                        <property name="text" translatable="yes">TX2 ENABLE</property>
                         <layout manager="grid">
                           <property name="column">0</property>
-                          <property name="row">1</property>
+                          <property name="row">0</property>
                           <property name="sticky">e</property>
                         </layout>
                       </object>
