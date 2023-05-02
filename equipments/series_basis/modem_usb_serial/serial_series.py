@@ -4,7 +4,7 @@ from utils.log_init import log_set
 import utils.parameters.external_paramters as ext_pmt
 from connection_interface.connection_serial import ModemComport
 from utils.parameters.common_parameters_ftm import TDD_BANDS
-
+import utils.parameters.rssi_parameters as rssi
 
 logger = log_set('AtCmd')
 
@@ -574,7 +574,6 @@ class AtCmd:
         # self.command_cmw100_query('*OPC?')
         self.ser.com_close()
 
-
     def rx_path_setting_sig_gsm(self):
         """
         0: PRX, 1: DRX
@@ -733,10 +732,12 @@ class AtCmd:
             '15+5': 20,
             '40': 21,
         }
-        self.command(f'AT+LTXSENDREQSLOAPT={self.tx_path_dict[self.tx_path]},{bw_ca_index[self.bw_combo_lte]},{self.tx_freq_lte},'
-                     f'{self.rb_size_cc1_lte},{self.rb_start_cc1_lte},{self.mcs_lte_dict[self.mcs_cc1_lte]},'
-                     f'{self.rb_size_cc2_lte},{self.rb_start_cc2_lte},{self.mcs_lte_dict[self.mcs_cc2_lte]},'
-                     f'2,2,{self.tx_level},0')
+        self.command(
+            f'AT+LTXSENDREQSLOAPT={self.tx_path_dict[self.tx_path]},{bw_ca_index[self.bw_combo_lte]},'
+            f'{self.tx_freq_lte},'
+            f'{self.rb_size_cc1_lte},{self.rb_start_cc1_lte},{self.mcs_lte_dict[self.mcs_cc1_lte]},'
+            f'{self.rb_size_cc2_lte},{self.rb_start_cc2_lte},{self.mcs_lte_dict[self.mcs_cc2_lte]},'
+            f'2,2,{self.tx_level},0')
 
     @staticmethod
     def set_mipi_voltage_sky51001(tech, band, tx_path):
@@ -870,7 +871,7 @@ class AtCmd:
         """
         mipi_num, usid, addr = self.set_mipi_voltage_qm81052('LTE', band, tx_path)
 
-        res = self.command(f'AT+MIPIREAD={mipi_num},{int(usid, 16)},{addr}', delay=0.2)
+        res = self.command(f'AT+MIPIREAD={mipi_num},{usid},{addr}', delay=0.2)
         for line in res:
             if '+MIPIREAD:' in line.decode():
                 vol_hex = line.decode().split(':')[1].strip()
@@ -913,3 +914,62 @@ class AtCmd:
             return self.query_voltage_selector_sky51001
         elif module == 'qm81052':
             return self.query_voltage_selector_qm81052
+
+    @staticmethod
+    def query_rssi_scan(rssi_dict):
+        rat = rssi_dict["rat"]
+        rx_band = rssi_dict["rx_band"]
+        rx_bw = rssi_dict["rx_bw"]
+        scan_mode = rssi_dict["scan_mode"]
+        start_rx_freq = rssi_dict["start_rx_freq"]
+        stop_rx_freq = rssi_dict["stop_rx_freq"]
+        step_freq = rssi_dict["step_freq"]
+        antenna_selection = rssi_dict["antenna_selection"]
+        sampling_count = rssi_dict["sampling_count"]
+        tx1_enable = rssi_dict["tx1_enable"]
+        tx1_band = rssi_dict["tx1_band"]
+        tx1_rat = rssi_dict["tx1_rat"]
+        tx1_bw = rssi_dict["tx1_bw"]
+        tx1_freq = rssi_dict["tx1_freq"]
+        tx1_pwr = rssi_dict["tx1_pwr"]
+        tx1_rb_num = rssi_dict["tx1_rb_num"]
+        tx1_rb_start = rssi_dict["tx1_rb_start"]
+        tx1_mcs = rssi_dict["tx1_mcs"]
+        tx2_enable = rssi_dict["tx2_enable"]
+        tx2_band = rssi_dict["tx2_band"]
+        tx2_rat = rssi_dict["tx2_rat"]
+        tx2_bw = rssi_dict["tx2_bw"]
+        tx2_freq = rssi_dict["tx2_freq"]
+        tx2_pwr = rssi_dict["tx2_pwr"]
+        tx2_rb_num = rssi_dict["tx2_rb_num"]
+        tx2_rb_start = rssi_dict["tx2_rb_start"]
+        tx2_mcs = rssi_dict["tx2_mcs"]
+
+        result = f'AT+RSSISCAN=' \
+                 f'{rssi.RAT[rat]},' \
+                 f'{rssi.rx_bands_collection(rat, rx_band)}' \
+                 f'{rssi.RX_BW[rat][rx_bw]},' \
+                 f'{rssi.SCAN_MODE[scan_mode]},' \
+                 f'{start_rx_freq},' \
+                 f'{stop_rx_freq},' \
+                 f'{rssi.STEP_FREQ[rat][step_freq]},' \
+                 f'{rssi.ANTENNA_SELECTION[antenna_selection]},' \
+                 f'{sampling_count},' \
+                 f'0,' \
+                 f'{rssi.TX1_ENABLE[tx1_enable]},' \
+                 f'{tx1_band},' \
+                 f'{rssi.TX_BW[tx1_rat][tx1_bw]},' \
+                 f'{tx1_freq},' \
+                 f'{tx1_pwr},' \
+                 f'{tx1_rb_num},' \
+                 f'{tx1_rb_start},' \
+                 f'{tx1_mcs},' \
+                 f'{rssi.TX2_ENABLE[tx2_enable]},' \
+                 f'{tx2_band},' \
+                 f'{rssi.TX_BW[tx2_rat][tx2_bw]},' \
+                 f'{tx2_freq},' \
+                 f'{tx2_pwr},' \
+                 f'{tx2_rb_num},' \
+                 f'{tx2_rb_start},' \
+                 f'{tx2_mcs},'
+        return result
