@@ -915,8 +915,7 @@ class AtCmd:
         elif module == 'qm81052':
             return self.query_voltage_selector_qm81052
 
-    @staticmethod
-    def query_rssi_scan(rssi_dict):
+    def query_rssi_scan(self, rssi_dict):
         rx_rat = rssi_dict["rx_rat"]
         rx_band = rssi_dict["rx_band"]
         rx_bw = rssi_dict["rx_bw"]
@@ -945,31 +944,34 @@ class AtCmd:
         tx2_rb_start = rssi_dict["tx2_rb_start"]
         tx2_mcs = rssi_dict["tx2_mcs"]
 
-        result = f'AT+RSSISCAN=' \
-                 f'{rssi.RAT[rx_rat]},' \
-                 f'{rssi.rx_bands_collection(rat, rx_band)}' \
-                 f'{rssi.RX_BW[rat][rx_bw]},' \
-                 f'{rssi.SCAN_MODE[scan_mode]},' \
-                 f'{start_rx_freq},' \
-                 f'{stop_rx_freq},' \
-                 f'{rssi.STEP_FREQ[rx_rat][step_freq]},' \
-                 f'{rssi.ANTENNA_SELECTION[antenna_selection]},' \
-                 f'{sampling_count},' \
-                 f'0,' \
-                 f'{rssi.TX1_ENABLE[tx1_enable]},' \
-                 f'{tx1_band},' \
-                 f'{rssi.TX_BW[tx1_rat][tx1_bw]},' \
-                 f'{tx1_freq},' \
-                 f'{tx1_pwr},' \
-                 f'{tx1_rb_num},' \
-                 f'{tx1_rb_start},' \
-                 f'{tx1_mcs},' \
-                 f'{rssi.TX2_ENABLE[tx2_enable]},' \
-                 f'{tx2_band},' \
-                 f'{rssi.TX_BW[tx2_rat][tx2_bw]},' \
-                 f'{tx2_freq},' \
-                 f'{tx2_pwr},' \
-                 f'{tx2_rb_num},' \
-                 f'{tx2_rb_start},' \
-                 f'{tx2_mcs},'
-        return result
+        command_rssi = f'AT+RSSISCAN=' \
+                       f'{rssi.RAT[rx_rat]},' \
+                       f'{rssi.rx_bands_collection(rx_rat, rx_band)},' \
+                       f'{rssi.RX_BW[rx_rat][rx_bw]},' \
+                       f'{rssi.SCAN_MODE[scan_mode]},' \
+                       f'{start_rx_freq},' \
+                       f'{stop_rx_freq},' \
+                       f'{rssi.STEP_FREQ[rx_rat][step_freq]},' \
+                       f'{rssi.ANTENNA_SELECTION[antenna_selection]},' \
+                       f'{sampling_count},' \
+                       f'0,' \
+                       f'{rssi.TX1_ENABLE[tx1_enable]},' \
+                       f'{tx1_band},' \
+                       f'{rssi.TX_BW[tx1_rat][tx1_bw]},' \
+                       f'{tx1_freq},' \
+                       f'{tx1_pwr},' \
+                       f'{tx1_rb_num},' \
+                       f'{tx1_rb_start},' \
+                       f'{rssi.MCS[tx1_mcs]},' \
+                       f'{rssi.TX2_ENABLE[tx2_enable]},' \
+                       f'{tx2_band},' \
+                       f'{rssi.TX_BW[tx2_rat][tx2_bw]},' \
+                       f'{tx2_freq},' \
+                       f'{tx2_pwr},' \
+                       f'{tx2_rb_num},' \
+                       f'{tx2_rb_start},' \
+                       f'{rssi.MCS[tx2_mcs]},'
+
+        self.command(command_rssi)
+
+

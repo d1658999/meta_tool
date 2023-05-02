@@ -256,26 +256,26 @@ Sampling_Count = 20
 
 def rx_bands_collection(tech, band):
     if tech == 'GSM':
-        return BANDS_GSM
+        return BANDS_GSM[band]
     else:
         return band
 
 
 def main():
     command_line = f'AT+RSSISCAN=' \
-                   f'{RAT["LTE"]},' \
-                   f'{rx_bands_collection("LTE", 2)}' \
-                   f'{RX_BW["LTE"][10]},' \
+                   f'{RAT["NR"]},' \
+                   f'{rx_bands_collection("NR", "78")},' \
+                   f'{RX_BW["LTE"]["10"]},' \
                    f'{SCAN_MODE["PART"]},' \
                    f'{Start_Rx_Freq},' \
                    f'{Stop_Rx_Freq},' \
-                   f'{STEP_FREQ["LTE"][0.015]},' \
+                   f'{STEP_FREQ["LTE"]["0.015"]},' \
                    f'{ANTENNA_SELECTION["4RX_avg"]},' \
                    f'{Sampling_Count},' \
                    f'0,' \
                    f'{TX1_ENABLE["ON_DFTS"]},' \
                    f'{TX1_Band},' \
-                   f'{TX_BW["LTE"][10]},' \
+                   f'{TX_BW["LTE"]["10"]},' \
                    f'{TX1_Freq},' \
                    f'{TX1_PWR},' \
                    f'{TX1_rb_num},' \
@@ -283,7 +283,7 @@ def main():
                    f'{MCS["SCS15_QPSK"]},' \
                    f'{TX2_ENABLE["ON_DFTS"]},' \
                    f'{TX2_Band},' \
-                   f'{TX_BW["LTE"][10]},' \
+                   f'{TX_BW["LTE"]["10"]},' \
                    f'{TX2_Freq},' \
                    f'{TX2_PWR},' \
                    f'{TX2_rb_num},' \
@@ -291,7 +291,7 @@ def main():
                    f'{MCS["SCS15_QPSK"]},' \
                    f''
     print(command_line)
-
+    print(rx_bands_collection("NR", "5"))
 
 if __name__ == "__main__":
     main()

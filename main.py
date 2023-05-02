@@ -767,7 +767,6 @@ class MainApp:
 
         logger.info(f'Timer: {stop - start}')
 
-
     def rssi_scan(self):
         from equipments.series_basis.modem_usb_serial.serial_series import AtCmd
 
@@ -802,7 +801,8 @@ class MainApp:
 
         }
 
-        AtCmd.query_rssi_scan(rssi_dict)
+        rssi_scan = AtCmd()
+        rssi_scan.query_rssi_scan(rssi_dict)
 
     def t_measure(self):
         t = threading.Thread(target=self.mega_measure, daemon=True)
