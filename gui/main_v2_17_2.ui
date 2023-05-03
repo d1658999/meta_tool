@@ -16967,7 +16967,7 @@ Disable</property>
                     </child>
                     <child>
                       <object class="ttk.Label" id="label89">
-                        <property name="text" translatable="yes">TX1 Band</property>
+                        <property name="text" translatable="yes">TX2 Band</property>
                         <layout manager="grid">
                           <property name="column">0</property>
                           <property name="row">2</property>
@@ -16991,7 +16991,7 @@ Disable</property>
                     </child>
                     <child>
                       <object class="ttk.Label" id="label90">
-                        <property name="text" translatable="yes">TX1 BW</property>
+                        <property name="text" translatable="yes">TX2 BW</property>
                         <layout manager="grid">
                           <property name="column">0</property>
                           <property name="row">3</property>
@@ -17015,7 +17015,7 @@ Disable</property>
                     </child>
                     <child>
                       <object class="ttk.Label" id="label91">
-                        <property name="text" translatable="yes">TX1 Ferq
+                        <property name="text" translatable="yes">TX2 Ferq
 (KHz)</property>
                         <layout manager="grid">
                           <property name="column">0</property>
@@ -17040,7 +17040,7 @@ Disable</property>
                     </child>
                     <child>
                       <object class="ttk.Label" id="label92">
-                        <property name="text" translatable="yes">TX1 Power
+                        <property name="text" translatable="yes">TX2 Power
 (dBmx10)</property>
                         <layout manager="grid">
                           <property name="column">0</property>
