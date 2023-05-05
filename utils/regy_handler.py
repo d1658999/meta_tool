@@ -1,3 +1,4 @@
+import pathlib
 import xml.etree.ElementTree as ET
 from utils.log_init import log_set
 
@@ -45,7 +46,11 @@ logger = log_set('Parse_regy')
 #         print("Values:", values)
 
 
-def parser_regy(file_path):
+def regy_parser(file_name):
+    # combine to file_path
+    file_path = pathlib.Path('regy_file_parse') / pathlib.Path(file_name)  # formal use
+    # file_path = pathlib.Path('regy_file_parse') / pathlib.Path(file_name)  # test use
+
     # Parse the XML file
     tree = ET.parse(file_path)
     root = tree.getroot()
@@ -75,7 +80,7 @@ def parser_regy(file_path):
 def main():
     from equipments.series_basis.modem_usb_serial.serial_series import AtCmd
     command = AtCmd()
-    regy_dict = parser_regy(FILE_PATH)
+    regy_dict = regy_parser(file_name)
     for nv_name, regy_value in list(regy_dict.items()):
         for nv_index, nv_value in regy_value.items():
             command.set_google_nv(nv_name, nv_index, nv_value)

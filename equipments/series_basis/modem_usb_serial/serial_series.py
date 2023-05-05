@@ -5,7 +5,7 @@ import utils.parameters.external_paramters as ext_pmt
 from connection_interface.connection_serial import ModemComport
 from utils.parameters.common_parameters_ftm import TDD_BANDS
 import utils.parameters.rssi_parameters as rssi
-from utils.regy_handler import parser_regy
+from utils.regy_handler import regy_parser
 
 logger = log_set('AtCmd')
 
@@ -1015,8 +1015,8 @@ class AtCmd:
     def query_google_nv(self, nv_name):
         self.command_nv(f'AT+GOOGGETNV="{nv_name}"')
 
-    def write_regy(self, file_path):
-        regy_dict = parser_regy(file_path)
+    def write_regy(self, file_name):
+        regy_dict = regy_parser(file_name)
         for nv_name, regy_value in list(regy_dict.items()):
             for nv_index, nv_value in regy_value.items():
                 self.set_google_nv(nv_name, nv_index, nv_value)
@@ -1028,4 +1028,4 @@ if __name__ == '__main__':
     # NV_VALUE = '00'
     #
     command = AtCmd()
-    command.query_google_nv('!LTERF.TX.USER DSP MPR OFFSET TX0 B01')
+    command.query_google_nv('CAL.LTE.USED_RF_BAND')
