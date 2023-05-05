@@ -5,6 +5,7 @@ import utils.parameters.external_paramters as ext_pmt
 from connection_interface.connection_serial import ModemComport
 from utils.parameters.common_parameters_ftm import TDD_BANDS
 import utils.parameters.rssi_parameters as rssi
+from utils.regy_handler import parser_regy
 
 logger = log_set('AtCmd')
 
@@ -78,6 +79,39 @@ class AtCmd:
         self.cinr_list = None
         self.rsrp_list = None
         self.init_dicts()
+
+    def command_nv(self, command='at', delay=0.02):
+        logger.info(f'MTM: <<{command}')
+        command = command + '\r'
+        self.ser.write(command.encode())
+        time.sleep(delay)
+        response = self.ser.readlines()
+        for res in response:
+            r = res.decode().strip()
+            if len(r) > 1:  # with more than one response
+                logger.info(f'MTM: >>{r}')
+            else:
+                if not r:  # sometimes there is not \r\n in the middle response
+                    continue
+                else:  # only one response
+                    logger.info(f'MTM: >>{r[0]}')
+
+        while b'OK\r\n' not in response:
+            logger.info('OK is not at the end, so repeat again')
+            logger.info(f'==========repeat to response again=========')
+            response = self.ser.readlines()
+            time.sleep(1)
+            for res in response:
+                r = res.decode()
+                if len(r) > 1:  # with more than one response
+                    for rr in r:
+                        logger.info(f'MTM: >>{rr}')
+                else:
+                    if not r:  # sometimes there is not \r\n in the middle response
+                        continue
+                    else:  # only one response
+                        logger.info(f'MTM: >>{r[0]}')
+        return response
 
     def command(self, command='at', delay=0.2):
         logger.info(f'MTM: <<{command}')
@@ -974,4 +1008,24 @@ class AtCmd:
 
         self.command(command_rssi)
 
+    def set_google_nv(self, nv_name, nv_index, nv_value):
+        nv_value = hex(int(nv_value))[2:].zfill(2)  # to transfer to 2 placeholder
+        self.command_nv(f'AT+GOOGSETNV="{nv_name}",{nv_index},"{nv_value}"')
 
+    def query_google_nv(self, nv_name):
+        self.command_nv(f'AT+GOOGGETNV="{nv_name}"')
+
+    def write_regy(self, file_path):
+        regy_dict = parser_regy(file_path)
+        for nv_name, regy_value in list(regy_dict.items()):
+            for nv_index, nv_value in regy_value.items():
+                self.set_google_nv(nv_name, nv_index, nv_value)
+
+
+if __name__ == '__main__':
+    # NV_NAME = '!LTERF.TX.USER DSP MPR OFFSET TX0 B01'
+    # NV_INDEX = 0
+    # NV_VALUE = '00'
+    #
+    command = AtCmd()
+    command.query_google_nv('!LTERF.TX.USER DSP MPR OFFSET TX0 B01')
