@@ -35,6 +35,7 @@ class MainApp:
         button_run_signaling = builder.get_object("button_run_signaling", master)
         button_run_cse = builder.get_object("button_run_cse", master)
         button_run_ulca = builder.get_object("button_run_ulca", master)
+        self.button_mpr_gen = builder.get_object("button_mpr_gen", master)
         self.button_run_list = [button_run_ftm, button_run_ftm_fcc, button_run_ftm_ce, button_run_ftm_endc,
                                 button_run_signaling, button_run_cse, button_run_ulca]
         ICON_FILE = PROJECT_PATH / pathlib.Path('utils') / pathlib.Path('Wave.ico')
@@ -770,6 +771,7 @@ class MainApp:
         logger.info(f'Timer: {stop - start}')
 
     def rssi_scan(self):
+        self.export_ui_setting_yaml()
         from equipments.series_basis.modem_usb_serial.serial_series import AtCmd
 
         rssi_dict = {
@@ -807,21 +809,33 @@ class MainApp:
         rssi_scan.query_rssi_scan(rssi_dict)
 
     def mpr_nv_generate(self):
+        self.export_ui_setting_yaml()
+        self.button_mpr_gen['state'] = tkinter.DISABLED
+
         from test_scripts.file_generator.mpr_csv_generator import csv_file_generator
         bands_fr1 = self.wanted_band_FR1()
         bands_lte = self.wanted_band_LTE()
-        bands_concat = bands_lte + bands_fr1
-        bands = sorted(set(bands_concat))
-
         tx_path_list = self.wanted_tx_path()
 
-        for band in bands:
-            try:
+        if self.mpr_nv.get() != 'ALL':
+
+            for band in bands_fr1:
+                csv_file_generator(self.mpr_nv.get(), band, tx_path_list, 'FR1')
+
+            for band in bands_lte:
+                csv_file_generator(self.mpr_nv.get(), band, tx_path_list, 'LTE')
+        else:
+            bands = sorted(set(bands_fr1 + bands_lte))
+
+            for band in bands:
                 csv_file_generator(self.mpr_nv.get(), band, tx_path_list)
 
-            except Exception as err:
-                logger.info(err)
-                logger.info(f'Band {band} should not be in the MPR NV')
+        logger.info('Generation process finish!')
+        self.button_mpr_gen['state'] = tkinter.NORMAL
+
+    def t_mpr_nv_generate(self):
+        t = threading.Thread(target=self.mpr_nv_generate, daemon=True)
+        t.start()
 
     def t_measure(self):
         t = threading.Thread(target=self.mega_measure, daemon=True)

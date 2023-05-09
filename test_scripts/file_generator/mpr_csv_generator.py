@@ -2,6 +2,9 @@ import csv
 from pathlib import Path
 from equipments.series_basis.modem_usb_serial.serial_series import AtCmd
 from utils.adb_handler import get_serial_devices
+from utils.log_init import log_set
+
+logger = log_set('mpr_csv')
 
 FOLDER_PATH = Path('output') / Path(get_serial_devices())
 FILE_MPR_LTE = Path(FOLDER_PATH) / Path('mpr_lte.csv')
@@ -127,9 +130,9 @@ def csv_file_fr1_pc3(output_object, band):
         # Iterate over the dictionary
         for key, value in output_object.items():
             # Write the key and value to the csv file
-            if 'TX0' in key and 'NR_SUB6' in key:
+            if '!NR_SUB6RF.TX.USER MPR OFFSET TX0_N' in key:
                 writer.writerow([band, 'TX1', *value.values()])
-            elif 'TX1' in key and 'NR_SUB6' in key:
+            elif '!NR_SUB6RF.TX.USER MPR OFFSET TX1_N' in key:
                 writer.writerow([band, 'TX2', *value.values()])
 
 
@@ -141,9 +144,9 @@ def csv_file_fr1_pc2(output_object, band):
         # Iterate over the dictionary
         for key, value in output_object.items():
             # Write the key and value to the csv file
-            if 'TX0' in key and 'NR_SUB6' in key:
+            if '!NR_SUB6RF.TX.USER MPR OFFSET PC2 TX0_N' in key:
                 writer.writerow([band, 'TX1', *value.values()])
-            elif 'TX1' in key and 'NR_SUB6' in key:
+            elif '!NR_SUB6RF.TX.USER MPR OFFSET PC2 TX1_N' in key:
                 writer.writerow([band, 'TX2', *value.values()])
 
 
@@ -155,41 +158,58 @@ def csv_file_fr1_pc1p5(output_object, band):
         # Iterate over the dictionary
         for key, value in output_object.items():
             # Write the key and value to the csv file
-            if 'TX0' in key and 'NR_SUB6' in key:
+            if '!NR_SUB6RF.TX.USER MPR OFFSET PC1p5 TX0_N' in key:
                 writer.writerow([band, 'TX1', *value.values()])
-            elif 'TX1' in key and 'NR_SUB6' in key:
+            elif '!NR_SUB6RF.TX.USER MPR OFFSET PC1p5 TX1_N' in key:
                 writer.writerow([band, 'TX2', *value.values()])
 
 
-def csv_file_generator(mpr_nv, band, tx_path_list=None):
+def csv_file_generator(mpr_nv, band, tx_path_list=None, tech=None):
     if tx_path_list is None:
         tx_path_list = ['TX1']
+    elif 'MIMO' in tx_path_list:
+        tx_path_list.remove('MIMO')
 
     command = AtCmd()
 
-    if mpr_nv == '!LTERF.TX.USER DSP MPR OFFSET TX':
+    if mpr_nv == '!LTERF.TX.USER DSP MPR OFFSET TX' and tech == 'LTE':
         for tx_path in tx_path_list:
-            test_output = command.get_mpr_value('!LTERF.TX.USER DSP MPR OFFSET TX', band, tx_path)
-            csv_file_lte(test_output, band)
+            try:
+                test_output = command.get_mpr_value('!LTERF.TX.USER DSP MPR OFFSET TX', band, tx_path)
+                csv_file_lte(test_output, band)
+            except KeyError:
+                logger.info(f'Band {band} might have the tx_path: {tx_path}')
 
-    elif mpr_nv == '!LTERF.TX.USER DSP MPR INTRA_CA OFFSET TX':
-        test_output = command.get_mpr_value('!LTERF.TX.USER DSP MPR INTRA_CA OFFSET TX', band, 'TX1')
-        csv_file_lte_ca(test_output, band)
+    elif mpr_nv == '!LTERF.TX.USER DSP MPR INTRA_CA OFFSET TX' and tech == 'LTE':
+        try:
+            test_output = command.get_mpr_value('!LTERF.TX.USER DSP MPR INTRA_CA OFFSET TX', band, 'TX1')
+            csv_file_lte_ca(test_output, band)
+        except KeyError:
+            logger.info(f'Band {band} might have the CA path:')
 
-    elif mpr_nv == '!NR_SUB6RF.TX.USER MPR OFFSET TX':
+    elif mpr_nv == '!NR_SUB6RF.TX.USER MPR OFFSET TX' and tech == 'FR1':
         for tx_path in tx_path_list:
-            test_output = command.get_mpr_value('!LTERF.TX.USER DSP MPR INTRA_CA OFFSET TX', band, tx_path)
-            csv_file_fr1_pc3(test_output, band)
+            try:
+                test_output = command.get_mpr_value('!NR_SUB6RF.TX.USER MPR OFFSET TX', band, tx_path)
+                csv_file_fr1_pc3(test_output, band)
+            except KeyError:
+                logger.info(f'Band {band} might have the tx_path: {tx_path}')
 
-    elif mpr_nv == '!NR_SUB6RF.TX.USER MPR OFFSET PC2 TX':
+    elif mpr_nv == '!NR_SUB6RF.TX.USER MPR OFFSET PC2 TX' and tech == 'FR1':
         for tx_path in tx_path_list:
-            test_output = command.get_mpr_value('!NR_SUB6RF.TX.USER MPR OFFSET PC2 TX', band, tx_path)
-            csv_file_fr1_pc2(test_output, band)
+            try:
+                test_output = command.get_mpr_value('!NR_SUB6RF.TX.USER MPR OFFSET PC2 TX', band, tx_path)
+                csv_file_fr1_pc2(test_output, band)
+            except KeyError:
+                logger.info(f'Band {band} might have the tx_path: {tx_path}')
 
-    elif mpr_nv == '!NR_SUB6RF.TX.USER MPR OFFSET PC1p5 TX':
+    elif mpr_nv == '!NR_SUB6RF.TX.USER MPR OFFSET PC1p5 TX' and tech == 'FR1':
         for tx_path in tx_path_list:
-            test_output = command.get_mpr_value('!NR_SUB6RF.TX.USER MPR OFFSET PC1p5 TX', band, tx_path)
-            csv_file_fr1_pc1p5(test_output, band)
+            try:
+                test_output = command.get_mpr_value('!NR_SUB6RF.TX.USER MPR OFFSET PC1p5 TX', band, tx_path)
+                csv_file_fr1_pc1p5(test_output, band)
+            except KeyError:
+                logger.info(f'Band {band} might have the tx_path: {tx_path}')
 
     elif mpr_nv == 'ALL':
         test_output = command.get_mpr_value_all(band)
@@ -206,7 +226,7 @@ def csv_file_generator(mpr_nv, band, tx_path_list=None):
 
 
 def main():
-    csv_file_generator('ALL', 41)
+    pass
 
 
 if __name__ == '__main__':

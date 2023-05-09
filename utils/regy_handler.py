@@ -48,8 +48,8 @@ logger = log_set('Parse_regy')
 
 def regy_parser(file_name):
     # combine to file_path
-    # file_path = pathlib.Path('regy_file_parse') / pathlib.Path(file_name)  # formal use
-    file_path = pathlib.Path.cwd().parent / pathlib.Path('regy_file_parse') / pathlib.Path(file_name)  # test use
+    # file_path = pathlib.Path('regy_file_parse') / pathlib.Path(file_name)  # test use
+    file_path = pathlib.Path.cwd().parent / pathlib.Path('regy_file_parse') / pathlib.Path(file_name)  # formal use
 
     # Parse the XML file
     tree = ET.parse(file_path)

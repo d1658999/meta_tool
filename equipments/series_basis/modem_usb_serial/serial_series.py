@@ -1128,34 +1128,65 @@ class AtCmd:
 
         return mpr_nv_dict
 
-
-    def get_mpr_value_all(self, band):
-        """
-        Directly transfer all passable MPR NV
-        """
+    def mpr_nvs_check(self, band):
         used_band_tx1_index_lte = self.get_used_band_index("CAL.LTE.USED_RF_BAND")
         used_band_tx2_index_lte = self.get_used_band_index("CAL.LTE.USED_DUALTX_RF_BAND")
         used_band_tx1_index_fr1 = self.get_used_band_index("CAL.NR_SUB6.USED_RF_BAND")
         used_band_tx2_index_fr1 = self.get_used_band_index("CAL.NR_SUB6.USED_DUALTX_RF_BAND")
-        mpr_nv_all_dict = {}
+        # mpr_nvs = [
+        #     f'!LTERF.TX.USER DSP MPR OFFSET TX0 B{str(used_band_tx1_index_lte[band]).zfill(2)}',
+        #     f'!LTERF.TX.USER DSP MPR OFFSET TX1 B{str(used_band_tx2_index_lte[band]).zfill(2)}',
+        #     f'!LTERF.TX.USER DSP MPR INTRA_CA OFFSET TX B{str(used_band_tx1_index_lte[band]).zfill(2)}',
+        #     f'!NR_SUB6RF.TX.USER MPR OFFSET TX0_N{str(used_band_tx1_index_fr1[band]).zfill(2)}',
+        #     f'!NR_SUB6RF.TX.USER MPR OFFSET TX1_N{str(used_band_tx2_index_fr1[band]).zfill(2)}',
+        #     f'!NR_SUB6RF.TX.USER MPR OFFSET PC2 TX0_N{str(used_band_tx1_index_fr1[band]).zfill(2)}',
+        #     f'!NR_SUB6RF.TX.USER MPR OFFSET PC2 TX1_N{str(used_band_tx2_index_fr1[band]).zfill(2)}',
+        #     f'!NR_SUB6RF.TX.USER MPR OFFSET PC1p5 TX0_N{str(used_band_tx1_index_fr1[band]).zfill(2)}',
+        #     f'!NR_SUB6RF.TX.USER MPR OFFSET PC1p5 TX1_N{str(used_band_tx2_index_fr1[band]).zfill(2)}',
+        #
+        # ]
+
         mpr_nvs = [
-            f'!LTERF.TX.USER DSP MPR OFFSET TX0 B{str(used_band_tx1_index_lte[band]).zfill(2)}',
-            f'!LTERF.TX.USER DSP MPR OFFSET TX1 B{str(used_band_tx2_index_lte[band]).zfill(2)}',
-            f'!LTERF.TX.USER DSP MPR INTRA_CA OFFSET TX B{str(used_band_tx1_index_lte[band]).zfill(2)}',
-            f'!NR_SUB6RF.TX.USER MPR OFFSET TX0_N{str(used_band_tx1_index_fr1[band]).zfill(2)}',
-            f'!NR_SUB6RF.TX.USER MPR OFFSET TX1_N{str(used_band_tx2_index_fr1[band]).zfill(2)}',
-            f'!NR_SUB6RF.TX.USER MPR OFFSET PC2 TX0_N{str(used_band_tx1_index_fr1[band]).zfill(2)}',
-            f'!NR_SUB6RF.TX.USER MPR OFFSET PC2 TX1_N{str(used_band_tx2_index_fr1[band]).zfill(2)}',
-            f'!NR_SUB6RF.TX.USER MPR OFFSET PC1p5 TX0_N{str(used_band_tx1_index_fr1[band]).zfill(2)}',
-            f'!NR_SUB6RF.TX.USER MPR OFFSET PC1p5 TX1_N{str(used_band_tx2_index_fr1[band]).zfill(2)}',
+            f'!LTERF.TX.USER DSP MPR OFFSET TX0 B',
+            f'!LTERF.TX.USER DSP MPR OFFSET TX1 B',
+            f'!LTERF.TX.USER DSP MPR INTRA_CA OFFSET TX B',
+            f'!NR_SUB6RF.TX.USER MPR OFFSET TX0_N',
+            f'!NR_SUB6RF.TX.USER MPR OFFSET TX1_N',
+            f'!NR_SUB6RF.TX.USER MPR OFFSET PC2 TX0_N',
+            f'!NR_SUB6RF.TX.USER MPR OFFSET PC2 TX1_N',
+            f'!NR_SUB6RF.TX.USER MPR OFFSET PC1p5 TX0_N',
+            f'!NR_SUB6RF.TX.USER MPR OFFSET PC1p5 TX1_N',
 
         ]
+        mpr_nvs_new = []
         for mpr_nv in mpr_nvs:
+            try:
+                if mpr_nv == '!LTERF.TX.USER DSP MPR OFFSET TX0 B' or mpr_nv == '!LTERF.TX.USER DSP MPR INTRA_CA OFFSET TX B':
+                    mpr_nvs_new.append(mpr_nv + f'{str(used_band_tx1_index_lte[band]).zfill(2)}')
+
+                elif mpr_nv == '!LTERF.TX.USER DSP MPR OFFSET TX1 B':
+                    mpr_nvs_new.append(mpr_nv + f'{str(used_band_tx2_index_lte[band]).zfill(2)}')
+
+                elif 'TX0_N' in mpr_nv:
+                    mpr_nvs_new.append(mpr_nv + f'{str(used_band_tx1_index_fr1[band]).zfill(2)}')
+
+                elif 'TX1_N' in mpr_nv:
+                    mpr_nvs_new.append(mpr_nv + f'{str(used_band_tx2_index_fr1[band]).zfill(2)}')
+            except KeyError:
+                logger.info(f'Band {band} does not in the {mpr_nv}')
+
+        return mpr_nvs_new
+
+    def get_mpr_value_all(self, band):
+        """
+        Directly transfer all possible MPR NV with union all bands you select
+        """
+
+        mpr_nv_all_dict = {}
+
+        for mpr_nv in self.mpr_nvs_check(band):
             mpr_index_value = self.get_nv_index_value(self.query_google_nv(mpr_nv))
             mpr_nv_all_dict[mpr_nv] = mpr_index_value
-
-        logger.info(f'Band {band} has relative MPR NV of that:\n'
-                    f'{mpr_nv_all_dict}')
 
         return mpr_nv_all_dict
 
