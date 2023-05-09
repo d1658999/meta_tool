@@ -17177,7 +17177,7 @@ Disable</property>
                       <property name="sticky">nsew</property>
                     </layout>
                     <child>
-                      <object class="ttk.Button" id="button11">
+                      <object class="ttk.Button" id="button_mpr_gen">
                         <property name="command" type="command" cbtype="simple">mpr_nv_generate</property>
                         <property name="text" translatable="yes">Generate
   Table</property>
