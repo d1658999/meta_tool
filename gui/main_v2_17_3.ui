@@ -17178,7 +17178,7 @@ Disable</property>
                     </layout>
                     <child>
                       <object class="ttk.Button" id="button_mpr_gen">
-                        <property name="command" type="command" cbtype="simple">mpr_nv_generate</property>
+                        <property name="command" type="command" cbtype="simple">t_mpr_nv_generate</property>
                         <property name="text" translatable="yes">Generate
   Table</property>
                         <layout manager="grid">
