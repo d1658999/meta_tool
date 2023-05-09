@@ -48,8 +48,8 @@ logger = log_set('Parse_regy')
 
 def regy_parser(file_name):
     # combine to file_path
-    file_path = pathlib.Path('regy_file_parse') / pathlib.Path(file_name)  # formal use
-    # file_path = pathlib.Path('regy_file_parse') / pathlib.Path(file_name)  # test use
+    # file_path = pathlib.Path('regy_file_parse') / pathlib.Path(file_name)  # formal use
+    file_path = pathlib.Path.cwd().parent / pathlib.Path('regy_file_parse') / pathlib.Path(file_name)  # test use
 
     # Parse the XML file
     tree = ET.parse(file_path)
@@ -77,13 +77,47 @@ def regy_parser(file_name):
     #     logger.info(f'Values: {values_dict}')
 
 
+def regy_target_search_parser(file_name, target_name):
+    # combine to file_path
+    # file_path = pathlib.Path('regy_file_parse') / pathlib.Path(file_name)  # formal use
+    file_path = pathlib.Path.cwd().parent / pathlib.Path('regy_file_parse') / pathlib.Path(file_name)  # test use
+
+    # Parse the XML file
+    tree = ET.parse(file_path)
+    root = tree.getroot()
+
+    # Extract the registry name
+    registries_dict = {}
+    registries = root.findall('.//REGISTRY')
+
+    for registry in registries:
+        registry_name = registry.get('NAME')
+        if registry_name == target_name:
+            values = registry.findall('.//VALUE')
+            values_dict = {}
+            for value in values:
+                values_dict[int(value.get("INDEX")) - 1] = value.text.strip()
+            registries_dict[registry_name] = values_dict
+            break
+        else:
+            continue
+
+    # show the registries dictionary
+    logger.info(registries_dict)
+
+    return registries_dict  # key is NV name, values are the dict of {index: value.text}
+
+
 def main():
-    from equipments.series_basis.modem_usb_serial.serial_series import AtCmd
-    command = AtCmd()
-    regy_dict = regy_parser(file_name)
-    for nv_name, regy_value in list(regy_dict.items()):
-        for nv_index, nv_value in regy_value.items():
-            command.set_google_nv(nv_name, nv_index, nv_value)
+    # from equipments.series_basis.modem_usb_serial.serial_series import AtCmd
+    # test = AtCmd()
+    # file_name = 'regy_test_0.regy'
+    # target_name = '!LTERF.TX.USER DSP MPR OFFSET TX0 B01'
+    # regy_dict = regy_target_search_parser(file_name, target_name)
+    # for nv_name, regy_value in list(regy_dict.items()):
+    #     for nv_index, nv_value in regy_value.items():
+    #         test.set_google_nv(nv_name, nv_index, nv_value)
+    pass
 
 
 if __name__ == '__main__':

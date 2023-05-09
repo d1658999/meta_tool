@@ -80,10 +80,10 @@ class AtCmd:
         self.rsrp_list = None
         self.init_dicts()
 
-    def command_nv(self, command='at', delay=0.02):
-        logger.info(f'MTM: <<{command}')
-        command = command + '\r'
-        self.ser.write(command.encode())
+    def command_nv(self, cmd='at', delay=0.02):
+        logger.info(f'MTM: <<{cmd}')
+        cmd = cmd + '\r'
+        self.ser.write(cmd.encode())
         time.sleep(delay)
         response = self.ser.readlines()
         for res in response:
@@ -113,10 +113,10 @@ class AtCmd:
                         logger.info(f'MTM: >>{r[0]}')
         return response
 
-    def command(self, command='at', delay=0.2):
-        logger.info(f'MTM: <<{command}')
-        command = command + '\r'
-        self.ser.write(command.encode())
+    def command(self, cmd='at', delay=0.2):
+        logger.info(f'MTM: <<{cmd}')
+        cmd = cmd + '\r'
+        self.ser.write(cmd.encode())
         time.sleep(delay)
         response = self.ser.readlines()
         for res in response:
@@ -1009,23 +1009,249 @@ class AtCmd:
         self.command(command_rssi)
 
     def set_google_nv(self, nv_name, nv_index, nv_value):
-        nv_value = hex(int(nv_value))[2:].zfill(2)  # to transfer to 2 placeholder
-        self.command_nv(f'AT+GOOGSETNV="{nv_name}",{nv_index},"{nv_value}"')
+        nv_value_ = hex(int(nv_value))[2:].zfill(2)  # to transfer to 2 placeholder (0x1 -> 1 -> '01')
+        self.command_nv(f'AT+GOOGSETNV="{nv_name}",{nv_index},"{nv_value_}"')
 
     def query_google_nv(self, nv_name):
-        self.command_nv(f'AT+GOOGGETNV="{nv_name}"')
+        return self.command_nv(f'AT+GOOGGETNV="{nv_name}"')
 
     def write_regy(self, file_name):
         regy_dict = regy_parser(file_name)
-        for nv_name, regy_value in list(regy_dict.items()):
+        for nv_name, regy_value in regy_dict.items():
             for nv_index, nv_value in regy_value.items():
                 self.set_google_nv(nv_name, nv_index, nv_value)
 
+    @staticmethod
+    def get_nv_index_value(res):
+        index_value_dict = {}
+        for res_ in res:
+            resd = res_.decode().strip().split(',')
+            if len(resd) >= 3:
+                index_value_dict[resd[1]] = str(int(resd[2].strip('"'), 16))
+        logger.debug(index_value_dict)
+
+        return index_value_dict
+
+    def get_used_band_index(self, used_band_name):
+        """
+        To transfer used_band to {band: index, ...}
+        used_band_name parameter that can be valid:
+        'CAL.LTE.USED_RF_BAND'
+        'CAL.LTE.USED_DUALTX_RF_BAND'
+        'CAL.NR_SUB6.USED_RF_BAND'
+        'CAL.NR_SUB6.USED_DUALTX_RF_BAND'
+        'CAL.NR_SUB6.USED_ULMIMO_RF_BAND'
+        'CAL.NR_SUB6.USED_MULTICH_APT_RF_BAND'
+        return:
+        {band: index, ...}
+        """
+        index_value_dict = self.get_nv_index_value(self.query_google_nv(used_band_name))
+        used_band_index = {}
+        for index in index_value_dict:
+            used_band_index[int(index_value_dict[index])] = int(index) + 1
+        logger.debug(used_band_index)
+
+        return used_band_index
+
+    def get_mpr_value(self, mpr_nv, band, tx_path):
+        """
+        mpr_nv parameters:
+        eg:
+        !LTERF.TX.USER DSP MPR OFFSET TX{tx_path} B{band_index}, ...
+        !LTERF.TX.USER DSP MPR INTRA_CA OFFSET TX B{band_index}, ...
+        !NR_SUB6RF.TX.USER MPR OFFSET TX{tx_path} N{band_index}, ...
+        !NR_SUB6RF.TX.USER MPR OFFSET PC2 TX{tx_path} N{band_index}, ...
+        !NR_SUB6RF.TX.USER MPR OFFSET PC1p5 TX{tx_path} N{band_index}, ...
+        """
+        used_band_index = None
+        mpr_index_value = None
+        nv = None
+        mpr_nv_dict = {}
+
+        if mpr_nv == '!LTERF.TX.USER DSP MPR OFFSET TX':
+            if tx_path == 'TX1':
+                used_band_index = self.get_used_band_index("CAL.LTE.USED_RF_BAND")
+            elif tx_path == 'TX2':
+                used_band_index = self.get_used_band_index("CAL.LTE.USED_DUALTX_RF_BAND")
+
+            nv = f'!LTERF.TX.USER DSP MPR OFFSET TX{int(tx_path[-1]) - 1} ' \
+                 f'B{str(used_band_index[band]).zfill(2)}'
+
+            mpr_index_value = self.get_nv_index_value(self.query_google_nv(nv))
+            logger.info(f'Band {band} MPR index_value_dict: {mpr_index_value}')
+
+        elif mpr_nv == '!LTERF.TX.USER DSP MPR INTRA_CA OFFSET TX':
+            used_band_index = self.get_used_band_index("CAL.LTE.USED_RF_BAND")
+            nv = f'!LTERF.TX.USER DSP MPR INTRA_CA OFFSET TX ' \
+                 f'B{str(used_band_index[band]).zfill(2)}'
+
+            mpr_index_value = self.get_nv_index_value(self.query_google_nv(nv))
+            logger.info(f'Band {band}C MPR index_value_dict: {mpr_index_value}')
+
+        elif mpr_nv == '!NR_SUB6RF.TX.USER MPR OFFSET TX':
+            if tx_path == 'TX1':
+                used_band_index = self.get_used_band_index("CAL.NR_SUB6.USED_RF_BAND")
+            elif tx_path == 'TX2':
+                used_band_index = self.get_used_band_index("CAL.NR_SUB6.USED_DUALTX_RF_BAND")
+
+            nv = f'!NR_SUB6RF.TX.USER MPR OFFSET TX{int(tx_path[-1]) - 1}_' \
+                 f'N{str(used_band_index[band]).zfill(2)}'
+
+            mpr_index_value = self.get_nv_index_value(self.query_google_nv(nv))
+            logger.info(f'Band {band} MPR index_value_dict: {mpr_index_value}')
+
+        elif mpr_nv == '!NR_SUB6RF.TX.USER MPR OFFSET PC2 TX':
+            if tx_path == 'TX1':
+                used_band_index = self.get_used_band_index("CAL.NR_SUB6.USED_RF_BAND")
+            elif tx_path == 'TX2':
+                used_band_index = self.get_used_band_index("CAL.NR_SUB6.USED_DUALTX_RF_BAND")
+
+            nv = f'!NR_SUB6RF.TX.USER MPR OFFSET PC2 TX{int(tx_path[-1]) - 1}_' \
+                 f'N{str(used_band_index[band]).zfill(2)}'
+
+            mpr_index_value = self.get_nv_index_value(self.query_google_nv(nv))
+            logger.info(f'Band {band} MPR index_value_dict: {mpr_index_value}')
+
+        elif mpr_nv == '!NR_SUB6RF.TX.USER MPR OFFSET PC1p5 TX':
+            if tx_path == 'TX1':
+                used_band_index = self.get_used_band_index("CAL.NR_SUB6.USED_RF_BAND")
+            elif tx_path == 'TX2':
+                used_band_index = self.get_used_band_index("CAL.NR_SUB6.USED_DUALTX_RF_BAND")
+
+            nv = f'!NR_SUB6RF.TX.USER MPR OFFSET PC1p5 TX{int(tx_path[-1]) - 1}_' \
+                 f'N{str(used_band_index[band]).zfill(2)}'
+
+            mpr_index_value = self.get_nv_index_value(self.query_google_nv(nv))
+            logger.info(f'Band {band} MPR index_value_dict: {mpr_index_value}')
+
+        mpr_nv_dict[nv] = mpr_index_value
+
+        return mpr_nv_dict
+
+
+    def get_mpr_value_all(self, band):
+        """
+        Directly transfer all passable MPR NV
+        """
+        used_band_tx1_index_lte = self.get_used_band_index("CAL.LTE.USED_RF_BAND")
+        used_band_tx2_index_lte = self.get_used_band_index("CAL.LTE.USED_DUALTX_RF_BAND")
+        used_band_tx1_index_fr1 = self.get_used_band_index("CAL.NR_SUB6.USED_RF_BAND")
+        used_band_tx2_index_fr1 = self.get_used_band_index("CAL.NR_SUB6.USED_DUALTX_RF_BAND")
+        mpr_nv_all_dict = {}
+        mpr_nvs = [
+            f'!LTERF.TX.USER DSP MPR OFFSET TX0 B{str(used_band_tx1_index_lte[band]).zfill(2)}',
+            f'!LTERF.TX.USER DSP MPR OFFSET TX1 B{str(used_band_tx2_index_lte[band]).zfill(2)}',
+            f'!LTERF.TX.USER DSP MPR INTRA_CA OFFSET TX B{str(used_band_tx1_index_lte[band]).zfill(2)}',
+            f'!NR_SUB6RF.TX.USER MPR OFFSET TX0_N{str(used_band_tx1_index_fr1[band]).zfill(2)}',
+            f'!NR_SUB6RF.TX.USER MPR OFFSET TX1_N{str(used_band_tx2_index_fr1[band]).zfill(2)}',
+            f'!NR_SUB6RF.TX.USER MPR OFFSET PC2 TX0_N{str(used_band_tx1_index_fr1[band]).zfill(2)}',
+            f'!NR_SUB6RF.TX.USER MPR OFFSET PC2 TX1_N{str(used_band_tx2_index_fr1[band]).zfill(2)}',
+            f'!NR_SUB6RF.TX.USER MPR OFFSET PC1p5 TX0_N{str(used_band_tx1_index_fr1[band]).zfill(2)}',
+            f'!NR_SUB6RF.TX.USER MPR OFFSET PC1p5 TX1_N{str(used_band_tx2_index_fr1[band]).zfill(2)}',
+
+        ]
+        for mpr_nv in mpr_nvs:
+            mpr_index_value = self.get_nv_index_value(self.query_google_nv(mpr_nv))
+            mpr_nv_all_dict[mpr_nv] = mpr_index_value
+
+        logger.info(f'Band {band} has relative MPR NV of that:\n'
+                    f'{mpr_nv_all_dict}')
+
+        return mpr_nv_all_dict
+
 
 if __name__ == '__main__':
-    # NV_NAME = '!LTERF.TX.USER DSP MPR OFFSET TX0 B01'
+    import csv
+
+    # NV_NAME = 'CAL.LTE.USED_RF_BAND'
     # NV_INDEX = 0
     # NV_VALUE = '00'
     #
     command = AtCmd()
-    command.query_google_nv('CAL.LTE.USED_RF_BAND')
+    # res = command.query_google_nv('CAL.LTE.USED_RF_BAND')
+    # command.get_nv_index_value(res)
+    # command.get_used_band_index('CAL.NR_SUB6.USED_DUALTX_RF_BAND')
+    # test = command.get_mpr_value('!LTERF.TX.USER DSP MPR OFFSET TX', 41, 'TX1')
+    test_output = command.get_mpr_value_all(41)
+    with open('output_lte.csv', 'w', newline='') as csvfile:
+
+        # Write the header row
+        writer = csv.writer(csvfile)
+        writer.writerow(
+            ['Band', 'Tx_Path', 'ENABLE/DISABLE', 'QPSK_PRB', 'QPSK_FRB', 'Q16_PRB', 'Q16_FRB', 'Q64_PRB', 'Q64_FRB',
+             'Q256_PRB', 'Q256_FRB', '1.4MHz_offset', '3MHz_offset', '5MHz_offset', '10MHz_offset', '15MHz_offset',
+             '20MHz_offset', ])
+
+        # Iterate over the dictionary
+        for key, value in test_output.items():
+            # Write the key and value to the csv file
+            if 'TX0' in key and 'LTE' in key:
+                writer.writerow([41, 'TX1', *value.values()])
+            elif 'TX1' in key and 'LTE' in key:
+                writer.writerow([41, 'TX2', *value.values()])
+
+    with open('output_lte_ca.csv', 'w', newline='') as csvfile:
+
+        # Write the header row
+        writer = csv.writer(csvfile)
+        writer.writerow(
+            ['Band', 'Tx_Path', 'ENABLE/DISABLE', 'QPSK_PRB', 'QPSK_FRB', 'Q16_PRB', 'Q16_FRB', 'Q64_PRB', 'Q64_FRB',
+             'Q256_PRB', 'Q256_FRB', '1.4MHz_offset', '3MHz_offset', '5MHz_offset', '10MHz_offset', '15MHz_offset',
+             '20MHz_offset', ])
+
+        # Iterate over the dictionary
+        for key, value in test_output.items():
+            if 'INTRA_CA' in key:
+                # Write the key and value to the csv file
+                writer.writerow([41, 'TX1', *value.values()])
+
+    with open('output_fr1_pc3.csv', 'w', newline='') as csvfile:
+
+        # Write the header row
+        writer = csv.writer(csvfile)
+        writer.writerow(
+            ['Band', 'Tx_Path', 'ENABLE/DISABLE', 'QPSK_PRB', 'QPSK_FRB', 'Q16_PRB', 'Q16_FRB', 'Q64_PRB', 'Q64_FRB',
+             'Q256_PRB', 'Q256_FRB', '1.4MHz_offset', '3MHz_offset', '5MHz_offset', '10MHz_offset', '15MHz_offset',
+             '20MHz_offset', ])
+
+        # Iterate over the dictionary
+        for key, value in test_output.items():
+            # Write the key and value to the csv file
+            if 'TX0' in key and 'NR_SUB6RF.TX.USER MPR OFFSET TX' in key:
+                writer.writerow([41, 'TX1', *value.values()])
+            elif 'TX1' in key and 'NR_SUB6RF.TX.USER MPR OFFSET TX' in key:
+                writer.writerow([41, 'TX2', *value.values()])
+
+    with open('output_fr1_pc2.csv', 'w', newline='') as csvfile:
+
+        # Write the header row
+        writer = csv.writer(csvfile)
+        writer.writerow(
+            ['Band', 'Tx_Path', 'ENABLE/DISABLE', 'QPSK_PRB', 'QPSK_FRB', 'Q16_PRB', 'Q16_FRB', 'Q64_PRB', 'Q64_FRB',
+             'Q256_PRB', 'Q256_FRB', '1.4MHz_offset', '3MHz_offset', '5MHz_offset', '10MHz_offset', '15MHz_offset',
+             '20MHz_offset', ])
+
+        # Iterate over the dictionary
+        for key, value in test_output.items():
+            # Write the key and value to the csv file
+            if 'TX0' in key and 'NR_SUB6RF.TX.USER MPR OFFSET PC2 TX' in key:
+                writer.writerow([41, 'TX1', *value.values()])
+            elif 'TX1' in key and 'NR_SUB6RF.TX.USER MPR OFFSET PC2 TX' in key:
+                writer.writerow([41, 'TX2', *value.values()])
+
+    with open('output_fr1_pc1p5.csv', 'w', newline='') as csvfile:
+
+        # Write the header row
+        writer = csv.writer(csvfile)
+        writer.writerow(
+            ['Band', 'Tx_Path', 'ENABLE/DISABLE', 'QPSK_PRB', 'QPSK_FRB', 'Q16_PRB', 'Q16_FRB', 'Q64_PRB', 'Q64_FRB',
+             'Q256_PRB', 'Q256_FRB', '1.4MHz_offset', '3MHz_offset', '5MHz_offset', '10MHz_offset', '15MHz_offset',
+             '20MHz_offset', ])
+
+        # Iterate over the dictionary
+        for key, value in test_output.items():
+            # Write the key and value to the csv file
+            if 'TX0' in key and 'NR_SUB6RF.TX.USER MPR OFFSET PC1p5 TX' in key:
+                writer.writerow([41, 'TX1', *value.values()])
+            elif 'TX1' in key and 'NR_SUB6RF.TX.USER MPR OFFSET PC1p5 TX' in key:
+                writer.writerow([41, 'TX2', *value.values()])

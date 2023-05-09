@@ -3487,3 +3487,5 @@ class MainApp:
 if __name__ == "__main__":
     app = MainApp()
     app.run()
+    # from test_scripts.file_generator.mpr_csv_generator import csv_file_generator
+    # csv_file_generator('!NR_SUB6RF.TX.USER MPR OFFSET PC2 TX', 77, ['TX1', 'TX2'])
