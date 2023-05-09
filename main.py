@@ -18,7 +18,7 @@ from equipments.temp_chamber import TempChamber
 logger = log_set('GUI')
 
 PROJECT_PATH = pathlib.Path(__file__).parent
-PROJECT_UI = PROJECT_PATH / pathlib.Path('gui') / "main_v2_17_2.ui"
+PROJECT_UI = PROJECT_PATH / pathlib.Path('gui') / "main_v2_17_3.ui"
 
 
 class MainApp:
@@ -56,6 +56,7 @@ class MainApp:
         self.port_tx_fr1 = None
         self.rfout_anritsu = None
         self.sync_path = None
+        self.mpr_nv = None
         self.asw_path = None
         self.srs_path_enable = None
         self.asw_path_enable = None
@@ -377,6 +378,7 @@ class MainApp:
                 "port_tx_fr1",
                 "rfout_anritsu",
                 "sync_path",
+                "mpr_nv",
                 "tx_level",
                 "tx_level_endc_lte",
                 "tx_level_endc_fr1",
@@ -803,6 +805,23 @@ class MainApp:
 
         rssi_scan = AtCmd()
         rssi_scan.query_rssi_scan(rssi_dict)
+
+    def mpr_nv_generate(self):
+        from test_scripts.file_generator.mpr_csv_generator import csv_file_generator
+        bands_fr1 = self.wanted_band_FR1()
+        bands_lte = self.wanted_band_LTE()
+        bands_concat = bands_lte + bands_fr1
+        bands = sorted(set(bands_concat))
+
+        tx_path_list = self.wanted_tx_path()
+
+        for band in bands:
+            try:
+                csv_file_generator(self.mpr_nv.get(), band, tx_path_list)
+
+            except Exception as err:
+                logger.info(err)
+                logger.info(f'Band {band} should not be in the MPR NV')
 
     def t_measure(self):
         t = threading.Thread(target=self.mega_measure, daemon=True)
