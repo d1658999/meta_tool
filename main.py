@@ -14,11 +14,13 @@ from utils.adb_handler import get_serial_devices
 from utils.excel_handler import excel_folder_create
 from equipments.power_supply import Psu
 from equipments.temp_chamber import TempChamber
+# from equipments.series_basis.modem_usb_serial.serial_series import AtCmd
+# from utils.regy_handler import regy_target_search_parser_v2
 
 logger = log_set('GUI')
 
 PROJECT_PATH = pathlib.Path(__file__).parent
-PROJECT_UI = PROJECT_PATH / pathlib.Path('gui') / "main_v2_16_3.ui"
+PROJECT_UI = PROJECT_PATH / pathlib.Path('gui') / "main_v2_17_3.ui"
 
 
 class MainApp:
@@ -35,6 +37,7 @@ class MainApp:
         button_run_signaling = builder.get_object("button_run_signaling", master)
         button_run_cse = builder.get_object("button_run_cse", master)
         button_run_ulca = builder.get_object("button_run_ulca", master)
+        self.button_mpr_gen = builder.get_object("button_mpr_gen", master)
         self.button_run_list = [button_run_ftm, button_run_ftm_fcc, button_run_ftm_ce, button_run_ftm_endc,
                                 button_run_signaling, button_run_cse, button_run_ulca]
         ICON_FILE = PROJECT_PATH / pathlib.Path('utils') / pathlib.Path('Wave.ico')
@@ -56,6 +59,7 @@ class MainApp:
         self.port_tx_fr1 = None
         self.rfout_anritsu = None
         self.sync_path = None
+        self.mpr_nv = None
         self.asw_path = None
         self.srs_path_enable = None
         self.asw_path_enable = None
@@ -336,6 +340,33 @@ class MainApp:
         self.volt_mipi_en = None
         self.port_table_enable = None
         self.debug_enable = None
+        self.rssi_rx_rat = None
+        self.rssi_rx_band = None
+        self.rssi_rx_bw = None
+        self.rssi_scan_mode = None
+        self.rssi_start_rx_freq = None
+        self.rssi_stop_rx_freq = None
+        self.rssi_step_freq = None
+        self.rssi_antenna_selection = None
+        self.rssi_sampling_count = None
+        self.rssi_tx1_rat = None
+        self.rssi_tx1_enable = None
+        self.rssi_tx1_band = None
+        self.rssi_tx1_bw = None
+        self.rssi_tx1_freq = None
+        self.rssi_tx1_power = None
+        self.rssi_tx1_rb_num = None
+        self.rssi_tx1_rb_start = None
+        self.rssi_tx1_mcs = None
+        self.rssi_tx2_rat = None
+        self.rssi_tx2_enable = None
+        self.rssi_tx2_band = None
+        self.rssi_tx2_bw = None
+        self.rssi_tx2_freq = None
+        self.rssi_tx2_power = None
+        self.rssi_tx2_rb_num = None
+        self.rssi_tx2_rb_start = None
+        self.rssi_tx2_mcs = None
         builder.import_variables(
             self,
             [
@@ -350,6 +381,7 @@ class MainApp:
                 "port_tx_fr1",
                 "rfout_anritsu",
                 "sync_path",
+                "mpr_nv",
                 "tx_level",
                 "tx_level_endc_lte",
                 "tx_level_endc_fr1",
@@ -629,6 +661,33 @@ class MainApp:
                 "volt_mipi_en",
                 "port_table_enable",
                 "debug_enable",
+                "rssi_rx_rat",
+                "rssi_rx_band",
+                "rssi_rx_bw",
+                "rssi_scan_mode",
+                "rssi_start_rx_freq",
+                "rssi_stop_rx_freq",
+                "rssi_step_freq",
+                "rssi_antenna_selection",
+                "rssi_sampling_count",
+                "rssi_tx1_rat",
+                "rssi_tx1_enable",
+                "rssi_tx1_band",
+                "rssi_tx1_bw",
+                "rssi_tx1_freq",
+                "rssi_tx1_power",
+                "rssi_tx1_rb_num",
+                "rssi_tx1_rb_start",
+                "rssi_tx1_mcs",
+                "rssi_tx2_rat",
+                "rssi_tx2_enable",
+                "rssi_tx2_band",
+                "rssi_tx2_bw",
+                "rssi_tx2_freq",
+                "rssi_tx2_power",
+                "rssi_tx2_rb_num",
+                "rssi_tx2_rb_start",
+                "rssi_tx2_mcs",
             ],
         )
 
@@ -712,6 +771,79 @@ class MainApp:
         stop = datetime.datetime.now()
 
         logger.info(f'Timer: {stop - start}')
+
+    def rssi_scan(self):
+        self.export_ui_setting_yaml()
+        from equipments.series_basis.modem_usb_serial.serial_series import AtCmd
+
+        rssi_dict = {
+            'rx_rat': self.rssi_rx_rat.get(),
+            'rx_band': self.rssi_rx_band.get(),
+            'rx_bw': self.rssi_rx_bw.get(),
+            'scan_mode': self.rssi_scan_mode.get(),
+            'start_rx_freq': self.rssi_start_rx_freq.get(),
+            'stop_rx_freq': self.rssi_stop_rx_freq.get(),
+            'step_freq': self.rssi_step_freq.get(),
+            'antenna_selection': self.rssi_antenna_selection.get(),
+            'sampling_count': self.rssi_sampling_count.get(),
+            'tx1_enable': self.rssi_tx1_enable.get(),
+            'tx1_rat': self.rssi_tx1_rat.get(),
+            'tx1_band': self.rssi_tx1_band.get(),
+            'tx1_bw': self.rssi_tx1_bw.get(),
+            'tx1_freq': self.rssi_tx1_freq.get(),
+            'tx1_pwr': self.rssi_tx1_power.get(),
+            'tx1_rb_num': self.rssi_tx1_rb_num.get(),
+            'tx1_rb_start': self.rssi_tx1_rb_start.get(),
+            'tx1_mcs': self.rssi_tx1_mcs.get(),
+            'tx2_enable': self.rssi_tx2_enable.get(),
+            'tx2_rat': self.rssi_tx2_rat.get(),
+            'tx2_band': self.rssi_tx2_band.get(),
+            'tx2_bw': self.rssi_tx2_bw.get(),
+            'tx2_freq': self.rssi_tx2_freq.get(),
+            'tx2_pwr': self.rssi_tx2_power.get(),
+            'tx2_rb_num': self.rssi_tx2_rb_num.get(),
+            'tx2_rb_start': self.rssi_tx2_rb_start.get(),
+            'tx2_mcs': self.rssi_tx2_mcs.get(),
+
+        }
+
+        rssi_scan = AtCmd()
+        rssi_scan.query_rssi_scan(rssi_dict)
+
+    def mpr_nv_generate(self):
+        start = datetime.datetime.now()
+
+        self.export_ui_setting_yaml()
+        self.button_mpr_gen['state'] = tkinter.DISABLED
+
+        from test_scripts.file_generator.mpr_csv_generator import csv_file_generator
+        bands_fr1 = self.wanted_band_FR1()
+        bands_lte = self.wanted_band_LTE()
+        tx_path_list = self.wanted_tx_path()
+
+        if self.mpr_nv.get() != 'ALL':
+
+            for band in bands_fr1:
+                csv_file_generator(self.mpr_nv.get(), band, tx_path_list, 'FR1')
+
+            for band in bands_lte:
+                csv_file_generator(self.mpr_nv.get(), band, tx_path_list, 'LTE')
+        else:
+            bands = sorted(set(bands_fr1 + bands_lte))
+
+            for band in bands:
+                csv_file_generator(self.mpr_nv.get(), band, tx_path_list)
+
+        logger.info('Generation process finish!')
+        self.button_mpr_gen['state'] = tkinter.NORMAL
+
+        stop = datetime.datetime.now()
+
+        logger.info(f'Timer: {stop - start}')
+
+    def t_mpr_nv_generate(self):
+        t = threading.Thread(target=self.mpr_nv_generate, daemon=True)
+        t.start()
 
     def t_measure(self):
         t = threading.Thread(target=self.mega_measure, daemon=True)
@@ -3396,3 +3528,13 @@ class MainApp:
 if __name__ == "__main__":
     app = MainApp()
     app.run()
+
+    # start = datetime.datetime.now()
+    #
+    # atcommand = AtCmd()
+    # atcommand.write_regy_v2('regy_test_0.regy')
+    # # atcommand.query_google_nv("!LTERF.TX.USER TEMP OFFSET TX0 B01")
+    # stop = datetime.datetime.now()
+    #
+    # logger.info(f'Timer: {stop - start}')
+    # regy_target_search_parser_v2('regy_test_0.regy', '!LTERF.TX.USER DSP MPR OFFSET TX0 B02')

@@ -4,7 +4,9 @@ from utils.log_init import log_set
 import utils.parameters.external_paramters as ext_pmt
 from connection_interface.connection_serial import ModemComport
 from utils.parameters.common_parameters_ftm import TDD_BANDS
-
+import utils.parameters.rssi_parameters as rssi
+from utils.regy_handler import regy_parser,  regy_parser_v2
+from utils.regy_handler import decimal_to_hex_twos_complement, convert_string
 
 logger = log_set('AtCmd')
 
@@ -79,10 +81,49 @@ class AtCmd:
         self.rsrp_list = None
         self.init_dicts()
 
-    def command(self, command='at', delay=0.2):
-        logger.info(f'MTM: <<{command}')
-        command = command + '\r'
-        self.ser.write(command.encode())
+    def command_nv(self, cmd='at', delay=0.02, mode='N'):
+        logger.info(f'MTM: <<{cmd}')
+        cmd = cmd + '\r'
+
+        if mode == 'Q':
+            self.ser.write(cmd.encode())
+            time.sleep(delay)
+
+        elif mode == 'N':
+            self.ser.write(cmd.encode())
+            time.sleep(delay)
+            response = self.ser.readlines()
+            for res in response:
+                r = res.decode().strip()
+                if len(r) > 1:  # with more than one response
+                    logger.info(f'MTM: >>{r}')
+                # else:
+                #     if not r:  # sometimes there is not \r\n in the middle response
+                #         continue
+                #     else:  # only one response
+                #         logger.info(f'MTM: >>{r[0]}')
+
+            while b'OK\r\n' not in response:
+                logger.info('OK is not at the end, so repeat again')
+                logger.info(f'==========repeat to response again=========')
+                response = self.ser.readlines()
+                time.sleep(1)
+                for res in response:
+                    r = res.decode()
+                    if len(r) > 1:  # with more than one response
+                        for rr in r:
+                            logger.info(f'MTM: >>{rr}')
+                    else:
+                        if not r:  # sometimes there is not \r\n in the middle response
+                            continue
+                        else:  # only one response
+                            logger.info(f'MTM: >>{r[0]}')
+            return response
+
+    def command(self, cmd='at', delay=0.2):
+        logger.info(f'MTM: <<{cmd}')
+        cmd = cmd + '\r'
+        self.ser.write(cmd.encode())
         time.sleep(delay)
         response = self.ser.readlines()
         for res in response:
@@ -574,7 +615,6 @@ class AtCmd:
         # self.command_cmw100_query('*OPC?')
         self.ser.com_close()
 
-
     def rx_path_setting_sig_gsm(self):
         """
         0: PRX, 1: DRX
@@ -733,10 +773,12 @@ class AtCmd:
             '15+5': 20,
             '40': 21,
         }
-        self.command(f'AT+LTXSENDREQSLOAPT={self.tx_path_dict[self.tx_path]},{bw_ca_index[self.bw_combo_lte]},{self.tx_freq_lte},'
-                     f'{self.rb_size_cc1_lte},{self.rb_start_cc1_lte},{self.mcs_lte_dict[self.mcs_cc1_lte]},'
-                     f'{self.rb_size_cc2_lte},{self.rb_start_cc2_lte},{self.mcs_lte_dict[self.mcs_cc2_lte]},'
-                     f'2,2,{self.tx_level},0')
+        self.command(
+            f'AT+LTXSENDREQSLOAPT={self.tx_path_dict[self.tx_path]},{bw_ca_index[self.bw_combo_lte]},'
+            f'{self.tx_freq_lte},'
+            f'{self.rb_size_cc1_lte},{self.rb_start_cc1_lte},{self.mcs_lte_dict[self.mcs_cc1_lte]},'
+            f'{self.rb_size_cc2_lte},{self.rb_start_cc2_lte},{self.mcs_lte_dict[self.mcs_cc2_lte]},'
+            f'2,2,{self.tx_level},0')
 
     @staticmethod
     def set_mipi_voltage_sky51001(tech, band, tx_path):
@@ -870,7 +912,7 @@ class AtCmd:
         """
         mipi_num, usid, addr = self.set_mipi_voltage_qm81052('LTE', band, tx_path)
 
-        res = self.command(f'AT+MIPIREAD={mipi_num},{int(usid, 16)},{addr}', delay=0.2)
+        res = self.command(f'AT+MIPIREAD={mipi_num},{usid},{addr}', delay=0.2)
         for line in res:
             if '+MIPIREAD:' in line.decode():
                 vol_hex = line.decode().split(':')[1].strip()
@@ -913,3 +955,273 @@ class AtCmd:
             return self.query_voltage_selector_sky51001
         elif module == 'qm81052':
             return self.query_voltage_selector_qm81052
+
+    def query_rssi_scan(self, rssi_dict):
+        rx_rat = rssi_dict["rx_rat"]
+        rx_band = rssi_dict["rx_band"]
+        rx_bw = rssi_dict["rx_bw"]
+        scan_mode = rssi_dict["scan_mode"]
+        start_rx_freq = rssi_dict["start_rx_freq"]
+        stop_rx_freq = rssi_dict["stop_rx_freq"]
+        step_freq = rssi_dict["step_freq"]
+        antenna_selection = rssi_dict["antenna_selection"]
+        sampling_count = rssi_dict["sampling_count"]
+        tx1_enable = rssi_dict["tx1_enable"]
+        tx1_rat = rssi_dict["tx1_rat"]
+        tx1_band = rssi_dict["tx1_band"]
+        tx1_bw = rssi_dict["tx1_bw"]
+        tx1_freq = rssi_dict["tx1_freq"]
+        tx1_pwr = rssi_dict["tx1_pwr"]
+        tx1_rb_num = rssi_dict["tx1_rb_num"]
+        tx1_rb_start = rssi_dict["tx1_rb_start"]
+        tx1_mcs = rssi_dict["tx1_mcs"]
+        tx2_enable = rssi_dict["tx2_enable"]
+        tx2_rat = rssi_dict["tx2_rat"]
+        tx2_band = rssi_dict["tx2_band"]
+        tx2_bw = rssi_dict["tx2_bw"]
+        tx2_freq = rssi_dict["tx2_freq"]
+        tx2_pwr = rssi_dict["tx2_pwr"]
+        tx2_rb_num = rssi_dict["tx2_rb_num"]
+        tx2_rb_start = rssi_dict["tx2_rb_start"]
+        tx2_mcs = rssi_dict["tx2_mcs"]
+
+        command_rssi = f'AT+RSSISCAN=' \
+                       f'{rssi.RAT[rx_rat]},' \
+                       f'{rssi.rx_bands_collection(rx_rat, rx_band)},' \
+                       f'{rssi.RX_BW[rx_rat][rx_bw]},' \
+                       f'{rssi.SCAN_MODE[scan_mode]},' \
+                       f'{start_rx_freq},' \
+                       f'{stop_rx_freq},' \
+                       f'{rssi.STEP_FREQ[rx_rat][step_freq]},' \
+                       f'{rssi.ANTENNA_SELECTION[antenna_selection]},' \
+                       f'{sampling_count},' \
+                       f'0,' \
+                       f'{rssi.TX1_ENABLE[tx1_enable]},' \
+                       f'{tx1_band},' \
+                       f'{rssi.TX_BW[tx1_rat][tx1_bw]},' \
+                       f'{tx1_freq},' \
+                       f'{tx1_pwr},' \
+                       f'{tx1_rb_num},' \
+                       f'{tx1_rb_start},' \
+                       f'{rssi.MCS[tx1_mcs]},' \
+                       f'{rssi.TX2_ENABLE[tx2_enable]},' \
+                       f'{tx2_band},' \
+                       f'{rssi.TX_BW[tx2_rat][tx2_bw]},' \
+                       f'{tx2_freq},' \
+                       f'{tx2_pwr},' \
+                       f'{tx2_rb_num},' \
+                       f'{tx2_rb_start},' \
+                       f'{rssi.MCS[tx2_mcs]},'
+
+        self.command(command_rssi)
+
+    def set_google_nv(self, nv_name, nv_index, nv_value):
+        # nv_value_ = hex(int(nv_value))[2:].zfill(2)  # to transfer to 2 placeholder (0x1 -> 1 -> '01')
+        self.command_nv(f'AT+GOOGSETNV="{nv_name}",{nv_index},"{nv_value}"', 0)
+
+    def query_google_nv(self, nv_name):
+        return self.command_nv(f'AT+GOOGGETNV="{nv_name}"')
+
+    def write_regy(self, file_name):
+        regy_dict = regy_parser(file_name)
+        for nv_name, regy_value in regy_dict.items():
+            for nv_index, nv_value in regy_value.items():
+                if nv_index == 'size':
+                    continue
+                else:
+                    # to do important transfer the format to meet LSI
+                    size = regy_value['size']
+                    hex_rep = decimal_to_hex_twos_complement(int(nv_value), size)
+                    nv_value_new = convert_string(hex_rep, size)
+
+                    # start to set nv
+                    self.set_google_nv(nv_name, nv_index, nv_value_new)
+
+    def write_regy_v2(self, file_name):
+        regy_dict = regy_parser_v2(file_name)
+        for nv_name, nv_values in regy_dict.items():
+            self.set_google_nv(nv_name, 0, nv_values)
+
+    @staticmethod
+    def get_nv_index_value(res):
+        index_value_dict = {}
+        for res_ in res:
+            resd = res_.decode().strip().split(',')
+            if len(resd) >= 3:
+                index_value_dict[resd[1]] = str(int(resd[2].strip('"'), 16))
+        logger.debug(index_value_dict)
+
+        return index_value_dict
+
+    def get_used_band_index(self, used_band_name):
+        """
+        To transfer used_band to {band: index, ...}
+        used_band_name parameter that can be valid:
+        'CAL.LTE.USED_RF_BAND'
+        'CAL.LTE.USED_DUALTX_RF_BAND'
+        'CAL.NR_SUB6.USED_RF_BAND'
+        'CAL.NR_SUB6.USED_DUALTX_RF_BAND'
+        'CAL.NR_SUB6.USED_ULMIMO_RF_BAND'
+        'CAL.NR_SUB6.USED_MULTICH_APT_RF_BAND'
+        return:
+        {band: index, ...}
+        """
+        index_value_dict = self.get_nv_index_value(self.query_google_nv(used_band_name))
+        used_band_index = {}
+        for index in index_value_dict:
+            used_band_index[int(index_value_dict[index])] = int(index) + 1
+        logger.debug(used_band_index)
+
+        return used_band_index
+
+    def get_mpr_value(self, mpr_nv, band, tx_path):
+        """
+        mpr_nv parameters:
+        eg:
+        !LTERF.TX.USER DSP MPR OFFSET TX{tx_path} B{band_index}, ...
+        !LTERF.TX.USER DSP MPR INTRA_CA OFFSET TX B{band_index}, ...
+        !NR_SUB6RF.TX.USER MPR OFFSET TX{tx_path} N{band_index}, ...
+        !NR_SUB6RF.TX.USER MPR OFFSET PC2 TX{tx_path} N{band_index}, ...
+        !NR_SUB6RF.TX.USER MPR OFFSET PC1p5 TX{tx_path} N{band_index}, ...
+        """
+        used_band_index = None
+        mpr_index_value = None
+        nv = None
+        mpr_nv_dict = {}
+
+        if mpr_nv == '!LTERF.TX.USER DSP MPR OFFSET TX':
+            if tx_path == 'TX1':
+                used_band_index = self.get_used_band_index("CAL.LTE.USED_RF_BAND")
+            elif tx_path == 'TX2':
+                used_band_index = self.get_used_band_index("CAL.LTE.USED_DUALTX_RF_BAND")
+
+            nv = f'!LTERF.TX.USER DSP MPR OFFSET TX{int(tx_path[-1]) - 1} ' \
+                 f'B{str(used_band_index[band]).zfill(2)}'
+
+            mpr_index_value = self.get_nv_index_value(self.query_google_nv(nv))
+            logger.info(f'Band {band} MPR index_value_dict: {mpr_index_value}')
+
+        elif mpr_nv == '!LTERF.TX.USER DSP MPR INTRA_CA OFFSET TX':
+            used_band_index = self.get_used_band_index("CAL.LTE.USED_RF_BAND")
+            nv = f'!LTERF.TX.USER DSP MPR INTRA_CA OFFSET TX ' \
+                 f'B{str(used_band_index[band]).zfill(2)}'
+
+            mpr_index_value = self.get_nv_index_value(self.query_google_nv(nv))
+            logger.info(f'Band {band}C MPR index_value_dict: {mpr_index_value}')
+
+        elif mpr_nv == '!NR_SUB6RF.TX.USER MPR OFFSET TX':
+            if tx_path == 'TX1':
+                used_band_index = self.get_used_band_index("CAL.NR_SUB6.USED_RF_BAND")
+            elif tx_path == 'TX2':
+                used_band_index = self.get_used_band_index("CAL.NR_SUB6.USED_DUALTX_RF_BAND")
+
+            nv = f'!NR_SUB6RF.TX.USER MPR OFFSET TX{int(tx_path[-1]) - 1}_' \
+                 f'N{str(used_band_index[band]).zfill(2)}'
+
+            mpr_index_value = self.get_nv_index_value(self.query_google_nv(nv))
+            logger.info(f'Band {band} MPR index_value_dict: {mpr_index_value}')
+
+        elif mpr_nv == '!NR_SUB6RF.TX.USER MPR OFFSET PC2 TX':
+            if tx_path == 'TX1':
+                used_band_index = self.get_used_band_index("CAL.NR_SUB6.USED_RF_BAND")
+            elif tx_path == 'TX2':
+                used_band_index = self.get_used_band_index("CAL.NR_SUB6.USED_DUALTX_RF_BAND")
+
+            nv = f'!NR_SUB6RF.TX.USER MPR OFFSET PC2 TX{int(tx_path[-1]) - 1}_' \
+                 f'N{str(used_band_index[band]).zfill(2)}'
+
+            mpr_index_value = self.get_nv_index_value(self.query_google_nv(nv))
+            logger.info(f'Band {band} MPR index_value_dict: {mpr_index_value}')
+
+        elif mpr_nv == '!NR_SUB6RF.TX.USER MPR OFFSET PC1p5 TX':
+            if tx_path == 'TX1':
+                used_band_index = self.get_used_band_index("CAL.NR_SUB6.USED_RF_BAND")
+            elif tx_path == 'TX2':
+                used_band_index = self.get_used_band_index("CAL.NR_SUB6.USED_DUALTX_RF_BAND")
+
+            nv = f'!NR_SUB6RF.TX.USER MPR OFFSET PC1p5 TX{int(tx_path[-1]) - 1}_' \
+                 f'N{str(used_band_index[band]).zfill(2)}'
+
+            mpr_index_value = self.get_nv_index_value(self.query_google_nv(nv))
+            logger.info(f'Band {band} MPR index_value_dict: {mpr_index_value}')
+
+        mpr_nv_dict[nv] = mpr_index_value
+
+        return mpr_nv_dict
+
+    def mpr_nvs_check(self, band):
+        used_band_tx1_index_lte = self.get_used_band_index("CAL.LTE.USED_RF_BAND")
+        used_band_tx2_index_lte = self.get_used_band_index("CAL.LTE.USED_DUALTX_RF_BAND")
+        used_band_tx1_index_fr1 = self.get_used_band_index("CAL.NR_SUB6.USED_RF_BAND")
+        used_band_tx2_index_fr1 = self.get_used_band_index("CAL.NR_SUB6.USED_DUALTX_RF_BAND")
+        # mpr_nvs = [
+        #     f'!LTERF.TX.USER DSP MPR OFFSET TX0 B{str(used_band_tx1_index_lte[band]).zfill(2)}',
+        #     f'!LTERF.TX.USER DSP MPR OFFSET TX1 B{str(used_band_tx2_index_lte[band]).zfill(2)}',
+        #     f'!LTERF.TX.USER DSP MPR INTRA_CA OFFSET TX B{str(used_band_tx1_index_lte[band]).zfill(2)}',
+        #     f'!NR_SUB6RF.TX.USER MPR OFFSET TX0_N{str(used_band_tx1_index_fr1[band]).zfill(2)}',
+        #     f'!NR_SUB6RF.TX.USER MPR OFFSET TX1_N{str(used_band_tx2_index_fr1[band]).zfill(2)}',
+        #     f'!NR_SUB6RF.TX.USER MPR OFFSET PC2 TX0_N{str(used_band_tx1_index_fr1[band]).zfill(2)}',
+        #     f'!NR_SUB6RF.TX.USER MPR OFFSET PC2 TX1_N{str(used_band_tx2_index_fr1[band]).zfill(2)}',
+        #     f'!NR_SUB6RF.TX.USER MPR OFFSET PC1p5 TX0_N{str(used_band_tx1_index_fr1[band]).zfill(2)}',
+        #     f'!NR_SUB6RF.TX.USER MPR OFFSET PC1p5 TX1_N{str(used_band_tx2_index_fr1[band]).zfill(2)}',
+        #
+        # ]
+
+        mpr_nvs = [
+            f'!LTERF.TX.USER DSP MPR OFFSET TX0 B',
+            f'!LTERF.TX.USER DSP MPR OFFSET TX1 B',
+            f'!LTERF.TX.USER DSP MPR INTRA_CA OFFSET TX B',
+            f'!NR_SUB6RF.TX.USER MPR OFFSET TX0_N',
+            f'!NR_SUB6RF.TX.USER MPR OFFSET TX1_N',
+            f'!NR_SUB6RF.TX.USER MPR OFFSET PC2 TX0_N',
+            f'!NR_SUB6RF.TX.USER MPR OFFSET PC2 TX1_N',
+            f'!NR_SUB6RF.TX.USER MPR OFFSET PC1p5 TX0_N',
+            f'!NR_SUB6RF.TX.USER MPR OFFSET PC1p5 TX1_N',
+
+        ]
+        mpr_nvs_new = []
+        for mpr_nv in mpr_nvs:
+            try:
+                if mpr_nv == '!LTERF.TX.USER DSP MPR OFFSET TX0 B' or mpr_nv == '!LTERF.TX.USER DSP MPR INTRA_CA OFFSET TX B':
+                    mpr_nvs_new.append(mpr_nv + f'{str(used_band_tx1_index_lte[band]).zfill(2)}')
+
+                elif mpr_nv == '!LTERF.TX.USER DSP MPR OFFSET TX1 B':
+                    mpr_nvs_new.append(mpr_nv + f'{str(used_band_tx2_index_lte[band]).zfill(2)}')
+
+                elif 'TX0_N' in mpr_nv:
+                    mpr_nvs_new.append(mpr_nv + f'{str(used_band_tx1_index_fr1[band]).zfill(2)}')
+
+                elif 'TX1_N' in mpr_nv:
+                    mpr_nvs_new.append(mpr_nv + f'{str(used_band_tx2_index_fr1[band]).zfill(2)}')
+            except KeyError:
+                logger.info(f'Band {band} does not in the {mpr_nv}')
+
+        return mpr_nvs_new
+
+    def get_mpr_value_all(self, band):
+        """
+        Directly transfer all possible MPR NV with union all bands you select
+        """
+
+        mpr_nv_all_dict = {}
+
+        for mpr_nv in self.mpr_nvs_check(band):
+            mpr_index_value = self.get_nv_index_value(self.query_google_nv(mpr_nv))
+            mpr_nv_all_dict[mpr_nv] = mpr_index_value
+
+        return mpr_nv_all_dict
+
+
+if __name__ == '__main__':
+    import csv
+
+    # NV_NAME = 'CAL.LTE.USED_RF_BAND'
+    # NV_INDEX = 0
+    # NV_VALUE = '00'
+    #
+    command = AtCmd()
+    # res = command.query_google_nv('CAL.LTE.USED_RF_BAND')
+    # command.get_nv_index_value(res)
+    # command.get_used_band_index('CAL.NR_SUB6.USED_DUALTX_RF_BAND')
+    # test = command.get_mpr_value('!LTERF.TX.USER DSP MPR OFFSET TX', 41, 'TX1')
+
