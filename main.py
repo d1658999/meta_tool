@@ -14,8 +14,8 @@ from utils.adb_handler import get_serial_devices
 from utils.excel_handler import excel_folder_create
 from equipments.power_supply import Psu
 from equipments.temp_chamber import TempChamber
-from equipments.series_basis.modem_usb_serial.serial_series import AtCmd
-from utils.regy_handler import regy_target_search_parser_v2
+# from equipments.series_basis.modem_usb_serial.serial_series import AtCmd
+# from utils.regy_handler import regy_target_search_parser_v2
 
 logger = log_set('GUI')
 
