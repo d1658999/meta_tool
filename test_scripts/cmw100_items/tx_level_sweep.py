@@ -742,7 +742,7 @@ class TxTestLevelSweep(AtCmd, CMW100):
                 self.bw_lte = item[2]
                 self.band_lte = item[3]
                 try:
-                    if self.tx_path in ['TX1, TX2']:
+                    if self.tx_path in ['TX1', 'TX2']:
                         self.port_table_selector(self.band_lte, self.tx_path)
                         if self.bw_lte in cm_pmt_ftm.bandwidths_selected_lte(self.band_lte):
                             self.tx_level_sweep_process_lte()

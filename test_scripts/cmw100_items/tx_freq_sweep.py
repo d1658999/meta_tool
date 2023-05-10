@@ -391,14 +391,18 @@ class TxTestFreqSweep(AtCmd, CMW100):
                 self.bw_lte = item[2]
                 self.band_lte = item[3]
                 try:
-                    self.port_table_selector(self.band_lte, self.tx_path)
-                    if self.bw_lte in cm_pmt_ftm.bandwidths_selected_lte(self.band_lte):
-                        self.tx_freq_sweep_process_lte()
+                    if self.tx_path in ['TX1', 'TX2']:
+                        self.port_table_selector(self.band_lte, self.tx_path)
+                        if self.bw_lte in cm_pmt_ftm.bandwidths_selected_lte(self.band_lte):
+                            self.tx_freq_sweep_process_lte()
+                        else:
+                            logger.info(f'B{self.band_lte} does not have BW {self.bw_lte}MHZ')
+
                     else:
-                        logger.info(f'B{self.band_lte} does not have BW {self.bw_lte}MHZ')
+                        logger.info(f'LTE Band {self.band_lte} does not have this tx path {self.tx_path}!')
 
                 except KeyError:
-                    logger.info(f'Band {self.band_lte} does not have this tx path {self.tx_path}')
+                    logger.info(f'Band {self.band_lte} does not have this tx path {self.tx_path}!!')
 
         for bw in ext_pmt.lte_bandwidths:
             try:
