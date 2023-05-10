@@ -14,6 +14,8 @@ from utils.adb_handler import get_serial_devices
 from utils.excel_handler import excel_folder_create
 from equipments.power_supply import Psu
 from equipments.temp_chamber import TempChamber
+from equipments.series_basis.modem_usb_serial.serial_series import AtCmd
+from utils.regy_handler import regy_target_search_parser_v2
 
 logger = log_set('GUI')
 
@@ -809,6 +811,8 @@ class MainApp:
         rssi_scan.query_rssi_scan(rssi_dict)
 
     def mpr_nv_generate(self):
+        start = datetime.datetime.now()
+
         self.export_ui_setting_yaml()
         self.button_mpr_gen['state'] = tkinter.DISABLED
 
@@ -832,6 +836,10 @@ class MainApp:
 
         logger.info('Generation process finish!')
         self.button_mpr_gen['state'] = tkinter.NORMAL
+
+        stop = datetime.datetime.now()
+
+        logger.info(f'Timer: {stop - start}')
 
     def t_mpr_nv_generate(self):
         t = threading.Thread(target=self.mpr_nv_generate, daemon=True)
@@ -3520,5 +3528,13 @@ class MainApp:
 if __name__ == "__main__":
     app = MainApp()
     app.run()
-    # from test_scripts.file_generator.mpr_csv_generator import csv_file_generator
-    # csv_file_generator('!NR_SUB6RF.TX.USER MPR OFFSET PC2 TX', 77, ['TX1', 'TX2'])
+
+    # start = datetime.datetime.now()
+    #
+    # atcommand = AtCmd()
+    # atcommand.write_regy_v2('regy_test_0.regy')
+    # # atcommand.query_google_nv("!LTERF.TX.USER TEMP OFFSET TX0 B01")
+    # stop = datetime.datetime.now()
+    #
+    # logger.info(f'Timer: {stop - start}')
+    # regy_target_search_parser_v2('regy_test_0.regy', '!LTERF.TX.USER DSP MPR OFFSET TX0 B02')

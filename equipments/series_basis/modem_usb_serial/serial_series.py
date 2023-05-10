@@ -5,7 +5,8 @@ import utils.parameters.external_paramters as ext_pmt
 from connection_interface.connection_serial import ModemComport
 from utils.parameters.common_parameters_ftm import TDD_BANDS
 import utils.parameters.rssi_parameters as rssi
-from utils.regy_handler import regy_parser
+from utils.regy_handler import regy_parser,  regy_parser_v2
+from utils.regy_handler import decimal_to_hex_twos_complement, convert_string
 
 logger = log_set('AtCmd')
 
@@ -80,38 +81,44 @@ class AtCmd:
         self.rsrp_list = None
         self.init_dicts()
 
-    def command_nv(self, cmd='at', delay=0.02):
+    def command_nv(self, cmd='at', delay=0.02, mode='N'):
         logger.info(f'MTM: <<{cmd}')
         cmd = cmd + '\r'
-        self.ser.write(cmd.encode())
-        time.sleep(delay)
-        response = self.ser.readlines()
-        for res in response:
-            r = res.decode().strip()
-            if len(r) > 1:  # with more than one response
-                logger.info(f'MTM: >>{r}')
-            else:
-                if not r:  # sometimes there is not \r\n in the middle response
-                    continue
-                else:  # only one response
-                    logger.info(f'MTM: >>{r[0]}')
 
-        while b'OK\r\n' not in response:
-            logger.info('OK is not at the end, so repeat again')
-            logger.info(f'==========repeat to response again=========')
+        if mode == 'Q':
+            self.ser.write(cmd.encode())
+            time.sleep(delay)
+
+        elif mode == 'N':
+            self.ser.write(cmd.encode())
+            time.sleep(delay)
             response = self.ser.readlines()
-            time.sleep(1)
             for res in response:
-                r = res.decode()
+                r = res.decode().strip()
                 if len(r) > 1:  # with more than one response
-                    for rr in r:
-                        logger.info(f'MTM: >>{rr}')
-                else:
-                    if not r:  # sometimes there is not \r\n in the middle response
-                        continue
-                    else:  # only one response
-                        logger.info(f'MTM: >>{r[0]}')
-        return response
+                    logger.info(f'MTM: >>{r}')
+                # else:
+                #     if not r:  # sometimes there is not \r\n in the middle response
+                #         continue
+                #     else:  # only one response
+                #         logger.info(f'MTM: >>{r[0]}')
+
+            while b'OK\r\n' not in response:
+                logger.info('OK is not at the end, so repeat again')
+                logger.info(f'==========repeat to response again=========')
+                response = self.ser.readlines()
+                time.sleep(1)
+                for res in response:
+                    r = res.decode()
+                    if len(r) > 1:  # with more than one response
+                        for rr in r:
+                            logger.info(f'MTM: >>{rr}')
+                    else:
+                        if not r:  # sometimes there is not \r\n in the middle response
+                            continue
+                        else:  # only one response
+                            logger.info(f'MTM: >>{r[0]}')
+            return response
 
     def command(self, cmd='at', delay=0.2):
         logger.info(f'MTM: <<{cmd}')
@@ -1009,8 +1016,8 @@ class AtCmd:
         self.command(command_rssi)
 
     def set_google_nv(self, nv_name, nv_index, nv_value):
-        nv_value_ = hex(int(nv_value))[2:].zfill(2)  # to transfer to 2 placeholder (0x1 -> 1 -> '01')
-        self.command_nv(f'AT+GOOGSETNV="{nv_name}",{nv_index},"{nv_value_}"')
+        # nv_value_ = hex(int(nv_value))[2:].zfill(2)  # to transfer to 2 placeholder (0x1 -> 1 -> '01')
+        self.command_nv(f'AT+GOOGSETNV="{nv_name}",{nv_index},"{nv_value}"', 0)
 
     def query_google_nv(self, nv_name):
         return self.command_nv(f'AT+GOOGGETNV="{nv_name}"')
@@ -1019,7 +1026,21 @@ class AtCmd:
         regy_dict = regy_parser(file_name)
         for nv_name, regy_value in regy_dict.items():
             for nv_index, nv_value in regy_value.items():
-                self.set_google_nv(nv_name, nv_index, nv_value)
+                if nv_index == 'size':
+                    continue
+                else:
+                    # to do important transfer the format to meet LSI
+                    size = regy_value['size']
+                    hex_rep = decimal_to_hex_twos_complement(int(nv_value), size)
+                    nv_value_new = convert_string(hex_rep, size)
+
+                    # start to set nv
+                    self.set_google_nv(nv_name, nv_index, nv_value_new)
+
+    def write_regy_v2(self, file_name):
+        regy_dict = regy_parser_v2(file_name)
+        for nv_name, nv_values in regy_dict.items():
+            self.set_google_nv(nv_name, 0, nv_values)
 
     @staticmethod
     def get_nv_index_value(res):
@@ -1203,86 +1224,4 @@ if __name__ == '__main__':
     # command.get_nv_index_value(res)
     # command.get_used_band_index('CAL.NR_SUB6.USED_DUALTX_RF_BAND')
     # test = command.get_mpr_value('!LTERF.TX.USER DSP MPR OFFSET TX', 41, 'TX1')
-    test_output = command.get_mpr_value_all(41)
-    with open('output_lte.csv', 'w', newline='') as csvfile:
 
-        # Write the header row
-        writer = csv.writer(csvfile)
-        writer.writerow(
-            ['Band', 'Tx_Path', 'ENABLE/DISABLE', 'QPSK_PRB', 'QPSK_FRB', 'Q16_PRB', 'Q16_FRB', 'Q64_PRB', 'Q64_FRB',
-             'Q256_PRB', 'Q256_FRB', '1.4MHz_offset', '3MHz_offset', '5MHz_offset', '10MHz_offset', '15MHz_offset',
-             '20MHz_offset', ])
-
-        # Iterate over the dictionary
-        for key, value in test_output.items():
-            # Write the key and value to the csv file
-            if 'TX0' in key and 'LTE' in key:
-                writer.writerow([41, 'TX1', *value.values()])
-            elif 'TX1' in key and 'LTE' in key:
-                writer.writerow([41, 'TX2', *value.values()])
-
-    with open('output_lte_ca.csv', 'w', newline='') as csvfile:
-
-        # Write the header row
-        writer = csv.writer(csvfile)
-        writer.writerow(
-            ['Band', 'Tx_Path', 'ENABLE/DISABLE', 'QPSK_PRB', 'QPSK_FRB', 'Q16_PRB', 'Q16_FRB', 'Q64_PRB', 'Q64_FRB',
-             'Q256_PRB', 'Q256_FRB', '1.4MHz_offset', '3MHz_offset', '5MHz_offset', '10MHz_offset', '15MHz_offset',
-             '20MHz_offset', ])
-
-        # Iterate over the dictionary
-        for key, value in test_output.items():
-            if 'INTRA_CA' in key:
-                # Write the key and value to the csv file
-                writer.writerow([41, 'TX1', *value.values()])
-
-    with open('output_fr1_pc3.csv', 'w', newline='') as csvfile:
-
-        # Write the header row
-        writer = csv.writer(csvfile)
-        writer.writerow(
-            ['Band', 'Tx_Path', 'ENABLE/DISABLE', 'QPSK_PRB', 'QPSK_FRB', 'Q16_PRB', 'Q16_FRB', 'Q64_PRB', 'Q64_FRB',
-             'Q256_PRB', 'Q256_FRB', '1.4MHz_offset', '3MHz_offset', '5MHz_offset', '10MHz_offset', '15MHz_offset',
-             '20MHz_offset', ])
-
-        # Iterate over the dictionary
-        for key, value in test_output.items():
-            # Write the key and value to the csv file
-            if 'TX0' in key and 'NR_SUB6RF.TX.USER MPR OFFSET TX' in key:
-                writer.writerow([41, 'TX1', *value.values()])
-            elif 'TX1' in key and 'NR_SUB6RF.TX.USER MPR OFFSET TX' in key:
-                writer.writerow([41, 'TX2', *value.values()])
-
-    with open('output_fr1_pc2.csv', 'w', newline='') as csvfile:
-
-        # Write the header row
-        writer = csv.writer(csvfile)
-        writer.writerow(
-            ['Band', 'Tx_Path', 'ENABLE/DISABLE', 'QPSK_PRB', 'QPSK_FRB', 'Q16_PRB', 'Q16_FRB', 'Q64_PRB', 'Q64_FRB',
-             'Q256_PRB', 'Q256_FRB', '1.4MHz_offset', '3MHz_offset', '5MHz_offset', '10MHz_offset', '15MHz_offset',
-             '20MHz_offset', ])
-
-        # Iterate over the dictionary
-        for key, value in test_output.items():
-            # Write the key and value to the csv file
-            if 'TX0' in key and 'NR_SUB6RF.TX.USER MPR OFFSET PC2 TX' in key:
-                writer.writerow([41, 'TX1', *value.values()])
-            elif 'TX1' in key and 'NR_SUB6RF.TX.USER MPR OFFSET PC2 TX' in key:
-                writer.writerow([41, 'TX2', *value.values()])
-
-    with open('output_fr1_pc1p5.csv', 'w', newline='') as csvfile:
-
-        # Write the header row
-        writer = csv.writer(csvfile)
-        writer.writerow(
-            ['Band', 'Tx_Path', 'ENABLE/DISABLE', 'QPSK_PRB', 'QPSK_FRB', 'Q16_PRB', 'Q16_FRB', 'Q64_PRB', 'Q64_FRB',
-             'Q256_PRB', 'Q256_FRB', '1.4MHz_offset', '3MHz_offset', '5MHz_offset', '10MHz_offset', '15MHz_offset',
-             '20MHz_offset', ])
-
-        # Iterate over the dictionary
-        for key, value in test_output.items():
-            # Write the key and value to the csv file
-            if 'TX0' in key and 'NR_SUB6RF.TX.USER MPR OFFSET PC1p5 TX' in key:
-                writer.writerow([41, 'TX1', *value.values()])
-            elif 'TX1' in key and 'NR_SUB6RF.TX.USER MPR OFFSET PC1p5 TX' in key:
-                writer.writerow([41, 'TX2', *value.values()])
