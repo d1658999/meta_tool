@@ -309,6 +309,21 @@ class AtCmd:
             'EPSK': 1,
         }
 
+        self.apt_vcc_dict_fr1 = {
+            'TX1CP': 0,
+            'TX2CP': 1,
+            'TX1DFTS': 2,
+            'TX2DFTS': 3,
+            'TX1Q256': 4,
+            'TX2Q256': 5,
+        }
+
+        self.pa_mode = {
+            'HPM': 0,
+            'LPM': 2,
+        }
+
+
     def select_scs_fr1(self, band):
         """
         For now FDD is forced to 15KHz and TDD is to be 30KHz
@@ -1211,17 +1226,82 @@ class AtCmd:
 
         return mpr_nv_all_dict
 
+    def set_stop_network_cal(self):
+        """
+        Network stop command for 2G/3G/4G mode
+        """
+        self.command('AT+HNSSTOP')
+
+    def set_postcal_fr1(self, band):
+        """
+        This is postcal for FR1
+        """
+        self.command(f'AT+NPOSTCALSTART={band}')
+
+    def set_rfcal_start_wcdma(self):
+        """
+        This is postcal for wcdma
+        """
+        self.command('AT+HSPARFCALSTART=7')
+
+    def set_apt_internal_calibration_fr1(self, tx_path, freq):
+        """
+        AT+NTXSAINTERNALAPT=P0, P1
+        Run TX internal APT calibration
+
+        P0 : Tx_path_no: (0: PCC, 1: SCC)
+        P1 : Tx Calibration frequency (kHz)
+
+        R00~R39 : HPM1 ~ HPM40 : APT calibration result of high
+        power mode (dBm * 100)
+        R40~R79 : MPM1 ~ MPM40 : APT calibration result of mid
+        power mode (dBm * 100)
+        R80~R119 : LPM1 ~ LPM40 : APT calibration result of low
+        power mode (dBm * 100)
+        """
+        self.command(f'AT+NTXSAINTERNALAPT={self.tx_path_dict[tx_path]},{freq}')
+
+    def set_calibration_finish_fr1(self):
+        """
+        Calibration mode finished
+        """
+        self.command(f'AT+NRFCALFINISH', 0.3)
+
+    def apt_calibration_process_fr1(self, band, tx_path, freq):
+        self.set_stop_network_cal()
+        self.set_postcal_fr1(band)
+        self.set_apt_internal_calibration_fr1(tx_path, freq)
+        self.set_calibration_finish_fr1()
+
+    def set_apt_vcc_fr1(self, vcc_para_dict):
+        """
+        AT+NTXAPTVOLNVWRITE=P0,P1,~P37
+        """
+        band = vcc_para_dict['band']
+        scheme = self.apt_vcc_dict_fr1[vcc_para_dict['scheme']]
+        pa_mode = vcc_para_dict['pa_mode']
+        vcc_value = ','.join(vcc_para_dict['vcc_value_list'])
+        self.command(f'AT+NTXAPTVOLNVWRITE={band},{scheme},{pa_mode},0,{vcc_value}')
+
+    def set_apt_bias_fr1(self, bias_num, bias_para_dict):
+        """
+        AT+NTXAPTBIASNVWRITE=P0,P1,~P38
+        """
+        band = bias_para_dict['band']
+        scheme = bias_para_dict['scheme']
+        pa_mode = bias_para_dict['pa_mode']
+        bias_value = ','.join(bias_para_dict['bias_value_list'])
+
+        self.command(f'AT+NTXAPTBIASNVWRITE={band},{scheme},{pa_mode},0,{bias_num},{bias_value}')
+
 
 if __name__ == '__main__':
-    import csv
+    # import csv
 
     # NV_NAME = 'CAL.LTE.USED_RF_BAND'
     # NV_INDEX = 0
     # NV_VALUE = '00'
     #
     command = AtCmd()
-    # res = command.query_google_nv('CAL.LTE.USED_RF_BAND')
-    # command.get_nv_index_value(res)
-    # command.get_used_band_index('CAL.NR_SUB6.USED_DUALTX_RF_BAND')
-    # test = command.get_mpr_value('!LTERF.TX.USER DSP MPR OFFSET TX', 41, 'TX1')
+    command.apt_calibration_process_fr1(1, 'TX1', 1950000)
 
