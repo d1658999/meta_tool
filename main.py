@@ -20,7 +20,7 @@ from equipments.temp_chamber import TempChamber
 logger = log_set('GUI')
 
 PROJECT_PATH = pathlib.Path(__file__).parent
-PROJECT_UI = PROJECT_PATH / pathlib.Path('gui') / "main_v2_17_3.ui"
+PROJECT_UI = PROJECT_PATH / pathlib.Path('gui') / "main_v2_18_1.ui"
 
 
 class MainApp:
@@ -3488,6 +3488,11 @@ class MainApp:
                     inst = TxTestCa()
                     inst.run()
                     inst.ser.com_close()
+
+            if self.wanted_test['apt_sweep'] and ext_pmt.sa_nsa == 0 and 'GENERAL' in ext_pmt.scripts:
+                inst = AptSweep()
+                inst.run()
+                inst.ser.com_close()
 
         elif self.instrument.get() == 'Cmw+Fsw':
             from test_scripts.harmonics_cbe.tx_harmonics import TxHarmonics
