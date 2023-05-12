@@ -268,6 +268,7 @@ class MainApp:
         self.B5_N77 = None
         self.B13_N5 = None
         self.rx_freq_sweep = None
+        self.apt_sweep = None
         self.U1 = None
         self.U2 = None
         self.HSUPA_all = None
@@ -590,6 +591,7 @@ class MainApp:
                 "B5_N77",
                 "B13_N5",
                 "rx_freq_sweep",
+                "apt_sweep",
                 "U1",
                 "U2",
                 "HSUPA_all",
@@ -873,6 +875,7 @@ class MainApp:
         self.tx.set(ui_init['test_items']['tx'])
         self.rx.set(ui_init['test_items']['rx'])
         self.rx_freq_sweep.set(ui_init['test_items']['rx_freq_sweep'])
+        self.apt_sweep.set(ui_init['test_items']['tx_apt_sweep'])
         self.tx_level_sweep.set(ui_init['test_items']['tx_level_sweep'])
         self.tx_freq_sweep.set(ui_init['test_items']['tx_freq_sweep'])
         self.tx_1rb_sweep.set(ui_init['test_items']['tx_1rb_sweep'])
@@ -1473,7 +1476,7 @@ class MainApp:
         band_segment_fr1 = self.band_segment_fr1.get()
         chan = self.wanted_chan()
         tx, rx, rx_freq_sweep, tx_level_sweep, tx_freq_sweep, tx_1rb_sweep, tx_harmonics, tx_cbe, \
-        tx_ca, tx_ca_cbe = self.wanted_tx_rx_sweep()
+        tx_ca, tx_ca_cbe, tx_apt_sweep = self.wanted_tx_rx_sweep()
         tpchb_enable = self.tempcham_enable.get()
         psu_enable = self.psu_enable.get()
         odpm_enable = self.odpm_enable.get()
@@ -1517,6 +1520,7 @@ class MainApp:
                 'rx': rx,
                 'rx_quick_enable': rx_quick_enable,
                 'rx_freq_sweep': rx_freq_sweep,
+                'tx_apt_sweep': tx_apt_sweep,
                 'tx_level_sweep': tx_level_sweep,
                 'tx_freq_sweep': tx_freq_sweep,
                 'tx_1rb_sweep': tx_1rb_sweep,
@@ -2206,6 +2210,7 @@ class MainApp:
         self.wanted_test.setdefault('tx_cbe', False)
         self.wanted_test.setdefault('tx_ca', False)
         self.wanted_test.setdefault('tx_ca_cbe', False)
+        self.wanted_test.setdefault('apt_sweep', False)
 
         if self.tx.get():
             logger.debug(self.tx.get())
@@ -2247,13 +2252,16 @@ class MainApp:
             logger.debug(self.rx_freq_sweep.get())
             self.wanted_test['rx_freq_sweep'] = self.rx_freq_sweep.get()
 
+        if self.apt_sweep.get():
+            self.wanted_test['apt_sweep'] = self.apt_sweep.get()
+
         if self.wanted_test == {}:
             logger.debug('Nothing to select for test items')
 
         logger.info(self.wanted_test)
         return self.tx.get(), self.rx.get(), self.rx_freq_sweep.get(), self.tx_level_sweep.get(), \
                self.tx_freq_sweep.get(), self.tx_1rb_sweep.get(), self.tx_harmonics.get(), self.tx_cbe.get(), \
-               self.tx_ca.get(), self.tx_ca_cbe.get()
+               self.tx_ca.get(), self.tx_ca_cbe.get(), self.apt_sweep.get()
 
     def wanted_ue_pwr(self):
         self.ue_power = []
@@ -3447,6 +3455,7 @@ class MainApp:
             from test_scripts.cmw100_items.tx_1rb_sweep import TxTest1RbSweep
             from test_scripts.cmw100_items.tx_power_fcc_ce import TxTestFccCe
             from test_scripts.cmw100_items.tx_ulca_combo import TxTestCa
+            from test_scripts.cmw100_items.apt_sweep_search import AptSweep
 
             excel_folder_create()
             # self.test_pipeline(inst_class_dict)

@@ -4,7 +4,7 @@ from pathlib import Path
 def port_tx_table_transfer(txas_select):  # txas_select = 0/1
     # to determine the txas path
     file_path = Path('utils') / Path(f'port_table_txas_{txas_select}.txt')  # formal
-    # FILE_PATH =  Path(f'port_table_txas_{txas_select}.txt')  # test
+    # file_path =  Path().cwd().parents[1] / Path('utils') / Path(f'port_table_txas_{txas_select}.txt')  # test
 
     # Create an empty dictionary to hold the port mappings
     port_table = {

@@ -1273,7 +1273,7 @@ class AtCmd:
         self.set_apt_internal_calibration_fr1(tx_path, freq)
         self.set_calibration_finish_fr1()
 
-    def set_apt_vcc_fr1(self, vcc_para_dict):
+    def set_apt_vcc_nv_fr1(self, vcc_para_dict):
         """
         AT+NTXAPTVOLNVWRITE=P0,P1,~P37
         """
@@ -1283,7 +1283,7 @@ class AtCmd:
         vcc_value = ','.join(vcc_para_dict['vcc_value_list'])
         self.command(f'AT+NTXAPTVOLNVWRITE={band},{scheme},{pa_mode},0,{vcc_value}')
 
-    def set_apt_bias_fr1(self, bias_num, bias_para_dict):
+    def set_apt_bias_nv_fr1(self, bias_num, bias_para_dict):
         """
         AT+NTXAPTBIASNVWRITE=P0,P1,~P38
         """
@@ -1294,6 +1294,39 @@ class AtCmd:
 
         self.command(f'AT+NTXAPTBIASNVWRITE={band},{scheme},{pa_mode},0,{bias_num},{bias_value}')
 
+    def set_apt_mode_force(self, band, tx_path, mode=0):
+        """
+        force apt into APT mode before doing APT sweep
+        mode = 0, which is APT mode
+        mode = 1, which is ET/SAPT mode
+        """
+        pa_mode_dict = {
+            0: 'APT',
+            1: 'ET/SAPT',
+        }
+        used_band_index = None
+
+        if tx_path == 'TX1':
+            used_band_index = self.get_used_band_index("CAL.NR_SUB6.USED_RF_BAND")
+        elif tx_path == 'TX2':
+            used_band_index = self.get_used_band_index("CAL.NR_SUB6.USED_DUALTX_RF_BAND")
+
+        nv = f'CAL.NR_SUB6.TX_PA_Range_Map_EN_TX{int(tx_path[-1]) - 1}_' \
+             f'N{str(used_band_index[band]).zfill(2)}'
+
+        logger.info(f'========== Force to set {pa_mode_dict[mode]} mode ==========')
+        self.set_google_nv(nv, 0, str(mode).zfill(2))
+
+
+    def set_apt_trymode(self):
+        # self.command('AT+NTXAPTTUNESET=5')
+        self.command('AT+NTXAPTTUNESET=1')
+
+    def set_apt_vcc_trymode(self, tx_path, vcc10):
+        self.command(f'AT+NAPTVOLSET={self.tx_path_dict[tx_path]},1,{vcc10}')
+
+    def set_apt_bias_trymode(self, tx_path, icq1, icq2):
+        self.command(f'AT+NTXPABIASSET={self.tx_path_dict[tx_path]},2,{icq1},{icq2}')
 
 if __name__ == '__main__':
     # import csv

@@ -91,6 +91,8 @@ def select_file_name_genre_tx_ftm(bw, tech, test_item='lmh'):
             return f'Tx_harmonics_{bw}MHZ_{tech}.xlsx'
         elif test_item == 'cbe':
             return f'Tx_cbe_{bw}MHZ_{tech}.xlsx'
+        elif test_item == 'apt_sweep':
+            return f'Tx_apt_sweep_candidate_{bw}MHZ_{tech}.xlsx'
 
     else:
         if test_item == 'level_sweep':
@@ -105,6 +107,8 @@ def select_file_name_genre_tx_ftm(bw, tech, test_item='lmh'):
             return f'Tx_harmonics_{bw}MHZ_{tech}_{ext_pmt.part_number}.xlsx'
         elif test_item == 'cbe':
             return f'Tx_cbe_{bw}MHZ_{tech}_{ext_pmt.part_number}.xlsx'
+        elif test_item == 'apt_sweep':
+            return f'Tx_apt_sweep_candidate_{bw}MHZ_{tech}_{ext_pmt.part_number}.xlsx'
 
 
 def select_file_name_rx_sig(bw, tech):
@@ -776,6 +780,9 @@ def tx_power_relative_test_export_excel_ftm(data, parameters_dict):
                     ws.cell(row, 25).value = measured_data[10]
                     ws.cell(row, 26).value = ext_pmt.condition
                     ws.cell(row, 29).value = measured_data[11] if ext_pmt.volt_mipi_en else None  # volt_mipi
+                    ws.cell(row, 30).value = measured_data[11] if parameters_dict['test_item'] == 'apt_sweep' else None # vcc
+                    ws.cell(row, 31).value = measured_data[12] if parameters_dict['test_item'] == 'apt_sweep' else None # bias0
+                    ws.cell(row, 32).value = measured_data[13] if parameters_dict['test_item'] == 'apt_sweep' else None # bias1
                     row += 1
 
             elif tx_freq_level <= 100:  # 1rb_sweep, lmh, freq_sweep, cbe
