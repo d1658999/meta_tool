@@ -642,8 +642,6 @@ class MainApp:
                 "frb_frb",
                 "one_rb0_one_rbmax",
                 "one_rbmax_one_rb0",
-                "endc_tx_path_lte",
-                "endc_tx_path_fr1",
                 "rx0_endc_lte",
                 "rx1_endc_lte",
                 "rx2_endc_lte",
@@ -884,6 +882,8 @@ class MainApp:
         self.tx_ca.set(ui_init['test_items']['tx_ca'])
         self.tx_ca_cbe.set(ui_init['test_items']['tx_ca_cbe'])
         self.port_tx.set(ui_init['port']['port_tx'])
+        self.tx_level_start.set(ui_init['external_inst']['tx_level_start'])
+        self.tx_level_stop.set(ui_init['external_inst']['tx_level_stop'])
         self.port_tx_lte.set(ui_init['port']['port_tx_lte'])
         self.port_tx_fr1.set(ui_init['port']['port_tx_fr1'])
         self.rfout_anritsu.set(ui_init['port']['rfout_anritsu'])
@@ -1459,6 +1459,8 @@ class MainApp:
         count = self.count.get()
         mod_gsm = self.mod_gsm.get()
         port_tx = self.port_tx.get()
+        tx_level_start = self.tx_level_start.get()
+        tx_level_stop = self.tx_level_stop.get()
         port_tx_lte = self.port_tx_lte.get()
         port_tx_fr1 = self.port_tx_fr1.get()
         sa_nsa = self.sa_nsa.get()
@@ -1587,6 +1589,8 @@ class MainApp:
                 'record_current': record_current_enable,
                 'count': count,
                 'wait_time': wait_time,
+                'tx_level_start': tx_level_start,
+                'tx_level_stop': tx_level_stop
             },
             'condition': {
                 'hthv': hthv,

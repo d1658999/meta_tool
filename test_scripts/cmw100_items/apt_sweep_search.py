@@ -1,3 +1,4 @@
+import traceback
 from pathlib import Path
 from utils.log_init import log_set
 from test_scripts.cmw100_items.tx_level_sweep import TxTestLevelSweep
@@ -22,11 +23,13 @@ BIAS0_STEP = 16
 BIAS1_START = 255
 BIAS1_STOP = 32
 BIAS1_STEP = 16
-ACLR_LIMIT_USL = -36
+ACLR_LIMIT_USL = -37
 ACLR_MARGIN = 3
 EVM_LIMIT_USL = 2.5
 EVM_LIMIT_ABS = 3
-COUNT = 4
+COUNT_BIAS1 = 4
+COUNT_BIAS0 = 6
+COUNT_VCC = 8
 
 
 class AptSweep(TxTestLevelSweep):
@@ -63,21 +66,26 @@ class AptSweep(TxTestLevelSweep):
                         self.set_apt_mode_force(1, 'TX1', 0)
 
                         self.tx_apt_sweep_process_fr1()
+
+                        # recover to ET/SAPT mode
+                        self.set_apt_mode_force(1, 'TX1', 1)
                     else:
                         logger.info(f'NR B{self.band_fr1} does not have BW {self.bw_fr1}MHZ')
 
-                except KeyError:
+                except KeyError as err:
+                    logger.debug(f'Error {err}')
+                    traceback.print_exc()
                     logger.info(f'NR Band {self.band_fr1} does not have this tx path {self.tx_path}')
 
         for bw in ext_pmt.fr1_bandwidths:
             try:
-                file_name = select_file_name_genre_tx_ftm(bw, 'FR1', 'level_sweep')
+                file_name = select_file_name_genre_tx_ftm(bw, 'FR1', 'apt_sweep')
                 file_path = Path(excel_folder_path()) / Path(file_name)
                 txp_aclr_evm_current_plot_ftm(file_path, {'script': 'GENERAL', 'tech': 'FR1'})
             except TypeError:
                 logger.info(f'there is no data to plot because the band does not have this BW ')
             except FileNotFoundError:
-                logger.info(f'there is not file to plot BW{bw} ')
+                logger.info(f'there is no file to plot BW{bw} ')
 
     def tx_apt_sweep_process_fr1(self):
         """
@@ -140,6 +148,7 @@ class AptSweep(TxTestLevelSweep):
 
         self.data = {}
         self.candidate = {}
+        vcc_start, bias0_start, bias1_start = VCC_START, BIAS0_START, BIAS1_START
         if self.tx_path in ['TX1', 'TX2']:
             for tx_level in range(tx_range_list[0], tx_range_list[1] + step, step):
                 self.tx_level = tx_level
@@ -148,27 +157,42 @@ class AptSweep(TxTestLevelSweep):
                 self.set_level_fr1(self.tx_level)
 
                 # start to sweep vcc, bias0, bias1
-                self.tx_apt_sweep_search()
+                self.tx_apt_sweep_search(vcc_start, bias0_start, bias1_start)
+
+                # this will use previous vcc,bias0, bias1 to start sweep
+                vcc_start = self.candidate[self.tx_level][-3]
+                bias0_start = self.candidate[self.tx_level][-2]
+                bias1_start = self.candidate[self.tx_level][-1]
+                logger.info(f'Adopt the best current consumption as {vcc_start}, {bias0_start}, {bias1_start} '
+                            f'as next tx level start parameter')
 
         elif self.tx_path in ['MIMO']:
-            for tx_level in range(tx_range_list[0], tx_range_list[1] + step, step):
-                path_count = 1  # this is for mimo path to store tx_path
-                for port_tx in [self.port_mimo_tx1, self.port_mimo_tx2]:
-                    self.port_tx = port_tx
-                    self.tx_path_mimo = self.tx_path + f'_{path_count}'
-                    self.tx_level = tx_level
-                    logger.info(f'========Now Tx level = {self.tx_level} dBm========')
-                    self.set_level_fr1(self.tx_level)
+            logger.info("MIMO doesn't need this function")
+            # for tx_level in range(tx_range_list[0], tx_range_list[1] + step, step):
+            #     path_count = 1  # this is for mimo path to store tx_path
+            #     for port_tx in [self.port_mimo_tx1, self.port_mimo_tx2]:
+            #         self.port_tx = port_tx
+            #         self.tx_path_mimo = self.tx_path + f'_{path_count}'
+            #         self.tx_level = tx_level
+            #         logger.info(f'========Now Tx level = {self.tx_level} dBm========')
+            #         self.set_level_fr1(self.tx_level)
+            #
+            #         # start to sweep vcc, bias0, bias1
+            #         self.tx_apt_sweep_search(vcc_start, bias0_start, bias1_start)
+            #
+            #         # this willuse previous vcc,bias0, bias1 to start sweep
+            #         vcc_start = self.candidate[-3]
+            #         bias0_start = self.candidate[-2]
+            #         bias1_start = self.candidate[-1]
 
-                    # start to sweep vcc, bias0, bias1
-                    self.tx_apt_sweep_search()
-
-    def tx_apt_sweep_search(self):
-        for vcc in range(VCC_START, VCC_STOP, -VCC_STEP):
+    def tx_apt_sweep_search(self, vcc_start, bias0_start, bias1_start):
+        count_vcc = COUNT_VCC
+        for vcc in range(vcc_start, VCC_STOP, -VCC_STEP):
             logger.info(f'Now VCC is {vcc} to run')
-            for bias0 in range(BIAS0_START, BIAS0_STOP, -BIAS0_STEP):
-                count = COUNT
-                for bias1 in range(BIAS1_START, BIAS1_STOP, -BIAS1_STEP):
+            count_bias0 = COUNT_BIAS0
+            for bias0 in range(bias0_start, BIAS0_STOP, -BIAS0_STEP):
+                count_bias1 = COUNT_BIAS1
+                for bias1 in range(bias1_start, BIAS1_STOP, -BIAS1_STEP):
 
                     self.set_apt_vcc_trymode('TX1', vcc)
                     self.set_apt_bias_trymode('TX1', bias0, bias1)
@@ -191,13 +215,17 @@ class AptSweep(TxTestLevelSweep):
                         self.data[self.tx_level] = self.aclr_mod_current_results
 
                         # check the current if it is the smallest
-                        if not self.candidate:
-                            self.candidate[self.tx_level] = self.aclr_mod_current_results
+                        try:
+                            if not self.candidate:
+                                self.candidate[self.tx_level] = self.aclr_mod_current_results
 
-                        elif self.candidate[self.tx_level][-4] >= self.aclr_mod_current_results[-4]:
+                            elif self.candidate[self.tx_level][-4] >= self.aclr_mod_current_results[-4]:
+                                self.candidate[self.tx_level] = self.aclr_mod_current_results
+                            else:
+                                pass
+                        except KeyError:
+                            # this is for forward tx_level to continue
                             self.candidate[self.tx_level] = self.aclr_mod_current_results
-                        else:
-                            pass
 
                         if self.tx_path in ['TX1', 'TX2']:  # this is for TX1, TX2, not MIMO
                             self.parameters = {
@@ -221,14 +249,28 @@ class AptSweep(TxTestLevelSweep):
                             self.file_path = tx_power_relative_test_export_excel_ftm(self.data, self.parameters)
                             self.data = {}
                     elif aclr_m > ACLR_LIMIT_USL or aclr_p > ACLR_LIMIT_USL or evm > EVM_LIMIT_ABS:
-                        if count > 1:
-                            count -= 1
+                        if count_bias1 > 1:
+                            count_bias1 -= 1
+                            logger.debug(f'activate the exception for bias1')
                         else:
-                            logger.info(f'over {COUNT} times failed spec, so skip remains of bias1')
+                            logger.info(f'over {COUNT_BIAS1} times failed spec for bias1, so skip remains of bias1')
                             break
-
-        # recover to ET/SAPT mode
-        self.set_apt_mode_force(1, 'TX1', 1)
+                if count_bias0 > 1 and count_bias1 == 1:
+                    count_bias0 -= 1
+                    logger.debug(f'activate the exception for bias0')
+                elif count_bias0 > 1:
+                    continue
+                else:
+                    logger.info(f'over {COUNT_BIAS0} times failed spec for bias0, so skip remains of bias0')
+                    break
+            if count_vcc > 1 and count_bias0 == 1:
+                count_vcc -= 1
+                logger.debug(f'activate the exception for vcc')
+            elif count_vcc > 1:
+                continue
+            else:
+                logger.info(f'over {COUNT_VCC} times failed spec for vcc, so skip remains of vcc')
+                break
 
     def run(self):
         for tech in ext_pmt.tech:
