@@ -1317,6 +1317,8 @@ class AtCmd:
         logger.info(f'========== Force to set {pa_mode_dict[mode]} mode ==========')
         self.set_google_nv(nv, 0, str(mode).zfill(2))
 
+    def set_apt_trymode_5(self):
+        self.command('AT+NTXAPTTUNESET=5')
 
     def set_apt_trymode(self):
         # self.command('AT+NTXAPTTUNESET=5')
@@ -1327,6 +1329,20 @@ class AtCmd:
 
     def set_apt_bias_trymode(self, tx_path, icq1, icq2):
         self.command(f'AT+NTXPABIASSET={self.tx_path_dict[tx_path]},2,{icq1},{icq2}')
+
+    def set_pa_range_mode(self, mode='H'):
+        """
+        HPM
+        AT+NTXPARANGEMAPSET=0,-1,-3,-5,-7
+        LPM
+        AT+NTXPARANGEMAPSET=0,25,23,21,19
+        """
+        pa_range = None
+        if mode == 'H':
+            pa_range = '0,-1,-3,-5,-7'
+        elif mode == 'L':
+            pa_range = '0,25,23,21,19'
+        self.command(f'AT+NTXPARANGEMAPSET={pa_range}')
 
 if __name__ == '__main__':
     # import csv

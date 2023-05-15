@@ -19,17 +19,17 @@ VCC_STOP = 60
 VCC_STEP = 10
 BIAS0_START = 255
 BIAS0_STOP = 32
-BIAS0_STEP = 16
+BIAS0_STEP = 4
 BIAS1_START = 255
 BIAS1_STOP = 32
-BIAS1_STEP = 16
+BIAS1_STEP = 4
 ACLR_LIMIT_USL = -37
-ACLR_MARGIN = 3
-EVM_LIMIT_USL = 2.5
-EVM_LIMIT_ABS = 3
-COUNT_BIAS1 = 4
-COUNT_BIAS0 = 6
-COUNT_VCC = 8
+ACLR_MARGIN = 15
+EVM_LIMIT_USL = 2.0
+EVM_LIMIT_ABS = 2.5
+COUNT_BIAS1 = 16
+COUNT_BIAS0 = 8
+COUNT_VCC = 4
 
 
 class AptSweep(TxTestLevelSweep):
@@ -130,8 +130,8 @@ class AptSweep(TxTestLevelSweep):
                         for tx_freq_select in tx_freq_select_list:
                             self.tx_freq_fr1 = tx_freq_select
                             self.loss_tx = get_loss(self.tx_freq_fr1)
-                            self.tx_set_fr1()
-                            self.tx_power_relative_test_initial_fr1()
+                            # self.tx_set_fr1()
+                            # self.tx_power_relative_test_initial_fr1()
 
                             #  following is real change tx level progress
                             self.tx_apt_sweep_subprocess_fr1()
@@ -153,8 +153,15 @@ class AptSweep(TxTestLevelSweep):
             for tx_level in range(tx_range_list[0], tx_range_list[1] + step, step):
                 self.tx_level = tx_level
                 logger.info(f'========Now Tx level = {self.tx_level} dBm========')
-                self.set_apt_trymode()
-                self.set_level_fr1(self.tx_level)
+                # self.set_level_fr1(self.tx_level)
+                self.tx_set_fr1()
+                self.set_apt_trymode_5()
+
+                self.set_pa_range_mode('H')
+                self.set_apt_trymode_5()
+
+
+                # self.aclr_mod_current_results = self.tx_measure_fr1()
 
                 # start to sweep vcc, bias0, bias1
                 self.tx_apt_sweep_search(vcc_start, bias0_start, bias1_start)
@@ -189,10 +196,31 @@ class AptSweep(TxTestLevelSweep):
         count_vcc = COUNT_VCC
         for vcc in range(vcc_start, VCC_STOP, -VCC_STEP):
             logger.info(f'Now VCC is {vcc} to run')
-            count_bias0 = COUNT_BIAS0
+            # speed up sweep time for bias0
+            if self.tx_level >= 18:
+                count_bias0 = COUNT_BIAS0
+            elif 18 > self.tx_level > 12:
+                count_bias0 = 6
+            elif 12 > self.tx_level > 7:
+                count_bias0 = 4
+            else:
+                count_bias0 = 2
+
             for bias0 in range(bias0_start, BIAS0_STOP, -BIAS0_STEP):
-                count_bias1 = COUNT_BIAS1
+                # speed up sweep time for bias1
+                if self.tx_level >= 18:
+                    count_bias1 = COUNT_BIAS1
+                elif 18 > self.tx_level >= 12:
+                    count_bias1 = 8
+                elif 12 > self.tx_level > 7:
+                    count_bias1 = 4
+                else:
+                    count_bias1 = 2
+
                 for bias1 in range(bias1_start, BIAS1_STOP, -BIAS1_STEP):
+
+                    self.set_level_fr1(self.tx_level)
+                    self.set_apt_trymode()
 
                     self.set_apt_vcc_trymode('TX1', vcc)
                     self.set_apt_bias_trymode('TX1', bias0, bias1)
@@ -284,8 +312,8 @@ def main():
     start = datetime.datetime.now()
 
     apt_sweep = AptSweep()
-    apt_sweep.tx_apt_sweep_pipeline_fr1()
-
+    # apt_sweep.tx_apt_sweep_pipeline_fr1()
+    apt_sweep.set_apt_internal_calibration_fr1('TX1', 1950000)
     stop = datetime.datetime.now()
 
     logger.info(f'Timer: {stop - start}')
