@@ -19,23 +19,27 @@ VCC_STOP = 60
 VCC_STEP = 10
 BIAS0_START = 255
 BIAS0_STOP = 32
-BIAS0_STEP = 4
+BIAS0_STEP = 3
 BIAS1_START = 255
 BIAS1_STOP = 32
 BIAS1_STEP = 4
 ACLR_LIMIT_USL = -37
 ACLR_MARGIN = 15
-EVM_LIMIT_USL = 2.0
+EVM_LIMIT_USL = 3.0
 EVM_LIMIT_ABS = 2.5
-COUNT_BIAS1 = 16
-COUNT_BIAS0 = 8
+COUNT_BIAS1 = 4
+COUNT_BIAS0 = 4
 COUNT_VCC = 4
 
 
 class AptSweep(TxTestLevelSweep):
     def __init__(self):
         super().__init__()
+        self.vcc_new = None
+        self.bias0_new = None
+        self.bias1_new = None
         self.candidate = None
+
 
     def tx_apt_sweep_pipeline_fr1(self):
         self.rx_level = ext_pmt.init_rx_sync_level
@@ -157,7 +161,7 @@ class AptSweep(TxTestLevelSweep):
                 self.tx_set_fr1()
                 self.set_apt_trymode_5()
 
-                self.set_pa_range_mode('H')
+                self.set_pa_range_mode('L')
                 self.set_apt_trymode_5()
 
 
@@ -165,13 +169,9 @@ class AptSweep(TxTestLevelSweep):
 
                 # start to sweep vcc, bias0, bias1
                 self.tx_apt_sweep_search(vcc_start, bias0_start, bias1_start)
+                vcc_start = self.vcc_new
 
-                # this will use previous vcc,bias0, bias1 to start sweep
-                vcc_start = self.candidate[self.tx_level][-3]
-                bias0_start = self.candidate[self.tx_level][-2]
-                bias1_start = self.candidate[self.tx_level][-1]
-                logger.info(f'Adopt the best current consumption as {vcc_start}, {bias0_start}, {bias1_start} '
-                            f'as next tx level start parameter')
+
 
         elif self.tx_path in ['MIMO']:
             logger.info("MIMO doesn't need this function")
@@ -193,112 +193,123 @@ class AptSweep(TxTestLevelSweep):
             #         bias1_start = self.candidate[-1]
 
     def tx_apt_sweep_search(self, vcc_start, bias0_start, bias1_start):
+        self.vcc_new = vcc_start
+        self.bias0_new = bias0_start
+        self.bias1_new = bias1_start
+
+        for bias0 in range(bias0_start, BIAS0_STOP, -BIAS0_STEP):
+            logger.info(f'Now Bias0 is {bias0} to run')
+            self.set_level_fr1(self.tx_level)
+            self.set_apt_trymode()
+
+            self.set_apt_vcc_trymode('TX1', self.vcc_new)
+            self.set_apt_bias_trymode('TX1', bias0, bias1_start)
+
+            self.aclr_mod_current_results = self.tx_measure_fr1()
+            self.aclr_mod_current_results.append(self.measure_current(self.band_fr1))
+            self.aclr_mod_current_results.append(self.vcc_new)
+            self.aclr_mod_current_results.append(bias0)
+            self.aclr_mod_current_results.append(self.bias1_new)
+
+            logger.debug(f'Get the apt result{self.aclr_mod_current_results}, {self.vcc_new}, {bias0}, {self.bias1_new}')
+            self.vcc_new, self.bias0_new, self.bias1_new = self.filter_data()
+
+        for bias1 in range(bias1_start, BIAS1_STOP, -BIAS1_STEP):
+
+            self.set_level_fr1(self.tx_level)
+            self.set_apt_trymode()
+
+            self.set_apt_vcc_trymode('TX1', self.vcc_new)
+            self.set_apt_bias_trymode('TX1', self.bias0_new, bias1)
+
+            self.aclr_mod_current_results = self.tx_measure_fr1()
+            self.aclr_mod_current_results.append(self.measure_current(self.band_fr1))
+            self.aclr_mod_current_results.append(self.vcc_new)
+            self.aclr_mod_current_results.append(self.bias0_new)
+            self.aclr_mod_current_results.append(bias1)
+
+            logger.debug(f'Get the apt result{self.aclr_mod_current_results}, {self.vcc_new}, {self.bias0_new}, {bias1}')
+            self.vcc_new, self.bias0_new, self.bias1_new = self.filter_data()
+
         count_vcc = COUNT_VCC
-        for vcc in range(vcc_start, VCC_STOP, -VCC_STEP):
+        for vcc in range(self.vcc_new, VCC_STOP, -VCC_STEP):
             logger.info(f'Now VCC is {vcc} to run')
-            # speed up sweep time for bias0
-            if self.tx_level >= 18:
-                count_bias0 = COUNT_BIAS0
-            elif 18 > self.tx_level > 12:
-                count_bias0 = 6
-            elif 12 > self.tx_level > 7:
-                count_bias0 = 4
-            else:
-                count_bias0 = 2
+            self.set_level_fr1(self.tx_level)
+            self.set_apt_trymode()
 
-            for bias0 in range(bias0_start, BIAS0_STOP, -BIAS0_STEP):
-                # speed up sweep time for bias1
-                if self.tx_level >= 18:
-                    count_bias1 = COUNT_BIAS1
-                elif 18 > self.tx_level >= 12:
-                    count_bias1 = 8
-                elif 12 > self.tx_level > 7:
-                    count_bias1 = 4
-                else:
-                    count_bias1 = 2
+            self.set_apt_vcc_trymode('TX1', vcc)
+            self.set_apt_bias_trymode('TX1', self.bias0_new, self.bias1_new)
 
-                for bias1 in range(bias1_start, BIAS1_STOP, -BIAS1_STEP):
+            self.aclr_mod_current_results = self.tx_measure_fr1()
+            self.aclr_mod_current_results.append(self.measure_current(self.band_fr1))
+            self.aclr_mod_current_results.append(vcc)
+            self.aclr_mod_current_results.append(self.bias0_new)
+            self.aclr_mod_current_results.append(self.bias1_new)
 
-                    self.set_level_fr1(self.tx_level)
-                    self.set_apt_trymode()
+            logger.debug(f'Get the apt result{self.aclr_mod_current_results}, {vcc}, {self.bias0_new}, {self.bias1_new}')
+            self.vcc_new, self.bias0_new, self.bias1_new = self.filter_data()
+            count_vcc -= 1
 
-                    self.set_apt_vcc_trymode('TX1', vcc)
-                    self.set_apt_bias_trymode('TX1', bias0, bias1)
-
-                    self.aclr_mod_current_results = self.tx_measure_fr1()
-                    self.aclr_mod_current_results.append(self.measure_current(self.band_fr1))
-                    self.aclr_mod_current_results.append(vcc)
-                    self.aclr_mod_current_results.append(bias0)
-                    self.aclr_mod_current_results.append(bias1)
-
-                    logger.debug(f'Get the apt result{self.aclr_mod_current_results}, {vcc}, {bias0}, {bias1}')
-
-                    aclr_m = self.aclr_mod_current_results[2]
-                    aclr_p = self.aclr_mod_current_results[4]
-                    evm = self.aclr_mod_current_results[7]
-
-                    if ((ACLR_LIMIT_USL - ACLR_MARGIN) < aclr_m < ACLR_LIMIT_USL) and (
-                            (ACLR_LIMIT_USL - ACLR_MARGIN) < aclr_p < ACLR_LIMIT_USL) and (evm < EVM_LIMIT_USL):
-
-                        self.data[self.tx_level] = self.aclr_mod_current_results
-
-                        # check the current if it is the smallest
-                        try:
-                            if not self.candidate:
-                                self.candidate[self.tx_level] = self.aclr_mod_current_results
-
-                            elif self.candidate[self.tx_level][-4] >= self.aclr_mod_current_results[-4]:
-                                self.candidate[self.tx_level] = self.aclr_mod_current_results
-                            else:
-                                pass
-                        except KeyError:
-                            # this is for forward tx_level to continue
-                            self.candidate[self.tx_level] = self.aclr_mod_current_results
-
-                        if self.tx_path in ['TX1', 'TX2']:  # this is for TX1, TX2, not MIMO
-                            self.parameters = {
-                                'script': self.script,
-                                'tech': self.tech,
-                                'band': self.band_fr1,
-                                'bw': self.bw_fr1,
-                                'tx_freq_level': self.tx_freq_fr1,
-                                'mcs': self.mcs_fr1,
-                                'tx_path': self.tx_path,
-                                'mod': None,
-                                'rb_state': self.rb_state,
-                                'rb_size': self.rb_size_fr1,
-                                'rb_start': self.rb_start_fr1,
-                                'sync_path': self.sync_path,
-                                'asw_srs_path': self.asw_srs_path,
-                                'scs': self.scs,
-                                'type': self.type_fr1,
-                                'test_item': 'apt_sweep',
-                            }
-                            self.file_path = tx_power_relative_test_export_excel_ftm(self.data, self.parameters)
-                            self.data = {}
-                    elif aclr_m > ACLR_LIMIT_USL or aclr_p > ACLR_LIMIT_USL or evm > EVM_LIMIT_ABS:
-                        if count_bias1 > 1:
-                            count_bias1 -= 1
-                            logger.debug(f'activate the exception for bias1')
-                        else:
-                            logger.info(f'over {COUNT_BIAS1} times failed spec for bias1, so skip remains of bias1')
-                            break
-                if count_bias0 > 1 and count_bias1 == 1:
-                    count_bias0 -= 1
-                    logger.debug(f'activate the exception for bias0')
-                elif count_bias0 > 1:
-                    continue
-                else:
-                    logger.info(f'over {COUNT_BIAS0} times failed spec for bias0, so skip remains of bias0')
-                    break
-            if count_vcc > 1 and count_bias0 == 1:
-                count_vcc -= 1
-                logger.debug(f'activate the exception for vcc')
-            elif count_vcc > 1:
-                continue
-            else:
-                logger.info(f'over {COUNT_VCC} times failed spec for vcc, so skip remains of vcc')
+            if count_vcc == 1:
                 break
+            else:
+                continue
+
+    def filter_data(self):
+        aclr_m = self.aclr_mod_current_results[2]
+        aclr_p = self.aclr_mod_current_results[4]
+        evm = self.aclr_mod_current_results[7]
+
+        if (aclr_m < ACLR_LIMIT_USL) and (aclr_p < ACLR_LIMIT_USL) and (evm < EVM_LIMIT_USL):
+
+            self.data[self.tx_level] = self.aclr_mod_current_results
+
+            # check the current if it is the smallest
+            try:
+                if not self.candidate:
+                    self.candidate[self.tx_level] = self.aclr_mod_current_results
+
+                elif self.candidate[self.tx_level][-4] >= self.aclr_mod_current_results[-4]:
+                    self.candidate[self.tx_level] = self.aclr_mod_current_results
+                else:
+                    pass
+            except KeyError:
+                # this is for forward tx_level to continue
+                self.candidate[self.tx_level] = self.aclr_mod_current_results
+
+            # this will use previous vcc,bias0, bias1 to start sweep
+            vcc = self.candidate[self.tx_level][-3]
+            bias0 = self.candidate[self.tx_level][-2]
+            bias1 = self.candidate[self.tx_level][-1]
+            logger.info(f'Adopt the best current consumption as {vcc}, {bias0}, {bias1} '
+                        f'as next tx level start parameter')
+
+            if self.tx_path in ['TX1', 'TX2']:  # this is for TX1, TX2, not MIMO
+                self.parameters = {
+                    'script': self.script,
+                    'tech': self.tech,
+                    'band': self.band_fr1,
+                    'bw': self.bw_fr1,
+                    'tx_freq_level': self.tx_freq_fr1,
+                    'mcs': self.mcs_fr1,
+                    'tx_path': self.tx_path,
+                    'mod': None,
+                    'rb_state': self.rb_state,
+                    'rb_size': self.rb_size_fr1,
+                    'rb_start': self.rb_start_fr1,
+                    'sync_path': self.sync_path,
+                    'asw_srs_path': self.asw_srs_path,
+                    'scs': self.scs,
+                    'type': self.type_fr1,
+                    'test_item': 'apt_sweep',
+                }
+                self.file_path = tx_power_relative_test_export_excel_ftm(self.data, self.parameters)
+                self.data = {}
+
+                return vcc, bias0, bias1
+
+        else:
+            return self.vcc_new, self.bias0_new, self.bias1_new
 
     def run(self):
         for tech in ext_pmt.tech:
