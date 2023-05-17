@@ -14,7 +14,7 @@ import datetime
 
 logger = log_set('apt_sweep')
 # TX_LEVEL_LIST = [24, 23]
-VCC_START = 500
+VCC_START = 350
 VCC_STOP = 60
 VCC_STEP = 10
 BIAS0_START = 255
@@ -197,23 +197,6 @@ class AptSweep(TxTestLevelSweep):
         self.bias0_new = bias0_start
         self.bias1_new = bias1_start
 
-        for bias0 in range(bias0_start, BIAS0_STOP, -BIAS0_STEP):
-            logger.info(f'Now Bias0 is {bias0} to run')
-            self.set_level_fr1(self.tx_level)
-            self.set_apt_trymode()
-
-            self.set_apt_vcc_trymode('TX1', self.vcc_new)
-            self.set_apt_bias_trymode('TX1', bias0, bias1_start)
-
-            self.aclr_mod_current_results = self.tx_measure_fr1()
-            self.aclr_mod_current_results.append(self.measure_current(self.band_fr1))
-            self.aclr_mod_current_results.append(self.vcc_new)
-            self.aclr_mod_current_results.append(bias0)
-            self.aclr_mod_current_results.append(self.bias1_new)
-
-            logger.debug(f'Get the apt result{self.aclr_mod_current_results}, {self.vcc_new}, {bias0}, {self.bias1_new}')
-            self.vcc_new, self.bias0_new, self.bias1_new = self.filter_data()
-
         for bias1 in range(bias1_start, BIAS1_STOP, -BIAS1_STEP):
 
             self.set_level_fr1(self.tx_level)
@@ -229,6 +212,23 @@ class AptSweep(TxTestLevelSweep):
             self.aclr_mod_current_results.append(bias1)
 
             logger.debug(f'Get the apt result{self.aclr_mod_current_results}, {self.vcc_new}, {self.bias0_new}, {bias1}')
+            self.vcc_new, self.bias0_new, self.bias1_new = self.filter_data()
+
+        for bias0 in range(bias0_start, BIAS0_STOP, -BIAS0_STEP):
+            logger.info(f'Now Bias0 is {bias0} to run')
+            self.set_level_fr1(self.tx_level)
+            self.set_apt_trymode()
+
+            self.set_apt_vcc_trymode('TX1', self.vcc_new)
+            self.set_apt_bias_trymode('TX1', bias0, self.bias1_new)
+
+            self.aclr_mod_current_results = self.tx_measure_fr1()
+            self.aclr_mod_current_results.append(self.measure_current(self.band_fr1))
+            self.aclr_mod_current_results.append(self.vcc_new)
+            self.aclr_mod_current_results.append(bias0)
+            self.aclr_mod_current_results.append(self.bias1_new)
+
+            logger.debug(f'Get the apt result{self.aclr_mod_current_results}, {self.vcc_new}, {bias0}, {self.bias1_new}')
             self.vcc_new, self.bias0_new, self.bias1_new = self.filter_data()
 
         count_vcc = COUNT_VCC
@@ -250,7 +250,7 @@ class AptSweep(TxTestLevelSweep):
             self.vcc_new, self.bias0_new, self.bias1_new = self.filter_data()
             count_vcc -= 1
 
-            if count_vcc == 1:
+            if count_vcc == 0:
                 break
             else:
                 continue
