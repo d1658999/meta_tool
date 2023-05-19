@@ -20,7 +20,7 @@ from equipments.temp_chamber import TempChamber
 logger = log_set('GUI')
 
 PROJECT_PATH = pathlib.Path(__file__).parent
-PROJECT_UI = PROJECT_PATH / pathlib.Path('gui') / "main_v2_18_1.ui"
+PROJECT_UI = PROJECT_PATH / pathlib.Path('gui') / "main_v2_18_2.ui"
 
 
 class MainApp:
@@ -269,6 +269,31 @@ class MainApp:
         self.B13_N5 = None
         self.rx_freq_sweep = None
         self.apt_sweep = None
+        self.apt_sweep_v2 = None
+        self.apt_level_start_hpm = None
+        self.apt_level_stop_hpm = None
+        self.apt_level_step_hpm = None
+        self.bias0_start_hpm = None
+        self.bias0_stop_hpm = None
+        self.bias0_step_hpm = None
+        self.bias1_start_hpm = None
+        self.bias1_stop_hpm = None
+        self.bias1_step_hpm = None
+        self.vcc_start_hpm = None
+        self.vcc_stop_hpm = None
+        self.vcc_step_hpm = None
+        self.apt_level_start_lpm = None
+        self.apt_level_stop_lpm = None
+        self.apt_level_step_lpm = None
+        self.bias0_start_lpm = None
+        self.bias0_stop_lpm = None
+        self.bias0_step_lpm = None
+        self.bias1_start_lpm = None
+        self.bias1_stop_lpm = None
+        self.bias1_step_lpm = None
+        self.vcc_start_lpm = None
+        self.vcc_stop_lpm = None
+        self.vcc_step_lpm = None
         self.U1 = None
         self.U2 = None
         self.HSUPA_all = None
@@ -592,6 +617,31 @@ class MainApp:
                 "B13_N5",
                 "rx_freq_sweep",
                 "apt_sweep",
+                "apt_sweep_v2",
+                "apt_level_start_hpm",
+                "apt_level_stop_hpm",
+                "apt_level_step_hpm",
+                "bias0_start_hpm",
+                "bias0_stop_hpm",
+                "bias0_step_hpm",
+                "bias1_start_hpm",
+                "bias1_stop_hpm",
+                "bias1_step_hpm",
+                "vcc_start_hpm",
+                "vcc_stop_hpm",
+                "vcc_step_hpm",
+                "apt_level_start_lpm",
+                "apt_level_stop_lpm",
+                "apt_level_step_lpm",
+                "bias0_start_lpm",
+                "bias0_stop_lpm",
+                "bias0_step_lpm",
+                "bias1_start_lpm",
+                "bias1_stop_lpm",
+                "bias1_step_lpm",
+                "vcc_start_lpm",
+                "vcc_stop_lpm",
+                "vcc_step_lpm",
                 "U1",
                 "U2",
                 "HSUPA_all",
