@@ -18825,7 +18825,7 @@ Disable</property>
                       </object>
                     </child>
                     <child>
-                      <object class="ttk.Button" id="button5">
+                      <object class="ttk.Button" id="button_run_apt">
                         <property name="command" type="command" cbtype="simple">t_measure</property>
                         <property name="text" translatable="yes">Run</property>
                         <layout manager="grid">
