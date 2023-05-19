@@ -18877,7 +18877,7 @@ Disable</property>
                     <property name="width">200</property>
                     <layout manager="grid">
                       <property name="column">1</property>
-                      <property name="columnspan">3</property>
+                      <property name="columnspan">2</property>
                       <property name="row">0</property>
                       <property name="sticky">nsew</property>
                     </layout>
@@ -18889,7 +18889,7 @@ Disable</property>
                         <property name="variable">int:port_tx</property>
                         <layout manager="grid">
                           <property name="column">0</property>
-                          <property name="ipadx">90</property>
+                          <property name="ipadx">60</property>
                           <property name="row">0</property>
                         </layout>
                       </object>
@@ -18909,9 +18909,7 @@ Disable</property>
                 </child>
                 <child>
                   <object class="ttk.Labelframe" id="labelframe133">
-                    <property name="height">200</property>
                     <property name="text" translatable="yes">Sync/AS/SRS Path</property>
-                    <property name="width">200</property>
                     <layout manager="grid">
                       <property name="column">1</property>
                       <property name="row">1</property>
@@ -19018,7 +19016,6 @@ Disable</property>
                     <property name="width">200</property>
                     <layout manager="grid">
                       <property name="column">2</property>
-                      <property name="columnspan">2</property>
                       <property name="row">1</property>
                       <property name="sticky">nsew</property>
                     </layout>
@@ -19171,25 +19168,11 @@ Disable</property>
                       <property name="sticky">nsew</property>
                     </layout>
                     <child>
-                      <object class="ttk.Frame" id="frame46">
-                        <property name="height">200</property>
-                        <property name="width">200</property>
-                        <layout manager="grid">
-                          <property name="column">0</property>
-                          <property name="pady">10</property>
-                          <property name="row">1</property>
-                          <property name="sticky">nsew</property>
-                        </layout>
-                      </object>
-                    </child>
-                    <child>
                       <object class="ttk.Frame" id="frame47">
-                        <property name="height">200</property>
-                        <property name="width">200</property>
                         <layout manager="grid">
                           <property name="column">0</property>
                           <property name="row">0</property>
-                          <property name="sticky">nsew</property>
+                          <property name="sticky">w</property>
                         </layout>
                         <child>
                           <object class="ttk.Checkbutton" id="checkbutton671">
@@ -19292,7 +19275,7 @@ Disable</property>
                     <property name="text" translatable="yes">BW(FR1)</property>
                     <property name="width">200</property>
                     <layout manager="grid">
-                      <property name="column">5</property>
+                      <property name="column">4</property>
                       <property name="row">2</property>
                       <property name="rowspan">2</property>
                       <property name="sticky">nsew</property>
@@ -19487,7 +19470,7 @@ Disable</property>
                     <property name="text" translatable="yes">MCS(FR1)</property>
                     <property name="width">200</property>
                     <layout manager="grid">
-                      <property name="column">6</property>
+                      <property name="column">5</property>
                       <property name="row">2</property>
                       <property name="rowspan">2</property>
                       <property name="sticky">nsew</property>
@@ -19631,7 +19614,7 @@ Disable</property>
                     <property name="text" translatable="yes">RB_SET(FR1)</property>
                     <property name="width">200</property>
                     <layout manager="grid">
-                      <property name="column">7</property>
+                      <property name="column">6</property>
                       <property name="row">2</property>
                       <property name="rowspan">2</property>
                       <property name="sticky">nsew</property>
@@ -19756,7 +19739,7 @@ Disable</property>
                     <property name="text" translatable="yes">WCDMA</property>
                     <property name="width">200</property>
                     <layout manager="grid">
-                      <property name="column">5</property>
+                      <property name="column">3</property>
                       <property name="row">0</property>
                       <property name="rowspan">2</property>
                       <property name="sticky">nsew</property>
@@ -19895,7 +19878,7 @@ Disable</property>
                     <property name="text" translatable="yes">FR1_LB</property>
                     <property name="width">200</property>
                     <layout manager="grid">
-                      <property name="column">8</property>
+                      <property name="column">7</property>
                       <property name="row">2</property>
                       <property name="rowspan">2</property>
                       <property name="sticky">nsew</property>
@@ -20161,7 +20144,7 @@ Disable</property>
                     <property name="text" translatable="yes">FR1_MHB</property>
                     <property name="width">200</property>
                     <layout manager="grid">
-                      <property name="column">9</property>
+                      <property name="column">8</property>
                       <property name="row">2</property>
                       <property name="rowspan">2</property>
                       <property name="sticky">nsew</property>
@@ -20429,7 +20412,7 @@ Disable</property>
                     <property name="text" translatable="yes">FR1_UHB</property>
                     <property name="width">200</property>
                     <layout manager="grid">
-                      <property name="column">10</property>
+                      <property name="column">9</property>
                       <property name="row">2</property>
                       <property name="rowspan">2</property>
                       <property name="sticky">nsew</property>
@@ -20520,7 +20503,7 @@ Disable</property>
                     <property name="text" translatable="yes">Others</property>
                     <property name="width">200</property>
                     <layout manager="grid">
-                      <property name="column">11</property>
+                      <property name="column">10</property>
                       <property name="row">2</property>
                       <property name="rowspan">2</property>
                       <property name="sticky">nsew</property>
@@ -20559,7 +20542,7 @@ Disable</property>
                     <property name="text" translatable="yes">HPM</property>
                     <property name="width">200</property>
                     <layout manager="grid">
-                      <property name="column">6</property>
+                      <property name="column">4</property>
                       <property name="columnspan">2</property>
                       <property name="row">0</property>
                       <property name="rowspan">2</property>
@@ -20850,7 +20833,7 @@ Disable</property>
                     <property name="text" translatable="yes">LPM</property>
                     <property name="width">200</property>
                     <layout manager="grid">
-                      <property name="column">8</property>
+                      <property name="column">6</property>
                       <property name="columnspan">2</property>
                       <property name="row">0</property>
                       <property name="rowspan">2</property>
