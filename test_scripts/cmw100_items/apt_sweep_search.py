@@ -1,4 +1,5 @@
 import traceback
+import csv
 from pathlib import Path
 from utils.log_init import log_set
 from test_scripts.cmw100_items.tx_level_sweep import TxTestLevelSweep
@@ -14,7 +15,8 @@ import datetime
 
 logger = log_set('apt_sweep')
 # TX_LEVEL_LIST = [24, 23]
-VCC_START = 350
+VCC_START_HPM = 500
+VCC_START_LPM = 300
 VCC_STOP = 60
 VCC_STEP = 10
 BIAS0_START = 255
@@ -25,21 +27,22 @@ BIAS1_STOP = 32
 BIAS1_STEP = 4
 ACLR_LIMIT_USL = -37
 ACLR_MARGIN = 15
-EVM_LIMIT_USL = 3.0
+EVM_LIMIT_USL = 2.5
 EVM_LIMIT_ABS = 2.5
 COUNT_BIAS1 = 4
 COUNT_BIAS0 = 4
-COUNT_VCC = 4
+COUNT_VCC = 5
+ALGR_MODE = 1
 
 
 class AptSweep(TxTestLevelSweep):
     def __init__(self):
         super().__init__()
+        self.pa_range_mode = None
         self.vcc_new = None
         self.bias0_new = None
         self.bias1_new = None
         self.candidate = None
-
 
     def tx_apt_sweep_pipeline_fr1(self):
         self.rx_level = ext_pmt.init_rx_sync_level
@@ -143,35 +146,49 @@ class AptSweep(TxTestLevelSweep):
         self.set_test_end_fr1()
 
     def tx_apt_sweep_subprocess_fr1(self):
-        tx_range_list = ext_pmt.tx_level_range_list  # [tx_level_1, tx_level_2]
 
-        logger.info('----------TX Level Sweep progress---------')
-        logger.info(f'----------from {tx_range_list[0]} dBm to {tx_range_list[1]} dBm----------')
+        # tx_range_list = ext_pmt.tx_level_range_list  # [tx_level_1, tx_level_2]
 
-        step = -1 if tx_range_list[0] > tx_range_list[1] else 1
+        logger.info('----------APT TX Level Sweep progress---------')
+        # logger.info(f'----------from {tx_range_list[0]} dBm to {tx_range_list[1]} dBm----------')
+        #
+        # step = -1 if tx_range_list[0] > tx_range_list[1] else 1
 
-        self.data = {}
-        self.candidate = {}
-        vcc_start, bias0_start, bias1_start = VCC_START, BIAS0_START, BIAS1_START
+        tx_level_start, tx_level_stop = None, None
+        vcc_start, bias0_start, bias1_start = 0, 0, 0
+
         if self.tx_path in ['TX1', 'TX2']:
-            for tx_level in range(tx_range_list[0], tx_range_list[1] + step, step):
-                self.tx_level = tx_level
-                logger.info(f'========Now Tx level = {self.tx_level} dBm========')
-                # self.set_level_fr1(self.tx_level)
-                self.tx_set_fr1()
-                self.set_apt_trymode_5()
+            for pa_range_mode in ['H', 'L']:
+                self.pa_range_mode = pa_range_mode
+                if pa_range_mode == 'H':
+                    self.data = {}
+                    self.candidate = {}
+                    vcc_start, bias0_start, bias1_start = VCC_START_HPM, BIAS0_START, BIAS1_START
+                    tx_level_start = 23
+                    tx_level_stop = 10
 
-                self.set_pa_range_mode('L')
-                self.set_apt_trymode_5()
+                elif pa_range_mode == 'L':
+                    self.data = {}
+                    self.candidate = {}
+                    vcc_start, bias0_start, bias1_start = VCC_START_LPM, BIAS0_START, BIAS1_START
+                    tx_level_start = 17
+                    tx_level_stop = 0
 
+                for tx_level in range(tx_level_start, tx_level_stop - 1, -1):
+                    self.tx_level = tx_level
+                    logger.info(f'========Now Tx level = {self.tx_level} dBm========')
+                    # self.set_level_fr1(self.tx_level)
+                    self.tx_set_fr1()
+                    self.set_apt_trymode(5)
 
-                # self.aclr_mod_current_results = self.tx_measure_fr1()
+                    self.set_pa_range_mode(pa_range_mode)
+                    self.set_apt_trymode(5)
 
-                # start to sweep vcc, bias0, bias1
-                self.tx_apt_sweep_search(vcc_start, bias0_start, bias1_start)
-                vcc_start = self.vcc_new
+                    # start to sweep vcc, bias0, bias1
+                    self.tx_apt_sweep_search(vcc_start, bias0_start, bias1_start, mode=ALGR_MODE)
 
-
+                    # to take over the next level for vcc_start
+                    vcc_start = self.vcc_new
 
         elif self.tx_path in ['MIMO']:
             logger.info("MIMO doesn't need this function")
@@ -192,50 +209,30 @@ class AptSweep(TxTestLevelSweep):
             #         bias0_start = self.candidate[-2]
             #         bias1_start = self.candidate[-1]
 
-    def tx_apt_sweep_search(self, vcc_start, bias0_start, bias1_start):
+    def tx_apt_sweep_search(self, vcc_start, bias0_start, bias1_start, mode=1):
         self.vcc_new = vcc_start
         self.bias0_new = bias0_start
         self.bias1_new = bias1_start
 
-        for bias1 in range(bias1_start, BIAS1_STOP, -BIAS1_STEP):
+        if mode == 1:
+            self.loop_find_bias1(bias1_start)
+            self.loop_find_bias0(bias0_start)
+            self.loop_find_vcc()
 
-            self.set_level_fr1(self.tx_level)
-            self.set_apt_trymode()
+        elif mode == 0:
+            self.loop_find_bias0(bias0_start)
+            self.loop_find_bias1(bias1_start)
+            self.loop_find_vcc()
 
-            self.set_apt_vcc_trymode('TX1', self.vcc_new)
-            self.set_apt_bias_trymode('TX1', self.bias0_new, bias1)
+        # output the lowest current consumption items
+        self.apt_sweep_output_best(self.pa_range_mode, [self.tx_level, self.vcc_new, self.bias0_new, self.bias1_new])
 
-            self.aclr_mod_current_results = self.tx_measure_fr1()
-            self.aclr_mod_current_results.append(self.measure_current(self.band_fr1))
-            self.aclr_mod_current_results.append(self.vcc_new)
-            self.aclr_mod_current_results.append(self.bias0_new)
-            self.aclr_mod_current_results.append(bias1)
-
-            logger.debug(f'Get the apt result{self.aclr_mod_current_results}, {self.vcc_new}, {self.bias0_new}, {bias1}')
-            self.vcc_new, self.bias0_new, self.bias1_new = self.filter_data()
-
-        for bias0 in range(bias0_start, BIAS0_STOP, -BIAS0_STEP):
-            logger.info(f'Now Bias0 is {bias0} to run')
-            self.set_level_fr1(self.tx_level)
-            self.set_apt_trymode()
-
-            self.set_apt_vcc_trymode('TX1', self.vcc_new)
-            self.set_apt_bias_trymode('TX1', bias0, self.bias1_new)
-
-            self.aclr_mod_current_results = self.tx_measure_fr1()
-            self.aclr_mod_current_results.append(self.measure_current(self.band_fr1))
-            self.aclr_mod_current_results.append(self.vcc_new)
-            self.aclr_mod_current_results.append(bias0)
-            self.aclr_mod_current_results.append(self.bias1_new)
-
-            logger.debug(f'Get the apt result{self.aclr_mod_current_results}, {self.vcc_new}, {bias0}, {self.bias1_new}')
-            self.vcc_new, self.bias0_new, self.bias1_new = self.filter_data()
-
+    def loop_find_vcc(self):
         count_vcc = COUNT_VCC
         for vcc in range(self.vcc_new, VCC_STOP, -VCC_STEP):
             logger.info(f'Now VCC is {vcc} to run')
             self.set_level_fr1(self.tx_level)
-            self.set_apt_trymode()
+            self.set_apt_trymode(1)
 
             self.set_apt_vcc_trymode('TX1', vcc)
             self.set_apt_bias_trymode('TX1', self.bias0_new, self.bias1_new)
@@ -246,7 +243,8 @@ class AptSweep(TxTestLevelSweep):
             self.aclr_mod_current_results.append(self.bias0_new)
             self.aclr_mod_current_results.append(self.bias1_new)
 
-            logger.debug(f'Get the apt result{self.aclr_mod_current_results}, {vcc}, {self.bias0_new}, {self.bias1_new}')
+            logger.debug(
+                f'Get the apt result{self.aclr_mod_current_results}, {vcc}, {self.bias0_new}, {self.bias1_new}')
             self.vcc_new, self.bias0_new, self.bias1_new = self.filter_data()
             count_vcc -= 1
 
@@ -254,6 +252,43 @@ class AptSweep(TxTestLevelSweep):
                 break
             else:
                 continue
+
+    def loop_find_bias0(self, bias0_start):
+        for bias0 in range(bias0_start, BIAS0_STOP, -BIAS0_STEP):
+            logger.info(f'Now Bias0 is {bias0} to run')
+            self.set_level_fr1(self.tx_level)
+            self.set_apt_trymode(1)
+
+            self.set_apt_vcc_trymode('TX1', self.vcc_new)
+            self.set_apt_bias_trymode('TX1', bias0, self.bias1_new)
+
+            self.aclr_mod_current_results = self.tx_measure_fr1()
+            self.aclr_mod_current_results.append(self.measure_current(self.band_fr1))
+            self.aclr_mod_current_results.append(self.vcc_new)
+            self.aclr_mod_current_results.append(bias0)
+            self.aclr_mod_current_results.append(self.bias1_new)
+
+            logger.debug(
+                f'Get the apt result{self.aclr_mod_current_results}, {self.vcc_new}, {bias0}, {self.bias1_new}')
+            self.vcc_new, self.bias0_new, self.bias1_new = self.filter_data()
+
+    def loop_find_bias1(self, bias1_start):
+        for bias1 in range(bias1_start, BIAS1_STOP, -BIAS1_STEP):
+            self.set_level_fr1(self.tx_level)
+            self.set_apt_trymode(1)
+
+            self.set_apt_vcc_trymode('TX1', self.vcc_new)
+            self.set_apt_bias_trymode('TX1', self.bias0_new, bias1)
+
+            self.aclr_mod_current_results = self.tx_measure_fr1()
+            self.aclr_mod_current_results.append(self.measure_current(self.band_fr1))
+            self.aclr_mod_current_results.append(self.vcc_new)
+            self.aclr_mod_current_results.append(self.bias0_new)
+            self.aclr_mod_current_results.append(bias1)
+
+            logger.debug(
+                f'Get the apt result{self.aclr_mod_current_results}, {self.vcc_new}, {self.bias0_new}, {bias1}')
+            self.vcc_new, self.bias0_new, self.bias1_new = self.filter_data()
 
     def filter_data(self):
         aclr_m = self.aclr_mod_current_results[2]
@@ -276,12 +311,13 @@ class AptSweep(TxTestLevelSweep):
             except KeyError:
                 # this is for forward tx_level to continue
                 self.candidate[self.tx_level] = self.aclr_mod_current_results
+                logger.debug(f'If it does not have best, use this time result, {self.candidate}')
 
             # this will use previous vcc,bias0, bias1 to start sweep
             vcc = self.candidate[self.tx_level][-3]
             bias0 = self.candidate[self.tx_level][-2]
             bias1 = self.candidate[self.tx_level][-1]
-            logger.info(f'Adopt the best current consumption as {vcc}, {bias0}, {bias1} '
+            logger.info(f'Adopt level {self.tx_level} the best current consumption as {vcc}, {bias0}, {bias1} '
                         f'as next tx level start parameter')
 
             if self.tx_path in ['TX1', 'TX2']:  # this is for TX1, TX2, not MIMO
@@ -310,6 +346,36 @@ class AptSweep(TxTestLevelSweep):
 
         else:
             return self.vcc_new, self.bias0_new, self.bias1_new
+
+    @staticmethod
+    def apt_sweep_output_best(pa_range_mode, data):
+        file_name = None
+        if pa_range_mode == 'H':
+            file_name = f'Apt_sweep_choose_HPM.csv'
+        elif pa_range_mode == 'L':
+            file_name = f'Apt_sweep_choose_LPM.csv'
+
+        file_path = Path(excel_folder_path()) / Path(file_name)
+
+        # check if there is the file exist, if not, then create and write header
+        if Path(file_path).exists():
+            pass
+        else:
+            header_apt_sweep = [
+                'Tx_level',
+                'VCC',
+                'BIAS0',
+                'BIAS1',
+            ]
+            with open(file_path, 'w', newline='') as csvfile:
+                # Write the header row
+                writer = csv.writer(csvfile)
+                writer.writerow(header_apt_sweep)
+
+        # write vcc, bias0, bias1 to csv file
+        with open(file_path, 'a', newline='') as csvfile:
+            writer = csv.writer(csvfile)
+            writer.writerow(data)
 
     def run(self):
         for tech in ext_pmt.tech:

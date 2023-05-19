@@ -1317,12 +1317,8 @@ class AtCmd:
         logger.info(f'========== Force to set {pa_mode_dict[mode]} mode ==========')
         self.set_google_nv(nv, 0, str(mode).zfill(2))
 
-    def set_apt_trymode_5(self):
-        self.command('AT+NTXAPTTUNESET=5')
-
-    def set_apt_trymode(self):
-        # self.command('AT+NTXAPTTUNESET=5')
-        self.command('AT+NTXAPTTUNESET=1')
+    def set_apt_trymode(self, trymode):
+        self.command(f'AT+NTXAPTTUNESET={trymode}')
 
     def set_apt_vcc_trymode(self, tx_path, vcc10):
         self.command(f'AT+NAPTVOLSET={self.tx_path_dict[tx_path]},1,{vcc10}')

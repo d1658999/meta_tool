@@ -367,21 +367,21 @@ def tx_ulca_power_relative_test_export_excel_ftm(tech, data, sub_info):
         max_row = ws.max_row
         row = max_row + 1
 
-        ws.cell(row, 1).value = data[0]   # band
-        ws.cell(row, 2).value = data[1]   # chan_lmh
+        ws.cell(row, 1).value = data[0]  # band
+        ws.cell(row, 2).value = data[1]  # chan_lmh
         ws.cell(row, 3).value = ext_pmt.tx_level  # Tx_level
-        ws.cell(row, 4).value = data[2]   # cc1_bw
-        ws.cell(row, 5).value = data[3]   # cc2_bw
-        ws.cell(row, 6).value = data[4]   # cc1_channel
-        ws.cell(row, 7).value = data[5]   # cc2_channel
-        ws.cell(row, 8).value = data[6] / 1000000   # OBW
-        ws.cell(row, 9).value = data[7]   # sem power
-        ws.cell(row, 10).value = data[11]   # carrier power
-        ws.cell(row, 11).value = data[10]   # E_-1
-        ws.cell(row, 12).value = data[12]   # E_+1
-        ws.cell(row, 13).value = data[9]    # U_-1
-        ws.cell(row, 14).value = data[13]   # U_+1
-        ws.cell(row, 15).value = data[8]    # U_-2
+        ws.cell(row, 4).value = data[2]  # cc1_bw
+        ws.cell(row, 5).value = data[3]  # cc2_bw
+        ws.cell(row, 6).value = data[4]  # cc1_channel
+        ws.cell(row, 7).value = data[5]  # cc2_channel
+        ws.cell(row, 8).value = data[6] / 1000000  # OBW
+        ws.cell(row, 9).value = data[7]  # sem power
+        ws.cell(row, 10).value = data[11]  # carrier power
+        ws.cell(row, 11).value = data[10]  # E_-1
+        ws.cell(row, 12).value = data[12]  # E_+1
+        ws.cell(row, 13).value = data[9]  # U_-1
+        ws.cell(row, 14).value = data[13]  # U_+1
+        ws.cell(row, 15).value = data[8]  # U_-2
         ws.cell(row, 16).value = data[14]  # U_+2
         ws.cell(row, 17).value = data[18]  # cc1_pwr
         ws.cell(row, 18).value = data[15]  # cc1_evm
@@ -397,14 +397,14 @@ def tx_ulca_power_relative_test_export_excel_ftm(tech, data, sub_info):
         ws.cell(row, 28).value = data[26]  # cc2_iq
         ws.cell(row, 29).value = data[27]  # mcs
         ws.cell(row, 30).value = data[28]  # tx_path
-        ws.cell(row, 31).value = sub_info['cc1_alloc']   # cc1_rb_state
-        ws.cell(row, 32).value = sub_info['cc2_alloc']   # cc2_rb_state
+        ws.cell(row, 31).value = sub_info['cc1_alloc']  # cc1_rb_state
+        ws.cell(row, 32).value = sub_info['cc2_alloc']  # cc2_rb_state
         ws.cell(row, 33).value = data[29]  # Sync_Path
         ws.cell(row, 34).value = data[30]  # AS_Path
-        ws.cell(row, 35).value = None      # Current(mA)
-        ws.cell(row, 36).value = None      # Condition
-        ws.cell(row, 37).value = sub_info['temp0']      # Temp0
-        ws.cell(row, 38).value = sub_info['temp1']      # Temp1
+        ws.cell(row, 35).value = None  # Current(mA)
+        ws.cell(row, 36).value = None  # Condition
+        ws.cell(row, 37).value = sub_info['temp0']  # Temp0
+        ws.cell(row, 38).value = sub_info['temp1']  # Temp1
 
     # elif tech == 'FR1':  # this is not for FR1
     #     max_row = ws.max_row
@@ -532,6 +532,9 @@ def tx_power_relative_test_export_excel_ftm(data, parameters_dict):
                         ws['AA1'] = '2f0' if test_item == 'harmonics' else None
                         ws['AB1'] = '3f0' if test_item == 'harmonics' else None
                         ws['AA1'] = 'Voltage' if test_item in ['lmh', 'level_sweep'] else None
+                        ws['AA1'] = 'Vcc' if test_item in ['apt_sweep'] else None
+                        ws['AB1'] = 'Bias0' if test_item in ['apt_sweep'] else None
+                        ws['AC1'] = 'Bias1' if test_item in ['apt_sweep'] else None
                     else:  # to pass the dashboard
                         pass
 
@@ -709,7 +712,7 @@ def tx_power_relative_test_export_excel_ftm(data, parameters_dict):
                     ws.cell(row, 22).value = asw_srs_path
                     ws.cell(row, 23).value = measured_data[10]
                     ws.cell(row, 24).value = ext_pmt.condition
-                    ws.cell(row, 27).value = measured_data[11] if ext_pmt.volt_mipi_en else None # volt_mipi
+                    ws.cell(row, 27).value = measured_data[11] if ext_pmt.volt_mipi_en else None  # volt_mipi
                     row += 1
 
             elif tx_freq_level <= 100:  # 1rb_sweep, lmh, freq_sweep, cbe
@@ -780,9 +783,12 @@ def tx_power_relative_test_export_excel_ftm(data, parameters_dict):
                     ws.cell(row, 25).value = measured_data[10]
                     ws.cell(row, 26).value = ext_pmt.condition
                     ws.cell(row, 29).value = measured_data[11] if ext_pmt.volt_mipi_en else None  # volt_mipi
-                    ws.cell(row, 30).value = measured_data[11] if parameters_dict['test_item'] == 'apt_sweep' else None # vcc
-                    ws.cell(row, 31).value = measured_data[12] if parameters_dict['test_item'] == 'apt_sweep' else None # bias0
-                    ws.cell(row, 32).value = measured_data[13] if parameters_dict['test_item'] == 'apt_sweep' else None # bias1
+                    ws.cell(row, 29).value = measured_data[11] if parameters_dict[
+                                                                      'test_item'] == 'apt_sweep' else None  # vcc
+                    ws.cell(row, 30).value = measured_data[12] if parameters_dict[
+                                                                      'test_item'] == 'apt_sweep' else None  # bias0
+                    ws.cell(row, 31).value = measured_data[13] if parameters_dict[
+                                                                      'test_item'] == 'apt_sweep' else None  # bias1
                     row += 1
 
             elif tx_freq_level <= 100:  # 1rb_sweep, lmh, freq_sweep, cbe
