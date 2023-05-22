@@ -473,7 +473,7 @@ def tx_power_relative_test_export_excel_ftm(data, parameters_dict):
     test_item = parameters_dict['test_item']
     logger.info('----------save to excel----------')
     filename = None
-    if script in ['GENERAL', 'CSE']:
+    if script in ['GENERAL', 'CSE', 'APT']:
         if tx_freq_level >= 100:
             filename = select_file_name_genre_tx_ftm(bw, tech, test_item)
         elif tx_freq_level <= 100:
@@ -976,7 +976,7 @@ def txp_aclr_evm_current_plot_ftm(file_path, parameters_dict):
     # type_ = parameters_dict['type']
     logger.info('----------Plot Chart---------')
     wb = openpyxl.load_workbook(file_path)
-    if script in ['GENERAL', 'CSE']:
+    if script in ['GENERAL', 'CSE', 'APT']:
         if tech == 'LTE':
             for ws_name in wb.sheetnames:
                 if 'Raw_Data' in ws_name:

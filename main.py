@@ -37,9 +37,10 @@ class MainApp:
         button_run_signaling = builder.get_object("button_run_signaling", master)
         button_run_cse = builder.get_object("button_run_cse", master)
         button_run_ulca = builder.get_object("button_run_ulca", master)
+        button_run_apt = builder.get_object("button_run_apt", master)
         self.button_mpr_gen = builder.get_object("button_mpr_gen", master)
         self.button_run_list = [button_run_ftm, button_run_ftm_fcc, button_run_ftm_ce, button_run_ftm_endc,
-                                button_run_signaling, button_run_cse, button_run_ulca]
+                                button_run_signaling, button_run_cse, button_run_ulca, button_run_apt, ]
         ICON_FILE = PROJECT_PATH / pathlib.Path('utils') / pathlib.Path('Wave.ico')
         self.mainwindow.iconbitmap(ICON_FILE)
         # self.checkbox_hsupa = builder.get_object("checkbutton_WCDMA", master)
@@ -50,6 +51,7 @@ class MainApp:
 
         self.instrument = None
         self.general = None
+        self.apt = None
         self.cse = None
         self.ulca = None
         self.sa_nsa = None
@@ -398,6 +400,7 @@ class MainApp:
             [
                 "instrument",
                 "general",
+                "apt",
                 "cse",
                 "ulca",
                 "sa_nsa",
@@ -746,8 +749,8 @@ class MainApp:
         # self.import_ui_setting()
         log_clear()
         self.import_ui_setting_yaml()
-        self.endc_tx_path_lte.set('TX1')
-        self.endc_tx_path_fr1.set('TX1')
+        self.endc_tx_path_init()
+
         # self.inst_to_tech()
 
     def run(self):
@@ -762,6 +765,39 @@ class MainApp:
     def stop():
         print('Crtrl C')
         os.kill(signal.CTRL_C_EVENT, 0)
+
+    def apt_sweep_init(self):
+        import utils.parameters.external_paramters as ext_pmt
+
+        ext_pmt.apt_tx_level_start_hpm = self.apt_level_start_hpm.get()
+        ext_pmt.apt_tx_level_stop_hpm = self.apt_level_stop_hpm.get()
+        ext_pmt.apt_tx_level_step_hpm = self.apt_level_step_hpm.get()
+        ext_pmt.apt_vcc_start_hpm = self.vcc_start_hpm.get()
+        ext_pmt.apt_vcc_stop_hpm = self.vcc_stop_hpm.get()
+        ext_pmt.apt_vcc_step_hpm = self.vcc_step_hpm.get()
+        ext_pmt.apt_bias0_start_hpm = self.bias0_start_hpm.get()
+        ext_pmt.apt_bias0_stop_hpm = self.bias0_stop_hpm.get()
+        ext_pmt.apt_bias0_step_hpm = self.bias0_step_hpm.get()
+        ext_pmt.apt_bias1_start_hpm = self.bias1_start_hpm.get()
+        ext_pmt.apt_bias1_stop_hpm = self.bias1_stop_hpm.get()
+        ext_pmt.apt_bias1_step_hpm = self.bias1_step_hpm.get()
+
+        ext_pmt.apt_tx_level_start_lpm = self.apt_level_start_lpm.get()
+        ext_pmt.apt_tx_level_stop_lpm = self.apt_level_stop_lpm.get()
+        ext_pmt.apt_tx_level_step_lpm = self.apt_level_step_lpm.get()
+        ext_pmt.apt_vcc_start_lpm = self.vcc_start_lpm.get()
+        ext_pmt.apt_vcc_stop_lpm = self.vcc_stop_lpm.get()
+        ext_pmt.apt_vcc_step_lpm = self.vcc_step_lpm.get()
+        ext_pmt.apt_bias0_start_lpm = self.bias0_start_lpm.get()
+        ext_pmt.apt_bias0_stop_lpm = self.bias0_stop_lpm.get()
+        ext_pmt.apt_bias0_step_lpm = self.bias0_step_lpm.get()
+        ext_pmt.apt_bias1_start_lpm = self.bias1_start_lpm.get()
+        ext_pmt.apt_bias1_stop_lpm = self.bias1_stop_lpm.get()
+        ext_pmt.apt_bias1_step_lpm = self.bias1_step_lpm.get()
+
+    def endc_tx_path_init(self):
+        self.endc_tx_path_lte.set('TX1')
+        self.endc_tx_path_fr1.set('TX1')
 
     def fool_proof_vol(self):
         vol_cap = 4.5
@@ -1031,12 +1067,12 @@ class MainApp:
             #     self.N17.set(band_fr1)
             elif band_fr1 == 18:
                 self.N18.set(band_fr1)
-            elif band_fr1 == 19:
-                self.N19.set(band_fr1)
+            # elif band_fr1 == 19:
+            #     self.N19.set(band_fr1)
             elif band_fr1 == 20:
                 self.N20.set(band_fr1)
-            elif band_fr1 == 21:
-                self.N21.set(band_fr1)
+            # elif band_fr1 == 21:
+            #     self.N21.set(band_fr1)
             elif band_fr1 == 24:
                 self.N24.set(band_fr1)
             elif band_fr1 == 25:
@@ -1373,6 +1409,8 @@ class MainApp:
                 self.cse.set(True)
             elif script == 'ULCA':
                 self.ulca.set(True)
+            elif script == "APT":
+                self.apt.set(True)
 
         for _type in ui_init['type']['type_fr1']:
             if _type == 'DFTS':
@@ -3057,7 +3095,11 @@ class MainApp:
             logger.debug('ULCA')
             self.script.append('ULCA')
 
-        if self.script == []:
+        if self.apt.get():
+            logger.debug('APT')
+            self.script.append('APT')
+
+        if not self.script:
             logger.debug('Nothing to select for script')
 
         logger.info(f'Script to select : {self.script}')
@@ -3460,6 +3502,34 @@ class MainApp:
         ext_pmt.tx_level_range_list[0] = self.tx_level_start.get()
         ext_pmt.tx_level_range_list[1] = self.tx_level_stop.get()
 
+        # apt sweep hpm
+        ext_pmt.apt_tx_level_start_hpm = self.apt_level_start_hpm.get()
+        ext_pmt.apt_tx_level_stop_hpm = self.apt_level_stop_hpm.get()
+        ext_pmt.apt_tx_level_step_hpm = self.apt_level_step_hpm.get()
+        ext_pmt.apt_vcc_start_hpm = self.vcc_start_hpm.get()
+        ext_pmt.apt_vcc_stop_hpm = self.vcc_stop_hpm.get()
+        ext_pmt.apt_vcc_step_hpm = self.vcc_step_hpm.get()
+        ext_pmt.apt_bias0_start_hpm = self.bias0_start_hpm.get()
+        ext_pmt.apt_bias0_stop_hpm = self.bias0_stop_hpm.get()
+        ext_pmt.apt_bias0_step_hpm = self.bias0_step_hpm.get()
+        ext_pmt.apt_bias1_start_hpm = self.bias1_start_hpm.get()
+        ext_pmt.apt_bias1_stop_hpm = self.bias1_stop_hpm.get()
+        ext_pmt.apt_bias1_step_hpm = self.bias1_step_hpm.get()
+
+        # apt sweep lpm
+        ext_pmt.apt_tx_level_start_lpm = self.apt_level_start_lpm.get()
+        ext_pmt.apt_tx_level_stop_lpm = self.apt_level_stop_lpm.get()
+        ext_pmt.apt_tx_level_step_lpm = self.apt_level_step_lpm.get()
+        ext_pmt.apt_vcc_start_lpm = self.vcc_start_lpm.get()
+        ext_pmt.apt_vcc_stop_lpm = self.vcc_stop_lpm.get()
+        ext_pmt.apt_vcc_step_lpm = self.vcc_step_lpm.get()
+        ext_pmt.apt_bias0_start_lpm = self.bias0_start_lpm.get()
+        ext_pmt.apt_bias0_stop_lpm = self.bias0_stop_lpm.get()
+        ext_pmt.apt_bias0_step_lpm = self.bias0_step_lpm.get()
+        ext_pmt.apt_bias1_start_lpm = self.bias1_start_lpm.get()
+        ext_pmt.apt_bias1_stop_lpm = self.bias1_stop_lpm.get()
+        ext_pmt.apt_bias1_step_lpm = self.bias1_step_lpm.get()
+
         if self.instrument.get() == 'Anritsu8820':
             from test_scripts.anritsu_items.mt8820_tx_lmh import TxTestGenre
             from test_scripts.anritsu_items.mt8820_rx import RxTestGenre
@@ -3552,7 +3622,7 @@ class MainApp:
                     inst.run()
                     inst.ser.com_close()
 
-            if self.wanted_test['apt_sweep'] and ext_pmt.sa_nsa == 0 and 'GENERAL' in ext_pmt.scripts:
+            if self.wanted_test['apt_sweep'] and ext_pmt.sa_nsa == 0 and 'APT' in ext_pmt.scripts:
                 inst = AptSweep()
                 inst.run()
                 inst.ser.com_close()

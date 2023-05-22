@@ -14,37 +14,85 @@ import utils.parameters.rb_parameters as rb_pmt
 import datetime
 
 logger = log_set('apt_sweep')
-# TX_LEVEL_LIST = [24, 23]
-VCC_START_HPM = 500
-VCC_START_LPM = 300
-VCC_STOP = 60
-VCC_STEP = 10
-BIAS0_START = 255
-BIAS0_STOP = 32
-BIAS0_STEP = 3
-BIAS1_START = 255
-BIAS1_STOP = 32
-BIAS1_STEP = 4
+
 ACLR_LIMIT_USL = -37
 ACLR_MARGIN = 15
 EVM_LIMIT_USL = 2.5
-EVM_LIMIT_ABS = 2.5
-COUNT_BIAS1 = 4
-COUNT_BIAS0 = 4
+# EVM_LIMIT_ABS = 2.5
+# COUNT_BIAS1 = 4
+# COUNT_BIAS0 = 4
 COUNT_VCC = 5
 ALGR_MODE = 1
 
 
 class AptSweep(TxTestLevelSweep):
+
     def __init__(self):
         super().__init__()
+        self.BIAS1_STEP_LPM = None
+        self.BIAS1_STOP_LPM = None
+        self.BIAS1_START_LPM = None
+        self.BIAS0_STEP_LPM = None
+        self.BIAS0_STOP_LPM = None
+        self.BIAS0_START_LPM = None
+        self.VCC_STEP_LPM = None
+        self.VCC_STOP_LPM = None
+        self.VCC_START_LPM = None
+        self.TX_LEVEL_STEP_LPM = None
+        self.TX_LEVEL_SOP_LPM = None
+        self.TX_LEVEL_START_LPM = None
+        self.BIAS1_STEP_HPM = None
+        self.BIAS1_STOP_HPM = None
+        self.BIAS1_START_HPM = None
+        self.BIAS0_STEP_HPM = None
+        self.BIAS0_STOP_HPM = None
+        self.BIAS0_START_HPM = None
+        self.VCC_STEP_HPM = None
+        self.VCC_STOP_HPM = None
+        self.VCC_START_HPM = None
+        self.TX_LEVEL_STEP_HPM = None
+        self.TX_LEVEL_SOP_HPM = None
+        self.TX_LEVEL_START_HPM = None
+        self.bias1_step = None
+        self.bias1_stop = None
+        self.bias0_step = None
+        self.bias0_stop = None
+        self.vcc_step = None
+        self.vcc_stop = None
         self.pa_range_mode = None
         self.vcc_new = None
         self.bias0_new = None
         self.bias1_new = None
         self.candidate = None
-
+        
+    def global_parameters(self):
+        self.TX_LEVEL_START_HPM = ext_pmt.apt_tx_level_start_hpm
+        self.TX_LEVEL_SOP_HPM = ext_pmt.apt_tx_level_stop_hpm
+        self.TX_LEVEL_STEP_HPM = ext_pmt.apt_tx_level_step_hpm
+        self.VCC_START_HPM = ext_pmt.apt_vcc_start_hpm
+        self.VCC_STOP_HPM = ext_pmt.apt_vcc_stop_hpm
+        self.VCC_STEP_HPM = ext_pmt.apt_vcc_step_hpm
+        self.BIAS0_START_HPM = ext_pmt.apt_bias0_start_hpm
+        self.BIAS0_STOP_HPM = ext_pmt.apt_bias0_stop_hpm
+        self.BIAS0_STEP_HPM = ext_pmt.apt_bias0_step_hpm
+        self.BIAS1_START_HPM = ext_pmt.apt_bias1_start_hpm
+        self.BIAS1_STOP_HPM = ext_pmt.apt_bias1_stop_hpm
+        self.BIAS1_STEP_HPM = ext_pmt.apt_bias1_step_hpm
+        self.TX_LEVEL_START_LPM = ext_pmt.apt_tx_level_start_lpm
+        self.TX_LEVEL_SOP_LPM = ext_pmt.apt_tx_level_stop_lpm
+        self.TX_LEVEL_STEP_LPM = ext_pmt.apt_tx_level_step_lpm
+        self.VCC_START_LPM = ext_pmt.apt_vcc_start_lpm
+        self.VCC_STOP_LPM = ext_pmt.apt_vcc_stop_lpm
+        self.VCC_STEP_LPM = ext_pmt.apt_vcc_step_lpm
+        self.BIAS0_START_LPM = ext_pmt.apt_bias0_start_lpm
+        self.BIAS0_STOP_LPM = ext_pmt.apt_bias0_stop_lpm
+        self.BIAS0_STEP_LPM = ext_pmt.apt_bias0_step_lpm
+        self.BIAS1_START_LPM = ext_pmt.apt_bias1_start_lpm
+        self.BIAS1_STOP_LPM = ext_pmt.apt_bias1_stop_lpm
+        self.BIAS1_STEP_LPM = ext_pmt.apt_bias1_step_lpm
+        
     def tx_apt_sweep_pipeline_fr1(self):
+        self.global_parameters()
         self.rx_level = ext_pmt.init_rx_sync_level
         self.tx_level = ext_pmt.tx_level
         self.port_tx = ext_pmt.port_tx
@@ -75,7 +123,11 @@ class AptSweep(TxTestLevelSweep):
                         self.tx_apt_sweep_process_fr1()
 
                         # recover to ET/SAPT mode
+                        self.set_pa_range_mode('H')
+                        self.set_apt_trymode(5)
+                        self.set_apt_trymode(0)
                         self.set_apt_mode_force(1, 'TX1', 1)
+
                     else:
                         logger.info(f'NR B{self.band_fr1} does not have BW {self.bw_fr1}MHZ')
 
@@ -88,7 +140,7 @@ class AptSweep(TxTestLevelSweep):
             try:
                 file_name = select_file_name_genre_tx_ftm(bw, 'FR1', 'apt_sweep')
                 file_path = Path(excel_folder_path()) / Path(file_name)
-                txp_aclr_evm_current_plot_ftm(file_path, {'script': 'GENERAL', 'tech': 'FR1'})
+                txp_aclr_evm_current_plot_ftm(file_path, {'script': 'APT', 'tech': 'FR1'})
             except TypeError:
                 logger.info(f'there is no data to plot because the band does not have this BW ')
             except FileNotFoundError:
@@ -126,7 +178,7 @@ class AptSweep(TxTestLevelSweep):
         for mcs in ext_pmt.mcs_fr1:
             self.mcs_fr1 = mcs
             for script in ext_pmt.scripts:
-                if script == 'GENERAL':
+                if script == 'APT':
                     self.script = script
                     for rb_ftm in ext_pmt.rb_ftm_fr1:  # INNER, OUTER
                         self.rb_size_fr1, self.rb_start_fr1 = rb_pmt.GENERAL_FR1[self.bw_fr1][self.scs][self.type_fr1][
@@ -160,21 +212,37 @@ class AptSweep(TxTestLevelSweep):
         if self.tx_path in ['TX1', 'TX2']:
             for pa_range_mode in ['H', 'L']:
                 self.pa_range_mode = pa_range_mode
+                tx_level_step = None
                 if pa_range_mode == 'H':
                     self.data = {}
                     self.candidate = {}
-                    vcc_start, bias0_start, bias1_start = VCC_START_HPM, BIAS0_START, BIAS1_START
-                    tx_level_start = 23
-                    tx_level_stop = 10
+                    vcc_start, bias0_start, bias1_start = self.VCC_START_HPM, self.BIAS0_START_HPM, self.BIAS1_START_HPM
+                    self.vcc_stop = self.VCC_STOP_HPM
+                    self.vcc_step = self.VCC_STEP_HPM
+                    self.bias0_stop = self.BIAS0_STOP_HPM
+                    self.bias1_stop = self.BIAS1_STOP_HPM
+                    self.bias0_step = self.BIAS0_STEP_HPM
+                    self.bias1_step = self.BIAS1_STEP_HPM
+                    tx_level_start = self.TX_LEVEL_START_HPM
+                    tx_level_stop = self.TX_LEVEL_SOP_HPM
+                    tx_level_step = self.TX_LEVEL_STEP_HPM
 
                 elif pa_range_mode == 'L':
                     self.data = {}
                     self.candidate = {}
-                    vcc_start, bias0_start, bias1_start = VCC_START_LPM, BIAS0_START, BIAS1_START
-                    tx_level_start = 17
-                    tx_level_stop = 0
+                    vcc_start, bias0_start, bias1_start = self.VCC_START_LPM, self.BIAS0_START_LPM, self.BIAS1_START_LPM
+                    self.vcc_stop = self.VCC_STOP_LPM
+                    self.vcc_step = self.VCC_STEP_LPM
+                    self.bias0_stop = self.BIAS0_STOP_LPM
+                    self.bias0_step = self.BIAS0_STEP_LPM
+                    self.bias1_stop = self.BIAS1_STOP_LPM
+                    self.bias1_step = self.BIAS1_STEP_LPM
 
-                for tx_level in range(tx_level_start, tx_level_stop - 1, -1):
+                    tx_level_start = self.TX_LEVEL_START_LPM
+                    tx_level_stop = self.TX_LEVEL_SOP_LPM
+                    tx_level_step = self.TX_LEVEL_STEP_LPM
+
+                for tx_level in range(tx_level_start, tx_level_stop - 1, - tx_level_step):
                     self.tx_level = tx_level
                     logger.info(f'========Now Tx level = {self.tx_level} dBm========')
                     # self.set_level_fr1(self.tx_level)
@@ -225,11 +293,12 @@ class AptSweep(TxTestLevelSweep):
             self.loop_find_vcc()
 
         # output the lowest current consumption items
-        self.apt_sweep_output_best(self.pa_range_mode, [self.tx_level, self.vcc_new, self.bias0_new, self.bias1_new])
+        self.apt_sweep_output_best(self.band_fr1, self.pa_range_mode,
+                                   [self.tx_level, self.vcc_new, self.bias0_new, self.bias1_new])
 
     def loop_find_vcc(self):
         count_vcc = COUNT_VCC
-        for vcc in range(self.vcc_new, VCC_STOP, -VCC_STEP):
+        for vcc in range(self.vcc_new, self.vcc_stop, - self.vcc_step):
             logger.info(f'Now VCC is {vcc} to run')
             self.set_level_fr1(self.tx_level)
             self.set_apt_trymode(1)
@@ -254,7 +323,7 @@ class AptSweep(TxTestLevelSweep):
                 continue
 
     def loop_find_bias0(self, bias0_start):
-        for bias0 in range(bias0_start, BIAS0_STOP, -BIAS0_STEP):
+        for bias0 in range(bias0_start, self.bias0_stop, - self.bias0_step):
             logger.info(f'Now Bias0 is {bias0} to run')
             self.set_level_fr1(self.tx_level)
             self.set_apt_trymode(1)
@@ -273,7 +342,7 @@ class AptSweep(TxTestLevelSweep):
             self.vcc_new, self.bias0_new, self.bias1_new = self.filter_data()
 
     def loop_find_bias1(self, bias1_start):
-        for bias1 in range(bias1_start, BIAS1_STOP, -BIAS1_STEP):
+        for bias1 in range(bias1_start, self.bias1_stop, - self.bias1_step):
             self.set_level_fr1(self.tx_level)
             self.set_apt_trymode(1)
 
@@ -317,8 +386,7 @@ class AptSweep(TxTestLevelSweep):
             vcc = self.candidate[self.tx_level][-3]
             bias0 = self.candidate[self.tx_level][-2]
             bias1 = self.candidate[self.tx_level][-1]
-            logger.info(f'Adopt level {self.tx_level} the best current consumption as {vcc}, {bias0}, {bias1} '
-                        f'as next tx level start parameter')
+            logger.info(f'Adopt level {self.tx_level} the best current consumption as {vcc}, {bias0}, {bias1}')
 
             if self.tx_path in ['TX1', 'TX2']:  # this is for TX1, TX2, not MIMO
                 self.parameters = {
@@ -348,12 +416,12 @@ class AptSweep(TxTestLevelSweep):
             return self.vcc_new, self.bias0_new, self.bias1_new
 
     @staticmethod
-    def apt_sweep_output_best(pa_range_mode, data):
+    def apt_sweep_output_best(band, pa_range_mode, data):
         file_name = None
         if pa_range_mode == 'H':
-            file_name = f'Apt_sweep_choose_HPM.csv'
+            file_name = f'Apt_sweep_choose_HPM_B{band}.csv'
         elif pa_range_mode == 'L':
-            file_name = f'Apt_sweep_choose_LPM.csv'
+            file_name = f'Apt_sweep_choose_LPM_B{band}.csv'
 
         file_path = Path(excel_folder_path()) / Path(file_name)
 

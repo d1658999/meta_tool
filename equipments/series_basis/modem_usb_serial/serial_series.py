@@ -5,7 +5,7 @@ import utils.parameters.external_paramters as ext_pmt
 from connection_interface.connection_serial import ModemComport
 from utils.parameters.common_parameters_ftm import TDD_BANDS
 import utils.parameters.rssi_parameters as rssi
-from utils.regy_handler import regy_parser,  regy_parser_v2
+from utils.regy_handler import regy_parser, regy_parser_v2
 from utils.regy_handler import decimal_to_hex_twos_complement, convert_string
 
 logger = log_set('AtCmd')
@@ -322,7 +322,6 @@ class AtCmd:
             'HPM': 0,
             'LPM': 2,
         }
-
 
     def select_scs_fr1(self, band):
         """
@@ -1340,6 +1339,7 @@ class AtCmd:
             pa_range = '0,25,23,21,19'
         self.command(f'AT+NTXPARANGEMAPSET={pa_range}')
 
+
 if __name__ == '__main__':
     # import csv
 
@@ -1349,4 +1349,3 @@ if __name__ == '__main__':
     #
     command = AtCmd()
     command.apt_calibration_process_fr1(1, 'TX1', 1950000)
-
