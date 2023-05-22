@@ -21060,7 +21060,7 @@ Disable</property>
                     <child>
                       <object class="ttk.Entry" id="entry51">
                         <property name="justify">center</property>
-                        <property name="text" translatable="yes">280</property>
+                        <property name="text" translatable="yes">350</property>
                         <property name="textvariable">int:vcc_start_lpm</property>
                         <layout manager="grid">
                           <property name="column">1</property>
