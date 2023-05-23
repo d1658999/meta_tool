@@ -20677,7 +20677,7 @@ Disable</property>
                     <child>
                       <object class="ttk.Entry" id="entry35">
                         <property name="justify">center</property>
-                        <property name="text" translatable="yes">3</property>
+                        <property name="text" translatable="yes">13</property>
                         <property name="textvariable">int:bias0_step_hpm</property>
                         <layout manager="grid">
                           <property name="column">0</property>
@@ -20746,7 +20746,7 @@ Disable</property>
                     <child>
                       <object class="ttk.Entry" id="entry38">
                         <property name="justify">center</property>
-                        <property name="text" translatable="yes">4</property>
+                        <property name="text" translatable="yes">13</property>
                         <property name="textvariable">int:bias1_step_hpm</property>
                         <layout manager="grid">
                           <property name="column">1</property>
@@ -20968,7 +20968,7 @@ Disable</property>
                     <child>
                       <object class="ttk.Entry" id="entry47">
                         <property name="justify">center</property>
-                        <property name="text" translatable="yes">3</property>
+                        <property name="text" translatable="yes">13</property>
                         <property name="textvariable">int:bias0_step_lpm</property>
                         <layout manager="grid">
                           <property name="column">0</property>
@@ -21037,7 +21037,7 @@ Disable</property>
                     <child>
                       <object class="ttk.Entry" id="entry50">
                         <property name="justify">center</property>
-                        <property name="text" translatable="yes">4</property>
+                        <property name="text" translatable="yes">13</property>
                         <property name="textvariable">int:bias1_step_lpm</property>
                         <layout manager="grid">
                           <property name="column">1</property>
