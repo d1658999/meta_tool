@@ -19191,7 +19191,6 @@ Disable</property>
                         <child>
                           <object class="ttk.Checkbutton" id="checkbutton808">
                             <property name="command" type="command" cbtype="simple">wanted_tx_rx_sweep</property>
-                            <property name="state">disabled</property>
                             <property name="text" translatable="yes">APT Sweep_v2</property>
                             <property name="variable">boolean:apt_sweep_v2</property>
                             <layout manager="grid">
