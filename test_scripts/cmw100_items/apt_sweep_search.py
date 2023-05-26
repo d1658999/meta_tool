@@ -118,7 +118,7 @@ class AptSweep(TxTestLevelSweep):
                     self.port_table_selector(self.band_fr1, self.tx_path)
                     if self.bw_fr1 in cm_pmt_ftm.bandwidths_selected_fr1(self.band_fr1):
                         # force to APT mode
-                        self.set_apt_mode_force(1, 'TX1', 0)
+                        self.set_apt_mode_force(self.band_fr1, 'TX1', 0)
 
                         self.tx_apt_sweep_process_fr1()
 
@@ -126,7 +126,7 @@ class AptSweep(TxTestLevelSweep):
                         self.set_pa_range_mode('H')
                         self.set_apt_trymode(5)
                         self.set_apt_trymode(0)
-                        self.set_apt_mode_force(1, 'TX1', 1)
+                        self.set_apt_mode_force(self.band_fr1, 'TX1', 1)
 
                     else:
                         logger.info(f'NR B{self.band_fr1} does not have BW {self.bw_fr1}MHZ')
