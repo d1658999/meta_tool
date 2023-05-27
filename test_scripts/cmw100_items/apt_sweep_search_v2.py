@@ -211,16 +211,21 @@ class AptSweepV2(AptSweep):
         self.set_apt_bias_nv_each_cp_fr1(self.band_fr1, self.tx_path, 0, 'L', self.index_lpm_wanted, bias0_start)
         self.set_apt_bias_nv_each_cp_fr1(self.band_fr1, self.tx_path, 1, 'L', self.index_lpm_wanted, bias1_start)
 
-
         if mode == 1:
             self.loop_find_bias1(bias1_start)
             self.loop_find_bias0(bias0_start)
             self.loop_find_vcc()
 
+            # to fill out the other level to vcc and bias that are not by apt sweep
+            self.fill_out_rest_vcc_bias(self.TX_LEVEL_START_HPM, self.TX_LEVEL_SOP_HPM, self.band_fr1, self.tx_path)
+
         elif mode == 0:
             self.loop_find_bias0(bias0_start)
             self.loop_find_bias1(bias1_start)
             self.loop_find_vcc()
+
+            # to fill out the other level to vcc and bias that are not by apt sweep
+            self.fill_out_rest_vcc_bias(self.TX_LEVEL_START_HPM, self.TX_LEVEL_SOP_HPM, self.band_fr1, self.tx_path)
 
         # output the lowest current consumption items
         self.apt_sweep_output_best(self.band_fr1, 'H',
@@ -249,7 +254,6 @@ class AptSweepV2(AptSweep):
             self.aclr_mod_current_results.append(self.bias0_new)
             self.aclr_mod_current_results.append(self.bias1_new)
 
-
             logger.debug(
                 f'Get the apt result{self.aclr_mod_current_results}, {vcc}, {self.bias0_new}, {self.bias1_new}')
             self.vcc_new, self.bias0_new, self.bias1_new = self.filter_data()
@@ -258,7 +262,9 @@ class AptSweepV2(AptSweep):
             if count_vcc == 0:
                 # this is to sync the LPM with HPM and use the best value
                 # if 23 >= self.tx_level > self.sw_point_level:
-                self.set_apt_vcc_nv_each_cp_fr1(self.band_fr1, self.tx_path, 'L', self.index_lpm_wanted, self.vcc_new)
+                if self.index_lpm_wanted <= 34:
+                    self.set_apt_vcc_nv_each_cp_fr1(self.band_fr1, self.tx_path, 'L', self.index_lpm_wanted,
+                                                    self.vcc_new)
                 # elif self.sw_point_level > self.tx_level:
                 self.set_apt_vcc_nv_each_cp_fr1(self.band_fr1, self.tx_path, 'H', self.index_hpm_wanted, self.vcc_new)
 
@@ -294,7 +300,8 @@ class AptSweepV2(AptSweep):
 
         # this is to sync the LPM with HPM and use the best value
         # if 23 >= self.tx_level > self.sw_point_level:
-        self.set_apt_bias_nv_each_cp_fr1(self.band_fr1, self.tx_path, 0, 'L', self.index_lpm_wanted, self.bias0_new)
+        if self.index_lpm_wanted <= 34:
+            self.set_apt_bias_nv_each_cp_fr1(self.band_fr1, self.tx_path, 0, 'L', self.index_lpm_wanted, self.bias0_new)
         # elif self.sw_point_level > self.tx_level:
         self.set_apt_bias_nv_each_cp_fr1(self.band_fr1, self.tx_path, 0, 'H', self.index_hpm_wanted, self.bias0_new)
 
@@ -326,7 +333,8 @@ class AptSweepV2(AptSweep):
 
         # this is to sync the LPM with HPM and use the best value
         # if 23 >= self.tx_level > self.sw_point_level:
-        self.set_apt_bias_nv_each_cp_fr1(self.band_fr1, self.tx_path, 1, 'L', self.index_lpm_wanted, self.bias1_new)
+        if self.index_lpm_wanted <= 34:
+            self.set_apt_bias_nv_each_cp_fr1(self.band_fr1, self.tx_path, 1, 'L', self.index_lpm_wanted, self.bias1_new)
         # elif self.sw_point_level > self.tx_level:
         self.set_apt_bias_nv_each_cp_fr1(self.band_fr1, self.tx_path, 1, 'H', self.index_hpm_wanted, self.bias1_new)
 
@@ -415,6 +423,75 @@ class AptSweepV2(AptSweep):
         with open(file_path, 'a', newline='') as csvfile:
             writer = csv.writer(csvfile)
             writer.writerow(data)
+
+    def fill_out_rest_vcc_bias(self, level_start, level_stop, band, tx_path):
+        max_level_rise = self.get_pa_hpm_rise_index(self.band_fr1, self.tx_path, 1)
+        rest_hpm2fill_higher_start_index = 34 - (max_level_rise - level_start) + 1
+        rest_hpm2fill_lower_stop_index = 34 - (max_level_rise - level_stop)
+        rest_lpm2fill_higher_start_index = 34 - (23 - level_start) + 1
+        rest_lpm2fill_lower_start_index = 34 - (23 - level_stop)
+
+        # common parameters
+        used_band_index = self.get_used_band_index_by_path_fr1(tx_path)
+        vcc_nv_hpm = f'CAL.NR_SUB6.TX_APT_DC_TABLE_MIDCH_HPM_TX{int(tx_path[-1]) - 1}' \
+                     f'_N{str(used_band_index[band]).zfill(2)}'
+        vcc_nv_lpm = f'CAL.NR_SUB6.TX_APT_DC_TABLE_MIDCH_LPM_TX{int(tx_path[-1]) - 1}' \
+                     f'_N{str(used_band_index[band]).zfill(2)}'
+        bias0_nv_hpm = f'CAL.NR_SUB6.TX_PA_BIAS0_MIDCH_HPM_TX{int(tx_path[-1]) - 1}' \
+                       f'_N{str(used_band_index[band]).zfill(2)}'
+        bias0_nv_lpm = f'CAL.NR_SUB6.TX_PA_BIAS0_MIDCH_LPM_TX{int(tx_path[-1]) - 1}' \
+                       f'_N{str(used_band_index[band]).zfill(2)}'
+        bias1_nv_hpm = f'CAL.NR_SUB6.TX_PA_BIAS1_MIDCH_HPM_TX{int(tx_path[-1]) - 1}' \
+                       f'_N{str(used_band_index[band]).zfill(2)}'
+        bias1_nv_lpm = f'CAL.NR_SUB6.TX_PA_BIAS1_MIDCH_LPM_TX{int(tx_path[-1]) - 1}' \
+                       f'_N{str(used_band_index[band]).zfill(2)}'
+
+        # to fill the rest at hpm higher
+        index_upper = 34 - (max_level_rise - level_start)
+
+        vcc_upper = int(self.get_nv_index_value(self.query_google_nv(vcc_nv_hpm))[f'{index_upper - 1}'])
+        bias0_upper = int(self.get_nv_index_value(self.query_google_nv(bias0_nv_hpm))[f'{index_upper - 1}'])
+        bias1_upper = int(self.get_nv_index_value(self.query_google_nv(bias1_nv_hpm))[f'{index_upper - 1}'])
+
+        for i in range(rest_hpm2fill_higher_start_index, 34 + 1):
+            self.set_apt_vcc_nv_each_cp_fr1(self.band_fr1, self.tx_path, 'H', i, vcc_upper)
+            self.set_apt_bias_nv_each_cp_fr1(self.band_fr1, self.tx_path, 0, 'H', i, bias0_upper)
+            self.set_apt_bias_nv_each_cp_fr1(self.band_fr1, self.tx_path, 1, 'H', i, bias1_upper)
+
+        # to fill the rest at hpm lower
+        index_lower = 34 - (max_level_rise - level_stop)
+        vcc_lower = int(self.get_nv_index_value(self.query_google_nv(vcc_nv_hpm))[f'{index_lower - 1}'])
+        bias0_lower = int(self.get_nv_index_value(self.query_google_nv(bias0_nv_hpm))[f'{index_lower - 1}'])
+        bias1_lower = int(self.get_nv_index_value(self.query_google_nv(bias1_nv_hpm))[f'{index_lower - 1}'])
+
+        for i in range(1, rest_hpm2fill_lower_stop_index):
+            self.set_apt_vcc_nv_each_cp_fr1(self.band_fr1, self.tx_path, 'H', i, vcc_lower)
+            self.set_apt_bias_nv_each_cp_fr1(self.band_fr1, self.tx_path, 0, 'H', i, bias0_lower)
+            self.set_apt_bias_nv_each_cp_fr1(self.band_fr1, self.tx_path, 1, 'H', i, bias1_lower)
+
+        # to fill the rest at lpm higher
+        if level_start <= 23:
+            index_upper = 34 - (23 - level_start)
+            vcc_upper = int(self.get_nv_index_value(self.query_google_nv(vcc_nv_lpm))[f'{index_upper - 1}'])
+            bias0_upper = int(self.get_nv_index_value(self.query_google_nv(bias0_nv_lpm))[f'{index_upper - 1}'])
+            bias1_upper = int(self.get_nv_index_value(self.query_google_nv(bias1_nv_lpm))[f'{index_upper - 1}'])
+
+            for i in range(rest_lpm2fill_higher_start_index, 34 + 1):
+                self.set_apt_vcc_nv_each_cp_fr1(self.band_fr1, self.tx_path, 'L', i, vcc_upper)
+                self.set_apt_bias_nv_each_cp_fr1(self.band_fr1, self.tx_path, 0, 'L', i, bias0_upper)
+                self.set_apt_bias_nv_each_cp_fr1(self.band_fr1, self.tx_path, 1, 'L', i, bias1_upper)
+
+        # to fill the rest at lpm lower
+        if level_stop <= 23:
+            index_lower = 34 - (23 - level_stop)
+            vcc_lower = int(self.get_nv_index_value(self.query_google_nv(vcc_nv_hpm))[f'{index_lower - 1}'])
+            bias0_lower = int(self.get_nv_index_value(self.query_google_nv(bias0_nv_lpm))[f'{index_lower - 1}'])
+            bias1_lower = int(self.get_nv_index_value(self.query_google_nv(bias1_nv_lpm))[f'{index_lower - 1}'])
+
+            for i in range(1, rest_lpm2fill_lower_start_index):
+                self.set_apt_vcc_nv_each_cp_fr1(self.band_fr1, self.tx_path, 'L', i, vcc_lower)
+                self.set_apt_bias_nv_each_cp_fr1(self.band_fr1, self.tx_path, 0, 'L', i, bias0_lower)
+                self.set_apt_bias_nv_each_cp_fr1(self.band_fr1, self.tx_path, 1, 'L', i, bias1_lower)
 
     def run(self):
         for tech in ext_pmt.tech:
