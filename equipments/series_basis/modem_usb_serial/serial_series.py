@@ -81,7 +81,7 @@ class AtCmd:
         self.rsrp_list = None
         self.init_dicts()
 
-    def command_nv(self, cmd='at', delay=0.02, mode='N'):
+    def command_nv(self, cmd='at', delay=0.05, mode='N'):
         logger.info(f'MTM: <<{cmd}')
         cmd = cmd + '\r'
 
@@ -1034,7 +1034,7 @@ class AtCmd:
         nv_value is hex not dec
         """
         # nv_value_ = hex(int(nv_value))[2:].zfill(2)  # to transfer to 2 placeholder (0x1 -> 1 -> '01')
-        self.command_nv(f'AT+GOOGSETNV="{nv_name}",{nv_index},"{nv_value}"', 0.1)
+        self.command_nv(f'AT+GOOGSETNV="{nv_name}",{nv_index},"{nv_value}"')
 
     def query_google_nv(self, nv_name):
         return self.command_nv(f'AT+GOOGGETNV="{nv_name}"')
@@ -1294,7 +1294,7 @@ class AtCmd:
         """
         Calibration mode finished
         """
-        self.command(f'AT+NRFCALFINISH', 0.3)
+        self.command(f'AT+NRFCALFINISH', 0.5)
 
     def apt_calibration_process_fr1(self, band, tx_path, freq):
         self.set_stop_network_cal()

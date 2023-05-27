@@ -1,3 +1,5 @@
+import time
+
 import traceback
 import csv
 from pathlib import Path
@@ -14,7 +16,7 @@ from test_scripts.cmw100_items.apt_sweep_search import AptSweep
 
 import datetime
 
-logger = log_set('apt_sweep')
+logger = log_set('apt_sweep_v2')
 
 ACLR_LIMIT_USL = -37
 ACLR_MARGIN = 15
@@ -202,6 +204,14 @@ class AptSweepV2(AptSweep):
         self.index_hpm_wanted = 34 - (max_level_rise - self.tx_level)
         self.index_lpm_wanted = 34 - (23 - self.tx_level)
 
+        self.set_apt_vcc_nv_each_cp_fr1(self.band_fr1, self.tx_path, 'H', self.index_hpm_wanted, vcc_start)
+        self.set_apt_bias_nv_each_cp_fr1(self.band_fr1, self.tx_path, 0, 'H', self.index_hpm_wanted, bias0_start)
+        self.set_apt_bias_nv_each_cp_fr1(self.band_fr1, self.tx_path, 1, 'H', self.index_hpm_wanted, bias1_start)
+        self.set_apt_vcc_nv_each_cp_fr1(self.band_fr1, self.tx_path, 'L', self.index_lpm_wanted, vcc_start)
+        self.set_apt_bias_nv_each_cp_fr1(self.band_fr1, self.tx_path, 0, 'L', self.index_lpm_wanted, bias0_start)
+        self.set_apt_bias_nv_each_cp_fr1(self.band_fr1, self.tx_path, 1, 'L', self.index_lpm_wanted, bias1_start)
+
+
         if mode == 1:
             self.loop_find_bias1(bias1_start)
             self.loop_find_bias0(bias0_start)
@@ -213,7 +223,7 @@ class AptSweepV2(AptSweep):
             self.loop_find_vcc()
 
         # output the lowest current consumption items
-        self.apt_sweep_output_best(self.band_fr1, self.pa_range_mode,
+        self.apt_sweep_output_best(self.band_fr1, 'H',
                                    [self.tx_level, self.vcc_new, self.bias0_new, self.bias1_new])
 
     def loop_find_vcc(self):
@@ -221,20 +231,24 @@ class AptSweepV2(AptSweep):
         for vcc in range(self.vcc_new, self.vcc_stop, - self.vcc_step):
             logger.info(f'Now VCC is {vcc} to run')
             # set nv and calibrate by apt only
-            if self.sw_point_level < self.tx_level:
+            if self.sw_point_level < self.tx_level * 10:
                 self.set_apt_vcc_nv_each_cp_fr1(self.band_fr1, self.tx_path, 'H', self.index_hpm_wanted, vcc)
+                time.sleep(0.2)
                 self.apt_calibration_process_fr1(self.band_fr1, self.tx_path, self.tx_freq_fr1)
-            elif self.sw_point_level >= self.tx_level:
+            elif self.sw_point_level >= self.tx_level * 10:
                 self.set_apt_vcc_nv_each_cp_fr1(self.band_fr1, self.tx_path, 'L', self.index_lpm_wanted, vcc)
+                time.sleep(0.2)
                 self.apt_calibration_process_fr1(self.band_fr1, self.tx_path, self.tx_freq_fr1)
 
             # main process
             self.loop_tx_test_process()
             self.aclr_mod_current_results = self.tx_measure_fr1()
             self.aclr_mod_current_results.append(self.measure_current(self.band_fr1))
+            self.set_test_end_fr1()
             self.aclr_mod_current_results.append(vcc)
             self.aclr_mod_current_results.append(self.bias0_new)
             self.aclr_mod_current_results.append(self.bias1_new)
+
 
             logger.debug(
                 f'Get the apt result{self.aclr_mod_current_results}, {vcc}, {self.bias0_new}, {self.bias1_new}')
@@ -242,7 +256,7 @@ class AptSweepV2(AptSweep):
             count_vcc -= 1
 
             if count_vcc == 0:
-                # this is to sync the LPM with HPM
+                # this is to sync the LPM with HPM and use the best value
                 # if 23 >= self.tx_level > self.sw_point_level:
                 self.set_apt_vcc_nv_each_cp_fr1(self.band_fr1, self.tx_path, 'L', self.index_lpm_wanted, self.vcc_new)
                 # elif self.sw_point_level > self.tx_level:
@@ -256,17 +270,20 @@ class AptSweepV2(AptSweep):
         for bias0 in range(bias0_start, self.bias0_stop, - self.bias0_step):
             logger.info(f'Now Bias0 is {bias0} to run')
             # set nv and calibrate by apt only
-            if self.sw_point_level < self.tx_level:
+            if self.sw_point_level < self.tx_level * 10:
                 self.set_apt_bias_nv_each_cp_fr1(self.band_fr1, self.tx_path, 0, 'H', self.index_hpm_wanted, bias0)
+                time.sleep(0.2)
                 self.apt_calibration_process_fr1(self.band_fr1, self.tx_path, self.tx_freq_fr1)
-            elif self.sw_point_level >= self.tx_level:
+            elif self.sw_point_level >= self.tx_level * 10:
                 self.set_apt_bias_nv_each_cp_fr1(self.band_fr1, self.tx_path, 0, 'L', self.index_lpm_wanted, bias0)
+                time.sleep(0.2)
                 self.apt_calibration_process_fr1(self.band_fr1, self.tx_path, self.tx_freq_fr1)
 
             # main process
             self.loop_tx_test_process()
             self.aclr_mod_current_results = self.tx_measure_fr1()
             self.aclr_mod_current_results.append(self.measure_current(self.band_fr1))
+            self.set_test_end_fr1()
             self.aclr_mod_current_results.append(self.vcc_new)
             self.aclr_mod_current_results.append(bias0)
             self.aclr_mod_current_results.append(self.bias1_new)
@@ -275,7 +292,7 @@ class AptSweepV2(AptSweep):
                 f'Get the apt result{self.aclr_mod_current_results}, {self.vcc_new}, {bias0}, {self.bias1_new}')
             self.vcc_new, self.bias0_new, self.bias1_new = self.filter_data()
 
-        # this is to sync the LPM with HPM
+        # this is to sync the LPM with HPM and use the best value
         # if 23 >= self.tx_level > self.sw_point_level:
         self.set_apt_bias_nv_each_cp_fr1(self.band_fr1, self.tx_path, 0, 'L', self.index_lpm_wanted, self.bias0_new)
         # elif self.sw_point_level > self.tx_level:
@@ -285,17 +302,20 @@ class AptSweepV2(AptSweep):
         for bias1 in range(bias1_start, self.bias1_stop, - self.bias1_step):
             logger.info(f'Now Bias1 is {bias1} to run')
             # set nv and calibrate by apt only
-            if self.sw_point_level < self.tx_level:
+            if self.sw_point_level < self.tx_level * 10:
                 self.set_apt_bias_nv_each_cp_fr1(self.band_fr1, self.tx_path, 1, 'H', self.index_hpm_wanted, bias1)
+                time.sleep(0.2)
                 self.apt_calibration_process_fr1(self.band_fr1, self.tx_path, self.tx_freq_fr1)
-            elif self.sw_point_level >= self.tx_level:
+            elif self.sw_point_level >= self.tx_level * 10:
                 self.set_apt_bias_nv_each_cp_fr1(self.band_fr1, self.tx_path, 1, 'L', self.index_lpm_wanted, bias1)
+                time.sleep(0.2)
                 self.apt_calibration_process_fr1(self.band_fr1, self.tx_path, self.tx_freq_fr1)
 
             # main process
             self.loop_tx_test_process()
             self.aclr_mod_current_results = self.tx_measure_fr1()
             self.aclr_mod_current_results.append(self.measure_current(self.band_fr1))
+            self.set_test_end_fr1()
             self.aclr_mod_current_results.append(self.vcc_new)
             self.aclr_mod_current_results.append(self.bias0_new)
             self.aclr_mod_current_results.append(bias1)
@@ -304,7 +324,7 @@ class AptSweepV2(AptSweep):
                 f'Get the apt result{self.aclr_mod_current_results}, {self.vcc_new}, {self.bias0_new}, {bias1}')
             self.vcc_new, self.bias0_new, self.bias1_new = self.filter_data()
 
-        # this is to sync the LPM with HPM
+        # this is to sync the LPM with HPM and use the best value
         # if 23 >= self.tx_level > self.sw_point_level:
         self.set_apt_bias_nv_each_cp_fr1(self.band_fr1, self.tx_path, 1, 'L', self.index_lpm_wanted, self.bias1_new)
         # elif self.sw_point_level > self.tx_level:
