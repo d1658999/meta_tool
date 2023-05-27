@@ -3,7 +3,8 @@ band:
   band_segment_fr1: A
   bands_ca_lte: []
   bands_endc: []
-  bands_fr1: []
+  bands_fr1:
+  - 41
   bands_gsm: []
   bands_hsdpa: []
   bands_hsupa: []
@@ -11,10 +12,11 @@ band:
   bands_wcdma: []
 bw:
   bw_ca_lte: []
-  bw_fr1: []
+  bw_fr1:
+  - 10
   bw_lte: []
 channel:
-  chan: ''
+  chan: M
 condition:
   hthv: false
   htlv: false
@@ -32,8 +34,8 @@ external_inst:
   psu: false
   record_current: true
   tempchb: false
-  tx_level_start: -20
-  tx_level_stop: 26
+  tx_level_start: 27
+  tx_level_stop: -10
   volt_mipi: false
   wait_time: 300
 instrument:
@@ -41,7 +43,8 @@ instrument:
 margin:
   cbe_limit_margin: '1.5'
 mcs:
-  mcs_fr1: []
+  mcs_fr1:
+  - QPSK
   mcs_lte:
   - QPSK
   modulaiton_gsm: GMSK
@@ -65,21 +68,24 @@ port:
 power:
   lb_gsm_pcl: 5
   mb_gsm_pcl: 0
-  tx_level: 23
+  tx_level: 26
   tx_level_endc_fr1: 20
   tx_level_endc_lte: 20
 rb_set:
-  rb_ftm_fr1: []
+  rb_ftm_fr1:
+  - OUTER_FULL
   rb_ftm_lte:
   - PRB
   rb_ftm_ulca_lte: []
 rx_set:
   ue_power: []
 scripts:
-  scripts: []
-tab: 0
+  scripts:
+  - APT
+tab: 10
 tech:
-  tech: []
+  tech:
+  - FR1
 test_items:
   rx: false
   rx_freq_sweep: false
@@ -87,11 +93,13 @@ test_items:
   tx: false
   tx_1rb_sweep: false
   tx_apt_sweep: false
+  tx_apt_sweep_v2: true
   tx_ca: false
   tx_ca_cbe: false
   tx_cbe: false
   tx_freq_sweep: false
   tx_harmonics: false
-  tx_level_sweep: false
+  tx_level_sweep: true
 type:
-  type_fr1: []
+  type_fr1:
+  - CP

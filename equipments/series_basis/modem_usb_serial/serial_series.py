@@ -1030,8 +1030,11 @@ class AtCmd:
         self.command(command_rssi)
 
     def set_google_nv(self, nv_name, nv_index, nv_value):
+        """
+        nv_value is hex not dec
+        """
         # nv_value_ = hex(int(nv_value))[2:].zfill(2)  # to transfer to 2 placeholder (0x1 -> 1 -> '01')
-        self.command_nv(f'AT+GOOGSETNV="{nv_name}",{nv_index},"{nv_value}"', 0)
+        self.command_nv(f'AT+GOOGSETNV="{nv_name}",{nv_index},"{nv_value}"', 0.1)
 
     def query_google_nv(self, nv_name):
         return self.command_nv(f'AT+GOOGGETNV="{nv_name}"')
@@ -1087,6 +1090,33 @@ class AtCmd:
         logger.debug(used_band_index)
 
         return used_band_index
+
+    def get_used_band_index_by_path_fr1(self, tx_path):
+        """
+        To transfer used_band to {band: index, ...}
+        used_band_name parameter that can be valid:
+        'CAL.NR_SUB6.USED_RF_BAND'
+        'CAL.NR_SUB6.USED_DUALTX_RF_BAND'
+        'CAL.NR_SUB6.USED_ULMIMO_RF_BAND'
+        return:
+        {band: index, ...}
+        """
+        used_band_name = None
+        if tx_path == 'TX1':
+            used_band_name = 'CAL.NR_SUB6.USED_RF_BAND'
+        elif tx_path == 'TX2':
+            used_band_name = 'CAL.NR_SUB6.USED_DUALTX_RF_BAND'
+        elif tx_path == 'MIMO':
+            used_band_name = 'CAL.NR_SUB6.USED_ULMIMO_RF_BAND'
+
+        index_value_dict = self.get_nv_index_value(self.query_google_nv(used_band_name))
+        used_band_index = {}
+        for index in index_value_dict:
+            used_band_index[int(index_value_dict[index])] = int(index) + 1
+        logger.debug(used_band_index)
+
+        return used_band_index
+
 
     def get_mpr_value(self, mpr_nv, band, tx_path):
         """
@@ -1258,7 +1288,7 @@ class AtCmd:
         R80~R119 : LPM1 ~ LPM40 : APT calibration result of low
         power mode (dBm * 100)
         """
-        self.command(f'AT+NTXSAINTERNALAPT={self.tx_path_dict[tx_path]},{freq}')
+        self.command(f'AT+NTXSAINTERNALAPT={self.tx_path_dict[tx_path]},{freq}', delay=0.5)
 
     def set_calibration_finish_fr1(self):
         """
@@ -1280,6 +1310,7 @@ class AtCmd:
         scheme = self.apt_vcc_dict_fr1[vcc_para_dict['scheme']]
         pa_mode = vcc_para_dict['pa_mode']
         vcc_value = ','.join(vcc_para_dict['vcc_value_list'])
+
         self.command(f'AT+NTXAPTVOLNVWRITE={band},{scheme},{pa_mode},0,{vcc_value}')
 
     def set_apt_bias_nv_fr1(self, bias_num, bias_para_dict):
@@ -1287,7 +1318,7 @@ class AtCmd:
         AT+NTXAPTBIASNVWRITE=P0,P1,~P38
         """
         band = bias_para_dict['band']
-        scheme = bias_para_dict['scheme']
+        scheme = self.apt_vcc_dict_fr1[bias_para_dict['scheme']]
         pa_mode = bias_para_dict['pa_mode']
         bias_value = ','.join(bias_para_dict['bias_value_list'])
 
@@ -1339,6 +1370,83 @@ class AtCmd:
             pa_range = '0,25,23,21,19'
         self.command(f'AT+NTXPARANGEMAPSET={pa_range}')
 
+    def set_apt_vcc_nv_each_cp_fr1(self, band, tx_path, pa_mode, index_wanted, value_wanted):
+        """
+        used for the NV:
+        CAL.NR_SUB6.TX_APT_DC_TABLE_MIDCH_HPM_TX0_Nxx
+        CAL.NR_SUB6.TX_APT_DC_TABLE_MIDCH_LPM_TX0_Nxx
+        CAL.NR_SUB6.TX_APT_DC_TABLE_MIDCH_HPM_TX1_Nxx
+        CAL.NR_SUB6.TX_APT_DC_TABLE_MIDCH_LPM_TX1_Nxx
+
+        pa_mode: use 'H' and 'L to be representative
+        index_wanted: use integer or string 1, 2, 3,...
+        value_wanted: use decimal value or string
+        """
+        # query the used_band and get the band index
+        used_band_index_fr1 = None
+        if tx_path == 'TX1':
+            used_band_index_fr1 = self.get_used_band_index('CAL.NR_SUB6.USED_RF_BAND')
+        elif tx_path == 'TX2':
+            used_band_index_fr1 = self.get_used_band_index('CAL.NR_SUB6.USED_DUALTX_RF_BAND')
+
+        # get the NV we want
+        vcc_nv_wanted = f'CAL.NR_SUB6.TX_APT_DC_TABLE_MIDCH_{pa_mode}PM_TX{int(tx_path[-1]) - 1}' \
+                        f'_N{str(used_band_index_fr1[band]).zfill(2)}'
+
+        # set the value we want in vcc_nv
+        hex_rep = decimal_to_hex_twos_complement(int(value_wanted), 2)  # vcc nv size is 2
+        nv_value_new = convert_string(hex_rep, 2)  # vcc nv size is 2
+        self.set_google_nv(vcc_nv_wanted, int(index_wanted) - 1, nv_value_new)
+        logger.info(f'Set value: {value_wanted} at index: {index_wanted}')
+
+    def set_apt_bias_nv_each_cp_fr1(self, band, tx_path, bias_num, pa_mode, index_wanted, value_wanted):
+        """
+        used for the NV:
+        CAL.NR_SUB6.TX_PA_BIAS0_MIDCH_HPM_TX0_Nxx
+        CAL.NR_SUB6.TX_PA_BIAS0_MIDCH_LPM_TX0_Nxx
+        CAL.NR_SUB6.TX_PA_BIAS0_MIDCH_HPM_TX1_Nxx
+        CAL.NR_SUB6.TX_PA_BIAS0_MIDCH_LPM_TX1_Nxx
+        CAL.NR_SUB6.TX_PA_BIAS1_MIDCH_HPM_TX0_Nxx
+        CAL.NR_SUB6.TX_PA_BIAS1_MIDCH_LPM_TX0_Nxx
+        CAL.NR_SUB6.TX_PA_BIAS1_MIDCH_HPM_TX1_Nxx
+        CAL.NR_SUB6.TX_PA_BIAS1_MIDCH_LPM_TX1_Nxx
+
+        pa_mode: use 'H' and 'L to be representative
+        index_wanted: use integer or string 1, 2, 3,...
+        value_wanted: use decimal value or string
+        """
+        # query the used_band and get the band index
+        used_band_index_fr1 = self.get_used_band_index_by_path_fr1(tx_path)
+
+        # get the NV we want
+        bias_nv_wanted = f'CAL.NR_SUB6.TX_PA_BIAS{bias_num}_MIDCH' \
+                         f'_{pa_mode}PM_TX{int(tx_path[-1]) - 1}' \
+                         f'_N{str(used_band_index_fr1[band]).zfill(2)}'
+
+        # set the value we want in vcc_nv
+        hex_rep = decimal_to_hex_twos_complement(int(value_wanted), 1)  # bias nv size is 1
+        nv_value_new = convert_string(hex_rep, 1)  # bias nv size is 1
+        self.set_google_nv(bias_nv_wanted, int(index_wanted) - 1, nv_value_new)
+        logger.info(f'Set value: {value_wanted} at index: {index_wanted}')
+
+    def get_pa_hpm_rise_index(self, band, tx_path, index) -> int:
+        """
+        index 1: max power level for apt nv -> index 34
+        index 4: sw point power level for apt nv
+        """
+        used_band_index = self.get_used_band_index_by_path_fr1(tx_path)
+        pa_map_rise_nv = f'CAL.NR_SUB6.TX_PA_Range_Map_Rise_TX{int(tx_path[-1]) - 1}' \
+                         f'_N{str(used_band_index[band]).zfill(2)}'
+        level_pa_rise = int(self.get_nv_index_value(self.query_google_nv(pa_map_rise_nv))[f'{index - 1}'])
+        if index == 1:
+            logger.info(f'The max level of index 34 for APT NV for VCC/BIAS is: {level_pa_rise}')
+        elif index == 4:
+            logger.info(f'The sw point level for APT NV for VCC/BIAS is: {level_pa_rise}')
+        else:
+            logger.info(f'there is tentatively no function at this index: {index}')
+
+        return level_pa_rise
+
 
 if __name__ == '__main__':
     # import csv
@@ -1348,4 +1456,5 @@ if __name__ == '__main__':
     # NV_VALUE = '00'
     #
     command = AtCmd()
-    command.apt_calibration_process_fr1(1, 'TX1', 1950000)
+    # command.apt_calibration_process_fr1(1, 'TX1', 1950000)
+    command.get_pa_hpm_rise_index(41, 'TX1', 4)

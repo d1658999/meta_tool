@@ -176,7 +176,7 @@ def regy_target_search_parser_v2(file_name, target_name):
 
 def decimal_to_hex_twos_complement(num, size):
     """
-    This is used for transfer negative and positive value to what LSI format
+    This is used for transfer negative and positive value to what LSI format is
     """
     bit_length = size * 8  # 1 byte = 1 size = 2 nibbles = 8 bits
     twos_complement = (1 << bit_length) + num
