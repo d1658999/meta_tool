@@ -298,7 +298,7 @@ class AptSweep(TxTestLevelSweep):
 
     def loop_find_vcc(self):
         count_vcc = COUNT_VCC
-        for vcc in range(self.vcc_new, self.vcc_stop, - self.vcc_step):
+        for vcc in range(self.vcc_new, self.vcc_stop - 1, - self.vcc_step):
             logger.info(f'Now VCC is {vcc} to run')
             self.set_level_fr1(self.tx_level)
             self.set_apt_trymode(1)
@@ -323,7 +323,7 @@ class AptSweep(TxTestLevelSweep):
                 continue
 
     def loop_find_bias0(self, bias0_start):
-        for bias0 in range(bias0_start, self.bias0_stop, - self.bias0_step):
+        for bias0 in range(bias0_start, self.bias0_stop - 1, - self.bias0_step):
             logger.info(f'Now Bias0 is {bias0} to run')
             self.set_level_fr1(self.tx_level)
             self.set_apt_trymode(1)
@@ -342,7 +342,7 @@ class AptSweep(TxTestLevelSweep):
             self.vcc_new, self.bias0_new, self.bias1_new = self.filter_data()
 
     def loop_find_bias1(self, bias1_start):
-        for bias1 in range(bias1_start, self.bias1_stop, - self.bias1_step):
+        for bias1 in range(bias1_start, self.bias1_stop - 1, - self.bias1_step):
             self.set_level_fr1(self.tx_level)
             self.set_apt_trymode(1)
 

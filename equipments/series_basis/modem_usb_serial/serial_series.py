@@ -6,7 +6,6 @@ from connection_interface.connection_serial import ModemComport
 from utils.parameters.common_parameters_ftm import TDD_BANDS
 import utils.parameters.rssi_parameters as rssi
 from utils.regy_handler import regy_parser, regy_parser_v2
-from utils.regy_handler import decimal_to_hex_twos_complement, convert_string
 
 logger = log_set('AtCmd')
 
@@ -81,7 +80,7 @@ class AtCmd:
         self.rsrp_list = None
         self.init_dicts()
 
-    def command_nv(self, cmd='at', delay=0.05, mode='N'):
+    def command_nv(self, cmd='at', delay=0.2, mode='N'):
         logger.info(f'MTM: <<{cmd}')
         cmd = cmd + '\r'
 
@@ -1048,8 +1047,8 @@ class AtCmd:
                 else:
                     # to do important transfer the format to meet LSI
                     size = regy_value['size']
-                    hex_rep = decimal_to_hex_twos_complement(int(nv_value), size)
-                    nv_value_new = convert_string(hex_rep, size)
+                    hex_rep = self.decimal_to_hex_twos_complement(int(nv_value), size)
+                    nv_value_new = self.convert_string(hex_rep, size)
 
                     # start to set nv
                     self.set_google_nv(nv_name, nv_index, nv_value_new)
@@ -1059,13 +1058,20 @@ class AtCmd:
         for nv_name, nv_values in regy_dict.items():
             self.set_google_nv(nv_name, 0, nv_values)
 
-    @staticmethod
-    def get_nv_index_value(res):
+    def get_nv_index_value(self, res):
         index_value_dict = {}
         for res_ in res:
             resd = res_.decode().strip().split(',')
-            if len(resd) >= 3:
-                index_value_dict[resd[1]] = str(int(resd[2].strip('"'), 16))
+            if len(resd) == 3:  # size == 1
+                index_value_dict[resd[1]] = str(int(resd[-1].strip('"'), 16))
+            elif len(resd) == 4:  # size == 2
+                hex_string = "".join((resd[-2].strip('"'), resd[-1].strip('"')))
+                new_string = str(self.hex_string2dec(hex_string))
+                index_value_dict[resd[1]] = new_string
+            elif len(resd) == 6:  # size == 4
+                hex_string = "".join((resd[-4].strip('"'), resd[-3].strip('"'), resd[-2].strip('"'), resd[-1].strip('"')))
+                new_string = str(self.hex_string2dec(hex_string))
+                index_value_dict[resd[1]] = new_string
         logger.debug(index_value_dict)
 
         return index_value_dict
@@ -1394,8 +1400,8 @@ class AtCmd:
                         f'_N{str(used_band_index_fr1[band]).zfill(2)}'
 
         # set the value we want in vcc_nv
-        hex_rep = decimal_to_hex_twos_complement(int(value_wanted), 2)  # vcc nv size is 2
-        nv_value_new = convert_string(hex_rep, 2)  # vcc nv size is 2
+        hex_rep = self.decimal_to_hex_twos_complement(int(value_wanted), 2)  # vcc nv size is 2
+        nv_value_new = self.convert_string(hex_rep, 2)  # vcc nv size is 2
         self.set_google_nv(vcc_nv_wanted, int(index_wanted) - 1, nv_value_new)
         logger.info(f'Set value: {value_wanted} at index: {index_wanted}')
 
@@ -1424,8 +1430,8 @@ class AtCmd:
                          f'_N{str(used_band_index_fr1[band]).zfill(2)}'
 
         # set the value we want in vcc_nv
-        hex_rep = decimal_to_hex_twos_complement(int(value_wanted), 1)  # bias nv size is 1
-        nv_value_new = convert_string(hex_rep, 1)  # bias nv size is 1
+        hex_rep = self.decimal_to_hex_twos_complement(int(value_wanted), 1)  # bias nv size is 1
+        nv_value_new = self.convert_string(hex_rep, 1)  # bias nv size is 1
         self.set_google_nv(bias_nv_wanted, int(index_wanted) - 1, nv_value_new)
         logger.info(f'Set value: {value_wanted} at index: {index_wanted}')
 
@@ -1447,6 +1453,44 @@ class AtCmd:
 
         return level_pa_rise
 
+    @staticmethod
+    def decimal_to_hex_twos_complement(num, size):
+        """
+        This is used for transfer negative and positive value to what LSI format is
+        """
+        bit_length = size * 8  # 1 byte = 1 size = 2 nibbles = 8 bits
+        twos_complement = (1 << bit_length) + num
+        hex_representation = hex(twos_complement & (2 ** bit_length - 1))[2:].zfill(bit_length // 4)
+        return hex_representation
+
+    @staticmethod
+    def convert_string(string, size):
+        """
+        This feature is used for register value transferred to at command use
+        """
+        # Convert the hex string to an integer
+        n = int(string, 16)
+
+        # Convert the integer to a byte array
+        b = n.to_bytes(size, 'little')
+
+        # Convert the byte array to a string
+        # result = ",".join(["{:02x}".format(x) for x in b])
+        result = ",".join([f"{x:02x}" for x in b])
+
+        return result
+
+    @staticmethod
+    def hex_string2dec(hex_string, byteorder='little', signed_bool=True):
+        """
+        This is for from get nv index value(hex string and uses little byteorder) and change to dec with signed
+        """
+        bytes_value = bytes.fromhex(hex_string)
+        int_signed_value = int.from_bytes(bytes_value, byteorder=byteorder, signed=signed_bool)
+        logger.debug(f'From hex_string {hex_string} to dec {int_signed_value}')
+
+        return int_signed_value
+
 
 if __name__ == '__main__':
     # import csv
@@ -1457,4 +1501,5 @@ if __name__ == '__main__':
     #
     command = AtCmd()
     # command.apt_calibration_process_fr1(1, 'TX1', 1950000)
-    command.get_pa_hpm_rise_index(41, 'TX1', 4)
+    # command.get_pa_hpm_rise_index(41, 'TX1', 4)
+    command.hex_string2dec('0A00')

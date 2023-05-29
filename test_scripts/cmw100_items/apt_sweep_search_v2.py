@@ -63,13 +63,20 @@ class AptSweepV2(AptSweep):
                         self.set_apt_mode_force(self.band_fr1, 'TX1', 0)
 
                         # check the sw point level
-                        self.sw_point_level = self.get_pa_hpm_rise_index(self.band_fr1, self.tx_path, 4)
+                        # self.sw_point_level = self.get_pa_hpm_rise_index(self.band_fr1, self.tx_path, 4)
 
                         self.select_scs_fr1(self.band_fr1)
                         self.tx_apt_sweep_process_fr1()
 
+                        # to fill out the other level to vcc and bias that are not by apt sweep
+                        self.fill_out_rest_vcc_bias(self.TX_LEVEL_START_HPM, self.TX_LEVEL_SOP_HPM, self.band_fr1,
+                                                    self.tx_path)
+
                         # recover to ET/SAPT mode
                         self.set_apt_mode_force(self.band_fr1, 'TX1', 1)
+
+                        # calibration
+                        self.apt_calibration_process_fr1(self.band_fr1, self.band_fr1, self.tx_freq_fr1)
 
                     else:
                         logger.info(f'NR B{self.band_fr1} does not have BW {self.bw_fr1}MHZ')
@@ -216,16 +223,10 @@ class AptSweepV2(AptSweep):
             self.loop_find_bias0(bias0_start)
             self.loop_find_vcc()
 
-            # to fill out the other level to vcc and bias that are not by apt sweep
-            self.fill_out_rest_vcc_bias(self.TX_LEVEL_START_HPM, self.TX_LEVEL_SOP_HPM, self.band_fr1, self.tx_path)
-
         elif mode == 0:
             self.loop_find_bias0(bias0_start)
             self.loop_find_bias1(bias1_start)
             self.loop_find_vcc()
-
-            # to fill out the other level to vcc and bias that are not by apt sweep
-            self.fill_out_rest_vcc_bias(self.TX_LEVEL_START_HPM, self.TX_LEVEL_SOP_HPM, self.band_fr1, self.tx_path)
 
         # output the lowest current consumption items
         self.apt_sweep_output_best(self.band_fr1, 'H',
@@ -233,17 +234,17 @@ class AptSweepV2(AptSweep):
 
     def loop_find_vcc(self):
         count_vcc = COUNT_VCC
-        for vcc in range(self.vcc_new, self.vcc_stop, - self.vcc_step):
+        for vcc in range(self.vcc_new, self.vcc_stop - 1, - self.vcc_step):
             logger.info(f'Now VCC is {vcc} to run')
             # set nv and calibrate by apt only
-            if self.sw_point_level < self.tx_level * 10:
-                self.set_apt_vcc_nv_each_cp_fr1(self.band_fr1, self.tx_path, 'H', self.index_hpm_wanted, vcc)
-                time.sleep(0.2)
-                self.apt_calibration_process_fr1(self.band_fr1, self.tx_path, self.tx_freq_fr1)
-            elif self.sw_point_level >= self.tx_level * 10:
-                self.set_apt_vcc_nv_each_cp_fr1(self.band_fr1, self.tx_path, 'L', self.index_lpm_wanted, vcc)
-                time.sleep(0.2)
-                self.apt_calibration_process_fr1(self.band_fr1, self.tx_path, self.tx_freq_fr1)
+            # if self.sw_point_level < self.tx_level * 10:
+            self.set_apt_vcc_nv_each_cp_fr1(self.band_fr1, self.tx_path, 'H', self.index_hpm_wanted, vcc)
+            # time.sleep(0.2)
+            # self.apt_calibration_process_fr1(self.band_fr1, self.tx_path, self.tx_freq_fr1)
+            # elif self.sw_point_level >= self.tx_level * 10:
+            self.set_apt_vcc_nv_each_cp_fr1(self.band_fr1, self.tx_path, 'L', self.index_lpm_wanted, vcc)
+            # time.sleep(0.2)
+            self.apt_calibration_process_fr1(self.band_fr1, self.tx_path, self.tx_freq_fr1)
 
             # main process
             self.loop_tx_test_process()
@@ -273,17 +274,17 @@ class AptSweepV2(AptSweep):
                 continue
 
     def loop_find_bias0(self, bias0_start):
-        for bias0 in range(bias0_start, self.bias0_stop, - self.bias0_step):
+        for bias0 in range(bias0_start, self.bias0_stop - 1, - self.bias0_step):
             logger.info(f'Now Bias0 is {bias0} to run')
             # set nv and calibrate by apt only
-            if self.sw_point_level < self.tx_level * 10:
-                self.set_apt_bias_nv_each_cp_fr1(self.band_fr1, self.tx_path, 0, 'H', self.index_hpm_wanted, bias0)
-                time.sleep(0.2)
-                self.apt_calibration_process_fr1(self.band_fr1, self.tx_path, self.tx_freq_fr1)
-            elif self.sw_point_level >= self.tx_level * 10:
-                self.set_apt_bias_nv_each_cp_fr1(self.band_fr1, self.tx_path, 0, 'L', self.index_lpm_wanted, bias0)
-                time.sleep(0.2)
-                self.apt_calibration_process_fr1(self.band_fr1, self.tx_path, self.tx_freq_fr1)
+            # if self.sw_point_level < self.tx_level * 10:
+            self.set_apt_bias_nv_each_cp_fr1(self.band_fr1, self.tx_path, 0, 'H', self.index_hpm_wanted, bias0)
+            # time.sleep(0.2)
+            # self.apt_calibration_process_fr1(self.band_fr1, self.tx_path, self.tx_freq_fr1)
+            # elif self.sw_point_level >= self.tx_level * 10:
+            self.set_apt_bias_nv_each_cp_fr1(self.band_fr1, self.tx_path, 0, 'L', self.index_lpm_wanted, bias0)
+            # time.sleep(0.2)
+            self.apt_calibration_process_fr1(self.band_fr1, self.tx_path, self.tx_freq_fr1)
 
             # main process
             self.loop_tx_test_process()
@@ -306,17 +307,17 @@ class AptSweepV2(AptSweep):
         self.set_apt_bias_nv_each_cp_fr1(self.band_fr1, self.tx_path, 0, 'H', self.index_hpm_wanted, self.bias0_new)
 
     def loop_find_bias1(self, bias1_start):
-        for bias1 in range(bias1_start, self.bias1_stop, - self.bias1_step):
+        for bias1 in range(bias1_start, self.bias1_stop - 1 , - self.bias1_step):
             logger.info(f'Now Bias1 is {bias1} to run')
             # set nv and calibrate by apt only
-            if self.sw_point_level < self.tx_level * 10:
-                self.set_apt_bias_nv_each_cp_fr1(self.band_fr1, self.tx_path, 1, 'H', self.index_hpm_wanted, bias1)
-                time.sleep(0.2)
-                self.apt_calibration_process_fr1(self.band_fr1, self.tx_path, self.tx_freq_fr1)
-            elif self.sw_point_level >= self.tx_level * 10:
-                self.set_apt_bias_nv_each_cp_fr1(self.band_fr1, self.tx_path, 1, 'L', self.index_lpm_wanted, bias1)
-                time.sleep(0.2)
-                self.apt_calibration_process_fr1(self.band_fr1, self.tx_path, self.tx_freq_fr1)
+            # if self.sw_point_level < self.tx_level * 10:
+            self.set_apt_bias_nv_each_cp_fr1(self.band_fr1, self.tx_path, 1, 'H', self.index_hpm_wanted, bias1)
+            # time.sleep(0.2)
+            # self.apt_calibration_process_fr1(self.band_fr1, self.tx_path, self.tx_freq_fr1)
+            # elif self.sw_point_level >= self.tx_level * 10:
+            self.set_apt_bias_nv_each_cp_fr1(self.band_fr1, self.tx_path, 1, 'L', self.index_lpm_wanted, bias1)
+            # time.sleep(0.2)
+            self.apt_calibration_process_fr1(self.band_fr1, self.tx_path, self.tx_freq_fr1)
 
             # main process
             self.loop_tx_test_process()
@@ -394,36 +395,6 @@ class AptSweepV2(AptSweep):
         else:
             return self.vcc_new, self.bias0_new, self.bias1_new
 
-    @staticmethod
-    def apt_sweep_output_best(band, pa_range_mode, data):
-        file_name = None
-        if pa_range_mode == 'H':
-            file_name = f'Apt_sweep_choose_HPM_B{band}.csv'
-        elif pa_range_mode == 'L':
-            file_name = f'Apt_sweep_choose_LPM_B{band}.csv'
-
-        file_path = Path(excel_folder_path()) / Path(file_name)
-
-        # check if there is the file exist, if not, then create and write header
-        if Path(file_path).exists():
-            pass
-        else:
-            header_apt_sweep = [
-                'Tx_level',
-                'VCC',
-                'BIAS0',
-                'BIAS1',
-            ]
-            with open(file_path, 'w', newline='') as csvfile:
-                # Write the header row
-                writer = csv.writer(csvfile)
-                writer.writerow(header_apt_sweep)
-
-        # write vcc, bias0, bias1 to csv file
-        with open(file_path, 'a', newline='') as csvfile:
-            writer = csv.writer(csvfile)
-            writer.writerow(data)
-
     def fill_out_rest_vcc_bias(self, level_start, level_stop, band, tx_path):
         max_level_rise = self.get_pa_hpm_rise_index(self.band_fr1, self.tx_path, 1)
         rest_hpm2fill_higher_start_index = 34 - (max_level_rise - level_start) + 1
@@ -484,7 +455,7 @@ class AptSweepV2(AptSweep):
         # to fill the rest at lpm lower
         if level_stop <= 23:
             index_lower = 34 - (23 - level_stop)
-            vcc_lower = int(self.get_nv_index_value(self.query_google_nv(vcc_nv_hpm))[f'{index_lower - 1}'])
+            vcc_lower = int(self.get_nv_index_value(self.query_google_nv(vcc_nv_lpm))[f'{index_lower - 1}'])
             bias0_lower = int(self.get_nv_index_value(self.query_google_nv(bias0_nv_lpm))[f'{index_lower - 1}'])
             bias1_lower = int(self.get_nv_index_value(self.query_google_nv(bias1_nv_lpm))[f'{index_lower - 1}'])
 
