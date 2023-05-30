@@ -32,6 +32,8 @@ class AptSweepV2(AptSweep):
 
     def __init__(self):
         super().__init__()
+        self.index_lpm_wanted = None
+        self.index_hpm_wanted = None
 
     def tx_apt_sweep_pipeline_fr1(self):
         self.global_parameters()
@@ -63,7 +65,7 @@ class AptSweepV2(AptSweep):
                         self.set_apt_mode_force(self.band_fr1, self.tx_path, 0)
 
                         # check the sw point level
-                        # self.sw_point_level = self.get_pa_hpm_rise_index(self.band_fr1, self.tx_path, 4)
+                        # self.sw_point_level = self.get_pa_sw_rise_level(self.band_fr1, self.tx_path, 4)
 
                         self.select_scs_fr1(self.band_fr1)
                         self.tx_apt_sweep_process_fr1()
@@ -207,7 +209,7 @@ class AptSweepV2(AptSweep):
         self.bias1_new = bias1_start
 
         # to search where the index should be put in apt nv of vcc/bias for HPM/LPM
-        max_level_rise = self.get_pa_hpm_rise_index(self.band_fr1, self.tx_path, 1)
+        max_level_rise = self.get_pa_sw_rise_level(self.band_fr1, self.tx_path, 1)
         self.index_hpm_wanted = 34 - (max_level_rise - self.tx_level)
         self.index_lpm_wanted = 34 - (23 - self.tx_level)
 
@@ -396,7 +398,7 @@ class AptSweepV2(AptSweep):
             return self.vcc_new, self.bias0_new, self.bias1_new
 
     def fill_out_rest_vcc_bias(self, level_start, level_stop, band, tx_path):
-        max_level_rise = self.get_pa_hpm_rise_index(self.band_fr1, self.tx_path, 1)
+        max_level_rise = self.get_pa_sw_rise_level(self.band_fr1, self.tx_path, 1)
         rest_hpm2fill_higher_start_index = 34 - (max_level_rise - level_start) + 1
         rest_hpm2fill_lower_stop_index = 34 - (max_level_rise - level_stop)
         rest_lpm2fill_higher_start_index = 34 - (23 - level_start) + 1
@@ -404,17 +406,17 @@ class AptSweepV2(AptSweep):
 
         # common parameters
         used_band_index = self.get_used_band_index_by_path_fr1(tx_path)
-        vcc_nv_hpm = f'CAL.NR_SUB6.TX_APT_DC_TABLE_MIDCH_HPM_TX{int(tx_path[-1]) - 1}' \
+        vcc_nv_hpm = f'CAL.NR_SUB6.TX_APT_DC_TABLE_MIDCH_HPM_TX{self.tx_path_dict[self.tx_path]}' \
                      f'_N{str(used_band_index[band]).zfill(2)}'
-        vcc_nv_lpm = f'CAL.NR_SUB6.TX_APT_DC_TABLE_MIDCH_LPM_TX{int(tx_path[-1]) - 1}' \
+        vcc_nv_lpm = f'CAL.NR_SUB6.TX_APT_DC_TABLE_MIDCH_LPM_TX{self.tx_path_dict[self.tx_path]}' \
                      f'_N{str(used_band_index[band]).zfill(2)}'
-        bias0_nv_hpm = f'CAL.NR_SUB6.TX_PA_BIAS0_MIDCH_HPM_TX{int(tx_path[-1]) - 1}' \
+        bias0_nv_hpm = f'CAL.NR_SUB6.TX_PA_BIAS0_MIDCH_HPM_TX{self.tx_path_dict[self.tx_path]}' \
                        f'_N{str(used_band_index[band]).zfill(2)}'
-        bias0_nv_lpm = f'CAL.NR_SUB6.TX_PA_BIAS0_MIDCH_LPM_TX{int(tx_path[-1]) - 1}' \
+        bias0_nv_lpm = f'CAL.NR_SUB6.TX_PA_BIAS0_MIDCH_LPM_TX{self.tx_path_dict[self.tx_path]}' \
                        f'_N{str(used_band_index[band]).zfill(2)}'
-        bias1_nv_hpm = f'CAL.NR_SUB6.TX_PA_BIAS1_MIDCH_HPM_TX{int(tx_path[-1]) - 1}' \
+        bias1_nv_hpm = f'CAL.NR_SUB6.TX_PA_BIAS1_MIDCH_HPM_TX{self.tx_path_dict[self.tx_path]}' \
                        f'_N{str(used_band_index[band]).zfill(2)}'
-        bias1_nv_lpm = f'CAL.NR_SUB6.TX_PA_BIAS1_MIDCH_LPM_TX{int(tx_path[-1]) - 1}' \
+        bias1_nv_lpm = f'CAL.NR_SUB6.TX_PA_BIAS1_MIDCH_LPM_TX{self.tx_path_dict[self.tx_path]}' \
                        f'_N{str(used_band_index[band]).zfill(2)}'
 
         # to fill the rest at hpm higher

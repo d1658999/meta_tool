@@ -1145,7 +1145,7 @@ class AtCmd:
             elif tx_path == 'TX2':
                 used_band_index = self.get_used_band_index("CAL.LTE.USED_DUALTX_RF_BAND")
 
-            nv = f'!LTERF.TX.USER DSP MPR OFFSET TX{int(tx_path[-1]) - 1} ' \
+            nv = f'!LTERF.TX.USER DSP MPR OFFSET TX{self.tx_path_dict[self.tx_path]} ' \
                  f'B{str(used_band_index[band]).zfill(2)}'
 
             mpr_index_value = self.get_nv_index_value(self.query_google_nv(nv))
@@ -1165,7 +1165,7 @@ class AtCmd:
             elif tx_path == 'TX2':
                 used_band_index = self.get_used_band_index("CAL.NR_SUB6.USED_DUALTX_RF_BAND")
 
-            nv = f'!NR_SUB6RF.TX.USER MPR OFFSET TX{int(tx_path[-1]) - 1}_' \
+            nv = f'!NR_SUB6RF.TX.USER MPR OFFSET TX{self.tx_path_dict[self.tx_path]}_' \
                  f'N{str(used_band_index[band]).zfill(2)}'
 
             mpr_index_value = self.get_nv_index_value(self.query_google_nv(nv))
@@ -1177,7 +1177,7 @@ class AtCmd:
             elif tx_path == 'TX2':
                 used_band_index = self.get_used_band_index("CAL.NR_SUB6.USED_DUALTX_RF_BAND")
 
-            nv = f'!NR_SUB6RF.TX.USER MPR OFFSET PC2 TX{int(tx_path[-1]) - 1}_' \
+            nv = f'!NR_SUB6RF.TX.USER MPR OFFSET PC2 TX{self.tx_path_dict[self.tx_path]}_' \
                  f'N{str(used_band_index[band]).zfill(2)}'
 
             mpr_index_value = self.get_nv_index_value(self.query_google_nv(nv))
@@ -1189,7 +1189,7 @@ class AtCmd:
             elif tx_path == 'TX2':
                 used_band_index = self.get_used_band_index("CAL.NR_SUB6.USED_DUALTX_RF_BAND")
 
-            nv = f'!NR_SUB6RF.TX.USER MPR OFFSET PC1p5 TX{int(tx_path[-1]) - 1}_' \
+            nv = f'!NR_SUB6RF.TX.USER MPR OFFSET PC1p5 TX{self.tx_path_dict[self.tx_path]}_' \
                  f'N{str(used_band_index[band]).zfill(2)}'
 
             mpr_index_value = self.get_nv_index_value(self.query_google_nv(nv))
@@ -1347,7 +1347,7 @@ class AtCmd:
         elif tx_path == 'TX2':
             used_band_index = self.get_used_band_index("CAL.NR_SUB6.USED_DUALTX_RF_BAND")
 
-        nv = f'CAL.NR_SUB6.TX_PA_Range_Map_EN_TX{int(tx_path[-1]) - 1}_' \
+        nv = f'CAL.NR_SUB6.TX_PA_Range_Map_EN_TX{self.tx_path_dict[self.tx_path]}_' \
              f'N{str(used_band_index[band]).zfill(2)}'
 
         logger.info(f'========== Force to set {pa_mode_dict[mode]} mode ==========')
@@ -1396,7 +1396,7 @@ class AtCmd:
             used_band_index_fr1 = self.get_used_band_index('CAL.NR_SUB6.USED_DUALTX_RF_BAND')
 
         # get the NV we want
-        vcc_nv_wanted = f'CAL.NR_SUB6.TX_APT_DC_TABLE_MIDCH_{pa_mode}PM_TX{int(tx_path[-1]) - 1}' \
+        vcc_nv_wanted = f'CAL.NR_SUB6.TX_APT_DC_TABLE_MIDCH_{pa_mode}PM_TX{self.tx_path_dict[self.tx_path]}' \
                         f'_N{str(used_band_index_fr1[band]).zfill(2)}'
 
         # set the value we want in vcc_nv
@@ -1426,7 +1426,7 @@ class AtCmd:
 
         # get the NV we want
         bias_nv_wanted = f'CAL.NR_SUB6.TX_PA_BIAS{bias_num}_MIDCH' \
-                         f'_{pa_mode}PM_TX{int(tx_path[-1]) - 1}' \
+                         f'_{pa_mode}PM_TX{self.tx_path_dict[self.tx_path]}' \
                          f'_N{str(used_band_index_fr1[band]).zfill(2)}'
 
         # set the value we want in vcc_nv
@@ -1435,13 +1435,13 @@ class AtCmd:
         self.set_google_nv(bias_nv_wanted, int(index_wanted) - 1, nv_value_new)
         logger.info(f'Set value: {value_wanted} at index: {index_wanted}')
 
-    def get_pa_hpm_rise_index(self, band, tx_path, index) -> int:
+    def get_pa_sw_rise_level(self, band, tx_path, index) -> int:
         """
         index 1: max power level for apt nv -> index 34
         index 4: sw point power level for apt nv
         """
         used_band_index = self.get_used_band_index_by_path_fr1(tx_path)
-        pa_map_rise_nv = f'CAL.NR_SUB6.TX_PA_Range_Map_Rise_TX{int(tx_path[-1]) - 1}' \
+        pa_map_rise_nv = f'CAL.NR_SUB6.TX_PA_Range_Map_Rise_TX{self.tx_path_dict[self.tx_path]}' \
                          f'_N{str(used_band_index[band]).zfill(2)}'
         level_pa_rise = int(self.get_nv_index_value(self.query_google_nv(pa_map_rise_nv))[f'{index - 1}'])
         if index == 1:
@@ -1452,6 +1452,12 @@ class AtCmd:
             logger.info(f'there is tentatively no function at this index: {index}')
 
         return level_pa_rise
+
+    def get_pa_sw_fall_level(self, band, tx_path, index) -> int:
+        """
+
+        """
+        pass
 
     @staticmethod
     def decimal_to_hex_twos_complement(num, size):
@@ -1501,5 +1507,5 @@ if __name__ == '__main__':
     #
     command = AtCmd()
     # command.apt_calibration_process_fr1(1, 'TX1', 1950000)
-    # command.get_pa_hpm_rise_index(41, 'TX1', 4)
+    # command.get_pa_sw_rise_level(41, 'TX1', 4)
     command.hex_string2dec('0A00')
