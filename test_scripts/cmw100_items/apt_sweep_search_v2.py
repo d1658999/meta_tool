@@ -25,7 +25,7 @@ EVM_LIMIT_USL = 2.5
 # COUNT_BIAS1 = 4
 # COUNT_BIAS0 = 4
 COUNT_VCC = 5
-ALGR_MODE = 1
+ALGR_MODE = 1  # 1:b1b0v, 2:b0b1v
 
 
 class AptSweepV2(AptSweep):
@@ -60,7 +60,7 @@ class AptSweepV2(AptSweep):
                     self.port_table_selector(self.band_fr1, self.tx_path)
                     if self.bw_fr1 in cm_pmt_ftm.bandwidths_selected_fr1(self.band_fr1):
                         # force to APT mode
-                        self.set_apt_mode_force(self.band_fr1, 'TX1', 0)
+                        self.set_apt_mode_force(self.band_fr1, self.tx_path, 0)
 
                         # check the sw point level
                         # self.sw_point_level = self.get_pa_hpm_rise_index(self.band_fr1, self.tx_path, 4)
@@ -73,7 +73,7 @@ class AptSweepV2(AptSweep):
                                                     self.tx_path)
 
                         # recover to ET/SAPT mode
-                        self.set_apt_mode_force(self.band_fr1, 'TX1', 1)
+                        self.set_apt_mode_force(self.band_fr1, self.tx_path, 1)
 
                         # calibration
                         self.apt_calibration_process_fr1(self.band_fr1, self.band_fr1, self.tx_freq_fr1)
@@ -260,15 +260,15 @@ class AptSweepV2(AptSweep):
             self.vcc_new, self.bias0_new, self.bias1_new = self.filter_data()
             count_vcc -= 1
 
-            if count_vcc == 0:
-                # this is to sync the LPM with HPM and use the best value
-                # if 23 >= self.tx_level > self.sw_point_level:
-                if self.index_lpm_wanted <= 34:
-                    self.set_apt_vcc_nv_each_cp_fr1(self.band_fr1, self.tx_path, 'L', self.index_lpm_wanted,
-                                                    self.vcc_new)
-                # elif self.sw_point_level > self.tx_level:
-                self.set_apt_vcc_nv_each_cp_fr1(self.band_fr1, self.tx_path, 'H', self.index_hpm_wanted, self.vcc_new)
+            # this is to sync the LPM with HPM and use the best value
+            # if 23 >= self.tx_level > self.sw_point_level:
+            if self.index_lpm_wanted <= 34:
+                self.set_apt_vcc_nv_each_cp_fr1(self.band_fr1, self.tx_path, 'L', self.index_lpm_wanted,
+                                                self.vcc_new)
+            # elif self.sw_point_level > self.tx_level:
+            self.set_apt_vcc_nv_each_cp_fr1(self.band_fr1, self.tx_path, 'H', self.index_hpm_wanted, self.vcc_new)
 
+            if count_vcc == 0:
                 break
             else:
                 continue
@@ -307,7 +307,7 @@ class AptSweepV2(AptSweep):
         self.set_apt_bias_nv_each_cp_fr1(self.band_fr1, self.tx_path, 0, 'H', self.index_hpm_wanted, self.bias0_new)
 
     def loop_find_bias1(self, bias1_start):
-        for bias1 in range(bias1_start, self.bias1_stop - 1 , - self.bias1_step):
+        for bias1 in range(bias1_start, self.bias1_stop - 1, - self.bias1_step):
             logger.info(f'Now Bias1 is {bias1} to run')
             # set nv and calibrate by apt only
             # if self.sw_point_level < self.tx_level * 10:

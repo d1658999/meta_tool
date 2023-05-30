@@ -582,6 +582,9 @@ def tx_power_relative_test_export_excel_ftm(data, parameters_dict):
                         ws['AC1'] = '2f0' if test_item == 'harmonics' else None
                         ws['AD1'] = '3f0' if test_item == 'harmonics' else None
                         ws['AC1'] = 'Voltage_mipi' if test_item in ['lmh', 'level_sweep'] else None
+                        ws['AC1'] = 'Vcc' if test_item in ['apt_sweep'] else None
+                        ws['AD1'] = 'Bias0' if test_item in ['apt_sweep'] else None
+                        ws['AE1'] = 'Bias1' if test_item in ['apt_sweep'] else None
                     else:  # to pass the dashboard
                         pass
 
