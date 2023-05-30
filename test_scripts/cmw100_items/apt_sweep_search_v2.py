@@ -1,13 +1,9 @@
-import time
-
 import traceback
-import csv
 from pathlib import Path
 from utils.log_init import log_set
-from test_scripts.cmw100_items.tx_level_sweep import TxTestLevelSweep
 from utils.loss_handler import get_loss
 import utils.parameters.external_paramters as ext_pmt
-from utils.excel_handler import txp_aclr_evm_current_plot_ftm, tx_power_relative_test_export_excel_ftm
+from utils.excel_handler import txp_aclr_evm_current_plot_ftm
 from utils.excel_handler import select_file_name_genre_tx_ftm, excel_folder_path
 import utils.parameters.common_parameters_ftm as cm_pmt_ftm
 from utils.channel_handler import channel_freq_select
@@ -25,7 +21,7 @@ EVM_LIMIT_USL = 2.5
 # COUNT_BIAS1 = 4
 # COUNT_BIAS0 = 4
 COUNT_VCC = 5
-ALGR_MODE = 1  # 1:b1b0v, 2:b0b1v
+ALGR_MODE = 1  # 1:b1b0v, 0:b0b1v
 
 
 class AptSweepV2(AptSweep):
@@ -341,62 +337,6 @@ class AptSweepV2(AptSweep):
         # elif self.sw_point_level > self.tx_level:
         self.set_apt_bias_nv_each_cp_fr1(self.band_fr1, self.tx_path, 1, 'H', self.index_hpm_wanted, self.bias1_new)
 
-    def filter_data(self):
-        aclr_m = self.aclr_mod_current_results[2]
-        aclr_p = self.aclr_mod_current_results[4]
-        evm = self.aclr_mod_current_results[7]
-
-        if (aclr_m < ACLR_LIMIT_USL) and (aclr_p < ACLR_LIMIT_USL) and (evm < EVM_LIMIT_USL):
-
-            self.data[self.tx_level] = self.aclr_mod_current_results
-
-            # check the current if it is the smallest
-            try:
-                if not self.candidate:
-                    self.candidate[self.tx_level] = self.aclr_mod_current_results
-
-                elif self.candidate[self.tx_level][-4] >= self.aclr_mod_current_results[-4]:
-                    self.candidate[self.tx_level] = self.aclr_mod_current_results
-                else:
-                    pass
-            except KeyError:
-                # this is for forward tx_level to continue
-                self.candidate[self.tx_level] = self.aclr_mod_current_results
-                logger.debug(f'If it does not have best, use this time result, {self.candidate}')
-
-            # this will use previous vcc,bias0, bias1 to start sweep
-            vcc = self.candidate[self.tx_level][-3]
-            bias0 = self.candidate[self.tx_level][-2]
-            bias1 = self.candidate[self.tx_level][-1]
-            logger.info(f'Adopt level {self.tx_level} the best current consumption as {vcc}, {bias0}, {bias1}')
-
-            if self.tx_path in ['TX1', 'TX2']:  # this is for TX1, TX2, not MIMO
-                self.parameters = {
-                    'script': self.script,
-                    'tech': self.tech,
-                    'band': self.band_fr1,
-                    'bw': self.bw_fr1,
-                    'tx_freq_level': self.tx_freq_fr1,
-                    'mcs': self.mcs_fr1,
-                    'tx_path': self.tx_path,
-                    'mod': None,
-                    'rb_state': self.rb_state,
-                    'rb_size': self.rb_size_fr1,
-                    'rb_start': self.rb_start_fr1,
-                    'sync_path': self.sync_path,
-                    'asw_srs_path': self.asw_srs_path,
-                    'scs': self.scs,
-                    'type': self.type_fr1,
-                    'test_item': 'apt_sweep',
-                }
-                self.file_path = tx_power_relative_test_export_excel_ftm(self.data, self.parameters)
-                self.data = {}
-
-                return vcc, bias0, bias1
-
-        else:
-            return self.vcc_new, self.bias0_new, self.bias1_new
-
     def fill_out_rest_vcc_bias(self, level_start, level_stop, band, tx_path):
         max_level_rise = self.get_pa_sw_rise_level(self.band_fr1, self.tx_path, 1)
         rest_hpm2fill_higher_start_index = 34 - (max_level_rise - level_start) + 1
@@ -465,13 +405,6 @@ class AptSweepV2(AptSweep):
                 self.set_apt_vcc_nv_each_cp_fr1(self.band_fr1, self.tx_path, 'L', i, vcc_lower)
                 self.set_apt_bias_nv_each_cp_fr1(self.band_fr1, self.tx_path, 0, 'L', i, bias0_lower)
                 self.set_apt_bias_nv_each_cp_fr1(self.band_fr1, self.tx_path, 1, 'L', i, bias1_lower)
-
-    def run(self):
-        for tech in ext_pmt.tech:
-            if tech == 'FR1':
-                self.tx_apt_sweep_pipeline_fr1()
-
-        self.cmw_close()
 
 
 def main():
