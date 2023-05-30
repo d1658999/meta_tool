@@ -74,7 +74,7 @@ class AptSweepV2(AptSweep):
                         self.set_apt_mode_force(self.band_fr1, self.tx_path, 1)
 
                         # calibration
-                        self.apt_calibration_process_fr1(self.band_fr1, self.band_fr1, self.tx_freq_fr1)
+                        self.apt_calibration_process_fr1(self.band_fr1, self.tx_path, self.tx_freq_fr1)
 
                     else:
                         logger.info(f'NR B{self.band_fr1} does not have BW {self.bw_fr1}MHZ')
