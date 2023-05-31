@@ -1123,7 +1123,6 @@ class AtCmd:
 
         return used_band_index
 
-
     def get_mpr_value(self, mpr_nv, band, tx_path):
         """
         mpr_nv parameters:

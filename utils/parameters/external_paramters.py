@@ -45,6 +45,7 @@ rfout_anritsu = 'MAIN'
 asw_path = 0
 srs_path = 0
 volt_mipi_en = False
+get_temp_en = False
 odpm_enable = False
 record_current_enable = True
 psu_enable = False

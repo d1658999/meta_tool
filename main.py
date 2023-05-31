@@ -20,7 +20,7 @@ from equipments.temp_chamber import TempChamber
 logger = log_set('GUI')
 
 PROJECT_PATH = pathlib.Path(__file__).parent
-PROJECT_UI = PROJECT_PATH / pathlib.Path('gui') / "main_v2_18_2.ui"
+PROJECT_UI = PROJECT_PATH / pathlib.Path('gui') / "main_v2_18_3.ui"
 
 
 class MainApp:
@@ -366,6 +366,7 @@ class MainApp:
         self.rx2_rx3_endc_fr1 = None
         self.rx_all_path_endc_fr1 = None
         self.volt_mipi_en = None
+        self.get_temp_en = None
         self.port_table_enable = None
         self.debug_enable = None
         self.rssi_rx_rat = None
@@ -712,6 +713,7 @@ class MainApp:
                 "rx2_rx3_endc_fr1",
                 "rx_all_path_endc_fr1",
                 "volt_mipi_en",
+                "get_temp_en",
                 "port_table_enable",
                 "debug_enable",
                 "rssi_rx_rat",
@@ -996,6 +998,7 @@ class MainApp:
         self.psu_enable.set(ui_init['external_inst']['psu'])
         self.odpm_enable.set(ui_init['external_inst']['odpm'])
         self.volt_mipi_en.set(ui_init['external_inst']['volt_mipi'])
+        self.get_temp_en.set(ui_init['external_inst']['get_temp'])
         self.record_current_enable.set(ui_init['external_inst']['record_current'])
         self.hthv.set(ui_init['condition']['hthv'])
         self.htlv.set(ui_init['condition']['htlv'])
@@ -1572,6 +1575,7 @@ class MainApp:
         psu_enable = self.psu_enable.get()
         odpm_enable = self.odpm_enable.get()
         volt_mipi_en = self.volt_mipi_en.get()
+        get_temp_en = self.get_temp_en.get()
         record_current_enable = self.record_current_enable.get()
         hthv = self.hthv.get()
         htlv = self.htlv.get()
@@ -1676,6 +1680,7 @@ class MainApp:
                 'psu': psu_enable,
                 'odpm': odpm_enable,
                 'volt_mipi': volt_mipi_en,
+                'get_temp': get_temp_en,
                 'record_current': record_current_enable,
                 'count': count,
                 'wait_time': wait_time,
@@ -1724,9 +1729,15 @@ class MainApp:
 
     def volt_mipi_status(self):
         if self.volt_mipi_en.get():
-            logger.info('=====Disable Volt_mipi=====')
-        else:
             logger.info('=====Enable Volt_mipi=====')
+        else:
+            logger.info('=====Disable Volt_mipi=====')
+
+    def get_temp_status(self):
+        if self.get_temp_en.get():
+            logger.info('=====Enable Get_Temperature=====')
+        else:
+            logger.info('=====Disable Get_Temperature=====')
 
     def record_current_enable_status(self):
         if self.record_current_enable.get():
@@ -3497,6 +3508,7 @@ class MainApp:
         ext_pmt.psu_enable = self.psu_enable.get()
         ext_pmt.odpm_enable = self.odpm_enable.get()
         ext_pmt.volt_mipi_en = self.volt_mipi_en.get()
+        ext_pmt.get_temp_en = self.get_temp_en.get()
         ext_pmt.record_current_enable = self.record_current_enable.get()
         ext_pmt.condition = self.condition
         ext_pmt.part_number = self.part_number.get()

@@ -17,14 +17,16 @@ class RxTestGenre(AtCmd, Anritsu8820):
         AtCmd.__init__(self)
         self.ser.com_close()
         Anritsu8820.__init__(self)
+        self.get_temp_en = ext_pmt.get_temp_en
 
-    def get_temperature(self, state=False):
+    def get_temperature(self):
         """
         for P22, AT+GOOGTHERMISTOR=1,1 for MHB LPAMid/ MHB Rx1 LFEM, AT+GOOGTHERMISTOR=0,1
         for LB LPAMid, MHB ENDC LPAMid, UHB(n77/n79 LPAF)
         :return:
         """
         self.ser.com_open()
+        state = self.get_temp_en
         if state is True:
             res0 = self.query_thermister0()
             res1 = self.query_thermister1()

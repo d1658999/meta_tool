@@ -3,8 +3,7 @@ band:
   band_segment_fr1: A
   bands_ca_lte: []
   bands_endc: []
-  bands_fr1:
-  - 41
+  bands_fr1: []
   bands_gsm: []
   bands_hsdpa: []
   bands_hsupa: []
@@ -12,11 +11,10 @@ band:
   bands_wcdma: []
 bw:
   bw_ca_lte: []
-  bw_fr1:
-  - 10
+  bw_fr1: []
   bw_lte: []
 channel:
-  chan: M
+  chan: ''
 condition:
   hthv: false
   htlv: false
@@ -30,6 +28,7 @@ criteria:
   ulca_lte: 1
 external_inst:
   count: 5
+  get_temp: false
   odpm: false
   psu: false
   record_current: true
@@ -43,10 +42,8 @@ instrument:
 margin:
   cbe_limit_margin: '1.5'
 mcs:
-  mcs_fr1:
-  - QPSK
-  mcs_lte:
-  - QPSK
+  mcs_fr1: []
+  mcs_lte: []
   modulaiton_gsm: GMSK
 path:
   asw_path: 0
@@ -56,12 +53,11 @@ path:
   srs_path: 0
   srs_path_enable: false
   sync_path: Main
-  tx_paths:
-  - TX2
+  tx_paths: []
 port:
   debug_enable: false
-  port_table_enable: true
-  port_tx: 4
+  port_table_enable: false
+  port_tx: 1
   port_tx_fr1: 1
   port_tx_lte: 3
   rfout_anritsu: MAIN
@@ -72,21 +68,16 @@ power:
   tx_level_endc_fr1: 20
   tx_level_endc_lte: 20
 rb_set:
-  rb_ftm_fr1:
-  - INNER_FULL
-  - OUTER_FULL
-  rb_ftm_lte:
-  - PRB
+  rb_ftm_fr1: []
+  rb_ftm_lte: []
   rb_ftm_ulca_lte: []
 rx_set:
   ue_power: []
 scripts:
-  scripts:
-  - GENERAL
+  scripts: []
 tab: 0
 tech:
-  tech:
-  - FR1
+  tech: []
 test_items:
   rx: false
   rx_freq_sweep: false
@@ -100,8 +91,6 @@ test_items:
   tx_cbe: false
   tx_freq_sweep: false
   tx_harmonics: false
-  tx_level_sweep: true
+  tx_level_sweep: false
 type:
-  type_fr1:
-  - DFTS
-  - CP
+  type_fr1: []
