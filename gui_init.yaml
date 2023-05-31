@@ -29,12 +29,12 @@ condition:
 criteria:
   ulca_lte: 1
 external_inst:
-  count: 1
+  count: 5
   odpm: false
   psu: false
   record_current: true
   tempchb: false
-  tx_level_start: 27
+  tx_level_start: 26
   tx_level_stop: -10
   volt_mipi: false
   wait_time: 300
@@ -57,11 +57,11 @@ path:
   srs_path_enable: false
   sync_path: Main
   tx_paths:
-  - TX1
+  - TX2
 port:
   debug_enable: false
-  port_table_enable: false
-  port_tx: 1
+  port_table_enable: true
+  port_tx: 4
   port_tx_fr1: 1
   port_tx_lte: 3
   rfout_anritsu: MAIN
@@ -73,6 +73,7 @@ power:
   tx_level_endc_lte: 20
 rb_set:
   rb_ftm_fr1:
+  - INNER_FULL
   - OUTER_FULL
   rb_ftm_lte:
   - PRB
@@ -81,8 +82,8 @@ rx_set:
   ue_power: []
 scripts:
   scripts:
-  - APT
-tab: 10
+  - GENERAL
+tab: 0
 tech:
   tech:
   - FR1
@@ -102,4 +103,5 @@ test_items:
   tx_level_sweep: true
 type:
   type_fr1:
+  - DFTS
   - CP
