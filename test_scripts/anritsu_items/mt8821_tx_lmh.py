@@ -8,6 +8,7 @@ from utils.log_init import log_set
 
 logger = log_set('8821TxSig')
 
+
 class TxTestGenre(AtCmd, Anritsu8821):
     def __init__(self):
         AtCmd.__init__(self)
