@@ -20,7 +20,7 @@ from equipments.temp_chamber import TempChamber
 logger = log_set('GUI')
 
 PROJECT_PATH = pathlib.Path(__file__).parent
-PROJECT_UI = PROJECT_PATH / pathlib.Path('gui') / "main_v2_18_3.ui"
+PROJECT_UI = PROJECT_PATH / pathlib.Path('gui') / "main_v2_18_4.ui"
 
 
 class MainApp:
@@ -270,8 +270,7 @@ class MainApp:
         self.B5_N77 = None
         self.B13_N5 = None
         self.rx_freq_sweep = None
-        self.apt_sweep = None
-        self.apt_sweep_v2 = None
+        self.apt_sweep_version = None
         self.apt_level_start_hpm = None
         self.apt_level_stop_hpm = None
         self.apt_level_step_hpm = None
@@ -620,8 +619,7 @@ class MainApp:
                 "B5_N77",
                 "B13_N5",
                 "rx_freq_sweep",
-                "apt_sweep",
-                "apt_sweep_v2",
+                "apt_sweep_version",
                 "apt_level_start_hpm",
                 "apt_level_stop_hpm",
                 "apt_level_step_hpm",
@@ -961,8 +959,7 @@ class MainApp:
         self.tx.set(ui_init['test_items']['tx'])
         self.rx.set(ui_init['test_items']['rx'])
         self.rx_freq_sweep.set(ui_init['test_items']['rx_freq_sweep'])
-        self.apt_sweep.set(ui_init['test_items']['tx_apt_sweep'])
-        self.apt_sweep_v2.set(ui_init['test_items']['tx_apt_sweep_v2'])
+        self.apt_sweep_version.set(ui_init['test_items']['tx_apt_sweep'])
         self.tx_level_sweep.set(ui_init['test_items']['tx_level_sweep'])
         self.tx_freq_sweep.set(ui_init['test_items']['tx_freq_sweep'])
         self.tx_1rb_sweep.set(ui_init['test_items']['tx_1rb_sweep'])
@@ -1570,7 +1567,7 @@ class MainApp:
         band_segment_fr1 = self.band_segment_fr1.get()
         chan = self.wanted_chan()
         tx, rx, rx_freq_sweep, tx_level_sweep, tx_freq_sweep, tx_1rb_sweep, tx_harmonics, tx_cbe, \
-        tx_ca, tx_ca_cbe, tx_apt_sweep, tx_apt_sweep_v2 = self.wanted_tx_rx_sweep()
+        tx_ca, tx_ca_cbe, tx_apt_sweep_version = self.wanted_tx_rx_sweep()
         tpchb_enable = self.tempcham_enable.get()
         psu_enable = self.psu_enable.get()
         odpm_enable = self.odpm_enable.get()
@@ -1615,8 +1612,7 @@ class MainApp:
                 'rx': rx,
                 'rx_quick_enable': rx_quick_enable,
                 'rx_freq_sweep': rx_freq_sweep,
-                'tx_apt_sweep': tx_apt_sweep,
-                'tx_apt_sweep_v2': tx_apt_sweep_v2,
+                'tx_apt_sweep': tx_apt_sweep_version,
                 'tx_level_sweep': tx_level_sweep,
                 'tx_freq_sweep': tx_freq_sweep,
                 'tx_1rb_sweep': tx_1rb_sweep,
@@ -1802,6 +1798,7 @@ class MainApp:
         self.chan_M.set(True)
         self.chan_H.set(True)
         self.sa_nsa.set(0)
+        self.apt_sweep_version.set(0)
         self.criteria_ulca_lte.set(0)
 
         logger.info(f'default instrument: {self.instrument.get()}')
@@ -2315,8 +2312,7 @@ class MainApp:
         self.wanted_test.setdefault('tx_cbe', False)
         self.wanted_test.setdefault('tx_ca', False)
         self.wanted_test.setdefault('tx_ca_cbe', False)
-        self.wanted_test.setdefault('apt_sweep', False)
-        self.wanted_test.setdefault('apt_sweep_v2', False)
+        self.wanted_test.setdefault('apt_sweep', 0)
 
         if self.tx.get():
             logger.debug(self.tx.get())
@@ -2358,11 +2354,9 @@ class MainApp:
             logger.debug(self.rx_freq_sweep.get())
             self.wanted_test['rx_freq_sweep'] = self.rx_freq_sweep.get()
 
-        if self.apt_sweep.get():
-            self.wanted_test['apt_sweep'] = self.apt_sweep.get()
-
-        if self.apt_sweep_v2.get():
-            self.wanted_test['apt_sweep_v2'] = self.apt_sweep_v2.get()
+        if self.apt_sweep_version.get():
+            print(self.apt_sweep_version.get())
+            self.wanted_test['apt_sweep'] = self.apt_sweep_version.get()
 
         if self.wanted_test == {}:
             logger.debug('Nothing to select for test items')
@@ -2370,7 +2364,7 @@ class MainApp:
         logger.info(self.wanted_test)
         return self.tx.get(), self.rx.get(), self.rx_freq_sweep.get(), self.tx_level_sweep.get(), \
                self.tx_freq_sweep.get(), self.tx_1rb_sweep.get(), self.tx_harmonics.get(), self.tx_cbe.get(), \
-               self.tx_ca.get(), self.tx_ca_cbe.get(), self.apt_sweep.get(), self.apt_sweep_v2.get()
+               self.tx_ca.get(), self.tx_ca_cbe.get(), self.apt_sweep_version.get()
 
     def wanted_ue_pwr(self):
         self.ue_power = []
@@ -3641,15 +3635,16 @@ class MainApp:
                     inst.run()
                     inst.ser.com_close()
 
-            if self.wanted_test['apt_sweep_v2'] and ext_pmt.sa_nsa == 0 and 'APT' in ext_pmt.scripts:
-                inst = AptSweepV2()
-                inst.run()
-                inst.ser.com_close()
+            if ext_pmt.sa_nsa == 0 and 'APT' in ext_pmt.scripts:
+                if self.apt_sweep_version.get() == 1:
+                    inst = AptSweepV2()
+                    inst.run()
+                    inst.ser.com_close()
 
-            elif self.wanted_test['apt_sweep'] and ext_pmt.sa_nsa == 0 and 'APT' in ext_pmt.scripts:
-                inst = AptSweep()
-                inst.run()
-                inst.ser.com_close()
+                elif self.apt_sweep_version.get() == 0:
+                    inst = AptSweep()
+                    inst.run()
+                    inst.ser.com_close()
 
         elif self.instrument.get() == 'Cmw+Fsw':
             from test_scripts.harmonics_cbe.tx_harmonics import TxHarmonics

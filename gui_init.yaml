@@ -75,7 +75,7 @@ rx_set:
   ue_power: []
 scripts:
   scripts: []
-tab: 0
+tab: 10
 tech:
   tech: []
 test_items:
@@ -84,8 +84,7 @@ test_items:
   rx_quick_enable: false
   tx: false
   tx_1rb_sweep: false
-  tx_apt_sweep: false
-  tx_apt_sweep_v2: true
+  tx_apt_sweep: 1
   tx_ca: false
   tx_ca_cbe: false
   tx_cbe: false
