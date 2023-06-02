@@ -18874,7 +18874,7 @@ Disable</property>
                           <property name="ipady">10</property>
                           <property name="padx">5</property>
                           <property name="pady">5</property>
-                          <property name="row">4</property>
+                          <property name="row">3</property>
                           <property name="sticky">nsew</property>
                         </layout>
                       </object>
@@ -18889,7 +18889,7 @@ Disable</property>
                           <property name="ipady">130</property>
                           <property name="padx">5</property>
                           <property name="pady">5</property>
-                          <property name="row">5</property>
+                          <property name="row">4</property>
                           <property name="sticky">nsew</property>
                         </layout>
                       </object>
@@ -18903,7 +18903,7 @@ Disable</property>
                           <property name="ipady">20</property>
                           <property name="padx">5</property>
                           <property name="pady">5</property>
-                          <property name="row">6</property>
+                          <property name="row">5</property>
                           <property name="sticky">nsew</property>
                         </layout>
                       </object>
@@ -18919,20 +18919,6 @@ Disable</property>
                           <property name="padx">5</property>
                           <property name="pady">5</property>
                           <property name="row">1</property>
-                          <property name="sticky">nw</property>
-                        </layout>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="ttk.Checkbutton" id="checkbutton638">
-                        <property name="command" type="command" cbtype="simple">get_temp_status</property>
-                        <property name="text" translatable="yes">Get_temp</property>
-                        <property name="variable">boolean:get_temp_en</property>
-                        <layout manager="grid">
-                          <property name="column">0</property>
-                          <property name="padx">5</property>
-                          <property name="pady">5</property>
-                          <property name="row">3</property>
                           <property name="sticky">nw</property>
                         </layout>
                       </object>
