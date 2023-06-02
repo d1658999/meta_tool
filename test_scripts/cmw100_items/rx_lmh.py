@@ -110,7 +110,7 @@ class RxTestGenre(AtCmd, CMW100):
     def query_fer_measure_gsm(self):
         self.sig_gen_gsm()
         self.sync_gsm()
-        self.query_fer_measure_gsm()
+        self.query_rssi_measure_gsm()
 
     def search_process_fr1(self):
         self.query_fer_measure_fr1()
@@ -137,8 +137,8 @@ class RxTestGenre(AtCmd, CMW100):
             # self.command_cmw100_query('*OPC?')
 
     def search_process_gsm(self):
-        rssi = None
         self.query_fer_measure_gsm()
+        rssi = self.rssi
         while self.fer < 2:
             rssi = self.rssi
             self.rx_level = round(self.rx_level - self.resolution, 1)  # to reduce a unit

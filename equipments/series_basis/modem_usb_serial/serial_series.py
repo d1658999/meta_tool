@@ -741,7 +741,7 @@ class AtCmd:
                 self.fer = eval(line.decode().split(':')[1])
                 logger.info(f'****FER: {self.fer / 1000} %****')
 
-    def query_fer_measure_gsm(self):
+    def query_rssi_measure_gsm(self):
         logger.info('========== FER measure ==========')
         res = self.command(f'AT+TESTBER={self.band_tx_set_dict_gsm[self.band_gsm]},{self.mod_dict_gsm[self.mod_gsm]},'
                            f'0,1,{self.rx_chan_gsm},{-1 * int(round(self.rx_level, 0))},7,2', delay=0.5)

@@ -1447,8 +1447,9 @@ def rx_power_relative_test_export_excel_ftm(data, parameters_dict):
     mcs = parameters_dict['mcs']
     tx_path = parameters_dict['tx_path']
     rx_path = parameters_dict['rx_path']
-    rb_size = parameters_dict['rb_size']
-    rb_start = parameters_dict['rb_start']
+    if tech in ['FR1', 'LTE']:
+        rb_size = parameters_dict['rb_size']
+        rb_start = parameters_dict['rb_start']
 
     logger.info('----------save to excel----------')
     if script == 'GENERAL':
