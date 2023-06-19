@@ -113,6 +113,10 @@ apt_bias1_start_lpm = 500
 apt_bias1_stop_lpm = 60
 apt_bias1_step_lpm = 10
 
+vcc_count_apt = 7
+aclr_limit_apt = -3.7
+evm_limit_apt = 2.5
+
 
 def main():
     """

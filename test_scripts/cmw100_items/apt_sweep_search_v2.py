@@ -14,13 +14,13 @@ import datetime
 
 logger = log_set('apt_sweep_v2')
 
-ACLR_LIMIT_USL = -37
-ACLR_MARGIN = 15
-EVM_LIMIT_USL = 2.5
+# ACLR_LIMIT_USL = -37
+# ACLR_MARGIN = 15
+# EVM_LIMIT_USL = 2.5
 # EVM_LIMIT_ABS = 2.5
 # COUNT_BIAS1 = 4
 # COUNT_BIAS0 = 4
-COUNT_VCC = 5
+# COUNT_VCC = 5
 ALGR_MODE = 1  # 1:b1b0v, 0:b0b1v
 
 
@@ -231,7 +231,7 @@ class AptSweepV2(AptSweep):
                                    [self.tx_level, self.vcc_new, self.bias0_new, self.bias1_new])
 
     def loop_find_vcc(self):
-        count_vcc = COUNT_VCC
+        count_vcc = self.COUNT_VCC
         for vcc in range(self.vcc_new, self.vcc_stop - 1, - self.vcc_step):
             logger.info(f'Now VCC is {vcc} to run')
             # set nv and calibrate by apt only

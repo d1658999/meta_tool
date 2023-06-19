@@ -20,7 +20,7 @@ from equipments.temp_chamber import TempChamber
 logger = log_set('GUI')
 
 PROJECT_PATH = pathlib.Path(__file__).parent
-PROJECT_UI = PROJECT_PATH / pathlib.Path('gui') / "main_v2_18_4.ui"
+PROJECT_UI = PROJECT_PATH / pathlib.Path('gui') / "main_v2_18_5.ui"
 
 
 class MainApp:
@@ -295,6 +295,9 @@ class MainApp:
         self.vcc_start_lpm = None
         self.vcc_stop_lpm = None
         self.vcc_step_lpm = None
+        self.vcc_count_apt = None
+        self.aclr_limit_apt = None
+        self.evm_limit_apt = None
         self.U1 = None
         self.U2 = None
         self.HSUPA_all = None
@@ -644,6 +647,9 @@ class MainApp:
                 "vcc_start_lpm",
                 "vcc_stop_lpm",
                 "vcc_step_lpm",
+                "vcc_count_apt",
+                "aclr_limit_apt",
+                "evm_limit_apt",
                 "U1",
                 "U2",
                 "HSUPA_all",
@@ -766,7 +772,7 @@ class MainApp:
         print('Crtrl C')
         os.kill(signal.CTRL_C_EVENT, 0)
 
-    def apt_sweep_init(self):
+    def apt_sweep_init(self):  # obsolete
         import utils.parameters.external_paramters as ext_pmt
 
         ext_pmt.apt_tx_level_start_hpm = self.apt_level_start_hpm.get()
@@ -794,6 +800,10 @@ class MainApp:
         ext_pmt.apt_bias1_start_lpm = self.bias1_start_lpm.get()
         ext_pmt.apt_bias1_stop_lpm = self.bias1_stop_lpm.get()
         ext_pmt.apt_bias1_step_lpm = self.bias1_step_lpm.get()
+
+        ext_pmt.vcc_count_apt = self.vcc_count_apt.get()
+        ext_pmt.aclr_limit_apt = self.aclr_limit_apt.get()
+        ext_pmt.evm_limit_apt = self.evm_limit_apt.get()
 
     def endc_tx_path_init(self):
         self.endc_tx_path_lte.set('TX1')
@@ -3541,6 +3551,11 @@ class MainApp:
         ext_pmt.apt_bias1_start_lpm = self.bias1_start_lpm.get()
         ext_pmt.apt_bias1_stop_lpm = self.bias1_stop_lpm.get()
         ext_pmt.apt_bias1_step_lpm = self.bias1_step_lpm.get()
+
+        # others
+        ext_pmt.vcc_count_apt = self.vcc_count_apt.get()
+        ext_pmt.aclr_limit_apt = self.aclr_limit_apt.get()
+        ext_pmt.evm_limit_apt = self.evm_limit_apt.get()
 
         if self.instrument.get() == 'Anritsu8820':
             from test_scripts.anritsu_items.mt8820_tx_lmh import TxTestGenre

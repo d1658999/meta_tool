@@ -15,13 +15,13 @@ import datetime
 
 logger = log_set('apt_sweep')
 
-ACLR_LIMIT_USL = -37
-ACLR_MARGIN = 15
-EVM_LIMIT_USL = 2.5
+# ACLR_LIMIT_USL = -37
+# ACLR_MARGIN = 15
+# EVM_LIMIT_USL = 2.5
 # EVM_LIMIT_ABS = 2.5
 # COUNT_BIAS1 = 4
 # COUNT_BIAS0 = 4
-COUNT_VCC = 5
+# COUNT_VCC = 5
 ALGR_MODE = 1
 
 
@@ -90,6 +90,10 @@ class AptSweep(TxTestLevelSweep):
         self.BIAS1_START_LPM = ext_pmt.apt_bias1_start_lpm
         self.BIAS1_STOP_LPM = ext_pmt.apt_bias1_stop_lpm
         self.BIAS1_STEP_LPM = ext_pmt.apt_bias1_step_lpm
+        self.ACLR_LIMIT_USL = ext_pmt.aclr_limit_apt
+        self.EVM_LIMIT_USL = ext_pmt.evm_limit_apt
+        self.COUNT_VCC = ext_pmt.vcc_count_apt
+
         
     def tx_apt_sweep_pipeline_fr1(self):
         self.global_parameters()
@@ -297,7 +301,7 @@ class AptSweep(TxTestLevelSweep):
                                    [self.tx_level, self.vcc_new, self.bias0_new, self.bias1_new])
 
     def loop_find_vcc(self):
-        count_vcc = COUNT_VCC
+        count_vcc = self.COUNT_VCC
         for vcc in range(self.vcc_new, self.vcc_stop - 1, - self.vcc_step):
             logger.info(f'Now VCC is {vcc} to run')
             self.set_level_fr1(self.tx_level)
@@ -364,7 +368,7 @@ class AptSweep(TxTestLevelSweep):
         aclr_p = self.aclr_mod_current_results[4]
         evm = self.aclr_mod_current_results[7]
 
-        if (aclr_m < ACLR_LIMIT_USL) and (aclr_p < ACLR_LIMIT_USL) and (evm < EVM_LIMIT_USL):
+        if (aclr_m < self.ACLR_LIMIT_USL) and (aclr_p < self.ACLR_LIMIT_USL) and (evm < self.EVM_LIMIT_USL):
 
             self.data[self.tx_level] = self.aclr_mod_current_results
 
