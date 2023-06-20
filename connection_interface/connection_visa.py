@@ -3,6 +3,7 @@ import time
 import pyvisa
 
 from utils.log_init import log_set
+from utils.parameters.external_paramters import tcpip
 
 logger = log_set('Visa')
 
@@ -71,9 +72,9 @@ class VisaComport:
             try:
                 for gpib in self.get_gpib_usb():  # this is to search GPIB for tempchamber
                     inst = pyvisa.ResourceManager().open_resource(gpib)
-                    inst = inst.query('*IDN?').strip()
+                    inst_res = inst.query('*IDN?').strip()
                     logger.info('----------Search temp chamber we are using----------')
-                    if 'NA:CMD_ERR' in inst:
+                    if 'NA:CMD_ERR' in inst_res:
                         gpib_wanted = gpib
                         break
 
@@ -108,14 +109,43 @@ class VisaComport:
 
             self.inst.timeout = 75000  # set the default timeout
 
+        elif 'E7515B' in equipment_name:
+            gpib_wanted = None
+            try:
+                resource = self.get_gpib_tcpip()  # this is to search tcpip by visa
+                inst = pyvisa.ResourceManager().open_resource(resource)
+                inst_res = inst.query('*IDN?').strip()
+                logger.info('----------Get UXM we are using----------')
+                logger.info(inst_res)
+
+            except Exception as err:
+                logger.info(err)
+                logger.info('Please check if connecting to UXM')
+
+            else:
+                logger.info(f'Connect to UXM successfully')
+                self.inst = pyvisa.ResourceManager().open_resource(resource)  # to build object of 'inst'
+
+            self.inst.timeout = 5000  # set the default timeout
+
     @staticmethod
     def get_gpib_usb():
         resources = []
+        print(pyvisa.ResourceManager().list_resources())
         for resource in pyvisa.ResourceManager().list_resources():
             if 'GPIB' in resource or 'USB' in resource:
                 resources.append(resource)
                 logger.debug(resource)
         return resources
+
+    @staticmethod
+    def get_gpib_tcpip():
+        resources = []
+        for resource in pyvisa.ResourceManager().list_resources():
+            if tcpip in resource:
+                logger.info(resource)
+
+                return resource
 
     def write(self, command):
         self.inst.write(command)
@@ -131,12 +161,13 @@ class VisaComport:
 
 
 def main():
-    test = VisaComport('CMW100')
+    test = VisaComport('E7515B')
     # print(test.query('*IDN?'))
     # print(test.query('SYSTem:BASE:OPTion:VERSion? "CMW_NRSub6G_Meas"'))
     t = "CMW_NRSub6G_Meas"
     tt = f'SYSTem:BASE:OPTion:VERSion? {t}'
     test.query(tt)
+
 
 if __name__ == '__main__':
     main()

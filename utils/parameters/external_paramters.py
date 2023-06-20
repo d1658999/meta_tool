@@ -117,6 +117,8 @@ vcc_count_apt = 7
 aclr_limit_apt = -3.7
 evm_limit_apt = 2.5
 
+tcpip = '192.168.1.100'
+
 
 def main():
     """
