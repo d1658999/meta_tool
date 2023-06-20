@@ -11,14 +11,14 @@ band_segment_fr1 = 'B'
 devices_serial = None
 et_tracker = 'sky51001'  # 'sky51001', 'qm81052'
 
-lte_bandwidths = [10]     # 1.4, 3, 5, 10, 15, 20
+lte_bandwidths = [10]  # 1.4, 3, 5, 10, 15, 20
 fr1_bandwidths = [10]  # 10, 15, 20, 25, 30 , 40, 50, 60, 80, 90, 100, 70
 lte_bandwidths_ca_combo = ['20+20']
 
-tech = ['FR1']   # 'LTE' | 'WCDMA' | 'GSM' | 'HSUPA' | 'HSDPA' | 'FR1'
+tech = ['FR1']  # 'LTE' | 'WCDMA' | 'GSM' | 'HSUPA' | 'HSDPA' | 'FR1'
 channel = 'M'  # 'LMH'
 
-fdd_tdd_cross_test = 0     # this is only for 8821,  0: only measure one of FDD or TDD; 1: measure both FDD and TDD
+fdd_tdd_cross_test = 0  # this is only for 8821,  0: only measure one of FDD or TDD; 1: measure both FDD and TDD
 
 tx_max_pwr_sensitivity = [1, 0]  # 1: Txmax power, 0: -10dBm
 
@@ -57,8 +57,9 @@ temp = 25
 srs_path_enable = False
 asw_path_enable = False
 sync_path = 'Main'  # 'Main', 'CA#1', 'CA#2', 'CA#3'
-tx_paths = ['TX1']   # 'TX1' | 'TX2' | 'MIMO
-rx_paths = [15]  #  0: default(free run) | 1: DRX_ONLY | 2: PRX ONLY | 3: PRX+DRX | 4: 4RX_PRX(RX2) ONLY | 8: 4RX_DRX(RX3) ONLY | 12: 4RX_PRX(RX2) + 4RX_DRX(RX3) | 15: ALL PATH
+tx_paths = ['TX1']  # 'TX1' | 'TX2' | 'MIMO
+rx_paths = [
+    15]  # 0: default(free run) | 1: DRX_ONLY | 2: PRX ONLY | 3: PRX+DRX | 4: 4RX_PRX(RX2) ONLY | 8: 4RX_DRX(RX3) ONLY | 12: 4RX_PRX(RX2) + 4RX_DRX(RX3) | 15: ALL PATH
 tx_path_endc_lte = 'TX1'
 tx_path_endc_fr1 = 'TX1'
 rx_paths_endc_lte = [15]
@@ -67,16 +68,16 @@ condition = 'NV'
 rx_fast_test_enable = False
 debug_enable = False
 
-
 scripts = ['GENERAL']  # 'GENERAL' | 'FCC' | 'CE' | 'FACTORY'
 
 mod_gsm = 'GMSK'  # 'GMSK' | 'EPSK'
 type_fr1 = ['CP']  # 'DFTS' | 'CP'
-mcs_lte = ['QPSK']   # 'QPSK' | 'Q16' | 'Q64' | 'Q256'
-mcs_fr1 = ['QPSK', 'Q16', 'Q64', 'Q256']   # 'BPSK' | 'QPSK' | 'Q16' | 'Q64' | 'Q256'
+mcs_lte = ['QPSK']  # 'QPSK' | 'Q16' | 'Q64' | 'Q256'
+mcs_fr1 = ['QPSK', 'Q16', 'Q64', 'Q256']  # 'BPSK' | 'QPSK' | 'Q16' | 'Q64' | 'Q256'
 rb_ftm_lte = ['FRB']  # 'PRB' | 'FRB'
 rb_ftm_ulca_lte = ['FRB_FRB']
-rb_ftm_fr1 = ['OUTER_FULL']  #  'INNER_FULL' | 'OUTER_FULL' | 'INNER_1RB_LEFT' | 'INNER_1RB_RIGHT' | 'EDGE_1RB_LEFT' | 'EDGE_1RB_RIGHT' | 'EDGE_FULL_LEFT' | 'EDGE_FULL_RIGHT'
+rb_ftm_fr1 = [
+    'OUTER_FULL']  # 'INNER_FULL' | 'OUTER_FULL' | 'INNER_1RB_LEFT' | 'INNER_1RB_RIGHT' | 'EDGE_1RB_LEFT' | 'EDGE_1RB_RIGHT' | 'EDGE_FULL_LEFT' | 'EDGE_FULL_RIGHT'
 scs = [1]  # 0: 15KHz | 1: 30KHz | 2: 60KHz
 
 tx_level_range_list = [20, 20]  # tx_level_1, tx_level_2
@@ -125,6 +126,7 @@ def main():
         test
     """
     print(wcdma_bands == [])
+
 
 if __name__ == "__main__":
     main()

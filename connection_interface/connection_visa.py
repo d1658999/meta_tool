@@ -110,10 +110,12 @@ class VisaComport:
             self.inst.timeout = 75000  # set the default timeout
 
         elif 'E7515B' in equipment_name:
-            gpib_wanted = None
+            port = 5025
+            resource = f'TCPIP0::{tcpip}::{port}::SOCKET'
             try:
-                resource = self.get_gpib_tcpip()  # this is to search tcpip by visa
                 inst = pyvisa.ResourceManager().open_resource(resource)
+                inst.read_termination = '\n'
+                inst.write_termination = '\n'
                 inst_res = inst.query('*IDN?').strip()
                 logger.info('----------Get UXM we are using----------')
                 logger.info(inst_res)
@@ -124,9 +126,26 @@ class VisaComport:
 
             else:
                 logger.info(f'Connect to UXM successfully')
-                self.inst = pyvisa.ResourceManager().open_resource(resource)  # to build object of 'inst'
+                self.inst = inst  # to build object of 'inst'
 
             self.inst.timeout = 5000  # set the default timeout
+        # elif 'E7515B' in equipment_name:
+        #     try:
+        #         resource = self.get_gpib_tcpip()  # this is to search tcpip by visa
+        #         inst = pyvisa.ResourceManager().open_resource(resource)
+        #         inst_res = inst.query('*IDN?').strip()
+        #         logger.info('----------Get UXM we are using----------')
+        #         logger.info(inst_res)
+        #
+        #     except Exception as err:
+        #         logger.info(err)
+        #         logger.info('Please check if connecting to UXM')
+        #
+        #     else:
+        #         logger.info(f'Connect to UXM successfully')
+        #         self.inst = pyvisa.ResourceManager().open_resource(resource)  # to build object of 'inst'
+        #
+        #     self.inst.timeout = 5000  # set the default timeout
 
     @staticmethod
     def get_gpib_usb():
@@ -140,7 +159,6 @@ class VisaComport:
 
     @staticmethod
     def get_gpib_tcpip():
-        resources = []
         for resource in pyvisa.ResourceManager().list_resources():
             if tcpip in resource:
                 logger.info(resource)
@@ -164,9 +182,9 @@ def main():
     test = VisaComport('E7515B')
     # print(test.query('*IDN?'))
     # print(test.query('SYSTem:BASE:OPTion:VERSion? "CMW_NRSub6G_Meas"'))
-    t = "CMW_NRSub6G_Meas"
-    tt = f'SYSTem:BASE:OPTion:VERSion? {t}'
-    test.query(tt)
+    # t = "CMW_NRSub6G_Meas"
+    # tt = f'SYSTem:BASE:OPTion:VERSion? {t}'
+    # test.query(tt)
 
 
 if __name__ == '__main__':
