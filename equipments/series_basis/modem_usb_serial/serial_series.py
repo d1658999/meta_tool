@@ -5,8 +5,7 @@ import utils.parameters.external_paramters as ext_pmt
 from connection_interface.connection_serial import ModemComport
 from utils.parameters.common_parameters_ftm import TDD_BANDS
 import utils.parameters.rssi_parameters as rssi
-from utils.regy_handler import regy_parser,  regy_parser_v2
-from utils.regy_handler import decimal_to_hex_twos_complement, convert_string
+from utils.regy_handler import regy_parser, regy_parser_v2
 
 logger = log_set('AtCmd')
 
@@ -81,7 +80,7 @@ class AtCmd:
         self.rsrp_list = None
         self.init_dicts()
 
-    def command_nv(self, cmd='at', delay=0.02, mode='N'):
+    def command_nv(self, cmd='at', delay=0.2, mode='N'):
         logger.info(f'MTM: <<{cmd}')
         cmd = cmd + '\r'
 
@@ -307,6 +306,20 @@ class AtCmd:
         self.mod_dict_gsm = {
             'GMSK': 0,
             'EPSK': 1,
+        }
+
+        self.apt_vcc_dict_fr1 = {
+            'TX1CP': 0,
+            'TX2CP': 1,
+            'TX1DFTS': 2,
+            'TX2DFTS': 3,
+            'TX1Q256': 4,
+            'TX2Q256': 5,
+        }
+
+        self.pa_mode = {
+            'HPM': 0,
+            'LPM': 2,
         }
 
     def select_scs_fr1(self, band):
@@ -728,7 +741,7 @@ class AtCmd:
                 self.fer = eval(line.decode().split(':')[1])
                 logger.info(f'****FER: {self.fer / 1000} %****')
 
-    def query_fer_measure_gsm(self):
+    def query_rssi_measure_gsm(self):
         logger.info('========== FER measure ==========')
         res = self.command(f'AT+TESTBER={self.band_tx_set_dict_gsm[self.band_gsm]},{self.mod_dict_gsm[self.mod_gsm]},'
                            f'0,1,{self.rx_chan_gsm},{-1 * int(round(self.rx_level, 0))},7,2', delay=0.5)
@@ -826,7 +839,7 @@ class AtCmd:
 
             elif tx_path == 'TX2':
                 if band in [1, 2, 3, 4, 66, 7, 25, 30, 38, 41, 40, 39, 34, 70, 75, 76, ]:
-                    mipi_num, usid, addr = 0, 4, 0
+                    mipi_num, usid, addr = 0, 4, 1
                 elif band in [42, 48, 77, 78, 79, ]:
                     mipi_num, usid, addr = 2, 5, 1
                 elif band in [26, 5, 8, 12, 13, 14, 17, 18, 19, 20, 28, 29, 71, 24]:
@@ -1016,8 +1029,11 @@ class AtCmd:
         self.command(command_rssi)
 
     def set_google_nv(self, nv_name, nv_index, nv_value):
+        """
+        nv_value is hex not dec
+        """
         # nv_value_ = hex(int(nv_value))[2:].zfill(2)  # to transfer to 2 placeholder (0x1 -> 1 -> '01')
-        self.command_nv(f'AT+GOOGSETNV="{nv_name}",{nv_index},"{nv_value}"', 0)
+        self.command_nv(f'AT+GOOGSETNV="{nv_name}",{nv_index},"{nv_value}"')
 
     def query_google_nv(self, nv_name):
         return self.command_nv(f'AT+GOOGGETNV="{nv_name}"')
@@ -1031,8 +1047,8 @@ class AtCmd:
                 else:
                     # to do important transfer the format to meet LSI
                     size = regy_value['size']
-                    hex_rep = decimal_to_hex_twos_complement(int(nv_value), size)
-                    nv_value_new = convert_string(hex_rep, size)
+                    hex_rep = self.decimal_to_hex_twos_complement(int(nv_value), size)
+                    nv_value_new = self.convert_string(hex_rep, size)
 
                     # start to set nv
                     self.set_google_nv(nv_name, nv_index, nv_value_new)
@@ -1042,13 +1058,20 @@ class AtCmd:
         for nv_name, nv_values in regy_dict.items():
             self.set_google_nv(nv_name, 0, nv_values)
 
-    @staticmethod
-    def get_nv_index_value(res):
+    def get_nv_index_value(self, res):
         index_value_dict = {}
         for res_ in res:
             resd = res_.decode().strip().split(',')
-            if len(resd) >= 3:
-                index_value_dict[resd[1]] = str(int(resd[2].strip('"'), 16))
+            if len(resd) == 3:  # size == 1
+                index_value_dict[resd[1]] = str(int(resd[-1].strip('"'), 16))
+            elif len(resd) == 4:  # size == 2
+                hex_string = "".join((resd[-2].strip('"'), resd[-1].strip('"')))
+                new_string = str(self.hex_string2dec(hex_string))
+                index_value_dict[resd[1]] = new_string
+            elif len(resd) == 6:  # size == 4
+                hex_string = "".join((resd[-4].strip('"'), resd[-3].strip('"'), resd[-2].strip('"'), resd[-1].strip('"')))
+                new_string = str(self.hex_string2dec(hex_string))
+                index_value_dict[resd[1]] = new_string
         logger.debug(index_value_dict)
 
         return index_value_dict
@@ -1066,6 +1089,32 @@ class AtCmd:
         return:
         {band: index, ...}
         """
+        index_value_dict = self.get_nv_index_value(self.query_google_nv(used_band_name))
+        used_band_index = {}
+        for index in index_value_dict:
+            used_band_index[int(index_value_dict[index])] = int(index) + 1
+        logger.debug(used_band_index)
+
+        return used_band_index
+
+    def get_used_band_index_by_path_fr1(self, tx_path):
+        """
+        To transfer used_band to {band: index, ...}
+        used_band_name parameter that can be valid:
+        'CAL.NR_SUB6.USED_RF_BAND'
+        'CAL.NR_SUB6.USED_DUALTX_RF_BAND'
+        'CAL.NR_SUB6.USED_ULMIMO_RF_BAND'
+        return:
+        {band: index, ...}
+        """
+        used_band_name = None
+        if tx_path == 'TX1':
+            used_band_name = 'CAL.NR_SUB6.USED_RF_BAND'
+        elif tx_path == 'TX2':
+            used_band_name = 'CAL.NR_SUB6.USED_DUALTX_RF_BAND'
+        elif tx_path == 'MIMO':
+            used_band_name = 'CAL.NR_SUB6.USED_ULMIMO_RF_BAND'
+
         index_value_dict = self.get_nv_index_value(self.query_google_nv(used_band_name))
         used_band_index = {}
         for index in index_value_dict:
@@ -1095,7 +1144,7 @@ class AtCmd:
             elif tx_path == 'TX2':
                 used_band_index = self.get_used_band_index("CAL.LTE.USED_DUALTX_RF_BAND")
 
-            nv = f'!LTERF.TX.USER DSP MPR OFFSET TX{int(tx_path[-1]) - 1} ' \
+            nv = f'!LTERF.TX.USER DSP MPR OFFSET TX{self.tx_path_dict[self.tx_path]} ' \
                  f'B{str(used_band_index[band]).zfill(2)}'
 
             mpr_index_value = self.get_nv_index_value(self.query_google_nv(nv))
@@ -1115,7 +1164,7 @@ class AtCmd:
             elif tx_path == 'TX2':
                 used_band_index = self.get_used_band_index("CAL.NR_SUB6.USED_DUALTX_RF_BAND")
 
-            nv = f'!NR_SUB6RF.TX.USER MPR OFFSET TX{int(tx_path[-1]) - 1}_' \
+            nv = f'!NR_SUB6RF.TX.USER MPR OFFSET TX{self.tx_path_dict[self.tx_path]}_' \
                  f'N{str(used_band_index[band]).zfill(2)}'
 
             mpr_index_value = self.get_nv_index_value(self.query_google_nv(nv))
@@ -1127,7 +1176,7 @@ class AtCmd:
             elif tx_path == 'TX2':
                 used_band_index = self.get_used_band_index("CAL.NR_SUB6.USED_DUALTX_RF_BAND")
 
-            nv = f'!NR_SUB6RF.TX.USER MPR OFFSET PC2 TX{int(tx_path[-1]) - 1}_' \
+            nv = f'!NR_SUB6RF.TX.USER MPR OFFSET PC2 TX{self.tx_path_dict[self.tx_path]}_' \
                  f'N{str(used_band_index[band]).zfill(2)}'
 
             mpr_index_value = self.get_nv_index_value(self.query_google_nv(nv))
@@ -1139,7 +1188,7 @@ class AtCmd:
             elif tx_path == 'TX2':
                 used_band_index = self.get_used_band_index("CAL.NR_SUB6.USED_DUALTX_RF_BAND")
 
-            nv = f'!NR_SUB6RF.TX.USER MPR OFFSET PC1p5 TX{int(tx_path[-1]) - 1}_' \
+            nv = f'!NR_SUB6RF.TX.USER MPR OFFSET PC1p5 TX{self.tx_path_dict[self.tx_path]}_' \
                  f'N{str(used_band_index[band]).zfill(2)}'
 
             mpr_index_value = self.get_nv_index_value(self.query_google_nv(nv))
@@ -1211,17 +1260,251 @@ class AtCmd:
 
         return mpr_nv_all_dict
 
+    def set_stop_network_cal(self):
+        """
+        Network stop command for 2G/3G/4G mode
+        """
+        self.command('AT+HNSSTOP')
+
+    def set_postcal_fr1(self, band):
+        """
+        This is postcal for FR1
+        """
+        self.command(f'AT+NPOSTCALSTART={band}')
+
+    def set_rfcal_start_wcdma(self):
+        """
+        This is postcal for wcdma
+        """
+        self.command('AT+HSPARFCALSTART=7')
+
+    def set_apt_internal_calibration_fr1(self, tx_path, freq):
+        """
+        AT+NTXSAINTERNALAPT=P0, P1
+        Run TX internal APT calibration
+
+        P0 : Tx_path_no: (0: PCC, 1: SCC)
+        P1 : Tx Calibration frequency (kHz)
+
+        R00~R39 : HPM1 ~ HPM40 : APT calibration result of high
+        power mode (dBm * 100)
+        R40~R79 : MPM1 ~ MPM40 : APT calibration result of mid
+        power mode (dBm * 100)
+        R80~R119 : LPM1 ~ LPM40 : APT calibration result of low
+        power mode (dBm * 100)
+        """
+        self.command(f'AT+NTXSAINTERNALAPT={self.tx_path_dict[tx_path]},{freq}', delay=0.5)
+
+    def set_calibration_finish_fr1(self):
+        """
+        Calibration mode finished
+        """
+        self.command(f'AT+NRFCALFINISH', 0.5)
+
+    def apt_calibration_process_fr1(self, band, tx_path, freq):
+        self.set_stop_network_cal()
+        self.set_postcal_fr1(band)
+        self.set_apt_internal_calibration_fr1(tx_path, freq)
+        self.set_calibration_finish_fr1()
+
+    def set_apt_vcc_nv_fr1(self, vcc_para_dict):
+        """
+        AT+NTXAPTVOLNVWRITE=P0,P1,~P37
+        """
+        band = vcc_para_dict['band']
+        scheme = self.apt_vcc_dict_fr1[vcc_para_dict['scheme']]
+        pa_mode = vcc_para_dict['pa_mode']
+        vcc_value = ','.join(vcc_para_dict['vcc_value_list'])
+
+        self.command(f'AT+NTXAPTVOLNVWRITE={band},{scheme},{pa_mode},0,{vcc_value}')
+
+    def set_apt_bias_nv_fr1(self, bias_num, bias_para_dict):
+        """
+        AT+NTXAPTBIASNVWRITE=P0,P1,~P38
+        """
+        band = bias_para_dict['band']
+        scheme = self.apt_vcc_dict_fr1[bias_para_dict['scheme']]
+        pa_mode = bias_para_dict['pa_mode']
+        bias_value = ','.join(bias_para_dict['bias_value_list'])
+
+        self.command(f'AT+NTXAPTBIASNVWRITE={band},{scheme},{pa_mode},0,{bias_num},{bias_value}')
+
+    def set_apt_mode_force(self, band, tx_path, mode=0):
+        """
+        force apt into APT mode before doing APT sweep
+        mode = 0, which is APT mode
+        mode = 1, which is ET/SAPT mode
+        """
+        pa_mode_dict = {
+            0: 'APT',
+            1: 'ET/SAPT',
+        }
+        used_band_index = None
+
+        if tx_path == 'TX1':
+            used_band_index = self.get_used_band_index("CAL.NR_SUB6.USED_RF_BAND")
+        elif tx_path == 'TX2':
+            used_band_index = self.get_used_band_index("CAL.NR_SUB6.USED_DUALTX_RF_BAND")
+
+        nv = f'CAL.NR_SUB6.TX_PA_Range_Map_EN_TX{self.tx_path_dict[self.tx_path]}_' \
+             f'N{str(used_band_index[band]).zfill(2)}'
+
+        logger.info(f'========== Force to set {pa_mode_dict[mode]} mode ==========')
+        self.set_google_nv(nv, 0, str(mode).zfill(2))
+
+    def set_apt_trymode(self, trymode):
+        self.command(f'AT+NTXAPTTUNESET={trymode}')
+
+    def set_apt_vcc_trymode(self, tx_path, vcc10):
+        self.command(f'AT+NAPTVOLSET={self.tx_path_dict[tx_path]},1,{vcc10}')
+
+    def set_apt_bias_trymode(self, tx_path, icq1, icq2):
+        self.command(f'AT+NTXPABIASSET={self.tx_path_dict[tx_path]},2,{icq1},{icq2}')
+
+    def set_pa_range_mode(self, mode='H'):
+        """
+        HPM
+        AT+NTXPARANGEMAPSET=0,-1,-3,-5,-7
+        LPM
+        AT+NTXPARANGEMAPSET=0,25,23,21,19
+        """
+        pa_range = None
+        if mode == 'H':
+            pa_range = '0,-1,-3,-5,-7'
+        elif mode == 'L':
+            pa_range = '0,25,23,21,19'
+        self.command(f'AT+NTXPARANGEMAPSET={pa_range}')
+
+    def set_apt_vcc_nv_each_cp_fr1(self, band, tx_path, pa_mode, index_wanted, value_wanted):
+        """
+        used for the NV:
+        CAL.NR_SUB6.TX_APT_DC_TABLE_MIDCH_HPM_TX0_Nxx
+        CAL.NR_SUB6.TX_APT_DC_TABLE_MIDCH_LPM_TX0_Nxx
+        CAL.NR_SUB6.TX_APT_DC_TABLE_MIDCH_HPM_TX1_Nxx
+        CAL.NR_SUB6.TX_APT_DC_TABLE_MIDCH_LPM_TX1_Nxx
+
+        pa_mode: use 'H' and 'L to be representative
+        index_wanted: use integer or string 1, 2, 3,...
+        value_wanted: use decimal value or string
+        """
+        # query the used_band and get the band index
+        used_band_index_fr1 = None
+        if tx_path == 'TX1':
+            used_band_index_fr1 = self.get_used_band_index('CAL.NR_SUB6.USED_RF_BAND')
+        elif tx_path == 'TX2':
+            used_band_index_fr1 = self.get_used_band_index('CAL.NR_SUB6.USED_DUALTX_RF_BAND')
+
+        # get the NV we want
+        vcc_nv_wanted = f'CAL.NR_SUB6.TX_APT_DC_TABLE_MIDCH_{pa_mode}PM_TX{self.tx_path_dict[self.tx_path]}' \
+                        f'_N{str(used_band_index_fr1[band]).zfill(2)}'
+
+        # set the value we want in vcc_nv
+        hex_rep = self.decimal_to_hex_twos_complement(int(value_wanted), 2)  # vcc nv size is 2
+        nv_value_new = self.convert_string(hex_rep, 2)  # vcc nv size is 2
+        self.set_google_nv(vcc_nv_wanted, int(index_wanted) - 1, nv_value_new)
+        logger.info(f'Set value: {value_wanted} at index: {index_wanted}')
+
+    def set_apt_bias_nv_each_cp_fr1(self, band, tx_path, bias_num, pa_mode, index_wanted, value_wanted):
+        """
+        used for the NV:
+        CAL.NR_SUB6.TX_PA_BIAS0_MIDCH_HPM_TX0_Nxx
+        CAL.NR_SUB6.TX_PA_BIAS0_MIDCH_LPM_TX0_Nxx
+        CAL.NR_SUB6.TX_PA_BIAS0_MIDCH_HPM_TX1_Nxx
+        CAL.NR_SUB6.TX_PA_BIAS0_MIDCH_LPM_TX1_Nxx
+        CAL.NR_SUB6.TX_PA_BIAS1_MIDCH_HPM_TX0_Nxx
+        CAL.NR_SUB6.TX_PA_BIAS1_MIDCH_LPM_TX0_Nxx
+        CAL.NR_SUB6.TX_PA_BIAS1_MIDCH_HPM_TX1_Nxx
+        CAL.NR_SUB6.TX_PA_BIAS1_MIDCH_LPM_TX1_Nxx
+
+        pa_mode: use 'H' and 'L to be representative
+        index_wanted: use integer or string 1, 2, 3,...
+        value_wanted: use decimal value or string
+        """
+        # query the used_band and get the band index
+        used_band_index_fr1 = self.get_used_band_index_by_path_fr1(tx_path)
+
+        # get the NV we want
+        bias_nv_wanted = f'CAL.NR_SUB6.TX_PA_BIAS{bias_num}_MIDCH' \
+                         f'_{pa_mode}PM_TX{self.tx_path_dict[self.tx_path]}' \
+                         f'_N{str(used_band_index_fr1[band]).zfill(2)}'
+
+        # set the value we want in vcc_nv
+        hex_rep = self.decimal_to_hex_twos_complement(int(value_wanted), 1)  # bias nv size is 1
+        nv_value_new = self.convert_string(hex_rep, 1)  # bias nv size is 1
+        self.set_google_nv(bias_nv_wanted, int(index_wanted) - 1, nv_value_new)
+        logger.info(f'Set value: {value_wanted} at index: {index_wanted}')
+
+    def get_pa_sw_rise_level(self, band, tx_path, index) -> int:
+        """
+        index 1: max power level for apt nv -> index 34
+        index 4: sw point power level for apt nv
+        """
+        used_band_index = self.get_used_band_index_by_path_fr1(tx_path)
+        pa_map_rise_nv = f'CAL.NR_SUB6.TX_PA_Range_Map_Rise_TX{self.tx_path_dict[self.tx_path]}' \
+                         f'_N{str(used_band_index[band]).zfill(2)}'
+        level_pa_rise = int(self.get_nv_index_value(self.query_google_nv(pa_map_rise_nv))[f'{index - 1}'])
+        if index == 1:
+            logger.info(f'The max level of index 34 for APT NV for VCC/BIAS is: {level_pa_rise}')
+        elif index == 4:
+            logger.info(f'The sw point level for APT NV for VCC/BIAS is: {level_pa_rise}')
+        else:
+            logger.info(f'there is tentatively no function at this index: {index}')
+
+        return level_pa_rise
+
+    def get_pa_sw_fall_level(self, band, tx_path, index) -> int:
+        """
+
+        """
+        pass
+
+    @staticmethod
+    def decimal_to_hex_twos_complement(num, size):
+        """
+        This is used for transfer negative and positive value to what LSI format is
+        """
+        bit_length = size * 8  # 1 byte = 1 size = 2 nibbles = 8 bits
+        twos_complement = (1 << bit_length) + num
+        hex_representation = hex(twos_complement & (2 ** bit_length - 1))[2:].zfill(bit_length // 4)
+        return hex_representation
+
+    @staticmethod
+    def convert_string(string, size):
+        """
+        This feature is used for register value transferred to at command use
+        """
+        # Convert the hex string to an integer
+        n = int(string, 16)
+
+        # Convert the integer to a byte array
+        b = n.to_bytes(size, 'little')
+
+        # Convert the byte array to a string
+        # result = ",".join(["{:02x}".format(x) for x in b])
+        result = ",".join([f"{x:02x}" for x in b])
+
+        return result
+
+    @staticmethod
+    def hex_string2dec(hex_string, byteorder='little', signed_bool=True):
+        """
+        This is for from get nv index value(hex string and uses little byteorder) and change to dec with signed
+        """
+        bytes_value = bytes.fromhex(hex_string)
+        int_signed_value = int.from_bytes(bytes_value, byteorder=byteorder, signed=signed_bool)
+        logger.debug(f'From hex_string {hex_string} to dec {int_signed_value}')
+
+        return int_signed_value
+
 
 if __name__ == '__main__':
-    import csv
+    # import csv
 
     # NV_NAME = 'CAL.LTE.USED_RF_BAND'
     # NV_INDEX = 0
     # NV_VALUE = '00'
     #
     command = AtCmd()
-    # res = command.query_google_nv('CAL.LTE.USED_RF_BAND')
-    # command.get_nv_index_value(res)
-    # command.get_used_band_index('CAL.NR_SUB6.USED_DUALTX_RF_BAND')
-    # test = command.get_mpr_value('!LTERF.TX.USER DSP MPR OFFSET TX', 41, 'TX1')
-
+    # command.apt_calibration_process_fr1(1, 'TX1', 1950000)
+    # command.get_pa_sw_rise_level(41, 'TX1', 4)
+    command.hex_string2dec('0A00')

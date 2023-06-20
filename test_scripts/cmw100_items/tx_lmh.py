@@ -35,6 +35,7 @@ class TxTestGenre(AtCmd, CMW100):
         self.odpm2 = None
         self.psu = None
         self.port_table = None
+        self.get_temp_en = ext_pmt.get_temp_en
 
     def port_table_selector(self, band, tx_path='TX1'):
         """
@@ -63,21 +64,27 @@ class TxTestGenre(AtCmd, CMW100):
         for LB LPAMid, MHB ENDC LPAMid, UHB(n77/n79 LPAF)
         :return:
         """
-        res0 = self.query_thermister0()
-        res1 = self.query_thermister1()
-        res_list = [res0, res1]
-        therm_list = []
-        for res in res_list:
-            for r in res:
-                if 'TEMPERATURE' in r.decode().strip():
-                    try:
-                        temp = eval(r.decode().strip().split(':')[1]) / 1000
-                        therm_list.append(temp)
-                    except Exception as err:
-                        logger.debug(err)
-                        therm_list.append(None)
-        logger.info(f'thermistor0 get temp: {therm_list[0]}')
-        logger.info(f'thermistor1 get temp: {therm_list[1]}')
+        state = self.get_temp_en
+        if state is True:
+            res0 = self.query_thermister0()
+            res1 = self.query_thermister1()
+            res_list = [res0, res1]
+            therm_list = []
+            for res in res_list:
+                for r in res:
+                    if 'TEMPERATURE' in r.decode().strip():
+                        try:
+                            temp = eval(r.decode().strip().split(':')[1]) / 1000
+                            therm_list.append(temp)
+                        except Exception as err:
+                            logger.debug(err)
+                            therm_list.append(None)
+            logger.info(f'thermistor0 get temp: {therm_list[0]}')
+            logger.info(f'thermistor1 get temp: {therm_list[1]}')
+
+        else:
+            therm_list = [None, None]
+
         return therm_list
 
     def results_combination_nlw(self, volt_enable):

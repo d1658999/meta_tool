@@ -4,7 +4,8 @@ band:
   bands_ca_lte: []
   bands_endc: []
   bands_fr1: []
-  bands_gsm: []
+  bands_gsm:
+  - 1900
   bands_hsdpa: []
   bands_hsupa: []
   bands_lte: []
@@ -27,11 +28,14 @@ condition:
 criteria:
   ulca_lte: 1
 external_inst:
-  count: 10
+  count: 1
+  get_temp: false
   odpm: false
   psu: false
   record_current: false
   tempchb: false
+  tx_level_start: -10
+  tx_level_stop: 26
   volt_mipi: false
   wait_time: 300
 instrument:
@@ -81,6 +85,7 @@ test_items:
   rx_quick_enable: false
   tx: false
   tx_1rb_sweep: false
+  tx_apt_sweep: 1
   tx_ca: false
   tx_ca_cbe: false
   tx_cbe: false

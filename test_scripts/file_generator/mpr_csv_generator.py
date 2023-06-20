@@ -41,16 +41,16 @@ def header_gen(want_type):
     """
 
     header_fr1 = [
-        'Band', 'Tx_Path', 'ENABLE/DISABLE', 'BPSK_edge_dfts', 'BPSK_inner_dfts', 'BPSK_outer_dfts',
-        'QPSK_edge_dfts', 'QPSK_inner_dfts', 'QPSK_outer_dfts',
-        'Q16_edge_dfts', 'Q16_inner_dfts', 'Q16_outer_dfts',
-        'Q64_edge_dfts', 'Q64_inner_dfts', 'Q64_outer_dfts',
-        'Q256_edge_dfts', 'Q256_inner_dfts', 'Q256_outer_dfts',
+        'Band', 'Tx_Path', 'ENABLE/DISABLE', 'BPSK_edge_dfts', 'BPSK_outer_dfts', 'BPSK_inner_dfts',
+        'QPSK_edge_dfts', 'QPSK_outer_dfts', 'QPSK_inner_dfts',
+        'Q16_edge_dfts', 'Q16_outer_dfts', 'Q16_inner_dfts',
+        'Q64_edge_dfts', 'Q64_outer_dfts', 'Q64_inner_dfts',
+        'Q256_edge_dfts', 'Q256_outer_dfts', 'Q256_inner_dfts',
         'reserved', 'reserved', 'reserved', 'reserved', 'reserved', 'reserved', 'reserved', 'reserved', 'reserved',
-        'QPSK_edge_cp', 'QPSK_inner_cp', 'QPSK_outer_cp',
-        'Q16_edge_cp', 'Q16_inner_cp', 'Q16_outer_cp',
-        'Q64_edge_cp', 'Q64_inner_cp', 'Q64_outer_cp',
-        'Q256_edge_cp', 'Q256_inner_cp', 'Q256_outer_cp',
+        'QPSK_edge_cp', 'QPSK_outer_cp', 'QPSK_inner_cp',
+        'Q16_edge_cp', 'Q16_outer_cp', 'Q16_inner_cp',
+        'Q64_edge_cp', 'Q64_outer_cp', 'Q64_inner_cp',
+        'Q256_edge_cp', 'Q256_outer_cp', 'Q256_inner_cp',
         'reserved', 'reserved', 'reserved', 'reserved', 'reserved', 'reserved', 'reserved', 'reserved',
         'reserved', 'reserved', 'reserved', 'reserved', 'reserved',
 

@@ -176,7 +176,7 @@ def regy_target_search_parser_v2(file_name, target_name):
 
 def decimal_to_hex_twos_complement(num, size):
     """
-    This is used for transfer negative and positive value to what LSI format
+    This is used for transfer negative and positive value to what LSI format is
     """
     bit_length = size * 8  # 1 byte = 1 size = 2 nibbles = 8 bits
     twos_complement = (1 << bit_length) + num
@@ -204,13 +204,21 @@ def convert_string(string, size):
 def main():
     # from equipments.series_basis.modem_usb_serial.serial_series import AtCmd
     # test = AtCmd()
-    file_name = 'temp_offset.regy'
+    # file_name = 'temp_offset.regy'
     # target_name = '!LTERF.TX.USER DSP MPR OFFSET TX0 B01'
     # regy_dict = regy_target_search_parser(file_name, target_name)
     # for nv_name, regy_value in list(regy_dict.items()):
     #     for nv_index, nv_value in regy_value.items():
     #         test.set_google_nv(nv_name, nv_index, nv_value)
-    regy_parser(file_name)
+    # regy_parser(file_name)
+    # xx = decimal_to_hex_twos_complement(-46, 2)
+    # yy = convert_string(xx, 2)
+    # print(xx)
+    # print(yy)
+    # print(yy.from_bytes(yy, byteorder='little', signed=True))
+    # print(int("ffd2", 16))
+    pass
+
 
     # print(decimal_to_hex_twos_complement(-5, 4))
     # print(convert_string(decimal_to_hex_twos_complement(-5, 4), 4))

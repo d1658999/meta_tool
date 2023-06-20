@@ -20,7 +20,7 @@ from equipments.temp_chamber import TempChamber
 logger = log_set('GUI')
 
 PROJECT_PATH = pathlib.Path(__file__).parent
-PROJECT_UI = PROJECT_PATH / pathlib.Path('gui') / "main_v2_17_3.ui"
+PROJECT_UI = PROJECT_PATH / pathlib.Path('gui') / "main_v2_18_5.ui"
 
 
 class MainApp:
@@ -37,9 +37,10 @@ class MainApp:
         button_run_signaling = builder.get_object("button_run_signaling", master)
         button_run_cse = builder.get_object("button_run_cse", master)
         button_run_ulca = builder.get_object("button_run_ulca", master)
+        button_run_apt = builder.get_object("button_run_apt", master)
         self.button_mpr_gen = builder.get_object("button_mpr_gen", master)
         self.button_run_list = [button_run_ftm, button_run_ftm_fcc, button_run_ftm_ce, button_run_ftm_endc,
-                                button_run_signaling, button_run_cse, button_run_ulca]
+                                button_run_signaling, button_run_cse, button_run_ulca, button_run_apt, ]
         ICON_FILE = PROJECT_PATH / pathlib.Path('utils') / pathlib.Path('Wave.ico')
         self.mainwindow.iconbitmap(ICON_FILE)
         # self.checkbox_hsupa = builder.get_object("checkbutton_WCDMA", master)
@@ -50,6 +51,7 @@ class MainApp:
 
         self.instrument = None
         self.general = None
+        self.apt = None
         self.cse = None
         self.ulca = None
         self.sa_nsa = None
@@ -268,6 +270,34 @@ class MainApp:
         self.B5_N77 = None
         self.B13_N5 = None
         self.rx_freq_sweep = None
+        self.apt_sweep_version = None
+        self.apt_level_start_hpm = None
+        self.apt_level_stop_hpm = None
+        self.apt_level_step_hpm = None
+        self.bias0_start_hpm = None
+        self.bias0_stop_hpm = None
+        self.bias0_step_hpm = None
+        self.bias1_start_hpm = None
+        self.bias1_stop_hpm = None
+        self.bias1_step_hpm = None
+        self.vcc_start_hpm = None
+        self.vcc_stop_hpm = None
+        self.vcc_step_hpm = None
+        self.apt_level_start_lpm = None
+        self.apt_level_stop_lpm = None
+        self.apt_level_step_lpm = None
+        self.bias0_start_lpm = None
+        self.bias0_stop_lpm = None
+        self.bias0_step_lpm = None
+        self.bias1_start_lpm = None
+        self.bias1_stop_lpm = None
+        self.bias1_step_lpm = None
+        self.vcc_start_lpm = None
+        self.vcc_stop_lpm = None
+        self.vcc_step_lpm = None
+        self.vcc_count_apt = None
+        self.aclr_limit_apt = None
+        self.evm_limit_apt = None
         self.U1 = None
         self.U2 = None
         self.HSUPA_all = None
@@ -338,6 +368,7 @@ class MainApp:
         self.rx2_rx3_endc_fr1 = None
         self.rx_all_path_endc_fr1 = None
         self.volt_mipi_en = None
+        self.get_temp_en = None
         self.port_table_enable = None
         self.debug_enable = None
         self.rssi_rx_rat = None
@@ -372,6 +403,7 @@ class MainApp:
             [
                 "instrument",
                 "general",
+                "apt",
                 "cse",
                 "ulca",
                 "sa_nsa",
@@ -590,6 +622,34 @@ class MainApp:
                 "B5_N77",
                 "B13_N5",
                 "rx_freq_sweep",
+                "apt_sweep_version",
+                "apt_level_start_hpm",
+                "apt_level_stop_hpm",
+                "apt_level_step_hpm",
+                "bias0_start_hpm",
+                "bias0_stop_hpm",
+                "bias0_step_hpm",
+                "bias1_start_hpm",
+                "bias1_stop_hpm",
+                "bias1_step_hpm",
+                "vcc_start_hpm",
+                "vcc_stop_hpm",
+                "vcc_step_hpm",
+                "apt_level_start_lpm",
+                "apt_level_stop_lpm",
+                "apt_level_step_lpm",
+                "bias0_start_lpm",
+                "bias0_stop_lpm",
+                "bias0_step_lpm",
+                "bias1_start_lpm",
+                "bias1_stop_lpm",
+                "bias1_step_lpm",
+                "vcc_start_lpm",
+                "vcc_stop_lpm",
+                "vcc_step_lpm",
+                "vcc_count_apt",
+                "aclr_limit_apt",
+                "evm_limit_apt",
                 "U1",
                 "U2",
                 "HSUPA_all",
@@ -640,8 +700,6 @@ class MainApp:
                 "frb_frb",
                 "one_rb0_one_rbmax",
                 "one_rbmax_one_rb0",
-                "endc_tx_path_lte",
-                "endc_tx_path_fr1",
                 "rx0_endc_lte",
                 "rx1_endc_lte",
                 "rx2_endc_lte",
@@ -659,6 +717,7 @@ class MainApp:
                 "rx2_rx3_endc_fr1",
                 "rx_all_path_endc_fr1",
                 "volt_mipi_en",
+                "get_temp_en",
                 "port_table_enable",
                 "debug_enable",
                 "rssi_rx_rat",
@@ -696,8 +755,8 @@ class MainApp:
         # self.import_ui_setting()
         log_clear()
         self.import_ui_setting_yaml()
-        self.endc_tx_path_lte.set('TX1')
-        self.endc_tx_path_fr1.set('TX1')
+        self.endc_tx_path_init()
+
         # self.inst_to_tech()
 
     def run(self):
@@ -712,6 +771,43 @@ class MainApp:
     def stop():
         print('Crtrl C')
         os.kill(signal.CTRL_C_EVENT, 0)
+
+    def apt_sweep_init(self):  # obsolete
+        import utils.parameters.external_paramters as ext_pmt
+
+        ext_pmt.apt_tx_level_start_hpm = self.apt_level_start_hpm.get()
+        ext_pmt.apt_tx_level_stop_hpm = self.apt_level_stop_hpm.get()
+        ext_pmt.apt_tx_level_step_hpm = self.apt_level_step_hpm.get()
+        ext_pmt.apt_vcc_start_hpm = self.vcc_start_hpm.get()
+        ext_pmt.apt_vcc_stop_hpm = self.vcc_stop_hpm.get()
+        ext_pmt.apt_vcc_step_hpm = self.vcc_step_hpm.get()
+        ext_pmt.apt_bias0_start_hpm = self.bias0_start_hpm.get()
+        ext_pmt.apt_bias0_stop_hpm = self.bias0_stop_hpm.get()
+        ext_pmt.apt_bias0_step_hpm = self.bias0_step_hpm.get()
+        ext_pmt.apt_bias1_start_hpm = self.bias1_start_hpm.get()
+        ext_pmt.apt_bias1_stop_hpm = self.bias1_stop_hpm.get()
+        ext_pmt.apt_bias1_step_hpm = self.bias1_step_hpm.get()
+
+        ext_pmt.apt_tx_level_start_lpm = self.apt_level_start_lpm.get()
+        ext_pmt.apt_tx_level_stop_lpm = self.apt_level_stop_lpm.get()
+        ext_pmt.apt_tx_level_step_lpm = self.apt_level_step_lpm.get()
+        ext_pmt.apt_vcc_start_lpm = self.vcc_start_lpm.get()
+        ext_pmt.apt_vcc_stop_lpm = self.vcc_stop_lpm.get()
+        ext_pmt.apt_vcc_step_lpm = self.vcc_step_lpm.get()
+        ext_pmt.apt_bias0_start_lpm = self.bias0_start_lpm.get()
+        ext_pmt.apt_bias0_stop_lpm = self.bias0_stop_lpm.get()
+        ext_pmt.apt_bias0_step_lpm = self.bias0_step_lpm.get()
+        ext_pmt.apt_bias1_start_lpm = self.bias1_start_lpm.get()
+        ext_pmt.apt_bias1_stop_lpm = self.bias1_stop_lpm.get()
+        ext_pmt.apt_bias1_step_lpm = self.bias1_step_lpm.get()
+
+        ext_pmt.vcc_count_apt = self.vcc_count_apt.get()
+        ext_pmt.aclr_limit_apt = self.aclr_limit_apt.get()
+        ext_pmt.evm_limit_apt = self.evm_limit_apt.get()
+
+    def endc_tx_path_init(self):
+        self.endc_tx_path_lte.set('TX1')
+        self.endc_tx_path_fr1.set('TX1')
 
     def fool_proof_vol(self):
         vol_cap = 4.5
@@ -873,6 +969,7 @@ class MainApp:
         self.tx.set(ui_init['test_items']['tx'])
         self.rx.set(ui_init['test_items']['rx'])
         self.rx_freq_sweep.set(ui_init['test_items']['rx_freq_sweep'])
+        self.apt_sweep_version.set(ui_init['test_items']['tx_apt_sweep'])
         self.tx_level_sweep.set(ui_init['test_items']['tx_level_sweep'])
         self.tx_freq_sweep.set(ui_init['test_items']['tx_freq_sweep'])
         self.tx_1rb_sweep.set(ui_init['test_items']['tx_1rb_sweep'])
@@ -881,6 +978,8 @@ class MainApp:
         self.tx_ca.set(ui_init['test_items']['tx_ca'])
         self.tx_ca_cbe.set(ui_init['test_items']['tx_ca_cbe'])
         self.port_tx.set(ui_init['port']['port_tx'])
+        self.tx_level_start.set(ui_init['external_inst']['tx_level_start'])
+        self.tx_level_stop.set(ui_init['external_inst']['tx_level_stop'])
         self.port_tx_lte.set(ui_init['port']['port_tx_lte'])
         self.port_tx_fr1.set(ui_init['port']['port_tx_fr1'])
         self.rfout_anritsu.set(ui_init['port']['rfout_anritsu'])
@@ -906,6 +1005,7 @@ class MainApp:
         self.psu_enable.set(ui_init['external_inst']['psu'])
         self.odpm_enable.set(ui_init['external_inst']['odpm'])
         self.volt_mipi_en.set(ui_init['external_inst']['volt_mipi'])
+        self.get_temp_en.set(ui_init['external_inst']['get_temp'])
         self.record_current_enable.set(ui_init['external_inst']['record_current'])
         self.hthv.set(ui_init['condition']['hthv'])
         self.htlv.set(ui_init['condition']['htlv'])
@@ -978,12 +1078,12 @@ class MainApp:
             #     self.N17.set(band_fr1)
             elif band_fr1 == 18:
                 self.N18.set(band_fr1)
-            elif band_fr1 == 19:
-                self.N19.set(band_fr1)
+            # elif band_fr1 == 19:
+            #     self.N19.set(band_fr1)
             elif band_fr1 == 20:
                 self.N20.set(band_fr1)
-            elif band_fr1 == 21:
-                self.N21.set(band_fr1)
+            # elif band_fr1 == 21:
+            #     self.N21.set(band_fr1)
             elif band_fr1 == 24:
                 self.N24.set(band_fr1)
             elif band_fr1 == 25:
@@ -1320,6 +1420,8 @@ class MainApp:
                 self.cse.set(True)
             elif script == 'ULCA':
                 self.ulca.set(True)
+            elif script == "APT":
+                self.apt.set(True)
 
         for _type in ui_init['type']['type_fr1']:
             if _type == 'DFTS':
@@ -1456,6 +1558,8 @@ class MainApp:
         count = self.count.get()
         mod_gsm = self.mod_gsm.get()
         port_tx = self.port_tx.get()
+        tx_level_start = self.tx_level_start.get()
+        tx_level_stop = self.tx_level_stop.get()
         port_tx_lte = self.port_tx_lte.get()
         port_tx_fr1 = self.port_tx_fr1.get()
         sa_nsa = self.sa_nsa.get()
@@ -1473,11 +1577,12 @@ class MainApp:
         band_segment_fr1 = self.band_segment_fr1.get()
         chan = self.wanted_chan()
         tx, rx, rx_freq_sweep, tx_level_sweep, tx_freq_sweep, tx_1rb_sweep, tx_harmonics, tx_cbe, \
-        tx_ca, tx_ca_cbe = self.wanted_tx_rx_sweep()
+        tx_ca, tx_ca_cbe, tx_apt_sweep_version = self.wanted_tx_rx_sweep()
         tpchb_enable = self.tempcham_enable.get()
         psu_enable = self.psu_enable.get()
         odpm_enable = self.odpm_enable.get()
         volt_mipi_en = self.volt_mipi_en.get()
+        get_temp_en = self.get_temp_en.get()
         record_current_enable = self.record_current_enable.get()
         hthv = self.hthv.get()
         htlv = self.htlv.get()
@@ -1517,6 +1622,7 @@ class MainApp:
                 'rx': rx,
                 'rx_quick_enable': rx_quick_enable,
                 'rx_freq_sweep': rx_freq_sweep,
+                'tx_apt_sweep': tx_apt_sweep_version,
                 'tx_level_sweep': tx_level_sweep,
                 'tx_freq_sweep': tx_freq_sweep,
                 'tx_1rb_sweep': tx_1rb_sweep,
@@ -1580,9 +1686,12 @@ class MainApp:
                 'psu': psu_enable,
                 'odpm': odpm_enable,
                 'volt_mipi': volt_mipi_en,
+                'get_temp': get_temp_en,
                 'record_current': record_current_enable,
                 'count': count,
                 'wait_time': wait_time,
+                'tx_level_start': tx_level_start,
+                'tx_level_stop': tx_level_stop
             },
             'condition': {
                 'hthv': hthv,
@@ -1626,9 +1735,15 @@ class MainApp:
 
     def volt_mipi_status(self):
         if self.volt_mipi_en.get():
-            logger.info('=====Disable Volt_mipi=====')
-        else:
             logger.info('=====Enable Volt_mipi=====')
+        else:
+            logger.info('=====Disable Volt_mipi=====')
+
+    def get_temp_status(self):
+        if self.get_temp_en.get():
+            logger.info('=====Enable Get_Temperature=====')
+        else:
+            logger.info('=====Disable Get_Temperature=====')
 
     def record_current_enable_status(self):
         if self.record_current_enable.get():
@@ -1693,6 +1808,7 @@ class MainApp:
         self.chan_M.set(True)
         self.chan_H.set(True)
         self.sa_nsa.set(0)
+        self.apt_sweep_version.set(0)
         self.criteria_ulca_lte.set(0)
 
         logger.info(f'default instrument: {self.instrument.get()}')
@@ -2206,6 +2322,7 @@ class MainApp:
         self.wanted_test.setdefault('tx_cbe', False)
         self.wanted_test.setdefault('tx_ca', False)
         self.wanted_test.setdefault('tx_ca_cbe', False)
+        self.wanted_test.setdefault('apt_sweep', 0)
 
         if self.tx.get():
             logger.debug(self.tx.get())
@@ -2247,13 +2364,17 @@ class MainApp:
             logger.debug(self.rx_freq_sweep.get())
             self.wanted_test['rx_freq_sweep'] = self.rx_freq_sweep.get()
 
+        if self.apt_sweep_version.get():
+            print(self.apt_sweep_version.get())
+            self.wanted_test['apt_sweep'] = self.apt_sweep_version.get()
+
         if self.wanted_test == {}:
             logger.debug('Nothing to select for test items')
 
         logger.info(self.wanted_test)
         return self.tx.get(), self.rx.get(), self.rx_freq_sweep.get(), self.tx_level_sweep.get(), \
                self.tx_freq_sweep.get(), self.tx_1rb_sweep.get(), self.tx_harmonics.get(), self.tx_cbe.get(), \
-               self.tx_ca.get(), self.tx_ca_cbe.get()
+               self.tx_ca.get(), self.tx_ca_cbe.get(), self.apt_sweep_version.get()
 
     def wanted_ue_pwr(self):
         self.ue_power = []
@@ -2995,7 +3116,11 @@ class MainApp:
             logger.debug('ULCA')
             self.script.append('ULCA')
 
-        if self.script == []:
+        if self.apt.get():
+            logger.debug('APT')
+            self.script.append('APT')
+
+        if not self.script:
             logger.debug('Nothing to select for script')
 
         logger.info(f'Script to select : {self.script}')
@@ -3387,6 +3512,7 @@ class MainApp:
         ext_pmt.psu_enable = self.psu_enable.get()
         ext_pmt.odpm_enable = self.odpm_enable.get()
         ext_pmt.volt_mipi_en = self.volt_mipi_en.get()
+        ext_pmt.get_temp_en = self.get_temp_en.get()
         ext_pmt.record_current_enable = self.record_current_enable.get()
         ext_pmt.condition = self.condition
         ext_pmt.part_number = self.part_number.get()
@@ -3397,6 +3523,39 @@ class MainApp:
         ext_pmt.vol_typ = self.vol_typ
         ext_pmt.tx_level_range_list[0] = self.tx_level_start.get()
         ext_pmt.tx_level_range_list[1] = self.tx_level_stop.get()
+
+        # apt sweep hpm
+        ext_pmt.apt_tx_level_start_hpm = self.apt_level_start_hpm.get()
+        ext_pmt.apt_tx_level_stop_hpm = self.apt_level_stop_hpm.get()
+        ext_pmt.apt_tx_level_step_hpm = self.apt_level_step_hpm.get()
+        ext_pmt.apt_vcc_start_hpm = self.vcc_start_hpm.get()
+        ext_pmt.apt_vcc_stop_hpm = self.vcc_stop_hpm.get()
+        ext_pmt.apt_vcc_step_hpm = self.vcc_step_hpm.get()
+        ext_pmt.apt_bias0_start_hpm = self.bias0_start_hpm.get()
+        ext_pmt.apt_bias0_stop_hpm = self.bias0_stop_hpm.get()
+        ext_pmt.apt_bias0_step_hpm = self.bias0_step_hpm.get()
+        ext_pmt.apt_bias1_start_hpm = self.bias1_start_hpm.get()
+        ext_pmt.apt_bias1_stop_hpm = self.bias1_stop_hpm.get()
+        ext_pmt.apt_bias1_step_hpm = self.bias1_step_hpm.get()
+
+        # apt sweep lpm
+        ext_pmt.apt_tx_level_start_lpm = self.apt_level_start_lpm.get()
+        ext_pmt.apt_tx_level_stop_lpm = self.apt_level_stop_lpm.get()
+        ext_pmt.apt_tx_level_step_lpm = self.apt_level_step_lpm.get()
+        ext_pmt.apt_vcc_start_lpm = self.vcc_start_lpm.get()
+        ext_pmt.apt_vcc_stop_lpm = self.vcc_stop_lpm.get()
+        ext_pmt.apt_vcc_step_lpm = self.vcc_step_lpm.get()
+        ext_pmt.apt_bias0_start_lpm = self.bias0_start_lpm.get()
+        ext_pmt.apt_bias0_stop_lpm = self.bias0_stop_lpm.get()
+        ext_pmt.apt_bias0_step_lpm = self.bias0_step_lpm.get()
+        ext_pmt.apt_bias1_start_lpm = self.bias1_start_lpm.get()
+        ext_pmt.apt_bias1_stop_lpm = self.bias1_stop_lpm.get()
+        ext_pmt.apt_bias1_step_lpm = self.bias1_step_lpm.get()
+
+        # others
+        ext_pmt.vcc_count_apt = self.vcc_count_apt.get()
+        ext_pmt.aclr_limit_apt = self.aclr_limit_apt.get()
+        ext_pmt.evm_limit_apt = self.evm_limit_apt.get()
 
         if self.instrument.get() == 'Anritsu8820':
             from test_scripts.anritsu_items.mt8820_tx_lmh import TxTestGenre
@@ -3447,6 +3606,8 @@ class MainApp:
             from test_scripts.cmw100_items.tx_1rb_sweep import TxTest1RbSweep
             from test_scripts.cmw100_items.tx_power_fcc_ce import TxTestFccCe
             from test_scripts.cmw100_items.tx_ulca_combo import TxTestCa
+            from test_scripts.cmw100_items.apt_sweep_search import AptSweep
+            from test_scripts.cmw100_items.apt_sweep_search_v2 import AptSweepV2
 
             excel_folder_create()
             # self.test_pipeline(inst_class_dict)
@@ -3486,6 +3647,17 @@ class MainApp:
                 # if script == 'ULCA':
                 if self.ulca.get():
                     inst = TxTestCa()
+                    inst.run()
+                    inst.ser.com_close()
+
+            if ext_pmt.sa_nsa == 0 and 'APT' in ext_pmt.scripts:
+                if self.apt_sweep_version.get() == 1:
+                    inst = AptSweepV2()
+                    inst.run()
+                    inst.ser.com_close()
+
+                elif self.apt_sweep_version.get() == 0:
+                    inst = AptSweep()
                     inst.run()
                     inst.ser.com_close()
 

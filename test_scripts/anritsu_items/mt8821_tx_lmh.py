@@ -8,11 +8,13 @@ from utils.log_init import log_set
 
 logger = log_set('8821TxSig')
 
+
 class TxTestGenre(AtCmd, Anritsu8821):
     def __init__(self):
         AtCmd.__init__(self)
         self.ser.com_close()
         Anritsu8821.__init__(self)
+        self.get_temp_en = ext_pmt.get_temp_en
 
     def get_temperature(self):
         """
@@ -21,22 +23,27 @@ class TxTestGenre(AtCmd, Anritsu8821):
         :return:
         """
         self.ser.com_open()
-        res0 = self.query_thermister0()
-        res1 = self.query_thermister1()
-        res_list = [res0, res1]
-        therm_list = []
-        for res in res_list:
-            for r in res:
-                if 'TEMPERATURE' in r.decode().strip():
-                    try:
-                        temp = eval(r.decode().strip().split(':')[1]) / 1000
-                        therm_list.append(temp)
-                    except Exception as err:
-                        logger.debug(err)
-                        therm_list.append(None)
-        logger.info(f'thermistor0 get temp: {therm_list[0]}')
-        logger.info(f'thermistor1 get temp: {therm_list[1]}')
-        self.ser.com_close()
+        state = self.get_temp_en
+        if state is True:
+            res0 = self.query_thermister0()
+            res1 = self.query_thermister1()
+            res_list = [res0, res1]
+            therm_list = []
+            for res in res_list:
+                for r in res:
+                    if 'TEMPERATURE' in r.decode().strip():
+                        try:
+                            temp = eval(r.decode().strip().split(':')[1]) / 1000
+                            therm_list.append(temp)
+                        except Exception as err:
+                            logger.debug(err)
+                            therm_list.append(None)
+            logger.info(f'thermistor0 get temp: {therm_list[0]}')
+            logger.info(f'thermistor1 get temp: {therm_list[1]}')
+
+        else:
+            therm_list = [None, None]
+
         return therm_list
 
     def tx_core(self, standard, band, dl_ch, bw=None):

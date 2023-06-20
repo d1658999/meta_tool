@@ -20,6 +20,8 @@ class ModemComport:
             if 'Modem' in comport.description:
                 comport_waned = comport.name
                 logger.info(f'Modem comport is: {comport_waned}')
+                logger.debug(f'Serial number is: {comport.serial_number}')
+
         return comport_waned
 
     def com_open(self):

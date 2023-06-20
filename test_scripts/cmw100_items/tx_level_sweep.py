@@ -35,6 +35,7 @@ class TxTestLevelSweep(AtCmd, CMW100):
         self.odpm2 = None
         self.psu = None
         self.port_table = None
+        self.get_temp_en = ext_pmt.get_temp_en
 
     def port_table_selector(self, band, tx_path='TX1'):
         """
@@ -57,24 +58,53 @@ class TxTestLevelSweep(AtCmd, CMW100):
         else:
             pass
 
+    def get_temperature(self):
+        """
+        for P22, AT+GOOGTHERMISTOR=1,1 for MHB LPAMid/ MHB Rx1 LFEM, AT+GOOGTHERMISTOR=0,1
+        for LB LPAMid, MHB ENDC LPAMid, UHB(n77/n79 LPAF)
+        :return:
+        """
+        state = self.get_temp_en
+        if state is True:
+            res0 = self.query_thermister0()
+            res1 = self.query_thermister1()
+            res_list = [res0, res1]
+            therm_list = []
+            for res in res_list:
+                for r in res:
+                    if 'TEMPERATURE' in r.decode().strip():
+                        try:
+                            temp = eval(r.decode().strip().split(':')[1]) / 1000
+                            therm_list.append(temp)
+                        except Exception as err:
+                            logger.debug(err)
+                            therm_list.append(None)
+            logger.info(f'thermistor0 get temp: {therm_list[0]}')
+            logger.info(f'thermistor1 get temp: {therm_list[1]}')
+
+        else:
+            therm_list = [None, None]
+
+        return therm_list
+
     def results_combination_nlw(self, volt_enable):
         results = None
         if volt_enable:
             volt_mipi_handler = self.query_voltage_collection(ext_pmt.et_tracker)
             if self.tech == 'FR1':
-                results = self.aclr_mod_current_results + volt_mipi_handler(
+                results = self.aclr_mod_current_results + self.get_temperature() + volt_mipi_handler(
                     self.tech, self.band_fr1, self.tx_path)
             elif self.tech == 'LTE':
-                results = self.aclr_mod_current_results + volt_mipi_handler(
+                results = self.aclr_mod_current_results + self.get_temperature() + volt_mipi_handler(
                     self.tech, self.band_lte, self.tx_path)
             elif self.tech == 'WCDMA':
-                results = self.aclr_mod_current_results + volt_mipi_handler(
+                results = self.aclr_mod_current_results + self.get_temperature() + volt_mipi_handler(
                     self.tech, self.band_wcdma, self.tx_path)
 
             return results
 
         else:
-            results = self.aclr_mod_current_results
+            results = self.aclr_mod_current_results + self.get_temperature()
             return results
 
     def select_asw_srs_path(self):
@@ -742,7 +772,7 @@ class TxTestLevelSweep(AtCmd, CMW100):
                 self.bw_lte = item[2]
                 self.band_lte = item[3]
                 try:
-                    if self.tx_path in ['TX1', 'TX2']:
+                    if self.tx_path in ['TX1, TX2']:
                         self.port_table_selector(self.band_lte, self.tx_path)
                         if self.bw_lte in cm_pmt_ftm.bandwidths_selected_lte(self.band_lte):
                             self.tx_level_sweep_process_lte()
