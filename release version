@@ -1,3 +1,6 @@
+release V2.19
+1. add NTN N255, N256, B23
+
 release V2.18
 1. add APT SWEEP function
 2. add get temperature checkbox to enable or disable the function of detect thermal

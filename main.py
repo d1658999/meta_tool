@@ -20,7 +20,7 @@ from equipments.temp_chamber import TempChamber
 logger = log_set('GUI')
 
 PROJECT_PATH = pathlib.Path(__file__).parent
-PROJECT_UI = PROJECT_PATH / pathlib.Path('gui') / "main_v2_18_5.ui"
+PROJECT_UI = PROJECT_PATH / pathlib.Path('gui') / "main_v2_19_1.ui"
 
 
 class MainApp:
@@ -184,6 +184,7 @@ class MainApp:
         self.B71 = None
         self.LB_all = None
         self.B21 = None
+        self.B23 = None
         self.B24 = None
         self.band_segment = None
         self.B1 = None
@@ -245,6 +246,8 @@ class MainApp:
         self.N70 = None
         self.N75 = None
         self.N76 = None
+        self.N255 = None
+        self.N256 = None
         # self.N39 = None
         self.N40 = None
         self.N38 = None
@@ -536,6 +539,7 @@ class MainApp:
                 "B71",
                 "LB_all",
                 "B21",
+                "B23",
                 "B24",
                 "band_segment",
                 "B1",
@@ -597,6 +601,8 @@ class MainApp:
                 "N70",
                 "N75",
                 "N76",
+                "N255",
+                "N256",
                 # "N39",
                 "N40",
                 "N38",
@@ -1118,6 +1124,10 @@ class MainApp:
                 self.N75.set(band_fr1)
             elif band_fr1 == 76:
                 self.N76.set(band_fr1)
+            elif band_fr1 == 255:
+                self.N255.set(band_fr1)
+            elif band_fr1 == 256:
+                self.N256.set(band_fr1)
             elif band_fr1 == 71:
                 self.N71.set(band_fr1)
             elif band_fr1 == 77:
@@ -1158,6 +1168,8 @@ class MainApp:
                 self.B20.set(band_lte)
             elif band_lte == 21:
                 self.B21.set(band_lte)
+            elif band_lte == 23:
+                self.B23.set(band_lte)
             elif band_lte == 24:
                 self.B24.set(band_lte)
             elif band_lte == 25:
@@ -1933,6 +1945,12 @@ class MainApp:
         if self.N76.get() == 76:
             logger.debug(self.N76.get())
             self.band_fr1.append(self.N76.get())
+        if self.N255.get() == 255:
+            logger.debug(self.N255.get())
+            self.band_fr1.append(self.N255.get())
+        if self.N256.get() == 256:
+            logger.debug(self.N256.get())
+            self.band_fr1.append(self.N256.get())
         if self.N30.get() == 30:
             logger.debug(self.N30.get())
             self.band_fr1.append(self.N30.get())
@@ -2078,6 +2096,9 @@ class MainApp:
         if self.B21.get() == 21:
             logger.debug(self.B21.get())
             band_lte.append(self.B21.get())
+        if self.B23.get() == 23:
+            logger.debug(self.B23.get())
+            band_lte.append(self.B23.get())
         if self.B24.get() == 24:
             logger.debug(self.B24.get())
             band_lte.append(self.B24.get())
@@ -2645,6 +2666,7 @@ class MainApp:
             self.B18.set(18)
             self.B19.set(19)
             self.B20.set(20)
+            self.B23.set(23)
             self.B24.set(24)
             self.B26.set(26)
             self.B28.set(28)
@@ -2663,6 +2685,7 @@ class MainApp:
             self.B18.set(0)
             self.B19.set(0)
             self.B20.set(0)
+            self.B23.set(0)
             self.B24.set(0)
             self.B26.set(0)
             self.B28.set(0)
@@ -2784,6 +2807,8 @@ class MainApp:
             self.N70.set(70)
             self.N75.set(75)
             self.N76.set(76)
+            self.N255.set(255)
+            self.N256.set(256)
             self.N7.set(7)
             self.N30.set(30)
             # self.N39.set(39)
@@ -2803,6 +2828,8 @@ class MainApp:
             self.N70.set(0)
             self.N75.set(0)
             self.N76.set(0)
+            self.N255.set(0)
+            self.N256.set(0)
             self.N7.set(0)
             self.N30.set(0)
             # self.N39.set(0)

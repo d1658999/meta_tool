@@ -64,7 +64,7 @@ class AptSweep(TxTestLevelSweep):
         self.bias0_new = None
         self.bias1_new = None
         self.candidate = None
-        
+
     def global_parameters(self):
         self.TX_LEVEL_START_HPM = ext_pmt.apt_tx_level_start_hpm
         self.TX_LEVEL_SOP_HPM = ext_pmt.apt_tx_level_stop_hpm
@@ -94,7 +94,6 @@ class AptSweep(TxTestLevelSweep):
         self.EVM_LIMIT_USL = ext_pmt.evm_limit_apt
         self.COUNT_VCC = ext_pmt.vcc_count_apt
 
-        
     def tx_apt_sweep_pipeline_fr1(self):
         self.global_parameters()
         self.rx_level = ext_pmt.init_rx_sync_level
