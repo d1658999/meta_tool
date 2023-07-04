@@ -2666,7 +2666,6 @@ class MainApp:
             self.B18.set(18)
             self.B19.set(19)
             self.B20.set(20)
-            self.B23.set(23)
             self.B24.set(24)
             self.B26.set(26)
             self.B28.set(28)
@@ -2685,7 +2684,6 @@ class MainApp:
             self.B18.set(0)
             self.B19.set(0)
             self.B20.set(0)
-            self.B23.set(0)
             self.B24.set(0)
             self.B26.set(0)
             self.B28.set(0)
@@ -2750,6 +2748,7 @@ class MainApp:
             self.B40.set(40)
             self.B38.set(38)
             self.B41.set(41)
+            self.B23.set(23)
 
         else:
             logger.debug("MHB band all are unchecked")
@@ -2766,6 +2765,7 @@ class MainApp:
             self.B40.set(0)
             self.B38.set(0)
             self.B41.set(0)
+            self.B23.set(0)
 
         self.wanted_band_LTE()
 

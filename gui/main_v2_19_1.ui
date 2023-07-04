@@ -4,7 +4,7 @@
     <property name="relief">flat</property>
     <property name="resizable">none</property>
     <property name="takefocus">false</property>
-    <property name="title" translatable="yes">Meta GUI(V2.18) by PriceWu@</property>
+    <property name="title" translatable="yes">Meta GUI(V2.19) by PriceWu@</property>
     <child>
       <object class="ttk.Notebook" id="notebook1">
         <layout manager="grid">
