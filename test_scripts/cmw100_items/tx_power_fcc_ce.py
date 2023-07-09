@@ -86,8 +86,8 @@ class TxTestFccCe(AtCmd, CMW100):
         rx_freq_list = cm_pmt_ftm.dl_freq_selected('FR1', self.band_fr1,
                                                    self.bw_fr1)  # [L_rx_freq, M_rx_ferq, H_rx_freq]
         self.rx_freq_fr1 = rx_freq_list[1]
-        self.loss_rx = get_loss(rx_freq_list[1])
-        self.loss_tx = get_loss(cm_pmt_ftm.transfer_freq_rx2tx_fr1(self.band_fr1, self.rx_freq_fr1))
+        self.loss_rx = self.loss_selector(rx_freq_list[1], ext_pmt.fdc_en)
+        self.loss_tx = self.loss_selector(cm_pmt_ftm.transfer_freq_rx2tx_fr1(self.band_fr1, self.rx_freq_fr1), ext_pmt.fdc_en)
         logger.info('----------Test FCC LMH progress---------')
         self.preset_instrument()
         self.set_measurement_group_gprf()
@@ -173,8 +173,8 @@ class TxTestFccCe(AtCmd, CMW100):
         rx_freq_list = cm_pmt_ftm.dl_freq_selected('FR1', self.band_fr1,
                                                    self.bw_fr1)  # [L_rx_freq, M_rx_ferq, H_rx_freq]
         self.rx_freq_fr1 = rx_freq_list[1]
-        self.loss_rx = get_loss(rx_freq_list[1])
-        self.loss_tx = get_loss(cm_pmt_ftm.transfer_freq_rx2tx_fr1(self.band_fr1, self.rx_freq_fr1))
+        self.loss_rx = self.loss_selector(rx_freq_list[1], ext_pmt.fdc_en)
+        self.loss_tx = self.loss_selector(cm_pmt_ftm.transfer_freq_rx2tx_fr1(self.band_fr1, self.rx_freq_fr1), ext_pmt.fdc_en)
         logger.info('----------Test CE LMH progress---------')
         self.preset_instrument()
         self.set_measurement_group_gprf()
@@ -227,7 +227,7 @@ class TxTestFccCe(AtCmd, CMW100):
 
     def tx_power_fcc_subprocess_fr1(self):
         self.data = data = {}
-        self.loss_tx = get_loss(self.tx_freq_fr1)
+        self.loss_tx = self.loss_selector(self.tx_freq_fr1, ext_pmt.fdc_en)
         self.set_tx_freq_gprf(self.tx_freq_fr1)
         self.set_duty_cycle()
         if self.tx_path in ['TX1', 'TX2']:
@@ -265,7 +265,7 @@ class TxTestFccCe(AtCmd, CMW100):
 
     def tx_power_ce_subprocess_fr1(self):
         self.data = data = {}
-        self.loss_tx = get_loss(self.tx_freq_fr1)
+        self.loss_tx = self.loss_selector(self.tx_freq_fr1, ext_pmt.fdc_en)
         self.set_tx_freq_gprf(self.tx_freq_fr1)
         self.set_duty_cycle()
         if self.tx_path in ['TX1', 'TX2']:

@@ -107,8 +107,8 @@ class TxTestCa(AtCmd, CMW100):
         self.tx_freq_lte = self.get_ca_freq_center_query()
         self.rx_freq_lte = cm_pmt_ftm.transfer_freq_tx2rx_lte(self.band_lte, self.tx_freq_lte)
         self.rx_freq_lte = int(self.rx_freq_lte / 100) * 100  # this is for sync use due to problem with detailed freq
-        self.loss_tx = get_loss(self.tx_freq_lte)
-        self.loss_rx = get_loss(self.rx_freq_lte)
+        self.loss_tx = self.loss_selector(self.tx_freq_lte, ext_pmt.fdc_en)
+        self.loss_rx = self.loss_selector(self.rx_freq_lte, ext_pmt.fdc_en)
 
     def tx_set_ulca_lte(self):
         # this is at command, real to tx set

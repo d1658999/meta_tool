@@ -39,6 +39,7 @@ port_tx_lte = 1  # 1 ~ 8 default is  1
 # port_rx_lte = 1  # 1 ~ 8 default is  1
 port_tx_fr1 = 4  # 1 ~ 8 default is  1
 port_table_en = False
+fdc_en = True
 # port_rx_fr1 = 1  # 1 ~ 8 default is  1
 rfout_anritsu = 'MAIN'
 

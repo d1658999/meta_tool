@@ -4,9 +4,10 @@ import time
 from equipments.series_basis.callbox.cmw_series import CMW
 from utils.parameters.common_parameters_ftm import TDD_BANDS
 import utils.parameters.external_paramters as ext_pmt
+from utils.loss_handler import get_loss
+from utils.loss_handler import read_fdc_file
 from utils.port_tx_handler import port_tx_table_transfer
 from utils.log_init import log_set
-
 
 logger = log_set('CMW100')
 
@@ -799,10 +800,28 @@ class CMW100(CMW):
         table = port_tx_table_transfer(txas_select)
         return table
 
+    def set_fdcorrection_create_process(self):
+        """
+        this is to create 8 tables for fd_correction
+        """
+        for p in range(8):
+            self.set_fd_correction_create(p + 1, read_fdc_file(p + 1))
+
+    def loss_selector(self, freq, fdc_en):
+        if fdc_en:
+            self.set_fdcorrection_create_process()
+            self.set_fd_correction_activate_txrx()
+            return 0
+
+        else:
+            return get_loss(freq)
+
+
 
 def main():
     cmw100 = CMW100()
     cmw100.cmw_query('*IDN?')
+
 
 
 if __name__ == '__main__':

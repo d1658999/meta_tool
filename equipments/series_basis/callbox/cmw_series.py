@@ -2305,6 +2305,90 @@ class CMW:
         """
         self.cmw_write(f'CONFigure:LTE:MEASurement:MEValuation:CPRefix {cyclic_prefix}')
 
+    def set_fd_correction_create(self, num, freq_loss_list):
+        """
+        CONFigure:BASE:FDCorrection:CTABle:CREate <TableName>{, <Frequency>,
+        <Correction>}...
+        Creates a new correction table for frequency-dependent attenuation and stores it on the
+        hard disk. If a table with the given name already exists for the addressed sub-instrument,
+        it is overwritten.
+        The parameter pairs <Frequency>, <Correction> are used to fill the table. At least one
+        parameter pair has to be entered. A command with an incomplete pair (e.g. <Frequency>
+        without <Correction>) is ignored completely. To add entries to an existing table see
+        CONFigure:BASE:FDCorrection:CTABle:ADD.
+        You can enter parameter pairs in any order. The table entries (pairs) are automatically
+        sorted from lowest to highest frequency.
+        Setting parameters:
+        <TableName> String parameter used to identify the table by other commands and
+        to store the table on the hard disk. The string must comply to Windows™ file name conventions,
+        see Mass Memory Commands.
+        <Frequency> Range: 100E+6 Hz to 6E+9 Hz
+        Increment: 0.1 Hz
+        Default unit: Hz
+        <Correction> Range: -50 dB to 90 dB
+        Increment: 0.01 dB
+        Default unit: dB
+        Example: CONFigure:BASE:FDCorrection:CTABle:CREate
+        'mytable', 1900000000, 0.5, 2000000000, 0.7
+        Create the table 'mytable' with two entries: 0.5 dB at 1900 MHz
+        and 0.7 dB at 2000 MHz
+        """
+        freq_loss_combined = ','.join(freq_loss_list)
+        self.cmw_write(f'CONFigure:BASE:FDCorrection:CTABle:CREate "AttExtTable{num}", {freq_loss_combined}')
+
+    def set_fd_correction_activate(self, direction, port, att_tables):
+        """
+        CONFigure:FDCorrection:ACTivate <Connector>, <TableName>[, <Direction>[,
+        <RFConverter>]]
+        Activates a correction table for one or more signal paths using a specific RF connector.
+        For bidirectional connectors the table can be applied to both directions or to one direction.
+        It is possible to assign different tables to the directions of a bidirectional connector, see
+        example.
+        A table can be assigned to all paths using the connector or to paths with a specific connector / converter combination.
+        Depending on the installed hardware and the active sub-instrument only a subset of the
+        listed values is allowed. The mapping of virtual connector names to physical connectors
+        also depends on the active sub-instrument. For details see Signal Path Settings.
+        Setting parameters:
+        <Connector> RF1C | RF1O | RF2C | RF3C | RF3O | RF4C | RFAO | RFAC |
+        RFBC
+        RF1C, RF2C, RF3C, RF4C, RF1O, RF3O:
+        RF 1 COM to RF 4 COM and RF 1/3 OUT front panel connectors
+        RFAC, RFBC, RFAO:
+        Virtual names for the RF COM and RF OUT connectors
+        <TableName> String parameter identifying the table. To display a list of existing
+        tables use the command
+        CONFigure:BASE:FDCorrection:CTABle:CATalog?.
+        <Direction> RXTX | RX | TX
+        Specifies the direction to which the correction table shall be
+        applied. RX means input and TX means output. For a pure output
+        connector RX is ignored.
+        RXTX: both directions (for output connector only output)
+        RX: input (not allowed for output connector)
+        TX: output
+        Default: RXTX
+        <RFConverter> RF1 | RF2 | RF3 | RF4
+        RX or TX module in the path (RFn = RXn / TXn)
+        If omitted, the table is activated for any paths using the
+        Example: CONFigure:FDCorrection:ACTivate RF1C,
+        'mytable_in', RX
+        CONFigure:FDCorrection:ACTivate RF1C,
+        'mytable_out', TX
+        Different tables are activated for the input and output direction of
+        the connector RF1C.
+        Example: CONFigure:FDCorrection:ACTivate RF1C, 'mytable',
+        RXTX, RF1
+        The table is activated for paths using RF1C and RX1 or TX1.
+        """
+        self.cmw_write(f'CONFigure:CMWS:FDCorrection:ACTivate:{direction} R1{port}, {att_tables}')
+
+    def set_fd_correction_activate_txrx(self):
+        """
+        set TX and RX for 1~8 ports once
+        """
+        att_tables = ','.join([f'"AttExtTable{n + 1}"' for n in range(8)])
+        self.set_fd_correction_activate('RX', 18, att_tables)
+        self.set_fd_correction_activate('TX', 18, att_tables)
+
     def get_modulation_average_query_fr1(self):
         """
         Return the current, average and standard deviation single value results.
