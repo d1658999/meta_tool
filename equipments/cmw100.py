@@ -60,6 +60,7 @@ class CMW100(CMW):
         self.system_err_all_query()
         self.cmw_write('*RST')
         self.cmw_query('*OPC?')
+        self.set_fdcorrection_create_activate_process(ext_pmt.fdc_en)
 
     def set_measurement_group_gprf(self):
         if self.tech == 'FR1':
@@ -800,28 +801,28 @@ class CMW100(CMW):
         table = port_tx_table_transfer(txas_select)
         return table
 
-    def set_fdcorrection_create_process(self):
+    def set_fdcorrection_create_activate_process(self, fdc_en):
         """
-        this is to create 8 tables for fd_correction
+        this is to create 8 tables for fd_correction and then set to activate the tables
         """
-        for p in range(8):
-            self.set_fd_correction_create(p + 1, read_fdc_file(p + 1))
-
-    def loss_selector(self, freq, fdc_en):
         if fdc_en:
-            self.set_fdcorrection_create_process()
+            for p in range(8):
+                self.set_fd_correction_create(p + 1, read_fdc_file(p + 1))
+
             self.set_fd_correction_activate_txrx()
+
+    @staticmethod
+    def loss_selector(freq, fdc_en):
+        if fdc_en:
             return 0
 
         else:
             return get_loss(freq)
 
 
-
 def main():
     cmw100 = CMW100()
     cmw100.cmw_query('*IDN?')
-
 
 
 if __name__ == '__main__':

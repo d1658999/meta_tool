@@ -33,8 +33,8 @@ def read_fdc_file(port):
         next(rows)  # skip the title
         loss_list = []
         for row in list(rows):
-            loss_list.append(row[0] * 10 ** 6)
-            loss_list.append(float(row[1]))
+            loss_list.append(str(int(row[0]) * 10 ** 6))
+            loss_list.append(row[1])
         return loss_list
 
 
