@@ -4,9 +4,10 @@ import time
 from equipments.series_basis.callbox.cmw_series import CMW
 from utils.parameters.common_parameters_ftm import TDD_BANDS
 import utils.parameters.external_paramters as ext_pmt
+from utils.loss_handler import get_loss
+from utils.loss_handler import read_fdc_file
 from utils.port_tx_handler import port_tx_table_transfer
 from utils.log_init import log_set
-
 
 logger = log_set('CMW100')
 
@@ -59,6 +60,7 @@ class CMW100(CMW):
         self.system_err_all_query()
         self.cmw_write('*RST')
         self.cmw_query('*OPC?')
+        self.set_fdcorrection_create_activate_process(ext_pmt.fdc_en)
 
     def set_measurement_group_gprf(self):
         if self.tech == 'FR1':
@@ -798,6 +800,24 @@ class CMW100(CMW):
     def port_tx_table(txas_select):
         table = port_tx_table_transfer(txas_select)
         return table
+
+    def set_fdcorrection_create_activate_process(self, fdc_en):
+        """
+        this is to create 8 tables for fd_correction and then set to activate the tables
+        """
+        if fdc_en:
+            for p in range(8):
+                self.set_fd_correction_create(p + 1, read_fdc_file(p + 1))
+
+            self.set_fd_correction_activate_txrx()
+
+    @staticmethod
+    def loss_selector(freq, fdc_en):
+        if fdc_en:
+            return 0
+
+        else:
+            return get_loss(freq)
 
 
 def main():

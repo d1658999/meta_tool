@@ -299,7 +299,7 @@ class TxTestLevelSweep(AtCmd, CMW100):
         tx_freq_list = [cm_pmt_ftm.transfer_freq_rx2tx_fr1(self.band_fr1, rx_freq) for rx_freq in rx_freq_list]
         self.rx_freq_fr1 = rx_freq_list[1]
         self.tx_freq_fr1 = tx_freq_list[1]
-        self.loss_rx = get_loss(rx_freq_list[1])
+        self.loss_rx = self.loss_selector(rx_freq_list[1], ext_pmt.fdc_en)
         self.preset_instrument()
         self.set_test_end_fr1()
         self.set_test_mode_fr1()
@@ -323,7 +323,7 @@ class TxTestLevelSweep(AtCmd, CMW100):
                         #  initial all before tx level prgress
                         for tx_freq_select in tx_freq_select_list:
                             self.tx_freq_fr1 = tx_freq_select
-                            self.loss_tx = get_loss(self.tx_freq_fr1)
+                            self.loss_tx = self.loss_selector(self.tx_freq_fr1, ext_pmt.fdc_en)
                             self.tx_set_fr1()
                             self.tx_power_relative_test_initial_fr1()
 
@@ -370,7 +370,7 @@ class TxTestLevelSweep(AtCmd, CMW100):
         tx_freq_list = [cm_pmt_ftm.transfer_freq_rx2tx_lte(self.band_lte, rx_freq) for rx_freq in rx_freq_list]
         self.rx_freq_lte = rx_freq_list[1]
         self.tx_freq_lte = tx_freq_list[1]
-        self.loss_rx = get_loss(rx_freq_list[1])
+        self.loss_rx = self.loss_selector(rx_freq_list[1], ext_pmt.fdc_en)
         self.preset_instrument()
         self.set_test_end_lte()
         self.set_test_mode_lte()
@@ -395,7 +395,7 @@ class TxTestLevelSweep(AtCmd, CMW100):
                         #  initial all before tx level prgress
                         for tx_freq_select in tx_freq_select_list:
                             self.tx_freq_lte = tx_freq_select
-                            self.loss_tx = get_loss(self.tx_freq_lte)
+                            self.loss_tx = self.loss_selector(self.tx_freq_lte, ext_pmt.fdc_en)
                             self.tx_set_lte()
                             self.tx_power_relative_test_initial_lte()
 
@@ -485,8 +485,8 @@ class TxTestLevelSweep(AtCmd, CMW100):
                     self.tx_chan_wcdma = tx_rx_chan_wcdma[0]
                     self.rx_freq_wcdma = cm_pmt_ftm.transfer_chan2freq_wcdma(self.band_wcdma, self.rx_chan_wcdma, 'rx')
                     self.tx_freq_wcdma = cm_pmt_ftm.transfer_chan2freq_wcdma(self.band_wcdma, self.tx_chan_wcdma, 'tx')
-                    self.loss_rx = get_loss(self.rx_freq_wcdma)
-                    self.loss_tx = get_loss(self.tx_freq_wcdma)
+                    self.loss_rx = self.loss_selector(self.rx_freq_wcdma, ext_pmt.fdc_en)
+                    self.loss_tx = self.loss_selector(self.tx_freq_wcdma, ext_pmt.fdc_en)
                     self.set_test_end_wcdma()
                     self.set_test_mode_wcdma()
                     self.cmw_query('*OPC?')
@@ -575,8 +575,8 @@ class TxTestLevelSweep(AtCmd, CMW100):
                     self.rx_chan_gsm = rx_chan_gsm
                     self.rx_freq_gsm = cm_pmt_ftm.transfer_chan2freq_gsm(self.band_gsm, self.rx_chan_gsm, 'rx')
                     self.tx_freq_gsm = cm_pmt_ftm.transfer_chan2freq_gsm(self.band_gsm, self.rx_chan_gsm, 'tx')
-                    self.loss_rx = get_loss(self.rx_freq_gsm)
-                    self.loss_tx = get_loss(self.tx_freq_gsm)
+                    self.loss_rx = self.loss_selector(self.rx_freq_gsm, ext_pmt.fdc_en)
+                    self.loss_tx = self.loss_selector(self.tx_freq_gsm, ext_pmt.fdc_en)
                     self.set_test_mode_gsm()
                     self.antenna_switch_v2()
                     self.sig_gen_gsm()

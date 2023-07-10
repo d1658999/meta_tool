@@ -29,6 +29,7 @@ criteria:
 external_inst:
   count: 1
   get_temp: false
+  fdc: false
   odpm: false
   psu: false
   record_current: false

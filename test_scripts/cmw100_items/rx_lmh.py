@@ -454,8 +454,8 @@ class RxTestGenre(AtCmd, CMW100):
             (self.rb_size_fr1, self.rb_start_fr1) = self.chan_rb[2]
             self.tx_freq_lte = int(self.tx_freq_lte * 1000)
             self.tx_freq_fr1 = int(self.tx_freq_fr1 * 1000)
-            loss_tx_lte = get_loss(self.tx_freq_lte)
-            loss_tx_fr1 = get_loss(self.tx_freq_fr1)
+            loss_tx_lte = self.loss_selector(self.tx_freq_lte, ext_pmt.fdc_en)
+            loss_tx_fr1 = self.loss_selector(self.tx_freq_fr1, ext_pmt.fdc_en)
             self.rx_freq_fr1 = cm_pmt_ftm.transfer_freq_tx2rx_fr1(self.band_fr1, self.tx_freq_fr1)
             self.rx_freq_lte = cm_pmt_ftm.transfer_freq_tx2rx_lte(self.band_lte, self.tx_freq_lte)
             self.preset_instrument()
@@ -467,13 +467,13 @@ class RxTestGenre(AtCmd, CMW100):
 
             # sync lte
             self.set_test_mode_lte()
-            self.loss_rx = get_loss(self.rx_freq_lte)
+            self.loss_rx = self.loss_selector(self.rx_freq_lte, ext_pmt.fdc_en)
             self.sig_gen_lte()
             self.sync_lte()
 
             # sync fr1
             self.set_test_mode_fr1()
-            self.loss_rx = get_loss(self.rx_freq_fr1)
+            self.loss_rx = self.loss_selector(self.rx_freq_fr1, ext_pmt.fdc_en)
             self.sig_gen_fr1()
             self.sync_fr1()
 
@@ -520,7 +520,7 @@ class RxTestGenre(AtCmd, CMW100):
 
             # LTE sync2
             self.rx_level = -70
-            self.loss_rx = get_loss(self.rx_freq_lte)
+            self.loss_rx = self.loss_selector(self.rx_freq_lte, ext_pmt.fdc_en)
             self.sig_gen_lte()
             self.sync_lte()
 
@@ -583,8 +583,8 @@ class RxTestGenre(AtCmd, CMW100):
                 self.rx_level_select_fr1()  # this is determination of rx if fast test is enable
                 self.rx_freq_fr1 = rx_freq
                 self.tx_freq_fr1 = cm_pmt_ftm.transfer_freq_rx2tx_fr1(self.band_fr1, self.rx_freq_fr1)
-                self.loss_rx = get_loss(self.rx_freq_fr1)
-                self.loss_tx = get_loss(self.tx_freq_fr1)
+                self.loss_rx = self.loss_selector(self.rx_freq_fr1, ext_pmt.fdc_en)
+                self.loss_tx = self.loss_selector(self.tx_freq_fr1, ext_pmt.fdc_en)
                 logger.info('----------Test LMH progress---------')
                 self.preset_instrument()
                 self.set_test_end_fr1()
@@ -640,8 +640,8 @@ class RxTestGenre(AtCmd, CMW100):
                 self.rx_level_select_lte()  # this is determination of rx if fast test is enable
                 self.rx_freq_lte = rx_freq
                 self.tx_freq_lte = cm_pmt_ftm.transfer_freq_rx2tx_lte(self.band_lte, self.rx_freq_lte)
-                self.loss_rx = get_loss(self.rx_freq_lte)
-                self.loss_tx = get_loss(self.tx_freq_lte)
+                self.loss_rx = self.loss_selector(self.rx_freq_lte, ext_pmt.fdc_en)
+                self.loss_tx = self.loss_selector(self.tx_freq_lte, ext_pmt.fdc_en)
                 logger.info('----------Test LMH progress---------')
                 self.preset_instrument()
                 self.set_test_end_lte()
@@ -705,8 +705,8 @@ class RxTestGenre(AtCmd, CMW100):
                                                                              'rx')
                     self.tx_freq_wcdma = cm_pmt_ftm.transfer_chan2freq_wcdma(self.band_wcdma, self.tx_chan_wcdma,
                                                                              'tx')
-                    self.loss_rx = get_loss(self.rx_freq_wcdma)
-                    self.loss_tx = get_loss(self.tx_freq_wcdma)
+                    self.loss_rx = self.loss_selector(self.rx_freq_wcdma, ext_pmt.fdc_en)
+                    self.loss_tx = self.loss_selector(self.tx_freq_wcdma, ext_pmt.fdc_en)
                     self.set_test_end_wcdma()
                     self.set_test_mode_wcdma()
                     self.cmw_query('*OPC?')
@@ -761,8 +761,8 @@ class RxTestGenre(AtCmd, CMW100):
                     self.rx_chan_gsm = rx_chan_gsm
                     self.rx_freq_gsm = cm_pmt_ftm.transfer_chan2freq_gsm(self.band_gsm, self.rx_chan_gsm, 'rx')
                     self.tx_freq_gsm = cm_pmt_ftm.transfer_chan2freq_gsm(self.band_gsm, self.rx_chan_gsm, 'tx')
-                    self.loss_rx = get_loss(self.rx_freq_gsm)
-                    self.loss_tx = get_loss(self.tx_freq_gsm)
+                    self.loss_rx = self.loss_selector(self.rx_freq_gsm, ext_pmt.fdc_en)
+                    self.loss_tx = self.loss_selector(self.tx_freq_gsm, ext_pmt.fdc_en)
                     self.set_test_mode_gsm()
                     self.rx_path_setting_gsm()
                     self.sig_gen_gsm()
