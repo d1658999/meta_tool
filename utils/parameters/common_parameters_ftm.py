@@ -17,7 +17,7 @@ def bandwidths_selected_fr1(band):
         'N20': [5, 10, 15, 20, ],
         'N24': [5, 10, ],
         'N25': [5, 10, 15, 20, 30, 40, ],
-        'N26': [5, 10, 15, 20, 25, 30, ],
+        'N26': [5, 10, 15, 20, ], # remove 25, 30
         'N28': [5, 10, 15, 20, ],
         'N29': [5, 10, ],
         'N30': [5, 10, ],
@@ -372,7 +372,7 @@ def transfer_chan2freq_wcdma(band, chan, tx_rx='tx'):
         return 0.2 * chan * 1000
 
 
-def trandfer_freq2chan_wcdma(band, freq, tx_rx='tx'):
+def transfer_freq2chan_wcdma(band, freq, tx_rx='tx'):
     if band == 4:
         if tx_rx == 'tx':
             return 5 * (freq / 1000 - 1450)

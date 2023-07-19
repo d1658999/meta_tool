@@ -840,7 +840,7 @@ def tx_power_relative_test_export_excel_ftm(data, parameters_dict):
                     chan = chan_judge_wcdma(band, tx_freq_level)
                     ws.cell(row, 1).value = band
                     # this channel
-                    ws.cell(row, 2).value = cm_pmt_ftm.trandfer_freq2chan_wcdma(band, tx_freq_level, 'tx')
+                    ws.cell(row, 2).value = cm_pmt_ftm.transfer_freq2chan_wcdma(band, tx_freq_level, 'tx')
                     ws.cell(row, 3).value = chan  # LMH
                     ws.cell(row, 4).value = tx_freq_level  # this tx_freq_wcdma
                     ws.cell(row, 5).value = tx_level
@@ -864,7 +864,7 @@ def tx_power_relative_test_export_excel_ftm(data, parameters_dict):
                 for tx_freq, measured_data in data.items():
                     chan = chan_judge_wcdma(band, tx_freq) if test_item != 'freq_sweep' else None
                     ws.cell(row, 1).value = band
-                    ws.cell(row, 2).value = cm_pmt_ftm.trandfer_freq2chan_wcdma(band, tx_freq, 'tx')  # this channel
+                    ws.cell(row, 2).value = cm_pmt_ftm.transfer_freq2chan_wcdma(band, tx_freq, 'tx')  # this channel
                     ws.cell(row, 3).value = chan  # LMH
                     ws.cell(row, 4).value = tx_freq
                     ws.cell(row, 5).value = tx_freq_level  # this tx_level
