@@ -529,12 +529,15 @@ def tx_power_relative_test_export_excel_ftm(data, parameters_dict):
                         ws['X1'] = 'Condition'
                         ws['Y1'] = 'Temp0'
                         ws['Z1'] = 'Temp1'
-                        ws['AA1'] = '2f0' if test_item == 'harmonics' else None
-                        ws['AB1'] = '3f0' if test_item == 'harmonics' else None
-                        ws['AA1'] = 'Voltage' if test_item in ['lmh', 'level_sweep'] else None
-                        ws['AA1'] = 'Vcc' if test_item in ['apt_sweep'] else None
-                        ws['AB1'] = 'Bias0' if test_item in ['apt_sweep'] else None
-                        ws['AC1'] = 'Bias1' if test_item in ['apt_sweep'] else None
+                        if test_item == 'harmonics':
+                            ws['AA1'] = '2f0'
+                            ws['AB1'] = '3f0'
+                        elif test_item in ['lmh', 'level_sweep']:
+                            ws['AA1'] = 'Voltage'
+                        elif test_item in ['apt_sweep']:
+                            ws['AA1'] = 'Vcc'
+                            ws['AB1'] = 'Bias0'
+                            ws['AC1'] = 'Bias1'
                     else:  # to pass the dashboard
                         pass
 
@@ -579,12 +582,15 @@ def tx_power_relative_test_export_excel_ftm(data, parameters_dict):
                         ws['Z1'] = 'Condition'
                         ws['AA1'] = 'Temp0'
                         ws['AB1'] = 'Temp1'
-                        ws['AC1'] = '2f0' if test_item == 'harmonics' else None
-                        ws['AD1'] = '3f0' if test_item == 'harmonics' else None
-                        ws['AC1'] = 'Voltage_mipi' if test_item in ['lmh', 'level_sweep'] else None
-                        ws['AC1'] = 'Vcc' if test_item in ['apt_sweep'] else None
-                        ws['AD1'] = 'Bias0' if test_item in ['apt_sweep'] else None
-                        ws['AE1'] = 'Bias1' if test_item in ['apt_sweep'] else None
+                        if test_item == 'harmonics':
+                            ws['AC1'] = '2f0'
+                            ws['AD1'] = '3f0'
+                        elif test_item in ['lmh', 'level_sweep']:
+                            ws['AC1'] = 'Voltage_mipi'
+                        elif test_item in ['apt_sweep']:
+                            ws['AC1'] = 'Vcc'
+                            ws['AD1'] = 'Bias0'
+                            ws['AE1'] = 'Bias1'
                     else:  # to pass the dashboard
                         pass
 
@@ -619,9 +625,11 @@ def tx_power_relative_test_export_excel_ftm(data, parameters_dict):
                         ws['R1'] = 'Condition'
                         ws['S1'] = 'Temp0'
                         ws['T1'] = 'Temp1'
-                        ws['U1'] = '2f0' if test_item == 'harmonics' else None
-                        ws['V1'] = '3f0' if test_item == 'harmonics' else None
-                        ws['U1'] = 'Voltage_mipi' if test_item in ['lmh', 'level_sweep'] else None
+                        if test_item == 'harmonics':
+                            ws['U1'] = '2f0'
+                            ws['V1'] = '3f0'
+                        elif test_item in ['lmh', 'level_sweep']:
+                            ws['U1'] = 'Voltage_mipi'
                     else:  # to pass the dashboard
                         pass
 

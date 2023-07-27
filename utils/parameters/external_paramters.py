@@ -9,7 +9,7 @@ endc_bands = ["3_78"]  # "3_78", "2_77","66_77"
 band_segment = 'A'  # 'A' | 'B' for B28A ,B28B
 band_segment_fr1 = 'B'
 devices_serial = None
-et_tracker = 'sky51001'  # 'sky51001', 'qm81052'
+et_tracker = 'qm81052'  # 'sky51001', 'qm81052'
 
 lte_bandwidths = [10]  # 1.4, 3, 5, 10, 15, 20
 fr1_bandwidths = [10]  # 10, 15, 20, 25, 30 , 40, 50, 60, 80, 90, 100, 70
