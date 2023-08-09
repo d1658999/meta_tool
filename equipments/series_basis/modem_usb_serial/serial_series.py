@@ -833,7 +833,7 @@ class AtCmd:
                 if band in [26, 5, 8, 12, 13, 14, 17, 18, 19, 20, 28, 29, 71, 24]:
                     mipi_num, usid, addr = 0, 4, 1
                 elif band in [1, 2, 3, 4, 66, 7, 25, 30, 38, 41, 40, 39, 34, 70, 75, 76, ]:
-                    mipi_num, usid, addr = 2, 5, 1
+                    mipi_num, usid, addr = 2, 5, 'b'
                 elif band in [42, 48, 77, 78, 79, ]:
                     mipi_num, usid, addr = 0, 4, 1
 
@@ -841,13 +841,13 @@ class AtCmd:
                 if band in [1, 2, 3, 4, 66, 7, 25, 30, 38, 41, 40, 39, 34, 70, 75, 76, ]:
                     mipi_num, usid, addr = 0, 4, 1
                 elif band in [42, 48, 77, 78, 79, ]:
-                    mipi_num, usid, addr = 2, 5, 1
+                    mipi_num, usid, addr = 2, 5, 'b'
                 elif band in [26, 5, 8, 12, 13, 14, 17, 18, 19, 20, 28, 29, 71, 24]:
                     mipi_num, usid, addr = 0, 4, 1
 
         elif tech in ['WCDMA']:
             if band in [1, 2, 4]:
-                mipi_num, usid, addr = 2, 5, 1
+                mipi_num, usid, addr = 2, 5, 'b'
             elif band in [5, 8, 6, 19]:
                 mipi_num, usid, addr = 0, 4, 1
 
