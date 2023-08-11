@@ -948,20 +948,50 @@ class AtCmd:
                 return [vol_real]
 
     def query_voltage_selector_sky51001(self, tech, band, tx_path):
+        volt_lowest_list = [0.2]
         if tech == 'FR1':
-            return self.query_voltage_fr1_sky51001(band, tx_path)
+            volt_list = self.query_voltage_fr1_sky51001(band, tx_path)
+            while volt_lowest_list == volt_list:
+                volt_list = self.query_voltage_fr1_sky51001(band, tx_path)
+
+            return volt_list
+
         elif tech == 'LTE':
-            return self.query_voltage_lte_sky51001(band, tx_path)
+            volt_list = self.query_voltage_lte_sky51001(band, tx_path)
+            while volt_lowest_list == volt_list:
+                volt_list = self.query_voltage_lte_sky51001(band, tx_path)
+
+            return volt_list
+
         elif tech == 'WCDMA':
-            return self.query_voltage_wcdma_sky51001(band)
+            volt_list = self.query_voltage_wcdma_sky51001(band)
+            while volt_lowest_list == volt_list:
+                volt_list = self.query_voltage_wcdma_sky51001(band)
+
+            return volt_list
 
     def query_voltage_selector_qm81052(self, tech, band, tx_path):
+        volt_lowest_list = [0.4]
         if tech == 'FR1':
-            return self.query_voltage_fr1_qm81052(band, tx_path)
+            volt_list = self.query_voltage_fr1_qm81052(band, tx_path)
+            while volt_lowest_list == volt_list:
+                volt_list = self.query_voltage_fr1_qm81052(band, tx_path)
+
+            return volt_list
+
         elif tech == 'LTE':
-            return self.query_voltage_lte_qm81052(band, tx_path)
+            volt_list = self.query_voltage_lte_qm81052(band, tx_path)
+            while volt_lowest_list == volt_list:
+                volt_list = self.query_voltage_lte_qm81052(band, tx_path)
+
+            return volt_list
+
         elif tech == 'WCDMA':
-            return self.query_voltage_wcdma_qm81052(band)
+            volt_list = self.query_voltage_wcdma_qm81052(band)
+            while volt_lowest_list == volt_list:
+                volt_list = self.query_voltage_wcdma_qm81052(band)
+
+            return volt_list
 
     def query_voltage_collection(self, module='qm81052'):
         if module == 'sky51001':
@@ -1069,7 +1099,8 @@ class AtCmd:
                 new_string = str(self.hex_string2dec(hex_string))
                 index_value_dict[resd[1]] = new_string
             elif len(resd) == 6:  # size == 4
-                hex_string = "".join((resd[-4].strip('"'), resd[-3].strip('"'), resd[-2].strip('"'), resd[-1].strip('"')))
+                hex_string = "".join(
+                    (resd[-4].strip('"'), resd[-3].strip('"'), resd[-2].strip('"'), resd[-1].strip('"')))
                 new_string = str(self.hex_string2dec(hex_string))
                 index_value_dict[resd[1]] = new_string
         logger.debug(index_value_dict)

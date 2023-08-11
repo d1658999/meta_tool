@@ -310,7 +310,19 @@ class CMW100(CMW):
         if self.band_lte in [34, 38, 39, 40, 41, 42, 48, 46]:
             # waveform_path = f'C:\\CMW100_WV\\SMU_Channel_CC0_RxAnt0_RF_Verification_10M_SIMO_01.wv'
             # v0.126
-            waveform_path = f'C:\\CMW100_WV\\SMU_NodeB_Ant0_LTE_SENS_10MHz_TDD_CFG1_SF_CFG4_SIMO_woCIF_AGL8_RC.wv'
+            if bw == 10:
+                waveform_path = f'C:\\CMW100_WV\\SMU_NodeB_Ant0_LTE_SENS_10MHz_TDD_CFG1_SF_CFG4_SIMO_woCIF_AGL8_RC.wv'
+            else:
+                # v0.135
+                bw_index = {
+                    '1.4': '01',
+                    '3': '02',
+                    '5': '03',
+                    '15': '05',
+                    '20': '06',
+                }
+                waveform_path = f'C:\\CMW100_WV\\SMU_NodeB_Ant0_TDD_FULL_{bw_index[str(bw)]}.wv'
+
         else:
             bw = '1p4' if bw == 1.4 else f'0{bw}' if bw <= 5 else bw
             waveform_path = f'C:\\CMW100_WV\\SMU_NodeB_Ant0_FRC_{bw}MHz.wv'

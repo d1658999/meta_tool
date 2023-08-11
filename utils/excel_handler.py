@@ -723,7 +723,9 @@ def tx_power_relative_test_export_excel_ftm(data, parameters_dict):
                     ws.cell(row, 22).value = asw_srs_path
                     ws.cell(row, 23).value = measured_data[10]
                     ws.cell(row, 24).value = ext_pmt.condition
-                    ws.cell(row, 27).value = measured_data[11] if ext_pmt.volt_mipi_en else None  # volt_mipi
+                    ws.cell(row, 25).value = measured_data[11]
+                    ws.cell(row, 26).value = measured_data[12]
+                    ws.cell(row, 27).value = measured_data[13] if ext_pmt.volt_mipi_en else None  # volt_mipi
                     row += 1
 
             elif tx_freq_level <= 100:  # 1rb_sweep, lmh, freq_sweep, cbe
@@ -755,10 +757,12 @@ def tx_power_relative_test_export_excel_ftm(data, parameters_dict):
                     ws.cell(row, 24).value = ext_pmt.condition if test_item == 'lmh' else None
                     ws.cell(row, 25).value = measured_data[11] if test_item in ['lmh', 'cbe'] else None
                     ws.cell(row, 26).value = measured_data[12] if test_item in ['lmh', 'cbe'] else None
-                    ws.cell(row, 27).value = measured_data[13][1] if test_item == 'harmonics' else None  # 2f0
-                    ws.cell(row, 28).value = measured_data[14][1] if test_item == 'harmonics' else None  # 3f0
-                    # volt_mipi
-                    ws.cell(row, 27).value = measured_data[13] if test_item == 'lmh' and ext_pmt.volt_mipi_en else None
+                    if ext_pmt.volt_mipi_en:  # volt_mipi
+                        ws.cell(row, 27).value = measured_data[13]
+                    elif test_item == 'harmonics':
+                        ws.cell(row, 27).value = measured_data[13][1]  # 2f0
+                        ws.cell(row, 28).value = measured_data[14][1]  # 3f0
+
                     row += 1
 
         elif tech == 'FR1':
@@ -793,13 +797,14 @@ def tx_power_relative_test_export_excel_ftm(data, parameters_dict):
                     ws.cell(row, 24).value = asw_srs_path
                     ws.cell(row, 25).value = measured_data[10]
                     ws.cell(row, 26).value = ext_pmt.condition
-                    ws.cell(row, 29).value = measured_data[11] if ext_pmt.volt_mipi_en else None  # volt_mipi
-                    ws.cell(row, 29).value = measured_data[11] if parameters_dict[
-                                                                      'test_item'] == 'apt_sweep' else None  # vcc
-                    ws.cell(row, 30).value = measured_data[12] if parameters_dict[
-                                                                      'test_item'] == 'apt_sweep' else None  # bias0
-                    ws.cell(row, 31).value = measured_data[13] if parameters_dict[
-                                                                      'test_item'] == 'apt_sweep' else None  # bias1
+                    ws.cell(row, 27).value = measured_data[11]
+                    ws.cell(row, 28).value = measured_data[12]
+                    if ext_pmt.volt_mipi_en:  # volt_mipi
+                        ws.cell(row, 29).value = measured_data[13]
+                    elif parameters_dict['test_item'] == 'apt_sweep':
+                        ws.cell(row, 29).value = measured_data[11]  # vcc
+                        ws.cell(row, 30).value = measured_data[12]  # bias0
+                        ws.cell(row, 31).value = measured_data[13]  # bias1
                     row += 1
 
             elif tx_freq_level <= 100:  # 1rb_sweep, lmh, freq_sweep, cbe
@@ -833,11 +838,12 @@ def tx_power_relative_test_export_excel_ftm(data, parameters_dict):
                     ws.cell(row, 26).value = ext_pmt.condition if test_item == 'lmh' else None
                     ws.cell(row, 27).value = measured_data[11] if test_item in ['lmh', 'cbe'] else None
                     ws.cell(row, 28).value = measured_data[12] if test_item in ['lmh', 'cbe'] else None
-                    ws.cell(row, 29).value = measured_data[13][1] if test_item == 'harmonics' else None  # 2f0
-                    ws.cell(row, 30).value = measured_data[14][1] if test_item == 'harmonics' else None  # 3f0
+                    if ext_pmt.volt_mipi_en:  # volt_mipi
+                        ws.cell(row, 29).value = measured_data[13]
+                    elif test_item == 'harmonics':
+                        ws.cell(row, 29).value = measured_data[13][1]  # 2f0
+                        ws.cell(row, 30).value = measured_data[14][1]  # 3f0
 
-                    # volt_mipi
-                    ws.cell(row, 29).value = measured_data[13] if test_item == 'lmh' and ext_pmt.volt_mipi_en else None
                     row += 1
 
         elif tech == 'WCDMA':
@@ -865,7 +871,9 @@ def tx_power_relative_test_export_excel_ftm(data, parameters_dict):
                     ws.cell(row, 16).value = asw_srs_path
                     ws.cell(row, 17).value = measured_data[9]
                     ws.cell(row, 18).value = ext_pmt.condition
-                    ws.cell(row, 21).value = measured_data[10] if ext_pmt.volt_mipi_en else None  # volt_mipi
+                    ws.cell(row, 19).value = measured_data[10]
+                    ws.cell(row, 20).value = measured_data[11]
+                    ws.cell(row, 21).value = measured_data[12] if ext_pmt.volt_mipi_en else None  # volt_mipi
                     row += 1
 
             elif tx_freq_level <= 100:  # 1rb_sweep, lmh, freq_sweep
@@ -891,10 +899,12 @@ def tx_power_relative_test_export_excel_ftm(data, parameters_dict):
                     ws.cell(row, 18).value = ext_pmt.condition if test_item == 'lmh' else None
                     ws.cell(row, 19).value = measured_data[10] if test_item == 'lmh' else None
                     ws.cell(row, 20).value = measured_data[11] if test_item == 'lmh' else None
-                    ws.cell(row, 21).value = measured_data[12][1] if test_item == 'harmonics' else None  # 2f0
-                    ws.cell(row, 22).value = measured_data[13][1] if test_item == 'harmonics' else None  # 3f0
-                    # volt_mipi
-                    ws.cell(row, 21).value = measured_data[12] if test_item == 'lmh' and ext_pmt.volt_mipi_en else None
+                    if ext_pmt.volt_mipi_en:
+                        ws.cell(row, 21).value = measured_data[12]
+                    elif test_item == 'harmonics':
+                        ws.cell(row, 21).value = measured_data[12][1]  # 2f0
+                        ws.cell(row, 22).value = measured_data[13][1]  # 3f0
+
                     row += 1
 
         elif tech == 'GSM':
@@ -927,6 +937,8 @@ def tx_power_relative_test_export_excel_ftm(data, parameters_dict):
                     ws.cell(row, 22).value = asw_srs_path
                     ws.cell(row, 23).value = measured_data[16]
                     ws.cell(row, 24).value = ext_pmt.condition
+                    ws.cell(row, 25).value = measured_data[17]
+                    ws.cell(row, 26).value = measured_data[18]
 
                     row += 1
 
