@@ -949,10 +949,14 @@ class AtCmd:
 
     def query_voltage_selector_sky51001(self, tech, band, tx_path):
         volt_lowest_list = [0.2]
+        count = 10
         if tech == 'FR1':
             volt_list = self.query_voltage_fr1_sky51001(band, tx_path)
             while volt_lowest_list == volt_list:
                 volt_list = self.query_voltage_fr1_sky51001(band, tx_path)
+                count -= 1
+                if count == 0:
+                    break
 
             return volt_list
 
@@ -960,6 +964,9 @@ class AtCmd:
             volt_list = self.query_voltage_lte_sky51001(band, tx_path)
             while volt_lowest_list == volt_list:
                 volt_list = self.query_voltage_lte_sky51001(band, tx_path)
+                count -= 1
+                if count == 0:
+                    break
 
             return volt_list
 
@@ -967,15 +974,22 @@ class AtCmd:
             volt_list = self.query_voltage_wcdma_sky51001(band)
             while volt_lowest_list == volt_list:
                 volt_list = self.query_voltage_wcdma_sky51001(band)
+                count -= 1
+                if count == 0:
+                    break
 
             return volt_list
 
     def query_voltage_selector_qm81052(self, tech, band, tx_path):
         volt_lowest_list = [0.4]
+        count_max = 10
         if tech == 'FR1':
             volt_list = self.query_voltage_fr1_qm81052(band, tx_path)
             while volt_lowest_list == volt_list:
                 volt_list = self.query_voltage_fr1_qm81052(band, tx_path)
+                count_max -= 1
+                if count_max == 0:
+                    break
 
             return volt_list
 
@@ -983,6 +997,9 @@ class AtCmd:
             volt_list = self.query_voltage_lte_qm81052(band, tx_path)
             while volt_lowest_list == volt_list:
                 volt_list = self.query_voltage_lte_qm81052(band, tx_path)
+                count_max -= 1
+                if count_max == 0:
+                    break
 
             return volt_list
 
@@ -990,6 +1007,9 @@ class AtCmd:
             volt_list = self.query_voltage_wcdma_qm81052(band)
             while volt_lowest_list == volt_list:
                 volt_list = self.query_voltage_wcdma_qm81052(band)
+                count_max -= 1
+                if count_max == 0:
+                    break
 
             return volt_list
 
