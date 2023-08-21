@@ -201,6 +201,134 @@ def convert_string(string, size):
     return result
 
 
+def regy_write_test(file_name, target_name):
+    # combine to file_path
+    # file_path = pathlib.Path('regy_file_parse') / pathlib.Path(file_name)  # formal use
+    # file_path = pathlib.Path.cwd().parent / pathlib.Path('regy_file_parse') / pathlib.Path(file_name)  # test use
+    file_path = pathlib.Path.cwd() / pathlib.Path(file_name)
+
+    # Parse the XML file
+    tree = ET.parse(file_path)
+    root = tree.getroot()
+
+    # Extract the registry name
+    registries_dict = {}
+    registries = root.findall('.//REGISTRY')
+
+    for registry in registries:
+        registry_name = registry.get('NAME')
+        registry_size = registry.get('SIZE')
+        if registry_name == target_name:
+            values = registry.findall('.//VALUE')
+            values[4].text = str(30)
+            values[3].text = str(30)
+            values[2].text = str(30)
+            values[1].text = str(10)
+            values[0].text = str(1)
+            break
+        else:
+            continue
+
+    # show the registries dictionary
+    tree.write('output__.regy', encoding='utf-8', xml_declaration=True)
+
+
+def regy_replace_test(file_name_base, file_name_changing):
+    # Step 1: Parse the base XML file and need changing file
+    original_xml_path = file_name_base
+    tree_base = ET.parse(original_xml_path)
+    root_base = tree_base.getroot()
+    tree_changing = ET.parse(file_name_changing)
+    root_changing = tree_changing.getroot()
+
+    # Step 2: Find wanted name in regy that wants to change
+    target_name_list = []
+    registries_changings = root_changing.findall('.//REGISTRY')
+    for registries_changing in registries_changings:
+        target_name_list.append(registries_changing.get("NAME"))
+
+    # Step 3: Search Base regy file and change the values for every specific NV
+    for base_registry in root_base.findall(".//REGISTRY"):
+        if base_registry.get("NAME") in target_name_list:
+            base_name = base_registry.get("NAME")
+            base_values = base_registry.findall(".//VALUE")
+            specific_nv_parsed  = root_changing.findall(f".//REGISTRY[@NAME='{base_name}']")[0]
+            changing_values = specific_nv_parsed.findall(".//VALUE")
+
+            for base_value_index in range(len(base_values)):
+                base_values[base_value_index].text = changing_values[base_value_index].text
+
+
+    # Step 4: Export to a new XML file with spaces for indentation
+    new_xml_path = "new_replaced.regy"
+    tree_base.write(new_xml_path, encoding='utf-8', xml_declaration=True)
+
+    print("New XML file generated successfully.")
+
+
+def regy_extract_test(file_name, target_name_list):
+    # Step 1: Parse the original XML file
+    original_xml_path = file_name
+    tree = ET.parse(original_xml_path)
+    root = tree.getroot()
+
+    # Step 2: Extract the desired items
+    desired_items = []
+    for category in root.findall(".//CATEGORY"):
+        new_category = ET.Element("CATEGORY")
+        new_category.set("NAME", category.get("NAME"))
+
+        # for registry in category.findall(".//REGISTRY[@NAME='CAL.LTE.TX_PA_Range_Map_Rise_TX0_B27']"):
+        for registry in category.findall(".//REGISTRY"):
+            if registry.get("NAME") in target_name_list:
+                new_registry = ET.Element("REGISTRY")
+                new_registry.set("NAME", registry.get("NAME"))
+                new_registry.set("TYPE", registry.get("TYPE"))
+                new_registry.set("SIZE", registry.get("SIZE"))
+                new_registry.set("STACKCOUNT", registry.get("STACKCOUNT"))
+
+                for value in registry.findall(".//VALUE"):
+                    new_value = ET.Element("VALUE")
+                    new_value.set("INDEX", value.get("INDEX"))
+                    new_value.text = value.text
+                    new_registry.append(new_value)
+
+                new_category.append(new_registry)
+
+        if len(new_category) > 0:
+            desired_items.append(new_category)
+
+    # Step 3: Create a new XML structure
+    new_root = ET.Element("NODE")
+    for item in desired_items:
+        new_root.append(item)
+
+    # Step 4: Export to a new XML file with spaces for indentation
+    prettify(new_root)
+    new_xml_path = "new.regy"
+    tree = ET.ElementTree(new_root)
+    tree.write(new_xml_path, encoding='utf-8', xml_declaration=True)
+
+    print("New XML file generated successfully.")
+
+
+def prettify(elem, level=0):
+    """Recursively adds spaces for indentation."""
+    indent = " " * level
+    if len(elem):
+        if not elem.text or not elem.text.strip():
+            elem.text = "\n" + indent + " "
+        if not elem.tail or not elem.tail.strip():
+            elem.tail = "\n" + indent
+        for elem in elem:
+            prettify(elem, level + 1)
+        if not elem.tail or not elem.tail.strip():
+            elem.tail = "\n" + indent
+    else:
+        if level and (not elem.tail or not elem.tail.strip()):
+            elem.tail = "\n" + indent
+
+
 def main():
     # from equipments.series_basis.modem_usb_serial.serial_series import AtCmd
     # test = AtCmd()
@@ -217,8 +345,10 @@ def main():
     # print(yy)
     # print(yy.from_bytes(yy, byteorder='little', signed=True))
     # print(int("ffd2", 16))
-    pass
+    # regy_write_test('sw_point.regy', "CAL.LTE.TX_PA_Range_Map_Rise_TX0_B27")
 
+    regy_replace_test('KM4_Common_RF_v0p1.regy',
+                      'UHB_ PA Range MAP_ES2.regy')
 
     # print(decimal_to_hex_twos_complement(-5, 4))
     # print(convert_string(decimal_to_hex_twos_complement(-5, 4), 4))
