@@ -201,7 +201,7 @@ def convert_string(string, size):
     return result
 
 
-def regy_write_test(file_name, target_name):
+def regy_write_test(file_name, target_name):  # this is prototype that is not used for others
     # combine to file_path
     # file_path = pathlib.Path('regy_file_parse') / pathlib.Path(file_name)  # formal use
     # file_path = pathlib.Path.cwd().parent / pathlib.Path('regy_file_parse') / pathlib.Path(file_name)  # test use
@@ -233,7 +233,7 @@ def regy_write_test(file_name, target_name):
     tree.write('output__.regy', encoding='utf-8', xml_declaration=True)
 
 
-def regy_replace_test(file_name_base, file_name_changing):
+def regy_replace(file_name_base, file_name_changing, output_path):
     # Step 1: Parse the base XML file and need changing file
     original_xml_path = file_name_base
     tree_base = ET.parse(original_xml_path)
@@ -252,23 +252,23 @@ def regy_replace_test(file_name_base, file_name_changing):
         if base_registry.get("NAME") in target_name_list:
             base_name = base_registry.get("NAME")
             base_values = base_registry.findall(".//VALUE")
-            specific_nv_parsed  = root_changing.findall(f".//REGISTRY[@NAME='{base_name}']")[0]
+            specific_nv_parsed = root_changing.findall(f".//REGISTRY[@NAME='{base_name}']")[0]
             changing_values = specific_nv_parsed.findall(".//VALUE")
 
             for base_value_index in range(len(base_values)):
                 base_values[base_value_index].text = changing_values[base_value_index].text
 
-
     # Step 4: Export to a new XML file with spaces for indentation
-    new_xml_path = "new_replaced.regy"
-    tree_base.write(new_xml_path, encoding='utf-8', xml_declaration=True)
+    new_regy_path = pathlib.Path(output_path) / pathlib.Path("New_Merged.regy")
+    tree_base.write(new_regy_path, encoding='utf-8', xml_declaration=True)
 
-    print("New XML file generated successfully.")
+    logger.info("New regy file generated successfully.")
 
 
-def regy_extract_test(file_name, target_name_list):
+def regy_extract_test(base_file_path, separate_file_path, output_path):
     # Step 1: Parse the original XML file
-    original_xml_path = file_name
+    original_xml_path = base_file_path
+    target_name_list = read_separate_nv(separate_file_path)
     tree = ET.parse(original_xml_path)
     root = tree.getroot()
 
@@ -305,11 +305,21 @@ def regy_extract_test(file_name, target_name_list):
 
     # Step 4: Export to a new XML file with spaces for indentation
     prettify(new_root)
-    new_xml_path = "new.regy"
+    new_xml_path = pathlib.Path(output_path) / pathlib.Path("new_separate.regy")
     tree = ET.ElementTree(new_root)
     tree.write(new_xml_path, encoding='utf-8', xml_declaration=True)
 
     print("New XML file generated successfully.")
+
+
+def read_separate_nv(separat_file_path):
+    target_name_list = []
+    with open(separat_file_path, 'r') as f:
+        for nv_name in f.readlines():
+            target_name_list.append(nv_name.strip())
+
+    return target_name_list
+
 
 
 def prettify(elem, level=0):
@@ -347,7 +357,7 @@ def main():
     # print(int("ffd2", 16))
     # regy_write_test('sw_point.regy', "CAL.LTE.TX_PA_Range_Map_Rise_TX0_B27")
 
-    regy_replace_test('KM4_Common_RF_v0p1.regy',
+    regy_replace('KM4_Common_RF_v0p1.regy',
                       'UHB_ PA Range MAP_ES2.regy')
 
     # print(decimal_to_hex_twos_complement(-5, 4))
