@@ -1,5 +1,13 @@
+release V2.20
+1. add Regy Tab to have merger and separate NV
+2. add .bat file to combine all results of .xlsx to .csv file
+3. rename Record current to ODPM2
+
 release V2.19
 1. add NTN N255, N256, B23
+2. Add FD Correction loss for every port
+3. Add tx level lower to -40 and higher to 30
+
 
 release V2.18
 1. add APT SWEEP function
