@@ -1582,7 +1582,7 @@ def rx_power_relative_test_export_excel_ftm(data, parameters_dict):
                     ws['A1'] = 'Band'
                     ws['B1'] = 'RX_Path'
                     ws['C1'] = 'Chan'
-                    ws['D1'] = 'Channel'
+                    ws['D1'] = 'Rx_Channel'
                     ws['E1'] = 'Tx_Freq'
                     ws['F1'] = 'Rx_Level'
 
