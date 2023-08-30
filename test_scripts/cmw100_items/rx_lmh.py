@@ -720,7 +720,7 @@ class RxTestGenre(AtCmd, CMW100):
                     # logger.debug(aclr_mod_results)
                     # data[self.tx_chan_wcdma] = aclr_mod_results
                     self.search_sensitivity_wcdma()
-                    data[self.tx_chan_wcdma] = self.rx_level
+                    data[self.rx_chan_wcdma] = self.rx_level
                     # self.query_rx_measure_wcdma()
                     # logger.info(f'Power: {aclr_mod_results[3]:.1f}, Sensitivity: {self.rx_level}')
                     # data[self.tx_freq_lte] = [aclr_mod_results[3], self.rx_level, self.rsrp_list, self.cinr_list,
