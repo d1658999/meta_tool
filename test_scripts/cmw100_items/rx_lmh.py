@@ -463,7 +463,7 @@ class RxTestGenre(AtCmd, CMW100):
             # sync progress
             self.set_test_end_lte(delay=0.5)
             self.set_test_end_fr1(delay=0.5)
-            self.rx_level = -70
+            self.rx_level = ext_pmt.init_rx_sync_level
 
             # sync lte
             self.set_test_mode_lte()
@@ -554,7 +554,8 @@ class RxTestGenre(AtCmd, CMW100):
                 self.tx_freq_lte, self.tx_freq_fr1,
                 self.tx_level_endc_lte, self.tx_level_endc_fr1,
                 self.rb_size_lte, self.rb_start_lte,
-                self.rb_size_fr1, self.rb_start_fr1
+                self.rb_size_fr1, self.rb_start_fr1,
+                self.rx_path_lte_dict[self.rx_path_lte], self.rx_path_fr1_dict[self.rx_path_fr1],
             ]
 
             self.set_test_end_fr1(delay=0.5)

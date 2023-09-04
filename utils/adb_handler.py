@@ -187,9 +187,9 @@ def get_odpm_current(count=1):
         odpm_list.append(eval(odpm_current))
         sleep(0.1)
         n += 1
-    current_average = sum(odpm_list) / len(odpm_list)
+    current_average = round(sum(odpm_list) / len(odpm_list), 2)
     print(f'Get the ODPM average current: {current_average} mA')
-    return round(current_average, 2)
+    return current_average
 
 
 def main():

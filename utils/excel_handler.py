@@ -1771,6 +1771,9 @@ def rx_power_endc_test_export_excel_ftm(data):
                 ws['N1'] = 'rb_start_LTE'
                 ws['O1'] = 'rb_size_FR1'
                 ws['P1'] = 'rb_start_FR1'
+                ws['Q1'] = 'LTE_RX_PATH'
+                ws['R1'] = 'FR1_RX_PATH'
+
             else:
                 pass
 
@@ -1783,8 +1786,10 @@ def rx_power_endc_test_export_excel_ftm(data):
         ws['D1'] = 'BW_FR1'
         ws['E1'] = 'Freq_tx_LTE'
         ws['F1'] = 'Freq_tx_FR1'
-        ws['G1'] = 'Diff_LTE'
-        ws['H1'] = 'Diff_FR1'
+        ws['G1'] = 'LTE_RX_PATH'
+        ws['H1'] = 'FR1_TX_PATH'
+        ws['I1'] = 'Diff_LTE'
+        ws['J1'] = 'Diff_FR1'
 
         wb.save(file_path)
         wb.close()
@@ -1837,8 +1842,10 @@ def rx_desense_endc_process_ftm(file_path):
         ws_desens.cell(row, 4).value = ws_txmax.cell(row, 8).value  # 'BW_FR1'
         ws_desens.cell(row, 5).value = ws_txmax.cell(row, 9).value  # 'Freq_tx_LTE'
         ws_desens.cell(row, 6).value = ws_txmax.cell(row, 10).value  # 'Freq_tx_FR1'
-        ws_desens.cell(row, 7).value = ws_txmax.cell(row, 5).value - ws_txmin.cell(row, 5).value  # desens lte
-        ws_desens.cell(row, 8).value = ws_txmax.cell(row, 6).value - ws_txmin.cell(row, 6).value  # desens fr1
+        ws_desens.cell(row, 7).value = ws_txmax.cell(row, 17).value  # 'LTE_RX_PATH'
+        ws_desens.cell(row, 8).value = ws_txmax.cell(row, 18).value  # 'FR1_RX_PATH'
+        ws_desens.cell(row, 9).value = ws_txmax.cell(row, 5).value - ws_txmin.cell(row, 5).value  # desens lte
+        ws_desens.cell(row, 10).value = ws_txmax.cell(row, 6).value - ws_txmin.cell(row, 6).value  # desens fr1
 
     wb.save(file_path)
     wb.close()
@@ -1993,7 +2000,7 @@ def rxs_relative_plot_ftm(file_path, parameters_dict):
 
 
 def rxs_endc_plot_ftm(file_path):
-    logger.info('----------Plot Chart LTE ---------')
+    logger.info('----------Plot Chart ENDC LTE ---------')
     wb = openpyxl.load_workbook(file_path)
     ws_dashboard = wb[f'Dashboard']
     ws_desens = wb[f'Desens_ENDC']
@@ -2004,7 +2011,7 @@ def rxs_endc_plot_ftm(file_path):
         ws_dashboard._charts.clear()
 
     chart1 = LineChart()
-    chart1.title = 'Sensitivity'
+    chart1.title = 'Sensitivity_LTE'
     chart1.y_axis.title = 'Rx_Level(dBm)'
     chart1.x_axis.title = 'Band'
     chart1.x_axis.tickLblPos = 'low'
@@ -2012,8 +2019,8 @@ def rxs_endc_plot_ftm(file_path):
     chart1.width = 32
     y_data_txmax = Reference(ws_txmax, min_col=5, min_row=2, max_col=5, max_row=ws_txmax.max_row)
     y_data_txmin = Reference(ws_txmin, min_col=5, min_row=2, max_col=5, max_row=ws_txmin.max_row)
-    y_data_desens = Reference(ws_desens, min_col=7, min_row=1, max_col=7, max_row=ws_desens.max_row)
-    x_data = Reference(ws_desens, min_col=1, min_row=2, max_col=6, max_row=ws_desens.max_row)
+    y_data_desens = Reference(ws_desens, min_col=9, min_row=1, max_col=9, max_row=ws_desens.max_row)
+    x_data = Reference(ws_desens, min_col=1, min_row=2, max_col=8, max_row=ws_desens.max_row)
 
     series_txmax = Series(y_data_txmax, title="Tx_Max")
     series_txmin = Series(y_data_txmin, title="Tx_-10dBm")
@@ -2031,20 +2038,20 @@ def rxs_endc_plot_ftm(file_path):
     chart1.y_axis.crosses = "max"
     chart1 += chart2
 
-    ws_dashboard.add_chart(chart1, "A1")
+    ws_dashboard.add_chart(chart1, "A40")
 
-    logger.info('----------Plot Chart FR1 ---------')
-    wb = openpyxl.load_workbook(file_path)
-    ws_dashboard = wb[f'Dashboard']
-    ws_desens = wb[f'Desens_ENDC']
-    ws_txmax = wb[f'Raw_Data_ENDC_FR1_TxMax']
-    ws_txmin = wb[f'Raw_Data_ENDC_FR1_-10dBm']
+    logger.info('----------Plot Chart ENDC FR1 ---------')
+    # wb = openpyxl.load_workbook(file_path)
+    # # ws_dashboard = wb[f'Dashboard']
+    # ws_desens = wb[f'Desens_ENDC']
+    # ws_txmax = wb[f'Raw_Data_ENDC_FR1_TxMax']
+    # ws_txmin = wb[f'Raw_Data_ENDC_FR1_-10dBm']
 
-    if ws_dashboard._charts:  # if there is charts, delete it
-        ws_dashboard._charts.clear()
+    # if ws_dashboard._charts:  # if there is charts, delete it
+    #     ws_dashboard._charts.clear()
 
     chart1 = LineChart()
-    chart1.title = 'Sensitivity'
+    chart1.title = 'Sensitivity_FR1'
     chart1.y_axis.title = 'Rx_Level(dBm)'
     chart1.x_axis.title = 'Band'
     chart1.x_axis.tickLblPos = 'low'
@@ -2052,8 +2059,8 @@ def rxs_endc_plot_ftm(file_path):
     chart1.width = 32
     y_data_txmax = Reference(ws_txmax, min_col=6, min_row=2, max_col=6, max_row=ws_txmax.max_row)
     y_data_txmin = Reference(ws_txmin, min_col=6, min_row=2, max_col=6, max_row=ws_txmin.max_row)
-    y_data_desens = Reference(ws_desens, min_col=8, min_row=1, max_col=8, max_row=ws_desens.max_row)
-    x_data = Reference(ws_desens, min_col=1, min_row=2, max_col=6, max_row=ws_desens.max_row)
+    y_data_desens = Reference(ws_desens, min_col=10, min_row=1, max_col=10, max_row=ws_desens.max_row)
+    x_data = Reference(ws_desens, min_col=1, min_row=2, max_col=8, max_row=ws_desens.max_row)
 
     series_txmax = Series(y_data_txmax, title="Tx_Max")
     series_txmin = Series(y_data_txmin, title="Tx_-10dBm")
