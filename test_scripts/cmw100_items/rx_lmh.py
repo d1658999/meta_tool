@@ -460,7 +460,7 @@ class RxTestGenre(AtCmd, CMW100):
             self.rx_freq_lte = cm_pmt_ftm.transfer_freq_tx2rx_lte(self.band_lte, self.tx_freq_lte)
             self.preset_instrument()
 
-            # sync progress
+            # set end at initial
             self.set_test_end_lte(delay=0.5)
             self.set_test_end_fr1(delay=0.5)
             self.rx_level = ext_pmt.init_rx_sync_level
