@@ -265,7 +265,7 @@ def regy_replace(file_name_base, file_name_changing, output_path):
     logger.info("New regy file generated successfully.")
 
 
-def regy_extract_test(base_file_path, separate_file_path, output_path):
+def regy_extract(base_file_path, separate_file_path, output_path):
     # Step 1: Parse the original XML file
     original_xml_path = base_file_path
     target_name_list = read_separate_nv(separate_file_path)

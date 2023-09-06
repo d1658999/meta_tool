@@ -510,8 +510,8 @@ class RxTestGenre(AtCmd, CMW100):
             self.power_endc_fr1 = round(aclr_mod_results_fr1[3], 2)
 
             # FR1 RxS
-            rxs_fr1 = self.search_sensitivity_fr1()
-
+            # rxs_fr1 = self.search_sensitivity_fr1()
+            rxs_fr1 = self.sensitivity_solution_select_fr1()
             # # set LTE power and get ENDC power for LTE
             # self.tx_level = ext_pmt.tx_level_endc_lte if self.ue_power_bool == 1 else -10
             # self.loss_tx = loss_tx_lte
@@ -543,7 +543,7 @@ class RxTestGenre(AtCmd, CMW100):
             self.rx_path_setting_lte()
 
             # LTE RxS
-            rxs_lte = self.search_sensitivity_lte()
+            rxs_lte = self.sensitivity_solution_select_fr1()
 
             # save data to excel
             data = [
@@ -826,6 +826,8 @@ class RxTestGenre(AtCmd, CMW100):
             logger.info('Need to check the environments')
             self.rx_level = 0
 
+        return self.rx_level
+
     def sensitivity_solution_select_lte(self):
         try:
             if not self.rx_fast_test_enable:
@@ -843,6 +845,8 @@ class RxTestGenre(AtCmd, CMW100):
             logger.info(err)
             logger.info('Need to check the environments')
             self.rx_level = 0
+
+        return self.rx_level
 
     @staticmethod
     def sens_calculation(real_sens_list):
