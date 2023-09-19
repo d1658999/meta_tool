@@ -1,3 +1,10 @@
+release V2.21
+1. add rx fast in ECDC tab, which can test it faster than general
+2. fix some samll bugs
+3. update fcc/ce frequency information
+4. update the header of WCDMA channel from TX to RX when measuring sensitivity
+
+
 release V2.20
 1. add Regy Tab to have merger and separate NV
 2. add .bat file to combine all results of .xlsx to .csv file

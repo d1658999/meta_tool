@@ -3,10 +3,10 @@ import pathlib
 import pygubu
 
 PROJECT_PATH = pathlib.Path(__file__).parent
-PROJECT_UI = PROJECT_PATH / pathlib.Path('gui') / "main_v2_20_2.ui"
+PROJECT_UI = PROJECT_PATH / pathlib.Path('gui') / "main_v2_21_1.ui"
 
 
-class MainV2202App:
+class MainV2211App:
     def __init__(self, master=None):
         self.builder = builder = pygubu.Builder()
         builder.add_resource_path(PROJECT_PATH)
