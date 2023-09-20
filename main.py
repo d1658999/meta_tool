@@ -15,7 +15,7 @@ from utils.adb_handler import get_serial_devices
 from utils.excel_handler import excel_folder_create
 from equipments.power_supply import Psu
 from equipments.temp_chamber import TempChamber
-from utils.regy_handler import regy_replace, regy_extract_test
+from utils.regy_handler import regy_replace, regy_extract
 
 # from equipments.series_basis.modem_usb_serial.serial_series import AtCmd
 # from utils.regy_handler import regy_target_search_parser_v2
@@ -2781,7 +2781,7 @@ class MainApp(MainV2202App):
 
     def separate_nv(self):
         OUTPUT_PATH = pathlib.Path('regy_separate')
-        regy_extract_test(self.base_regy_sep.get(), self.separate_txt.get(), OUTPUT_PATH)
+        regy_extract(self.base_regy_sep.get(), self.separate_txt.get(), OUTPUT_PATH)
         logger.info('Separate Successfully')
 
     def measure(self):
