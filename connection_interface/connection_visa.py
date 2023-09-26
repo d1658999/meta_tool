@@ -49,6 +49,7 @@ class VisaComport:
                 gpib_usb_wanted = None
                 for gpib_usb in self.get_gpib_usb():  # this is to search GPIB for PSU
                     inst = pyvisa.ResourceManager().open_resource(gpib_usb)
+                    print(inst)
                     inst_res = inst.query('*IDN?').strip()
                     logger.info('----------Search PSU we are using----------')
                     for psu in psu_list:
@@ -56,6 +57,9 @@ class VisaComport:
                             gpib_usb_wanted = gpib_usb
                             psu_select = psu
                             break
+
+                    if psu_select is not None:
+                        break
 
             except Exception as err:
                 logger.info(err)
