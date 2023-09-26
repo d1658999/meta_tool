@@ -948,7 +948,7 @@ class AtCmd:
                 return [vol_real]
 
     def query_voltage_selector_sky51001(self, tech, band, tx_path):
-        volt_lowest_list = [0.2]
+        volt_lowest_list = [1.8384]
         count = 10
         if tech == 'FR1':
             volt_list = self.query_voltage_fr1_sky51001(band, tx_path)
