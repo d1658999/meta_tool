@@ -3,10 +3,10 @@ import pathlib
 import pygubu
 
 PROJECT_PATH = pathlib.Path(__file__).parent
-PROJECT_UI = PROJECT_PATH / pathlib.Path('gui') / "main_v2_21_1.ui"
+PROJECT_UI = PROJECT_PATH / pathlib.Path('gui') / "main_v2_22_1.ui"
 
 
-class MainV2211App:
+class MainV2221App:
     def __init__(self, master=None):
         self.builder = builder = pygubu.Builder()
         builder.add_resource_path(PROJECT_PATH)
@@ -994,8 +994,11 @@ class MainV2211App:
     def separate_nv(self):
         pass
 
+    def separate_nv_2(self):
+        pass
+
 
 if __name__ == "__main__":
-    app = MainV2202App()
+    app = MainV2221App()
     app.run()
 

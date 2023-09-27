@@ -9,7 +9,7 @@ import signal
 import os
 import yaml
 
-from main_ui import MainV2211App
+from main_ui import MainV2221App
 from utils.log_init import log_set, log_clear
 from utils.adb_handler import get_serial_devices
 from utils.excel_handler import excel_folder_create
@@ -25,7 +25,7 @@ PROJECT_PATH = pathlib.Path(__file__).parent
 logger = log_set('GUI')
 
 
-class MainApp(MainV2211App):
+class MainApp(MainV2221App):
     def __init__(self, master=None):
         super().__init__()
         self.notebook = self.builder.get_object("notebook1")
