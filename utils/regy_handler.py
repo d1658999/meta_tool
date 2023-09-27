@@ -312,6 +312,54 @@ def regy_extract(base_file_path, separate_file_path, output_path):
     print("New XML file generated successfully.")
 
 
+def regy_extract_2(base_file_path, separate_file_path, output_path):
+    # Step 1: Parse the original XML file
+    original_xml_path = base_file_path
+    target_group_dict = read_separate_nv_2(separate_file_path)
+    tree = ET.parse(original_xml_path)
+    root = tree.getroot()
+
+    for target_group_name, target_name_list in target_group_dict.items():
+        # Step 2: Extract the desired items
+        desired_items = []
+        for category in root.findall(".//CATEGORY"):
+            new_category = ET.Element("CATEGORY")
+            new_category.set("NAME", category.get("NAME"))
+
+            # for registry in category.findall(".//REGISTRY[@NAME='CAL.LTE.TX_PA_Range_Map_Rise_TX0_B27']"):
+            for registry in category.findall(".//REGISTRY"):
+                if registry.get("NAME") in target_name_list:
+                    new_registry = ET.Element("REGISTRY")
+                    new_registry.set("NAME", registry.get("NAME"))
+                    new_registry.set("TYPE", registry.get("TYPE"))
+                    new_registry.set("SIZE", registry.get("SIZE"))
+                    new_registry.set("STACKCOUNT", registry.get("STACKCOUNT"))
+
+                    for value in registry.findall(".//VALUE"):
+                        new_value = ET.Element("VALUE")
+                        new_value.set("INDEX", value.get("INDEX"))
+                        new_value.text = value.text
+                        new_registry.append(new_value)
+
+                    new_category.append(new_registry)
+
+            if len(new_category) > 0:
+                desired_items.append(new_category)
+
+            # Step 3: Create a new XML structure
+            new_root = ET.Element("NODE")
+            for item in desired_items:
+                new_root.append(item)
+
+            # Step 4: Export to a new XML file with spaces for indentation
+            prettify(new_root)
+            new_xml_path = pathlib.Path(output_path) / pathlib.Path(f"{target_group_name}.regy")
+            tree = ET.ElementTree(new_root)
+            tree.write(new_xml_path, encoding='utf-8', xml_declaration=True)
+
+            print(f"New XML {target_group_name} file generated successfully.")
+
+
 def read_separate_nv(separat_file_path):
     target_name_list = []
     with open(separat_file_path, 'r') as f:
@@ -320,6 +368,32 @@ def read_separate_nv(separat_file_path):
 
     return target_name_list
 
+
+def read_separate_nv_2(separat_file_path):
+    target_group_dict = {}
+    target_name_list = []
+    target_group_name_temp = None
+    with open(separat_file_path, 'r') as f:
+        contents = f.readlines()
+        end_line = contents[-1]
+        for nv_name in contents:
+            target_group_name, target_name = nv_name.strip().split(' ', 1)
+
+            if target_group_name_temp is None or target_group_name_temp == target_group_name:
+                if end_line == nv_name:
+                    target_name_list.append(target_name)
+                    target_group_dict[target_group_name] = target_name_list
+
+                else:
+                    target_group_name_temp = target_group_name
+                    target_name_list.append(target_name)
+
+            elif target_group_name_temp != target_group_name:
+                target_group_dict[target_group_name_temp] = target_name_list
+                target_group_name_temp = target_group_name
+                target_name_list = [target_name]
+
+    return target_group_dict
 
 
 def prettify(elem, level=0):
