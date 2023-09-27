@@ -2,7 +2,7 @@ import math
 import time
 
 from equipments.series_basis.callbox.cmw_series import CMW
-from utils.parameters.common_parameters_ftm import TDD_BANDS
+from utils.parameters.common_parameters_ftm import TDD_BANDS, NTN_BANDS
 import utils.parameters.external_paramters as ext_pmt
 from utils.loss_handler import get_loss
 from utils.loss_handler import read_fdc_file
@@ -299,7 +299,7 @@ class CMW100(CMW):
         return sem_results, sem_avg_results
 
     def set_waveform_fr1(self, bw, scs, mcs):
-        if self.band_fr1 in [34, 38, 39, 40, 41, 42, 48, 77, 78, 79]:
+        if self.band_fr1 in TDD_BANDS and self.band_fr1 not in NTN_BANDS:
             waveform_path = f'C:\\CMW100_WV\\SMU_NodeB_NR_Ant0_NR_{bw}MHz_SCS{scs}_TDD_Sens_MCS{mcs}_rescale.wv'
         else:
             waveform_path = f'C:\\CMW100_WV\\SMU_NodeB_NR_Ant0_LTE_NR_{bw}MHz_SCS{scs}_FDD_Sens_MCS_{mcs}.wv'
@@ -307,7 +307,7 @@ class CMW100(CMW):
         self.set_arb_file_gprf(waveform_path)
 
     def set_waveform_lte(self, bw):
-        if self.band_lte in [34, 38, 39, 40, 41, 42, 48, 46]:
+        if self.band_lte in TDD_BANDS and self.band_lte not in NTN_BANDS:
             # waveform_path = f'C:\\CMW100_WV\\SMU_Channel_CC0_RxAnt0_RF_Verification_10M_SIMO_01.wv'
             # v0.126
             if bw == 10:
@@ -517,14 +517,14 @@ class CMW100(CMW):
 
     def select_mode_fdd_tdd(self, band):
         if self.tech == 'FR1':
-            if band in [34, 38, 39, 40, 41, 42, 48, 75, 76, 77, 78, 79, ]:
+            if band in TDD_BANDS:
                 self.set_duplexer_mode_fr1('TDD')
                 logger.debug('========== Set TDD ==========')
             else:
                 self.set_duplexer_mode_fr1('FDD')
                 logger.debug('========== Set FDD ==========')
         elif self.tech == 'LTE':
-            if band in [34, 38, 39, 40, 41, 42, 48, 46]:
+            if band in TDD_BANDS:
                 self.set_duplexer_mode_lte('TDD')
                 logger.debug('========== Set TDD ==========')
             else:
@@ -535,7 +535,7 @@ class CMW100(CMW):
         """
         For now FDD is forced to 15KHz and TDD is to be 30KHz
         """
-        if band in TDD_BANDS:
+        if band in TDD_BANDS and band not in NTN_BANDS:
             scs = 1
         else:
             scs = 0

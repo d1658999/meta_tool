@@ -1,4 +1,5 @@
-TDD_BANDS = [34, 38, 39, 40, 41, 42, 48, 77, 78, 79, ]
+TDD_BANDS = [34, 38, 39, 40, 41, 42, 48, 46, 77, 78, 79, 255, 256]
+NTN_BANDS = [23, 255, 256]
 
 # bandwidth index
 def bandwidths_selected_fr1(band):

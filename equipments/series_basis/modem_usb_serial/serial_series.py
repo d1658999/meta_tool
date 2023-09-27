@@ -3,7 +3,7 @@ import time
 from utils.log_init import log_set
 import utils.parameters.external_paramters as ext_pmt
 from connection_interface.connection_serial import ModemComport
-from utils.parameters.common_parameters_ftm import TDD_BANDS
+from utils.parameters.common_parameters_ftm import TDD_BANDS, NTN_BANDS
 import utils.parameters.rssi_parameters as rssi
 from utils.regy_handler import regy_parser, regy_parser_v2
 
@@ -326,7 +326,7 @@ class AtCmd:
         """
         For now FDD is forced to 15KHz and TDD is to be 30KHz
         """
-        if band in TDD_BANDS:
+        if band in TDD_BANDS and band not in NTN_BANDS:
             scs = 1
         else:
             scs = 0
@@ -381,7 +381,7 @@ class AtCmd:
 
     def sync_fr1(self):
         logger.info('---------Sync----------')
-        scs = 1 if self.band_fr1 in TDD_BANDS else 0
+        scs = 1 if self.band_fr1 in TDD_BANDS and self.band_fr1 not in NTN_BANDS else 0
         response = self.command(
             f'AT+NRFSYNC={self.sync_path_dict[self.sync_path]},{self.sync_mode},{scs},'
             f'{self.bw_fr1_dict[self.bw_fr1]},0,{self.rx_freq_fr1}',
@@ -816,9 +816,9 @@ class AtCmd:
 
         elif tech in ['WCDMA']:
             if band in [1, 2, 4]:
-                mipi_num, usid, addr = 0, 'b', 0
-            elif band in [5, 8, 6, 19]:
                 mipi_num, usid, addr = 2, 'b', 0
+            elif band in [5, 8, 6, 19]:
+                mipi_num, usid, addr = 0, 'b', 0
 
         return mipi_num, usid, addr
 
