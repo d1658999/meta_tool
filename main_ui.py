@@ -3,10 +3,10 @@ import pathlib
 import pygubu
 
 PROJECT_PATH = pathlib.Path(__file__).parent
-PROJECT_UI = PROJECT_PATH / pathlib.Path('gui') / "main_v2_22_1.ui"
+PROJECT_UI = PROJECT_PATH / pathlib.Path('gui') /"main_v2_22_2.ui"
 
 
-class MainV2221App:
+class MainV2222App:
     def __init__(self, master=None):
         self.builder = builder = pygubu.Builder()
         builder.add_resource_path(PROJECT_PATH)
@@ -368,6 +368,8 @@ class MainV2221App:
         self.changed_regy = None
         self.base_regy_sep = None
         self.separate_txt = None
+        self.base_regy_parse = None
+        self.parse_cfg = None
         builder.import_variables(
             self,
             [
@@ -725,6 +727,8 @@ class MainV2221App:
                 "changed_regy",
                 "base_regy_sep",
                 "separate_txt",
+                "base_regy_parse",
+                "parse_cfg",
             ],
         )
 
@@ -999,6 +1003,6 @@ class MainV2221App:
 
 
 if __name__ == "__main__":
-    app = MainV2221App()
+    app = MainV2222App()
     app.run()
 

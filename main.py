@@ -9,7 +9,7 @@ import signal
 import os
 import yaml
 
-from main_ui import MainV2221App
+from main_ui import MainV2222App
 from utils.log_init import log_set, log_clear
 from utils.adb_handler import get_serial_devices
 from utils.excel_handler import excel_folder_create
@@ -25,7 +25,7 @@ PROJECT_PATH = pathlib.Path(__file__).parent
 logger = log_set('GUI')
 
 
-class MainApp(MainV2221App):
+class MainApp(MainV2222App):
     def __init__(self, master=None):
         super().__init__()
         self.notebook = self.builder.get_object("notebook1")
@@ -2786,7 +2786,7 @@ class MainApp(MainV2221App):
 
     def separate_nv_2(self):
         OUTPUT_PATH = pathlib.Path('regy_separate')
-        regy_extract_2(self.base_regy_sep.get(), self.separate_txt.get(), OUTPUT_PATH)
+        regy_extract_2(self.base_regy_parse.get(), self.parse_cfg.get(), OUTPUT_PATH)
         logger.info('Separate Successfully')
 
     def measure(self):
