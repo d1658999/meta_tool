@@ -315,6 +315,7 @@ def regy_extract(base_file_path, separate_file_path, output_path):
 def regy_extract_2(base_file_path, separate_file_path, output_path):
     # Step 1: Parse the original XML file
     original_xml_path = base_file_path
+    file_name = pathlib.Path(base_file_path).stem
     target_group_dict = read_separate_nv_2(separate_file_path)
     tree = ET.parse(original_xml_path)
     root = tree.getroot()
@@ -353,11 +354,11 @@ def regy_extract_2(base_file_path, separate_file_path, output_path):
 
             # Step 4: Export to a new XML file with spaces for indentation
             prettify(new_root)
-            new_xml_path = pathlib.Path(output_path) / pathlib.Path(f"{target_group_name}.regy")
+            new_xml_path = pathlib.Path(output_path) / pathlib.Path(f"{file_name}_{target_group_name}.regy")
             tree = ET.ElementTree(new_root)
             tree.write(new_xml_path, encoding='utf-8', xml_declaration=True)
 
-            print(f"New XML {target_group_name} file generated successfully.")
+            print(f"New XML {file_name}_{target_group_name} file generated successfully.")
 
 
 def read_separate_nv(separat_file_path):
