@@ -67,6 +67,7 @@ rx_paths_endc_fr1 = [15]
 condition = 'NV'
 rx_fast_test_enable = False
 debug_enable = False
+fbrx_en = True
 
 scripts = ['GENERAL']  # 'GENERAL' | 'FCC' | 'CE' | 'FACTORY'
 

@@ -321,6 +321,12 @@ class AtCmd:
             'HPM': 0,
             'LPM': 2,
         }
+        self.pdread_dict = {
+            'GSM': 0,
+            'WCDMA': 1,
+            'LTE': 2,
+            'FR1': 6,
+        }
 
     def select_scs_fr1(self, band):
         """
@@ -1508,6 +1514,21 @@ class AtCmd:
 
         """
         pass
+
+    def query_fbrx_power(self, tech):
+        """
+        Get the FBRX power, only support for FR1, LTE
+        """
+        if ext_pmt.fbrx_en:
+            logger.info(f'----------Get {self.pdread_dict[tech]} FBRX power----------')
+            res = self.command(f'AT+PDREAD={self.pdread_dict[tech]}, 0')
+            for line in res:
+                if '+PDREAD:' in line.decode():
+                    fbrx_value = eval(line.decode().split(':')[1].strip())
+                    fbrx_power = round(fbrx_value / 1000, 2)
+                    return [fbrx_power]
+        else:
+            return [None]
 
     @staticmethod
     def decimal_to_hex_twos_complement(num, size):
