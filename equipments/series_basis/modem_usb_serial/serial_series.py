@@ -1520,7 +1520,7 @@ class AtCmd:
         Get the FBRX power, only support for FR1, LTE
         """
         if ext_pmt.fbrx_en:
-            logger.info(f'----------Get {self.pdread_dict[tech]} FBRX power----------')
+            logger.info(f'----------Get {tech} FBRX power----------')
             res = self.command(f'AT+PDREAD={self.pdread_dict[tech]}, 0')
             for line in res:
                 if '+PDREAD:' in line.decode():
