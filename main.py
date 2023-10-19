@@ -9,7 +9,7 @@ import signal
 import os
 import yaml
 
-from main_ui import MainV2222App
+from main_ui import MainV2231App
 from utils.log_init import log_set, log_clear
 from utils.adb_handler import get_serial_devices
 from utils.excel_handler import excel_folder_create
@@ -25,7 +25,7 @@ PROJECT_PATH = pathlib.Path(__file__).parent
 logger = log_set('GUI')
 
 
-class MainApp(MainV2222App):
+class MainApp(MainV2231App):
     def __init__(self, master=None):
         super().__init__()
         self.notebook = self.builder.get_object("notebook1")
@@ -305,6 +305,8 @@ class MainApp(MainV2222App):
         self.volt_mipi_en.set(ui_init['external_inst']['volt_mipi'])
         self.get_temp_en.set(ui_init['external_inst']['get_temp'])
         self.fdc_en.set(ui_init['external_inst']['fdc'])
+        self.fbrx_en.set(ui_init['external_inst']['fbrx'])
+        self.mipi_read_en.set(ui_init['external_inst']['mipi_read'])
         self.record_current_enable.set(ui_init['external_inst']['record_current'])
         self.hthv.set(ui_init['condition']['hthv'])
         self.htlv.set(ui_init['condition']['htlv'])
@@ -889,6 +891,8 @@ class MainApp(MainV2222App):
         volt_mipi_en = self.volt_mipi_en.get()
         get_temp_en = self.get_temp_en.get()
         fdc_en = self.fdc_en.get()
+        fbrx_en = self.fbrx_en_en.get()
+        mipi_read_en = self.mipi_read_en.get()
         record_current_enable = self.record_current_enable.get()
         hthv = self.hthv.get()
         htlv = self.htlv.get()
@@ -994,6 +998,8 @@ class MainApp(MainV2222App):
                 'volt_mipi': volt_mipi_en,
                 'get_temp': get_temp_en,
                 'fdc': fdc_en,
+                'fbrx': fbrx_en,
+                'mipi_read': mipi_read_en,
                 'record_current': record_current_enable,
                 'count': count,
                 'wait_time': wait_time,
@@ -1057,6 +1063,18 @@ class MainApp(MainV2222App):
             logger.info('=====Enable FD Correction=====')
         else:
             logger.info('=====Disable FD Correction=====')
+
+    def fbrx_en_status(self):
+        if self.fbrx_en.get():
+            logger.info('=====Enable FBRX POWER=====')
+        else:
+            logger.info('=====Disable FBRX POWER=====')
+
+    def mipi_read_en_status(self):
+        if self.mipi_read_en.get():
+            logger.info('=====Enable MIPI READ=====')
+        else:
+            logger.info('=====Disable MIPI READ=====')
 
     def record_current_enable_status(self):
         if self.record_current_enable.get():
@@ -2857,6 +2875,8 @@ class MainApp(MainV2222App):
         ext_pmt.volt_mipi_en = self.volt_mipi_en.get()
         ext_pmt.get_temp_en = self.get_temp_en.get()
         ext_pmt.fdc_en = self.fdc_en.get()
+        ext_pmt.fbrx_en = self.fbrx_en.get()
+        ext_pmt.mipi_read_en = self.mipi_read_en.get()
         ext_pmt.record_current_enable = self.record_current_enable.get()
         ext_pmt.condition = self.condition
         ext_pmt.part_number = self.part_number.get()

@@ -27,14 +27,16 @@ condition:
 criteria:
   ulca_lte: 1
 external_inst:
-  count: 1
-  get_temp: false
+  count: 5
   fdc: false
+  fbrx: false
+  mipi_read: false
+  get_temp: false
   odpm: false
   psu: false
   record_current: false
   tempchb: false
-  tx_level_start: -10
+  tx_level_start: -20
   tx_level_stop: 26
   volt_mipi: false
   wait_time: 300
@@ -47,11 +49,11 @@ mcs:
   mcs_lte: []
   modulaiton_gsm: GMSK
 path:
-  asw_path: 0
+  asw_path: 1
   asw_path_enable: false
   rx_paths: []
   sa_nsa: 0
-  srs_path: 0
+  srs_path: 1
   srs_path_enable: false
   sync_path: Main
   tx_paths: []
@@ -59,7 +61,7 @@ port:
   debug_enable: false
   port_table_enable: false
   port_tx: 1
-  port_tx_fr1: 1
+  port_tx_fr1: 4
   port_tx_lte: 3
   rfout_anritsu: MAIN
 power:

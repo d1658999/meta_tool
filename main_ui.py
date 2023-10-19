@@ -3,10 +3,10 @@ import pathlib
 import pygubu
 
 PROJECT_PATH = pathlib.Path(__file__).parent
-PROJECT_UI = PROJECT_PATH / pathlib.Path('gui') /"main_v2_22_2.ui"
+PROJECT_UI = PROJECT_PATH / pathlib.Path('gui') / "main_v2_23_1.ui"
 
 
-class MainV2222App:
+class MainV2231App:
     def __init__(self, master=None):
         self.builder = builder = pygubu.Builder()
         builder.add_resource_path(PROJECT_PATH)
@@ -20,6 +20,8 @@ class MainV2222App:
         self.volt_mipi_en = None
         self.get_temp_en = None
         self.fdc_en = None
+        self.fbrx_en = None
+        self.mipi_read_en = None
         self.port_tx = None
         self.port_table_enable = None
         self.sync_path = None
@@ -80,6 +82,7 @@ class MainV2222App:
         self.bw90_fr1 = None
         self.bw100_fr1 = None
         self.bw70_fr1 = None
+        self.bw35_fr1 = None
         self.qpsk_fr1 = None
         self.q16_fr1 = None
         self.q64_fr1 = None
@@ -379,6 +382,8 @@ class MainV2222App:
                 "volt_mipi_en",
                 "get_temp_en",
                 "fdc_en",
+                "fbrx_en",
+                "mipi_read_en",
                 "port_tx",
                 "port_table_enable",
                 "sync_path",
@@ -439,6 +444,7 @@ class MainV2222App:
                 "bw90_fr1",
                 "bw100_fr1",
                 "bw70_fr1",
+                "bw35_fr1",
                 "qpsk_fr1",
                 "q16_fr1",
                 "q64_fr1",
@@ -764,6 +770,12 @@ class MainV2222App:
     def fdc_en_status(self):
         pass
 
+    def fbrx_en_status(self):
+        pass
+
+    def mipi_read_en_status(self):
+        pass
+
     def select_tx_port(self, option):
         pass
 
@@ -1003,6 +1015,5 @@ class MainV2222App:
 
 
 if __name__ == "__main__":
-    app = MainV2222App()
+    app = MainV2231App()
     app.run()
-
