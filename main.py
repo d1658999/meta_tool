@@ -699,6 +699,8 @@ class MainApp(MainV2231App):
                 self.bw90_fr1.set(True)
             elif bw == 100:
                 self.bw100_fr1.set(True)
+            elif bw == 35:
+                self.bw35_fr1.set(True)
 
         for ue_pwr in ui_init['rx_set']['ue_power']:
             if ue_pwr == 1:
@@ -891,7 +893,7 @@ class MainApp(MainV2231App):
         volt_mipi_en = self.volt_mipi_en.get()
         get_temp_en = self.get_temp_en.get()
         fdc_en = self.fdc_en.get()
-        fbrx_en = self.fbrx_en_en.get()
+        fbrx_en = self.fbrx_en.get()
         mipi_read_en = self.mipi_read_en.get()
         record_current_enable = self.record_current_enable.get()
         hthv = self.hthv.get()
@@ -1902,6 +1904,7 @@ class MainApp(MainV2231App):
         self.bw20_fr1.set(False)
         self.bw25_fr1.set(False)
         self.bw30_fr1.set(False)
+        self.bw35_fr1.set(False)
         self.bw40_fr1.set(False)
         self.bw50_fr1.set(False)
         self.bw60_fr1.set(False)
@@ -2345,6 +2348,10 @@ class MainApp(MainV2231App):
         if self.bw100_fr1.get():
             logger.debug('Bw_100')
             self.bw_fr1.append(100)
+
+        if self.bw35_fr1.get():
+            logger.debug('Bw_35')
+            self.bw_fr1.append(35)
 
         if self.bw_fr1 == []:
             logger.debug('Nothing to select for Bw')

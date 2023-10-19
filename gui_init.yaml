@@ -28,10 +28,10 @@ criteria:
   ulca_lte: 1
 external_inst:
   count: 5
-  fdc: false
   fbrx: false
-  mipi_read: false
+  fdc: false
   get_temp: false
+  mipi_read: false
   odpm: false
   psu: false
   record_current: false
