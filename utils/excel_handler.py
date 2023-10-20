@@ -535,6 +535,8 @@ def tx_power_relative_test_export_excel_ftm(data, parameters_dict):
                         elif test_item in ['lmh', 'level_sweep']:
                             ws['AA1'] = 'Voltage'
                             ws['AB1'] = 'FBRX power'
+                            ws['AC1'] = 'MIPI read'
+
                         elif test_item in ['apt_sweep']:
                             ws['AA1'] = 'Vcc'
                             ws['AB1'] = 'Bias0'
@@ -589,6 +591,7 @@ def tx_power_relative_test_export_excel_ftm(data, parameters_dict):
                         elif test_item in ['lmh', 'level_sweep']:
                             ws['AC1'] = 'Voltage_mipi'
                             ws['AD1'] = 'FBRX power'
+                            ws['AE1'] = 'MIPI read'
                         elif test_item in ['apt_sweep']:
                             ws['AC1'] = 'Vcc'
                             ws['AD1'] = 'Bias0'
@@ -632,6 +635,7 @@ def tx_power_relative_test_export_excel_ftm(data, parameters_dict):
                             ws['V1'] = '3f0'
                         elif test_item in ['lmh', 'level_sweep']:
                             ws['U1'] = 'Voltage_mipi'
+                            ws['V1'] = 'MIPI read'
                     else:  # to pass the dashboard
                         pass
 
@@ -729,6 +733,7 @@ def tx_power_relative_test_export_excel_ftm(data, parameters_dict):
                     ws.cell(row, 26).value = measured_data[12]
                     ws.cell(row, 27).value = measured_data[13] if ext_pmt.volt_mipi_en else None  # volt_mipi
                     ws.cell(row, 28).value = measured_data[14] if ext_pmt.fbrx_en else None  # fbrx_power
+                    ws.cell(row, 29).value = measured_data[15] if ext_pmt.mipi_read_en else None  # mipi_read
                     row += 1
 
             elif tx_freq_level <= 100:  # 1rb_sweep, lmh, freq_sweep, cbe
@@ -768,6 +773,9 @@ def tx_power_relative_test_export_excel_ftm(data, parameters_dict):
 
                     if ext_pmt.fbrx_en:  # fbrx_power
                         ws.cell(row, 28).value = measured_data[14]
+
+                    if ext_pmt.mipi_read_en:  # mipi_read
+                        ws.cell(row, 29).value = measured_data[15]
 
                     row += 1
 
@@ -815,6 +823,9 @@ def tx_power_relative_test_export_excel_ftm(data, parameters_dict):
                     if ext_pmt.fbrx_en:  # fbrx_power
                         ws.cell(row, 30).value = measured_data[14]
 
+                    if ext_pmt.mipi_read_en:  # mipi_read
+                        ws.cell(row, 31).value = measured_data[15]
+
                     row += 1
 
             elif tx_freq_level <= 100:  # 1rb_sweep, lmh, freq_sweep, cbe
@@ -857,6 +868,9 @@ def tx_power_relative_test_export_excel_ftm(data, parameters_dict):
                     if ext_pmt.fbrx_en:  # fbrx_power
                         ws.cell(row, 30).value = measured_data[14]
 
+                    if ext_pmt.mipi_read_en:  # mipi_read
+                        ws.cell(row, 31).value = measured_data[15]
+
                     row += 1
 
         elif tech == 'WCDMA':
@@ -887,6 +901,7 @@ def tx_power_relative_test_export_excel_ftm(data, parameters_dict):
                     ws.cell(row, 19).value = measured_data[10]
                     ws.cell(row, 20).value = measured_data[11]
                     ws.cell(row, 21).value = measured_data[12] if ext_pmt.volt_mipi_en else None  # volt_mipi
+                    ws.cell(row, 22).value = measured_data[13] if ext_pmt.volt_mipi_en else None  # mipi_read
                     row += 1
 
             elif tx_freq_level <= 100:  # 1rb_sweep, lmh, freq_sweep
@@ -913,7 +928,8 @@ def tx_power_relative_test_export_excel_ftm(data, parameters_dict):
                     ws.cell(row, 19).value = measured_data[10] if test_item == 'lmh' else None
                     ws.cell(row, 20).value = measured_data[11] if test_item == 'lmh' else None
                     if ext_pmt.volt_mipi_en:
-                        ws.cell(row, 21).value = measured_data[12]
+                        ws.cell(row, 21).value = measured_data[12]  # volt_mipi
+                        ws.cell(row, 22).value = measured_data[13]  # mipi_read
                     elif test_item == 'harmonics':
                         ws.cell(row, 21).value = measured_data[12][1]  # 2f0
                         ws.cell(row, 22).value = measured_data[13][1]  # 3f0
