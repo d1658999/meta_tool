@@ -1530,6 +1530,47 @@ class AtCmd:
         else:
             return [None]
 
+    def query_mipi_read(self, tech, mipi_usid_addr):
+        if tech == "FR1":
+            res = self.command(f'AT+NMIPIREAD={mipi_usid_addr}', delay=0.2)
+            for line in res:
+                if '+NMIPIREAD:' in line.decode():
+                    vol_hex = line.decode().split(':')[1].strip()
+                    return vol_hex
+        elif tech == "LTE":
+            res = self.command(f'AT+MIPIREAD={mipi_usid_addr}', delay=0.2)
+            for line in res:
+                if '+MIPIREAD:' in line.decode():
+                    vol_hex = line.decode().split(':')[1].strip()
+                    return vol_hex
+
+        elif tech == "WCDMA":
+            res = self.command(f'AT+HMIPIREAD={mmipi_usid_addr}', delay=0.2)
+            for line in res:
+                if '+HMIPIREAD:' in line.decode():
+                    vol_hex = line.decode().split(':')[1].strip()
+                    return vol_hex
+
+    def query_comprehensive_mipi(self, tech, mipi_usid_addr_series):
+        """
+        the format is like:
+        2,5,0:0,4,0:1,5,2
+        use colon to seperate it
+        """
+        if ext_pmt.mipi_read_en:
+            res_series_list = []
+            mipi_list = mipi_usid_addr_series.strip().split(":")
+            for mipi in mipi_list:
+                res = self.query_mipi_read(tech, mipi)
+                res_series_list.append(res)
+
+            response_mipi = ':'.join(res_series_list)
+
+            return [response_mipi]
+        else:
+            return [None]
+
+
     @staticmethod
     def decimal_to_hex_twos_complement(num, size):
         """
