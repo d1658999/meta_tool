@@ -11,7 +11,7 @@ from utils.excel_handler import txp_aclr_evm_current_plot_ftm, tx_power_relative
 from utils.excel_handler import select_file_name_genre_tx_ftm, excel_folder_path
 from utils.channel_handler import channel_freq_select
 import utils.parameters.rb_parameters as rb_pmt
-from utils.mipi_read_handler import read_mipi_setting
+from utils.mipi_read_handler import mipi_settings_dict
 
 logger = log_set('tx_lmh')
 
@@ -38,7 +38,6 @@ class TxTestGenre(AtCmd, CMW100):
         self.port_table = None
         self.get_temp_en = ext_pmt.get_temp_en
         self.mipi_usid_addr_series = None  # this should have other function
-        self.mipi_setting_dict = read_mipi_setting()
 
     def port_table_selector(self, band, tx_path='TX1'):
         """
@@ -501,7 +500,8 @@ class TxTestGenre(AtCmd, CMW100):
                 self.bw_fr1 = item[2]
                 self.band_fr1 = item[3]
                 self.type_fr1 = item[4]
-                self.mipi_usid_addr_series = self.mipi_setting_dict[f'{self.tx_path}_{self.tech}_{self.band_fr1}']
+                self.mipi_usid_addr_series = mipi_settings_dict(self.tx_path, self.tech, self.band_fr1)
+
                 try:
                     self.port_table_selector(self.band_fr1, self.tx_path)  # this is determined if using port table
                     if self.bw_fr1 in cm_pmt_ftm.bandwidths_selected_fr1(self.band_fr1):
@@ -539,7 +539,8 @@ class TxTestGenre(AtCmd, CMW100):
                 self.tx_path = item[1]
                 self.bw_lte = item[2]
                 self.band_lte = item[3]
-                self.mipi_usid_addr_series = self.mipi_setting_dict[f'{self.tx_path}_{self.tech}_{self.band_lte}']
+                self.mipi_usid_addr_series = mipi_settings_dict(self.tx_path, self.tech, self.band_lte)
+
                 try:
                     if self.tx_path in ['TX1', 'TX2']:
                         self.port_table_selector(self.band_lte, self.tx_path)  # this is determined if using port table
@@ -567,7 +568,8 @@ class TxTestGenre(AtCmd, CMW100):
         self.tx_level = ext_pmt.tx_level
         self.port_tx = ext_pmt.port_tx
         self.chan = ext_pmt.channel
-        self.mipi_usid_addr_series = self.mipi_setting_dict[f'{self.tx_path}_{self.tech}_{self.band_wcdma}']
+        self.mipi_usid_addr_series = mipi_settings_dict(self.tx_path, self.tech, self.band_wcdma)
+
         for tech in ext_pmt.tech:
             if tech == 'WCDMA' and ext_pmt.wcdma_bands != []:
                 self.tech = 'WCDMA'

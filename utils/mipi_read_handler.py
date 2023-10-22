@@ -1,5 +1,6 @@
 import csv
 from pathlib import Path
+from utils.parameters.external_paramters import volt_mipi_en, fbrx_en, mipi_read_en
 
 
 def read_mipi_setting():
@@ -13,6 +14,16 @@ def read_mipi_setting():
         for row in list(rows):
             mipi_setting_dict[row[0]] = row[1]
         return mipi_setting_dict
+
+
+def mipi_settings_dict(tx_path, tech, band):
+    try:
+        if volt_mipi_en or fbrx_en or mipi_read_en:
+            mipi_dicts = read_mipi_setting()
+            return mipi_dicts[f'{tx_path}_{tech}_{band}']
+    except Exception as e:
+        logger.info(f'There is not mipi setting for {e}, please check the mipi setting')
+        return None
 
 
 def main():

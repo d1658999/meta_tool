@@ -1557,7 +1557,7 @@ class AtCmd:
         2,5,0:0,4,0:1,5,2
         use colon to seperate it
         """
-        if ext_pmt.mipi_read_en:
+        if ext_pmt.mipi_read_en and mipi_usid_addr_series:
             logger.info(f'========== MIPI READING is starting ==========')
             res_series_list = []
             mipi_list = mipi_usid_addr_series.strip().split(":")
