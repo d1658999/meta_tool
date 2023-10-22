@@ -94,9 +94,9 @@ class TxTestGenre(AtCmd, CMW100):
         else:
             return [None]
 
-    def results_combination_nlw(self, volt_enable, fbrx_enable, mipi_read_en):
+    def results_combination_nlw(self):
         results = None
-        if volt_enable or fbrx_enable or mipi_read_en:
+        if ext_pmt.volt_mipi_en or ext_pmt.fbrx_en or ext_pmt.mipi_read_en:
             if self.tech == 'FR1':
                 results = self.aclr_mod_current_results + self.get_temperature() + self.volt_mipi_handler(
                     self.tech, self.band_fr1, self.tx_path) + self.query_fbrx_power(
@@ -271,9 +271,7 @@ class TxTestGenre(AtCmd, CMW100):
                             self.aclr_mod_current_results = aclr_mod_results = self.tx_measure_lte()
                             logger.debug(aclr_mod_results)
                             self.aclr_mod_current_results.append(self.measure_current(self.band_lte))
-                            data_freq[self.tx_freq_lte] = self.results_combination_nlw(ext_pmt.volt_mipi_en,
-                                                                                       ext_pmt.fbrx_en,
-                                                                                       ext_pmt.mipi_read_en)
+                            data_freq[self.tx_freq_lte] = self.results_combination_nlw()
                         logger.debug(data_freq)
 
                         # ready to export to excel
@@ -339,8 +337,7 @@ class TxTestGenre(AtCmd, CMW100):
                     logger.debug(aclr_mod_results)
                     self.aclr_mod_current_results.append(self.measure_current(self.band_wcdma))
                     tx_freq_wcdma = cm_pmt_ftm.transfer_chan2freq_wcdma(self.band_wcdma, self.tx_chan_wcdma)
-                    data_chan[tx_freq_wcdma] = self.results_combination_nlw(ext_pmt.volt_mipi_en, ext_pmt.fbrx_en,
-                                                                            ext_pmt.mipi_read_en)
+                    data_chan[tx_freq_wcdma] = self.results_combination_nlw()
                 logger.debug(data_chan)
 
                 # ready to export to excel
@@ -443,8 +440,7 @@ class TxTestGenre(AtCmd, CMW100):
             self.aclr_mod_current_results = aclr_mod_results = self.tx_measure_fr1()
             logger.debug(aclr_mod_results)
             self.aclr_mod_current_results.append(self.measure_current(self.band_fr1))
-            self.data_freq[self.tx_freq_fr1] = self.results_combination_nlw(ext_pmt.volt_mipi_en, ext_pmt.fbrx_en,
-                                                                            ext_pmt.mipi_read_en)
+            self.data_freq[self.tx_freq_fr1] = self.results_combination_nlw()
             logger.debug(self.data_freq)
 
         elif self.tx_path in ['MIMO']:  # measure two port
@@ -456,8 +452,7 @@ class TxTestGenre(AtCmd, CMW100):
                 self.aclr_mod_current_results = aclr_mod_results = self.tx_measure_fr1()
                 logger.debug(aclr_mod_results)
                 self.aclr_mod_current_results.append(self.measure_current(self.band_fr1))
-                data_freq[self.tx_freq_fr1] = self.results_combination_nlw(ext_pmt.volt_mipi_en, ext_pmt.fbrx_en,
-                                                                           ext_pmt.mipi_read_en)
+                data_freq[self.tx_freq_fr1] = self.results_combination_nlw()
                 logger.debug(data_freq)
 
                 # ready to export to excel

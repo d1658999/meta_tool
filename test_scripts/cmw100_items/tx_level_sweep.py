@@ -95,9 +95,9 @@ class TxTestLevelSweep(AtCmd, CMW100):
         else:
             return [None]
 
-    def results_combination_nlw(self, volt_enable, fbrx_enable, mipi_read_en):
+    def results_combination_nlw(self):
         results = None
-        if volt_enable or fbrx_enable or mipi_read_en:
+        if ext_pmt.volt_mipi_en or ext_pmt.fbrx_en or ext_pmt.mipi_read_en:
             if self.tech == 'FR1':
                 results = self.aclr_mod_current_results + self.get_temperature() + self.volt_mipi_handler(
                     self.tech, self.band_fr1, self.tx_path) + self.query_fbrx_power(
@@ -440,8 +440,7 @@ class TxTestLevelSweep(AtCmd, CMW100):
                                 self.aclr_mod_current_results = aclr_mod_results = aclr_results + mod_results
                                 logger.debug(aclr_mod_results)
                                 self.aclr_mod_current_results.append(self.measure_current(self.band_lte))
-                                data[tx_level] = self.results_combination_nlw(ext_pmt.volt_mipi_en, ext_pmt.fbrx_en,
-                                                                              ext_pmt.mipi_read_en)
+                                data[tx_level] = self.results_combination_nlw()
                             logger.debug(data)
                             self.parameters = {
                                 'script': self.script,
@@ -535,8 +534,7 @@ class TxTestLevelSweep(AtCmd, CMW100):
                         self.aclr_mod_current_results = spectrum_results + mod_results
                         logger.debug(self.aclr_mod_current_results)
                         self.aclr_mod_current_results.append(self.measure_current(self.band_wcdma))
-                        data[tx_level] = self.results_combination_nlw(ext_pmt.volt_mipi_e, ext_pmt.fbrx_en,
-                                                                      ext_pmt.mipi_read_en)
+                        data[tx_level] = self.results_combination_nlw()
                     logger.debug(data)
                     self.parameters = {
                         'script': self.script,
@@ -667,8 +665,7 @@ class TxTestLevelSweep(AtCmd, CMW100):
                 self.aclr_mod_current_results = aclr_mod_results = aclr_results + mod_results
                 logger.debug(aclr_mod_results)
                 self.aclr_mod_current_results.append(self.measure_current(self.band_fr1))
-                self.data[tx_level] = self.results_combination_nlw(ext_pmt.volt_mipi_en, ext_pmt.fbrx_en,
-                                                                   ext_pmt.mipi_read_en)
+                self.data[tx_level] = self.results_combination_nlw()
             logger.debug(self.data)
 
         elif self.tx_path in ['MIMO']:
@@ -697,8 +694,7 @@ class TxTestLevelSweep(AtCmd, CMW100):
                     self.aclr_mod_current_results = aclr_mod_results = aclr_results + mod_results
                     logger.debug(aclr_mod_results)
                     self.aclr_mod_current_results.append(self.measure_current(self.band_fr1))
-                    data[tx_level] = self.results_combination_nlw(ext_pmt.volt_mipi_en, ext_pmt.fbrx_en,
-                                                                  ext_pmt.mipi_read_en)
+                    data[tx_level] = self.results_combination_nlw()
                     logger.debug(data)
                     self.parameters = {
                         'script': self.script,
