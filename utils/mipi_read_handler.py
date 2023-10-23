@@ -1,6 +1,6 @@
 import csv
 from pathlib import Path
-from utils.parameters.external_paramters import volt_mipi_en, fbrx_en, mipi_read_en
+import utils.parameters.external_paramters as ext_pmt
 
 
 def read_mipi_setting():
@@ -18,7 +18,7 @@ def read_mipi_setting():
 
 def mipi_settings_dict(tx_path, tech, band):
     try:
-        if volt_mipi_en or fbrx_en or mipi_read_en:
+        if ext_pmt.volt_mipi_en or ext_pmt.fbrx_en or ext_pmt.mipi_read_en:
             mipi_dicts = read_mipi_setting()
             return mipi_dicts[f'{tx_path}_{tech}_{band}']
     except Exception as e:
