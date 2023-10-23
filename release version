@@ -1,3 +1,8 @@
+release V2.23
+1. Add FBRX power detection
+2. Add MIPI READ
+3. Fix some bugs
+
 release V2.22
 1. add parse cfg file
 2. fix sky51001 mipi value and psu selection bugs
