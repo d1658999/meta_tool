@@ -613,7 +613,7 @@ class TxTestLevelSweep(AtCmd, CMW100):
                         mod_orfs_current_results = mod_orfs_results = self.tx_measure_gsm()
                         logger.debug(mod_orfs_results)
                         mod_orfs_current_results.append(self.measure_current(self.band_gsm))
-                        data[tx_pcl] = mod_orfs_current_results
+                        data[tx_pcl] = mod_orfs_current_results + self.get_temperature()
                     logger.debug(data)
                     self.parameters = {
                         'script': self.script,
