@@ -1314,7 +1314,7 @@ class FSW:
         //Print
         HCOP:IMM
         """
-        self.fsw_write(f'HCOPy:DEVice:LANGuage {form}')
+        self.fsw_write(f'HCOPy:DEVice:LANGuage1 {form}')
 
     def set_hcopy_content(self, arg='HCOPy'):
         """

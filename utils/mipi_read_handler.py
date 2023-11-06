@@ -18,7 +18,7 @@ def read_mipi_setting():
 
 def mipi_settings_dict(tx_path, tech, band):
     try:
-        if ext_pmt.volt_mipi_en or ext_pmt.fbrx_en or ext_pmt.mipi_read_en:
+        if ext_pmt.mipi_read_en:
             mipi_dicts = read_mipi_setting()
             return mipi_dicts[f'{tx_path}_{tech}_{band}']
     except Exception as e:
