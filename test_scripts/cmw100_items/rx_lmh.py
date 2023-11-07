@@ -511,7 +511,8 @@ class RxTestGenre(AtCmd, CMW100):
 
             # FR1 RxS
             # rxs_fr1 = self.search_sensitivity_fr1()
-            rxs_fr1 = self.sensitivity_solution_select_fr1()
+            self.query_rx_measure_fr1()
+            rxs_fr1 = self.esens_list  # [rx0, rx1,rx2, rx3]
             # # set LTE power and get ENDC power for LTE
             # self.tx_level = ext_pmt.tx_level_endc_lte if self.ue_power_bool == 1 else -10
             # self.loss_tx = loss_tx_lte
@@ -549,13 +550,13 @@ class RxTestGenre(AtCmd, CMW100):
             data = [
                 int(self.band_lte), int(self.band_fr1),
                 self.power_endc_lte, self.power_endc_fr1,
-                rxs_lte, rxs_fr1,
+                rxs_lte, rxs_fr1[0], rxs_fr1[1], rxs_fr1[2], rxs_fr1[3],
                 self.bw_lte, self.bw_fr1,
                 self.tx_freq_lte, self.tx_freq_fr1,
                 self.tx_level_endc_lte, self.tx_level_endc_fr1,
                 self.rb_size_lte, self.rb_start_lte,
                 self.rb_size_fr1, self.rb_start_fr1,
-                self.rx_path_lte_dict[self.rx_path_lte], self.rx_path_fr1_dict[self.rx_path_fr1],
+                self.rx_path_lte_dict[self.rx_path_lte],
             ]
 
             self.set_test_end_fr1(delay=0.5)
