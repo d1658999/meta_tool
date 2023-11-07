@@ -890,7 +890,7 @@ def tx_power_relative_test_export_excel_ftm(data, parameters_dict):
                     ws.cell(row, 19).value = measured_data[10]
                     ws.cell(row, 20).value = measured_data[11]
                     ws.cell(row, 21).value = measured_data[12] if ext_pmt.volt_mipi_en else None  # volt_mipi
-                    ws.cell(row, 22).value = measured_data[13] if ext_pmt.volt_mipi_en else None  # mipi_read
+                    ws.cell(row, 22).value = measured_data[13] if ext_pmt.mipi_read_en else None  # mipi_read
                     row += 1
 
             elif tx_freq_level <= 100:  # 1rb_sweep, lmh, freq_sweep
@@ -917,8 +917,8 @@ def tx_power_relative_test_export_excel_ftm(data, parameters_dict):
                     ws.cell(row, 19).value = measured_data[10] if test_item == 'lmh' else None
                     ws.cell(row, 20).value = measured_data[11] if test_item == 'lmh' else None
                     if test_item != 'harmonics':
-                        ws.cell(row, 21).value = measured_data[12]  # volt_mipi
-                        ws.cell(row, 22).value = measured_data[13]  # mipi_read
+                        ws.cell(row, 21).value = measured_data[12] if ext_pmt.volt_mipi_en else None  # volt_mipi
+                        ws.cell(row, 22).value = measured_data[13] if ext_pmt.mipi_read_en else None  # mipi_read
                     elif test_item == 'harmonics':
                         ws.cell(row, 21).value = measured_data[12][1]  # 2f0
                         ws.cell(row, 22).value = measured_data[13][1]  # 3f0
@@ -1778,19 +1778,22 @@ def rx_power_endc_test_export_excel_ftm(data):
                 ws['C1'] = 'Power_LTE_measured'
                 ws['D1'] = 'Power_FR1_measured'
                 ws['E1'] = 'Sensitivity_LTE'
-                ws['F1'] = 'Sensitivity_FR1'
-                ws['G1'] = 'BW_LTE'
-                ws['H1'] = 'BW_FR1'
-                ws['I1'] = 'Freq_tx_LTE'
-                ws['J1'] = 'Freq_tx_FR1'
-                ws['K1'] = 'Tx_level_LTE'
-                ws['L1'] = 'Tx_level_FR1'
-                ws['M1'] = 'rb_size_LTE'
-                ws['N1'] = 'rb_start_LTE'
-                ws['O1'] = 'rb_size_FR1'
-                ws['P1'] = 'rb_start_FR1'
-                ws['Q1'] = 'LTE_RX_PATH'
-                ws['R1'] = 'FR1_RX_PATH'
+                ws['F1'] = 'Sensitivity_FR1_RX0'
+                ws['G1'] = 'Sensitivity_FR1_RX1'
+                ws['H1'] = 'Sensitivity_FR1_RX2'
+                ws['I1'] = 'Sensitivity_FR1_RX3'
+                ws['J1'] = 'BW_LTE'
+                ws['K1'] = 'BW_FR1'
+                ws['L1'] = 'Freq_tx_LTE'
+                ws['M1'] = 'Freq_tx_FR1'
+                ws['N1'] = 'Tx_level_LTE'
+                ws['O1'] = 'Tx_level_FR1'
+                ws['P1'] = 'rb_size_LTE'
+                ws['Q1'] = 'rb_start_LTE'
+                ws['R1'] = 'rb_size_FR1'
+                ws['S1'] = 'rb_start_FR1'
+                ws['T1'] = 'LTE_RX_PATH'
+                # ws['U1'] = 'FR1_RX_PATH'
 
             else:
                 pass
@@ -1805,9 +1808,12 @@ def rx_power_endc_test_export_excel_ftm(data):
         ws['E1'] = 'Freq_tx_LTE'
         ws['F1'] = 'Freq_tx_FR1'
         ws['G1'] = 'LTE_RX_PATH'
-        ws['H1'] = 'FR1_TX_PATH'
-        ws['I1'] = 'Diff_LTE'
-        ws['J1'] = 'Diff_FR1'
+        # ws['K1'] = 'FR1_TX_PATH'
+        ws['H1'] = 'Diff_LTE'
+        ws['I1'] = 'Diff_FR1_RX0'
+        ws['J1'] = 'Diff_FR1_RX1'
+        ws['K1'] = 'Diff_FR1_RX2'
+        ws['L1'] = 'Diff_FR1_RX3'
 
         wb.save(file_path)
         wb.close()
@@ -1856,14 +1862,17 @@ def rx_desense_endc_process_ftm(file_path):
     for row in range(2, ws_txmax.max_row + 1):
         ws_desens.cell(row, 1).value = ws_txmax.cell(row, 1).value  # 'Band_LTE'
         ws_desens.cell(row, 2).value = ws_txmax.cell(row, 2).value  # 'Band_FR1'
-        ws_desens.cell(row, 3).value = ws_txmax.cell(row, 7).value  # 'BW_LTE'
-        ws_desens.cell(row, 4).value = ws_txmax.cell(row, 8).value  # 'BW_FR1'
-        ws_desens.cell(row, 5).value = ws_txmax.cell(row, 9).value  # 'Freq_tx_LTE'
-        ws_desens.cell(row, 6).value = ws_txmax.cell(row, 10).value  # 'Freq_tx_FR1'
-        ws_desens.cell(row, 7).value = ws_txmax.cell(row, 17).value  # 'LTE_RX_PATH'
-        ws_desens.cell(row, 8).value = ws_txmax.cell(row, 18).value  # 'FR1_RX_PATH'
-        ws_desens.cell(row, 9).value = ws_txmax.cell(row, 5).value - ws_txmin.cell(row, 5).value  # desens lte
-        ws_desens.cell(row, 10).value = ws_txmax.cell(row, 6).value - ws_txmin.cell(row, 6).value  # desens fr1
+        ws_desens.cell(row, 3).value = ws_txmax.cell(row, 10).value  # 'BW_LTE'
+        ws_desens.cell(row, 4).value = ws_txmax.cell(row, 11).value  # 'BW_FR1'
+        ws_desens.cell(row, 5).value = ws_txmax.cell(row, 12).value  # 'Freq_tx_LTE'
+        ws_desens.cell(row, 6).value = ws_txmax.cell(row, 13).value  # 'Freq_tx_FR1'
+        ws_desens.cell(row, 7).value = ws_txmax.cell(row, 20).value  # 'LTE_RX_PATH'
+        # ws_desens.cell(row, 8).value = ws_txmax.cell(row, 18).value  # 'FR1_RX_PATH'
+        ws_desens.cell(row, 8).value = ws_txmax.cell(row, 5).value - ws_txmin.cell(row, 5).value  # desens lte
+        ws_desens.cell(row, 9).value = ws_txmax.cell(row, 6).value - ws_txmin.cell(row, 6).value  # desens fr1_rx0
+        ws_desens.cell(row, 10).value = ws_txmax.cell(row, 7).value - ws_txmin.cell(row, 7).value  # desens fr1_rx1
+        ws_desens.cell(row, 11).value = ws_txmax.cell(row, 8).value - ws_txmin.cell(row, 8).value  # desens fr1_rx2
+        ws_desens.cell(row, 12).value = ws_txmax.cell(row, 9).value - ws_txmin.cell(row, 9).value  # desens fr1_rx3
 
     wb.save(file_path)
     wb.close()
