@@ -489,8 +489,9 @@ class RxTestGenre(AtCmd, CMW100):
 
             # lte tx measurement
             self.port_tx = self.port_tx_lte
-            self.power_endc_lte = round(self.tx_measure_lte()[3], 2)  # modulation power
-            logger.info(f'LTE Power: {self.power_endc_lte}')
+            ext_pmt.fbrx_en = True
+            self.power_endc_lte = round(self.query_fbrx_power('LTE')[0], 2)  # modulation power
+            logger.info(f'LTE FBRX Power: {self.power_endc_lte}')
 
             # set FR1 power
             self.tx_level = self.tx_level_endc_fr1
@@ -504,10 +505,10 @@ class RxTestGenre(AtCmd, CMW100):
 
             # FR1 tx measurement
             self.port_tx = self.port_tx_fr1
-            aclr_mod_results_fr1 = self.tx_measure_fr1()
-            logger.debug(aclr_mod_results_fr1)
-            logger.info(f'FR1 Power: {aclr_mod_results_fr1[3]}')  # modulation power
-            self.power_endc_fr1 = round(aclr_mod_results_fr1[3], 2)
+            fbrx_power_fr1 = self.query_fbrx_power('FR1')[0]
+            logger.debug(fbrx_power_fr1)
+            logger.info(f'FR1 FBRX Power: {fbrx_power_fr1}')  # modulation power
+            self.power_endc_fr1 = round(fbrx_power_fr1, 2)
 
             # FR1 RxS
             # rxs_fr1 = self.search_sensitivity_fr1()
