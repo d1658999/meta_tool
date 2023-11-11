@@ -102,7 +102,7 @@ class FSW:
         """
         self.fsw_write(f'DISPlay:WINDow:TRACe:Y:SCALe:RLEVel {level}')
 
-    def set_reference_level_offset(self, band, offset=0.0):
+    def set_reference_level_offset(self, tech, band, offset=0.0):
         """
         DISPlay[:WINDow<n>][:SUBWindow<w>]:TRACe<t>:Y[:SCALe]:RLEVel:OFFSet <Offset>
         This command defines a reference level offset (for all traces in all windows).
@@ -117,7 +117,7 @@ class FSW:
         Default unit: DB
         Example:  DISP:TRAC:Y:RLEV:OFFS -10dB
         """
-        offset += self.duty_factor(band)  # due to the loss is minus
+        offset += self.duty_factor(tech, band)  # due to the loss is minus
         self.fsw_write(f'DISPlay:WINDow:TRACe:Y:SCALe:RLEVel:OFFSet {offset}')
 
     def set_scale_range(self, range_=100):
@@ -1200,16 +1200,19 @@ class FSW:
         self.fsw_query(f'LIST:RANGe:COUNt?')
 
     @staticmethod
-    def duty_factor(band):
+    def duty_factor(tech, band):
         """
         The formual is 10log(1/d)
         where d is the percentage of on in the period
         for P22 is 20% for 41, so d is 0.2
         for P23 is 40% for 41, so d is 0.4
         """
-
         if band in [38, 39, 40, 41, 46, 42, 48, 77, 78, 79, ]:
-            d = 0.4
+            d = None
+            if tech == 'LTE':
+                d = 0.4
+            elif tech == 'FR1':
+                d = 0.2
             factor = round((10 * log10(1 / d)), 2)
             return factor
         elif band in [850, 900, 1800, 1900]:
@@ -1453,7 +1456,7 @@ class FSW:
 def main():
     fsw = FSW('FSW50')
     fsw.set_reference_level(-30)
-    fsw.set_reference_level_offset(1, 5)
+    fsw.set_reference_level_offset('LTE', 1, 5)
     fsw.set_input_attenuation(1)
     fsw.set_freq_center(3900000)
     fsw.set_freq_span(1000)

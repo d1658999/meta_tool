@@ -127,7 +127,7 @@ class TxTestCaCBE(AtCmd, CMW100, FSW50):
 
         # spectrum setting for spurios emission
         self.system_preset()
-        self.set_reference_level_offset(self.band_lte, self.loss_tx)
+        self.set_reference_level_offset('LTE', self.band_lte, self.loss_tx)
         self.set_spur_initial()
         spur_state = self.set_spur_spec_limit_line(self.band_lte, self.chan_lmh,
                                                    int(self.bw_cc1), int(self.bw_cc2))

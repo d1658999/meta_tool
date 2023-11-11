@@ -19,7 +19,7 @@ class FSW50(FSW):
     def get_level_harmonics(self, band, harmonic_freq, loss):
         # basic environment setting
         # self.set_reference_level(-30 - MARGIN)
-        self.set_reference_level_offset(band, loss)
+        self.set_reference_level_offset(self.tech, band, loss)
         self.set_input_attenuation(0)
         self.set_freq_center(harmonic_freq)
         self.set_freq_span(500)  # span 500MHz

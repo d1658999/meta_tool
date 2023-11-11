@@ -114,7 +114,7 @@ class TxCBE(TxTestGenre, FSW50):
 
                             # spectrum setting for spurios emission
                             self.system_preset()
-                            self.set_reference_level_offset(self.band_fr1, self.loss_tx)
+                            self.set_reference_level_offset('FR1', self.band_fr1, self.loss_tx)
                             self.set_spur_initial()
                             spur_state = self.set_spur_spec_limit_line(self.band_fr1, zip_dict_chan[self.tx_freq_fr1],
                                                                        self.bw_fr1)
@@ -258,7 +258,7 @@ class TxCBE(TxTestGenre, FSW50):
 
                             # spectrum setting for spurios emission
                             self.system_preset()
-                            self.set_reference_level_offset(self.band_lte, self.loss_tx)
+                            self.set_reference_level_offset('LTE', self.band_lte, self.loss_tx)
                             self.set_spur_initial()
                             spur_state = self.set_spur_spec_limit_line(self.band_lte, zip_dict_chan[self.tx_freq_lte],
                                                                        self.bw_lte)
