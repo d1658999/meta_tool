@@ -206,6 +206,7 @@ class AtCmd:
             100: 11,
             70: 12,
             35: 13,
+            45: 14,
         }
         self.mcs_lte_dict = {
             'QPSK': 0,
