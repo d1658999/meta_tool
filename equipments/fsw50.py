@@ -1987,10 +1987,10 @@ class FSW50(FSW):
                 self.set_spur_list_range_freq_stop(3, 3.549 * ghz)
                 self.set_spur_list_range_freq_stop(4, 3.55 * ghz)
                 if (bw1 + bw2) > 10:
-                    self.set_spur_list_range_freq_stop(5, 3.57 * ghz)
-                    self.set_spur_list_range_freq_stop(6, 3.571 * ghz)
-                    self.set_spur_list_range_freq_stop(7, 3.590 * ghz)
-                    self.set_spur_list_range_freq_stop(8, 3.62 * ghz)
+                    self.set_spur_list_range_freq_stop(5, 3.55 * ghz + (bw1 + bw2) * mgz)
+                    self.set_spur_list_range_freq_stop(6, 3.551 * ghz + (bw1 + bw2) * mgz)
+                    self.set_spur_list_range_freq_stop(7, 3.570 * ghz + (bw1 + bw2) * mgz)
+                    self.set_spur_list_range_freq_stop(8, 3.60 * ghz + (bw1 + bw2) * mgz)
                 else:
                     self.set_spur_list_range_freq_stop(5, 3.56 * ghz)
                     self.set_spur_list_range_freq_stop(6, 3.561 * ghz)
@@ -2014,17 +2014,23 @@ class FSW50(FSW):
                 self.set_spur_list_range_band_vbw(2, 3 * mhz)
                 self.set_spur_list_range_band_rbw(3, 1 * mhz)
                 self.set_spur_list_range_band_vbw(3, 3 * mhz)
-                if (bw1 + bw2) > 10:
+                if 20 >= (bw1 + bw2) > 10:
                     self.set_spur_list_range_band_rbw(4, 200 * khz)
                     self.set_spur_list_range_band_vbw(4, 3 * 200 * khz)
+                elif (bw1 + bw2) > 20:
+                    self.set_spur_list_range_band_rbw(4, 500 * khz)
+                    self.set_spur_list_range_band_vbw(4, 3 * 500 * khz)
                 else:
                     self.set_spur_list_range_band_rbw(4, 10 * (bw1 + bw2) * khz)
                     self.set_spur_list_range_band_vbw(4, 3 * 10 * (bw1 + bw2) * khz)
                 self.set_spur_list_range_band_rbw(5, 100 * khz)
                 self.set_spur_list_range_band_vbw(5, 3 * 100 * khz)
-                if (bw1 + bw2) > 10:
+                if 20 >= (bw1 + bw2) > 10:
                     self.set_spur_list_range_band_rbw(6, 200 * khz)
                     self.set_spur_list_range_band_vbw(6, 3 * 200 * khz)
+                elif (bw1 + bw2) > 20:
+                    self.set_spur_list_range_band_rbw(6, 500 * khz)
+                    self.set_spur_list_range_band_vbw(6, 3 * 500 * khz)
                 else:
                     self.set_spur_list_range_band_rbw(6, 10 * (bw1 + bw2) * khz)
                     self.set_spur_list_range_band_vbw(6, 3 * 10 * (bw1 + bw2) * khz)
@@ -2069,10 +2075,10 @@ class FSW50(FSW):
             elif chan == 'H':
                 # range
                 if (bw1 + bw2) > 10:
-                    self.set_spur_list_range_freq_start(1, 3.630 * ghz)
-                    self.set_spur_list_range_freq_stop(1, 3.660 * ghz)
-                    self.set_spur_list_range_freq_stop(2, 3.679 * ghz)
-                    self.set_spur_list_range_freq_stop(3, 3.680 * ghz)
+                    self.set_spur_list_range_freq_start(1, 3.610 * ghz + (bw1 + bw2) * mgz)
+                    self.set_spur_list_range_freq_stop(1, 3.640 * ghz + (bw1 + bw2) * mgz)
+                    self.set_spur_list_range_freq_stop(2, 3.659 * ghz + (bw1 + bw2) * mgz)
+                    self.set_spur_list_range_freq_stop(3, 3.660 * ghz + (bw1 + bw2) * mgz)
                 else:
                     self.set_spur_list_range_freq_start(1, 3.64 * ghz)
                     self.set_spur_list_range_freq_stop(1, 3.68 * ghz)
@@ -2101,17 +2107,23 @@ class FSW50(FSW):
                 self.set_spur_list_range_band_vbw(7, 3 * mhz)
                 self.set_spur_list_range_band_rbw(6, 1 * mhz)
                 self.set_spur_list_range_band_vbw(6, 3 * mhz)
-                if (bw1 + bw2) > 10:
+                if 20 >= (bw1 + bw2) > 10:
                     self.set_spur_list_range_band_rbw(5, 200 * khz)
                     self.set_spur_list_range_band_vbw(5, 3 * 200 * khz)
+                elif (bw1 + bw2) > 20:
+                    self.set_spur_list_range_band_rbw(5, 500 * khz)
+                    self.set_spur_list_range_band_vbw(5, 3 * 500 * khz)
                 else:
                     self.set_spur_list_range_band_rbw(5, 10 * (bw1 + bw2) * khz)
                     self.set_spur_list_range_band_vbw(5, 3 * 10 * (bw1 + bw2) * khz)
                 self.set_spur_list_range_band_rbw(4, 100 * khz)
                 self.set_spur_list_range_band_vbw(4, 3 * 100 * khz)
-                if (bw1 + bw2) > 10:
+                if 20 >= (bw1 + bw2) > 10:
                     self.set_spur_list_range_band_rbw(3, 200 * khz)
                     self.set_spur_list_range_band_vbw(3, 3 * 200 * khz)
+                elif (bw1 + bw2) > 20:
+                    self.set_spur_list_range_band_rbw(3, 500 * khz)
+                    self.set_spur_list_range_band_vbw(3, 3 * 500 * khz)
                 else:
                     self.set_spur_list_range_band_rbw(3, 10 * (bw1 + bw2) * khz)
                     self.set_spur_list_range_band_vbw(3, 3 * 10 * (bw1 + bw2) * khz)
