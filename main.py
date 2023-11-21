@@ -9,7 +9,7 @@ import signal
 import os
 import yaml
 
-from main_ui import MainV2231App
+from main_ui import MainV2241App
 from utils.log_init import log_set, log_clear
 from utils.adb_handler import get_serial_devices
 from utils.excel_handler import excel_folder_create
@@ -25,7 +25,7 @@ PROJECT_PATH = pathlib.Path(__file__).parent
 logger = log_set('GUI')
 
 
-class MainApp(MainV2231App):
+class MainApp(MainV2241App):
     def __init__(self, master=None):
         super().__init__()
         self.notebook = self.builder.get_object("notebook1")
@@ -701,6 +701,8 @@ class MainApp(MainV2231App):
                 self.bw100_fr1.set(True)
             elif bw == 35:
                 self.bw35_fr1.set(True)
+            elif bw == 45:
+                self.bw45_fr1.set(True)
 
         for ue_pwr in ui_init['rx_set']['ue_power']:
             if ue_pwr == 1:
@@ -1906,6 +1908,7 @@ class MainApp(MainV2231App):
         self.bw30_fr1.set(False)
         self.bw35_fr1.set(False)
         self.bw40_fr1.set(False)
+        self.bw45_fr1.set(False)
         self.bw50_fr1.set(False)
         self.bw60_fr1.set(False)
         self.bw70_fr1.set(False)
@@ -2352,6 +2355,10 @@ class MainApp(MainV2231App):
         if self.bw35_fr1.get():
             logger.debug('Bw_35')
             self.bw_fr1.append(35)
+
+        if self.bw45_fr1.get():
+            logger.debug('Bw_45')
+            self.bw_fr1.append(45)
 
         if self.bw_fr1 == []:
             logger.debug('Nothing to select for Bw')

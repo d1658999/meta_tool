@@ -3,10 +3,10 @@ import pathlib
 import pygubu
 
 PROJECT_PATH = pathlib.Path(__file__).parent
-PROJECT_UI = PROJECT_PATH / pathlib.Path('gui') / "main_v2_23_1.ui"
+PROJECT_UI = PROJECT_PATH / pathlib.Path('gui') / "main_v2_24_1.ui"
 
 
-class MainV2231App:
+class MainV2241App:
     def __init__(self, master=None):
         self.builder = builder = pygubu.Builder()
         builder.add_resource_path(PROJECT_PATH)
@@ -83,6 +83,7 @@ class MainV2231App:
         self.bw100_fr1 = None
         self.bw70_fr1 = None
         self.bw35_fr1 = None
+        self.bw45_fr1 = None
         self.qpsk_fr1 = None
         self.q16_fr1 = None
         self.q64_fr1 = None
@@ -445,6 +446,7 @@ class MainV2231App:
                 "bw100_fr1",
                 "bw70_fr1",
                 "bw35_fr1",
+                "bw45_fr1",
                 "qpsk_fr1",
                 "q16_fr1",
                 "q64_fr1",
@@ -1015,5 +1017,6 @@ class MainV2231App:
 
 
 if __name__ == "__main__":
-    app = MainV2231App()
+    app = MainV2241App()
     app.run()
+
