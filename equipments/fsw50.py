@@ -2075,10 +2075,10 @@ class FSW50(FSW):
             elif chan == 'H':
                 # range
                 if (bw1 + bw2) > 10:
-                    self.set_spur_list_range_freq_start(1, 3.610 * ghz + (bw1 + bw2) * mhz)
-                    self.set_spur_list_range_freq_stop(1, 3.640 * ghz + (bw1 + bw2) * mhz)
-                    self.set_spur_list_range_freq_stop(2, 3.659 * ghz + (bw1 + bw2) * mhz)
-                    self.set_spur_list_range_freq_stop(3, 3.660 * ghz + (bw1 + bw2) * mhz)
+                    self.set_spur_list_range_freq_start(1, 3.650 * ghz - (bw1 + bw2) * mhz)
+                    self.set_spur_list_range_freq_stop(1, 3.680 * ghz - (bw1 + bw2) * mhz)
+                    self.set_spur_list_range_freq_stop(2, 3.699 * ghz - (bw1 + bw2) * mhz)
+                    self.set_spur_list_range_freq_stop(3, 3.700 * ghz - (bw1 + bw2) * mhz)
                 else:
                     self.set_spur_list_range_freq_start(1, 3.64 * ghz)
                     self.set_spur_list_range_freq_stop(1, 3.68 * ghz)
