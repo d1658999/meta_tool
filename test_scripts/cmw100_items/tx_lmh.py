@@ -179,9 +179,9 @@ class TxTestGenre(AtCmd, CMW100):
         self.preset_instrument()
         self.set_test_end_fr1()
         self.set_test_mode_fr1()
-        self.select_asw_srs_path()
         self.sig_gen_fr1()
         self.sync_fr1()
+        self.select_asw_srs_path()
 
         # scs = 1 if self.band_fr1 in [34, 38, 39, 40, 41, 42, 48, 77, 78,  # temp
         #                              79] else 0  # for now FDD is forced to 15KHz and TDD is to be 30KHz  # temp
@@ -248,9 +248,9 @@ class TxTestGenre(AtCmd, CMW100):
         self.preset_instrument()
         self.set_test_end_lte()
         self.set_test_mode_lte()
-        self.antenna_switch_v2()
         self.sig_gen_lte()
         self.sync_lte()
+        self.antenna_switch_v2()
 
         tx_freq_lmh_list = [cm_pmt_ftm.transfer_freq_rx2tx_lte(self.band_lte, rx_freq) for rx_freq in rx_freq_list]
         tx_freq_select_list = sorted(set(channel_freq_select(self.chan, tx_freq_lmh_list)))

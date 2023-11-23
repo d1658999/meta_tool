@@ -314,9 +314,9 @@ class TxTestLevelSweep(AtCmd, CMW100):
         self.preset_instrument()
         self.set_test_end_fr1()
         self.set_test_mode_fr1()
-        self.select_asw_srs_path()
         self.sig_gen_fr1()
         self.sync_fr1()
+        self.select_asw_srs_path()
 
         tx_freq_lmh_list = [cm_pmt_ftm.transfer_freq_rx2tx_fr1(self.band_fr1, rx_freq) for rx_freq in rx_freq_list]
         tx_freq_select_list = sorted(set(channel_freq_select(self.chan, tx_freq_lmh_list)))
@@ -385,10 +385,10 @@ class TxTestLevelSweep(AtCmd, CMW100):
         self.preset_instrument()
         self.set_test_end_lte()
         self.set_test_mode_lte()
-        self.antenna_switch_v2()
         self.cmw_query('*OPC?')
         self.sig_gen_lte()
         self.sync_lte()
+        self.antenna_switch_v2()
 
         tx_freq_lmh_list = [cm_pmt_ftm.transfer_freq_rx2tx_lte(self.band_lte, rx_freq) for rx_freq in rx_freq_list]
         tx_freq_select_list = sorted(set(channel_freq_select(self.chan, tx_freq_lmh_list)))
