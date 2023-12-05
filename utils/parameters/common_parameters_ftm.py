@@ -678,9 +678,10 @@ def special_uplink_config_sensitivity_fr1(band, scs, bw):
                 return 128, 32
             elif bw == 40:
                 return 128, 88
+            elif bw == 45:
+                return 128, 114
             elif bw == 50:
                 return 128, 142
-
         elif scs == 30:
             if bw == 10:
                 return 24, 0
@@ -694,6 +695,8 @@ def special_uplink_config_sensitivity_fr1(band, scs, bw):
                 return 64, 14
             elif bw == 40:
                 return 64, 42
+            elif bw == 45:
+                return 64, 55
             elif bw == 50:
                 return 64, 69
         elif scs == 60:
@@ -709,8 +712,11 @@ def special_uplink_config_sensitivity_fr1(band, scs, bw):
                 return 30, 8
             elif bw == 40:
                 return 30, 21
+            elif bw == 45:
+                return 30, 28
             elif bw == 50:
                 return 30, 35
+
     elif int(band) == 2:
         if scs == 15:
             if bw == 5:
@@ -721,6 +727,12 @@ def special_uplink_config_sensitivity_fr1(band, scs, bw):
                 return 50, 29
             elif bw == 20:
                 return 50, 56
+            elif bw == 25:
+                return 50, 83
+            elif bw == 30:
+                return 48, 112
+            elif bw == 40:
+                return 40, 176
         elif scs == 30:
             if bw == 5:
                 return 10, 1
@@ -730,6 +742,12 @@ def special_uplink_config_sensitivity_fr1(band, scs, bw):
                 return 24, 14
             elif bw == 20:
                 return 24, 27
+            elif bw == 25:
+                return 24, 41
+            elif bw == 30:
+                return 24, 54
+            elif bw == 40:
+                return 20, 86
         elif scs == 60:
             if bw == 10:
                 return 10, 1
@@ -737,6 +755,13 @@ def special_uplink_config_sensitivity_fr1(band, scs, bw):
                 return 10, 8
             elif bw == 20:
                 return 10, 14
+            elif bw == 25:
+                return 10, 21
+            elif bw == 30:
+                return 10, 28
+            elif bw == 40:
+                return 10, 41
+
     elif int(band) == 3:
         if scs == 15:
             if bw == 5:
@@ -751,8 +776,14 @@ def special_uplink_config_sensitivity_fr1(band, scs, bw):
                 return 50, 83
             elif bw == 30:
                 return 50, 110
+            elif bw == 35:
+                return 50, 138
             elif bw == 40:
                 return 50, 166
+            elif bw == 45:
+                return 50, 192
+            elif bw == 50:
+                return 50, 220
         elif scs == 30:
             if bw == 10:
                 return 24, 0
@@ -764,8 +795,14 @@ def special_uplink_config_sensitivity_fr1(band, scs, bw):
                 return 24, 41
             elif bw == 30:
                 return 24, 54
+            elif bw == 35:
+                return 24, 68
             elif bw == 40:
                 return 24, 82
+            elif bw == 45:
+                return 24, 95
+            elif bw == 50:
+                return 24, 109
         elif scs == 60:
             if bw == 10:
                 return 10, 1
@@ -777,8 +814,15 @@ def special_uplink_config_sensitivity_fr1(band, scs, bw):
                 return 10, 21
             elif bw == 30:
                 return 10, 28
+            elif bw == 35:
+                return 10, 34
             elif bw == 40:
                 return 10, 41
+            elif bw == 45:
+                return 10, 48
+            elif bw == 50:
+                return 10, 55
+
     elif int(band) == 5:
         if scs == 15:
             if bw == 5:
@@ -796,6 +840,7 @@ def special_uplink_config_sensitivity_fr1(band, scs, bw):
                 return 10, 28
             elif bw == 20:
                 return 10, 41
+
     elif int(band) == 7:
         if scs == 15:
             if bw == 5:
@@ -807,11 +852,13 @@ def special_uplink_config_sensitivity_fr1(band, scs, bw):
             elif bw == 20:
                 return 75, 31
             elif bw == 25:
-                return 64, 32
+                return 72, 61
+            elif bw == 30:
+                return 64, 96
             elif bw == 40:
-                return 108, 54
+                return 45, 171
             elif bw == 50:
-                return 135, 67
+                return 45, 225
         elif scs == 30:
             if bw == 10:
                 return 24, 0
@@ -820,11 +867,13 @@ def special_uplink_config_sensitivity_fr1(band, scs, bw):
             elif bw == 20:
                 return 36, 15
             elif bw == 25:
-                return 32, 16
+                return 36, 29
+            elif bw == 30:
+                return 32, 46
             elif bw == 40:
-                return 50, 25
+                return 20, 86
             elif bw == 50:
-                return 64, 32
+                return 20, 113
         elif scs == 60:
             if bw == 10:
                 return 10, 1
@@ -833,11 +882,12 @@ def special_uplink_config_sensitivity_fr1(band, scs, bw):
             elif bw == 20:
                 return 18, 6
             elif bw == 25:
-                return 15, 7
+                return 18, 13
             elif bw == 40:
-                return 25, 12
+                return 10, 41
             elif bw == 50:
-                return 32, 16
+                return 10, 55
+
     elif int(band) == 8:
         if scs == 15:
             if bw == 5:
@@ -855,6 +905,7 @@ def special_uplink_config_sensitivity_fr1(band, scs, bw):
                 return 10, 28
             elif bw == 20:
                 return 10, 41
+
     elif int(band) == 12:
         if scs == 15:
             if bw == 5:
@@ -868,28 +919,41 @@ def special_uplink_config_sensitivity_fr1(band, scs, bw):
                 return 10, 14
             elif bw == 15:
                 return 10, 28
+
+    elif int(band) == 13:
+        if scs == 15:
+            if bw == 5:
+                return 20, 0
+            elif bw == 10:
+                return 20, 0
+        elif scs == 30:
+            if bw == 10:
+                return 10, 0
+
     elif int(band) == 14:
         if scs == 15:
             if bw == 5:
-                return 20, 5
+                return 20, 0
             elif bw == 10:
-                return 20, 32
+                return 20, 0
         elif scs == 30:
             if bw == 10:
-                return 10, 14
-    elif int(band) == 18:
-        if scs == 15:
-            if bw == 5:
-                return 20, 5
-            elif bw == 10:
-                return 20, 32
-            elif bw == 15:
-                return 20, 59
-        elif scs == 30:
-            if bw == 10:
-                return 10, 14
-            elif bw == 15:
-                return 10, 28
+                return 10, 0
+
+    # elif int(band) == 18:
+    #     if scs == 15:
+    #         if bw == 5:
+    #             return 20, 5
+    #         elif bw == 10:
+    #             return 20, 32
+    #         elif bw == 15:
+    #             return 20, 59
+    #     elif scs == 30:
+    #         if bw == 10:
+    #             return 10, 14
+    #         elif bw == 15:
+    #             return 10, 28
+
     elif int(band) == 20:
         if scs == 15:
             if bw == 5:
@@ -919,6 +983,7 @@ def special_uplink_config_sensitivity_fr1(band, scs, bw):
         elif scs == 60:
             if bw == 10:
                 return 10, 0
+
     elif int(band) == 25:
         if scs == 15:
             if bw == 5:
@@ -929,6 +994,12 @@ def special_uplink_config_sensitivity_fr1(band, scs, bw):
                 return 50, 29
             elif bw == 20:
                 return 50, 56
+            elif bw == 25:
+                return 50, 83
+            elif bw == 30:
+                return 48, 112
+            elif bw == 40:
+                return 40, 176
         elif scs == 30:
             if bw == 10:
                 return 24, 0
@@ -936,6 +1007,12 @@ def special_uplink_config_sensitivity_fr1(band, scs, bw):
                 return 24, 14
             elif bw == 20:
                 return 24, 27
+            elif bw == 25:
+                return 24, 41
+            elif bw == 30:
+                return 24, 54
+            elif bw == 40:
+                return 20, 86
         elif scs == 60:
             if bw == 10:
                 return 10, 0
@@ -943,6 +1020,13 @@ def special_uplink_config_sensitivity_fr1(band, scs, bw):
                 return 10, 8
             elif bw == 20:
                 return 10, 14
+            elif bw == 25:
+                return 10, 21
+            elif bw == 30:
+                return 10, 28
+            elif bw == 40:
+                return 10, 41
+
     elif int(band) == 26:
         if scs == 15:
             if bw == 5:
@@ -960,6 +1044,7 @@ def special_uplink_config_sensitivity_fr1(band, scs, bw):
                 return 12, 26
             elif bw == 15:
                 return 12, 39
+
     elif int(band) == 28:
         if scs == 15:
             if bw == 5:
@@ -981,6 +1066,7 @@ def special_uplink_config_sensitivity_fr1(band, scs, bw):
                 return 10, 41
             elif bw == 30:
                 return 10, 68
+
     elif int(band) == 30:
         if scs == 15:
             if bw == 5:
@@ -990,6 +1076,7 @@ def special_uplink_config_sensitivity_fr1(band, scs, bw):
         elif scs == 30:
             if bw == 10:
                 return 10, 14
+
     elif int(band) == 34:
         if scs == 15:
             if bw == 5:
@@ -1008,6 +1095,7 @@ def special_uplink_config_sensitivity_fr1(band, scs, bw):
                 return 10, 0
             elif bw == 15:
                 return 18, 0
+
     elif int(band) == 38:
         if scs == 15:
             if bw == 5:
@@ -1044,6 +1132,7 @@ def special_uplink_config_sensitivity_fr1(band, scs, bw):
                 return 30, 0
             elif bw == 40:
                 return 50, 0
+
     elif int(band) == 39:
         if scs == 15:
             if bw == 5:
@@ -1086,6 +1175,7 @@ def special_uplink_config_sensitivity_fr1(band, scs, bw):
                 return 36, 0
             elif bw == 40:
                 return 50, 0
+
     elif int(band) == 40:
         if scs == 15:
             if bw == 5:
@@ -1142,6 +1232,7 @@ def special_uplink_config_sensitivity_fr1(band, scs, bw):
                 return 75, 0
             elif bw == 80:
                 return 100, 0
+
     elif int(band) == 41:
         if scs == 15:
             if bw == 10:
@@ -1200,6 +1291,7 @@ def special_uplink_config_sensitivity_fr1(band, scs, bw):
                 return 120, 0
             elif bw == 100:
                 return 135, 0
+
     elif int(band) == 48:
         if scs == 15:
             if bw == 10:
@@ -1260,6 +1352,7 @@ def special_uplink_config_sensitivity_fr1(band, scs, bw):
                 return 120, 0
             elif bw == 100:
                 return 135, 0
+
     elif int(band) == 50:
         if scs == 15:
             if bw == 10:
