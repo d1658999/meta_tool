@@ -1213,6 +1213,10 @@ def special_uplink_config_sensitivity_fr1(band, scs, bw):
                 return 162, 0
             elif bw == 80:
                 return 216, 0
+            elif bw == 90:
+                return 243, 0
+            elif bw == 100:
+                return 270, 0
         elif scs == 60:
             if bw == 10:
                 return 10, 0
