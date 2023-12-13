@@ -54,6 +54,7 @@ class MainApp(MainV2241App):
         log_clear()
         self.import_ui_setting_yaml()
         self.endc_tx_path_init()
+        self.tpchb = None
 
         # self.inst_to_tech()
 
