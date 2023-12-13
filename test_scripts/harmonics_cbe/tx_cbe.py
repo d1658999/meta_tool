@@ -13,10 +13,11 @@ import utils.parameters.rb_parameters as rb_pmt
 import time
 
 logger = log_set('Tx_CBE')
-FILE_FOLDER = Path(excel_folder_path())
 
 
 class TxCBE(TxTestGenre, FSW50):
+    FILE_FOLDER = Path(excel_folder_path())
+
     def __init__(self):
         TxTestGenre.__init__(self)
         FSW50.__init__(self)
@@ -155,7 +156,7 @@ class TxCBE(TxTestGenre, FSW50):
                                         f'{self.tx_path}_TxAS{asw_path}_' \
                                         f'{spec_state}' \
                                         f'.png'  # this is power level
-                            local_file_path = FILE_FOLDER / Path(file_name)
+                            local_file_path = self.FILE_FOLDER / Path(file_name)
                             self.get_spur_screenshot(local_file_path)
 
                         logger.debug(data_freq)
@@ -301,7 +302,7 @@ class TxCBE(TxTestGenre, FSW50):
                                         f'{self.tx_path}_TxAS{asw_path}_' \
                                         f'{spec_state}' \
                                         f'.png'  # this is power level
-                            local_file_path = FILE_FOLDER / Path(file_name)
+                            local_file_path = self.FILE_FOLDER / Path(file_name)
                             self.get_spur_screenshot(local_file_path)
 
                         logger.debug(data_freq)
