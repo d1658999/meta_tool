@@ -19,7 +19,7 @@ from utils.parameters.rb_parameters import ulca_fcc_lte
 from utils.excel_handler import tx_ulca_power_relative_test_export_excel_ftm
 
 logger = log_set('tx_ulca_cbe')
-FILE_FOLDER = Path(excel_folder_path())
+
 
 
 class TxTestCaCBE(AtCmd, CMW100, FSW50):
@@ -200,7 +200,7 @@ class TxTestCaCBE(AtCmd, CMW100, FSW50):
                     f'TxAS{asw_path}_' \
                     f'{spec_state}' \
                     f'.png'  # this is power level
-        local_file_path = FILE_FOLDER / Path(file_name)
+        local_file_path = self.file_folder / Path(file_name)
         self.get_spur_screenshot(local_file_path)
 
         # export to excel
@@ -214,6 +214,7 @@ class TxTestCaCBE(AtCmd, CMW100, FSW50):
         self.set_test_end_lte()
 
     def tx_power_aclr_ulca_pipline_lte(self):
+        self.file_folder = Path(excel_folder_path())
         self.preset_instrument()
         self.set_test_end_lte()
         self.port_tx = ext_pmt.port_tx

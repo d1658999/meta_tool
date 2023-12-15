@@ -157,7 +157,9 @@ def excel_folder_create():
 
 
 def excel_folder_path():
-    return Path('output') / Path(ext_pmt.devices_serial)
+    path = Path('output') / Path(ext_pmt.devices_serial)
+    logger.info(f'========== folder path: {path}==========')
+    return path
 
 
 def tx_power_fcc_ce_export_excel_ftm(data, parameters_dict):
