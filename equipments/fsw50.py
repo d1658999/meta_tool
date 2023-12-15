@@ -2174,9 +2174,9 @@ class FSW50(FSW):
             return 1
 
     def get_spur_screenshot(self, local_file_path):
+        self.set_screenshot_format('PNG')
         temp_file_fsw = r"C:\temp\screenshot.png"
         self.set_file_path(temp_file_fsw)
-        self.set_screenshot_format('PNG')
         self.print_screenshot()
         time.sleep(1)
         data = self.get_data_query(r"C:\temp\screenshot.png")
