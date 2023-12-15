@@ -16,8 +16,6 @@ logger = log_set('Tx_CBE')
 
 
 class TxCBE(TxTestGenre, FSW50):
-    FILE_FOLDER = Path(excel_folder_path())
-
     def __init__(self):
         TxTestGenre.__init__(self)
         FSW50.__init__(self)
@@ -26,6 +24,7 @@ class TxCBE(TxTestGenre, FSW50):
         """
         this pipline is same as tx_lmh
         """
+        self.file_folder = Path(excel_folder_path())
         self.tx_level = ext_pmt.tx_level
         self.port_tx = ext_pmt.port_tx
         self.chan = ext_pmt.channel
@@ -156,7 +155,7 @@ class TxCBE(TxTestGenre, FSW50):
                                         f'{self.tx_path}_TxAS{asw_path}_' \
                                         f'{spec_state}' \
                                         f'.png'  # this is power level
-                            local_file_path = self.FILE_FOLDER / Path(file_name)
+                            local_file_path = self.file_folder / Path(file_name)
                             self.get_spur_screenshot(local_file_path)
 
                         logger.debug(data_freq)
@@ -302,7 +301,7 @@ class TxCBE(TxTestGenre, FSW50):
                                         f'{self.tx_path}_TxAS{asw_path}_' \
                                         f'{spec_state}' \
                                         f'.png'  # this is power level
-                            local_file_path = self.FILE_FOLDER / Path(file_name)
+                            local_file_path = self.file_folder / Path(file_name)
                             self.get_spur_screenshot(local_file_path)
 
                         logger.debug(data_freq)
