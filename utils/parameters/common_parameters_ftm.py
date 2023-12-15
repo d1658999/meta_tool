@@ -654,6 +654,13 @@ def special_uplink_config_sensitivity_lte(band, bw):
         return 20, 16
     elif int(band) == 28 and int(bw) == 20:
         return 25, 75
+    elif int(band) == 71 and int(bw) == 10:
+        return 25, 0
+    elif int(band) == 71 and int(bw) == 15:
+        return 20, 0
+    elif int(band) == 71 and int(bw) == 20:
+        return 20, 0
+
     else:
         if bw == 1.4:
             return 6, 0
