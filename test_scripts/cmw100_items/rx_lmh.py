@@ -270,7 +270,7 @@ class RxTestGenre(AtCmd, CMW100):
                 self.tx_path = item[1]
                 self.bw_fr1 = item[2]
                 self.ue_power_bool = item[3]
-                self.tx_level = ext_pmt.tx_level if self.ue_power_bool == 1 else -10
+                self.tx_level = ext_pmt.tx_level_spin if self.ue_power_bool == 1 else -10
                 self.band_fr1 = item[4]
                 try:
                     self.port_table_selector(self.band_fr1, self.tx_path)
@@ -325,7 +325,7 @@ class RxTestGenre(AtCmd, CMW100):
                 self.tx_path = item[1]
                 self.bw_lte = item[2]
                 self.ue_power_bool = item[3]
-                self.tx_level = ext_pmt.tx_level if self.ue_power_bool == 1 else -10
+                self.tx_level = ext_pmt.tx_level_spin if self.ue_power_bool == 1 else -10
                 self.band_lte = item[4]
                 try:
                     self.port_table_selector(self.band_lte, self.tx_path)

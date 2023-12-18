@@ -70,6 +70,7 @@ power:
   tx_level: 26
   tx_level_endc_fr1: 20
   tx_level_endc_lte: 20
+  tx_level_spin: 26
 rb_set:
   rb_ftm_fr1: []
   rb_ftm_lte: []

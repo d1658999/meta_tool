@@ -332,7 +332,7 @@ class TxTestFreqSweep(AtCmd, CMW100):
 
     def tx_freq_sweep_pipline_fr1(self):
         self.rx_level = ext_pmt.init_rx_sync_level
-        self.tx_level = ext_pmt.tx_level
+        self.tx_level = ext_pmt.tx_level_spin
         self.port_tx = ext_pmt.port_tx
         # self.chan = ext_pmt.channel
         self.sa_nsa_mode = ext_pmt.sa_nsa
@@ -374,7 +374,7 @@ class TxTestFreqSweep(AtCmd, CMW100):
 
     def tx_freq_sweep_pipline_lte(self):
         self.rx_level = ext_pmt.init_rx_sync_level
-        self.tx_level = ext_pmt.tx_level
+        self.tx_level = ext_pmt.tx_level_spin
         self.port_tx = ext_pmt.port_tx
         # self.chan = ext_pmt.channel
         items = [
@@ -416,7 +416,7 @@ class TxTestFreqSweep(AtCmd, CMW100):
 
     def tx_freq_sweep_pipline_wcdma(self):
         self.rx_level = ext_pmt.init_rx_sync_level
-        self.tx_level = ext_pmt.tx_level
+        self.tx_level = ext_pmt.tx_level_spin
         self.port_tx = ext_pmt.port_tx
         # self.chan = ext_pmt.channel
         for tech in ext_pmt.tech:
@@ -430,7 +430,7 @@ class TxTestFreqSweep(AtCmd, CMW100):
 
     def tx_freq_sweep_pipline_gsm(self):
         self.rx_level = ext_pmt.init_rx_sync_level
-        self.tx_level = ext_pmt.tx_level
+        self.tx_level = ext_pmt.tx_level_spin
         self.port_tx = ext_pmt.port_tx
         # self.chan = ext_pmt.channel
         self.mod_gsm = ext_pmt.mod_gsm

@@ -23,6 +23,7 @@ fdd_tdd_cross_test = 0  # this is only for 8821,  0: only measure one of FDD or 
 tx_max_pwr_sensitivity = [1, 0]  # 1: Txmax power, 0: -10dBm
 
 tx_level = 26
+tx_level_spin = 26
 tx_level_endc_lte = 20
 tx_level_endc_fr1 = 27
 tx_pcl_lb = 5  # GMSK_MB: 0 ~ 15, EPSK_MB 2~15:

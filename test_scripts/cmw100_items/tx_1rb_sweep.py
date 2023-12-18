@@ -58,7 +58,7 @@ class TxTest1RbSweep(AtCmd, CMW100):
 
     def tx_1rb_sweep_pipeline_fr1(self):
         self.rx_level = ext_pmt.init_rx_sync_level
-        self.tx_level = ext_pmt.tx_level
+        self.tx_level = ext_pmt.tx_level_spin
         self.port_tx = ext_pmt.port_tx
         self.chan = ext_pmt.channel
         self.sa_nsa_mode = ext_pmt.sa_nsa

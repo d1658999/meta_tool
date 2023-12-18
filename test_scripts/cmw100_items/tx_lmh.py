@@ -480,7 +480,7 @@ class TxTestGenre(AtCmd, CMW100):
                 path_count += 1
 
     def tx_power_aclr_evm_lmh_pipeline_fr1(self):
-        self.tx_level = ext_pmt.tx_level
+        self.tx_level = ext_pmt.tx_level_spin
         self.port_tx = ext_pmt.port_tx
         self.chan = ext_pmt.channel
         self.sa_nsa_mode = ext_pmt.sa_nsa
@@ -523,7 +523,7 @@ class TxTestGenre(AtCmd, CMW100):
                 logger.info(f'there is not file to plot BW{bw} ')
 
     def tx_power_aclr_evm_lmh_pipeline_lte(self):
-        self.tx_level = ext_pmt.tx_level
+        self.tx_level = ext_pmt.tx_level_spin
         self.port_tx = ext_pmt.port_tx
         self.chan = ext_pmt.channel
         items = [
@@ -565,7 +565,7 @@ class TxTestGenre(AtCmd, CMW100):
                 logger.info(f'there is not file to plot BW{bw} ')
 
     def tx_power_aclr_evm_lmh_pipeline_wcdma(self):
-        self.tx_level = ext_pmt.tx_level
+        self.tx_level = ext_pmt.tx_level_spin
         self.port_tx = ext_pmt.port_tx
         self.chan = ext_pmt.channel
         self.mipi_usid_addr_series = mipi_settings_dict(self.tx_path, self.tech, self.band_wcdma)
@@ -580,7 +580,7 @@ class TxTestGenre(AtCmd, CMW100):
                 txp_aclr_evm_current_plot_ftm(self.file_path, self.parameters)
 
     def tx_power_aclr_evm_lmh_pipeline_gsm(self):
-        self.tx_level = ext_pmt.tx_level
+        self.tx_level = ext_pmt.tx_level_spin
         self.port_tx = ext_pmt.port_tx
         self.chan = ext_pmt.channel
         self.mod_gsm = ext_pmt.mod_gsm
