@@ -1,4 +1,3 @@
-#!/usr/bin/python3
 import pathlib
 import tkinter
 import tkinter.ttk as ttk
@@ -9,7 +8,7 @@ import signal
 import os
 import yaml
 
-from main_ui import MainV2241App
+from main_ui import MainV2242App
 from utils.log_init import log_set, log_clear
 from utils.adb_handler import get_serial_devices
 from utils.excel_handler import excel_folder_create
@@ -25,7 +24,7 @@ PROJECT_PATH = pathlib.Path(__file__).parent
 logger = log_set('GUI')
 
 
-class MainApp(MainV2241App):
+class MainApp(MainV2242App):
     def __init__(self, master=None):
         super().__init__()
         self.notebook = self.builder.get_object("notebook1")
@@ -864,6 +863,7 @@ class MainApp(MainV2241App):
         pcl_lb_gsm = self.pcl_lb.get()
         pcl_mb_gsm = self.pcl_mb.get()
         tx_level = self.tx_level.get()
+        tx_level_spin = self.tx_level_spin.get()
         tx_level_endc_lte = self.tx_level_endc_lte.get()
         tx_leve_endc_fr1 = self.tx_level_endc_fr1.get()
         wait_time = self.wait_time.get()
@@ -968,6 +968,7 @@ class MainApp(MainV2241App):
                 'lb_gsm_pcl': pcl_lb_gsm,
                 'mb_gsm_pcl': pcl_mb_gsm,
                 'tx_level': tx_level,
+                'tx_level_spin': tx_level_spin,
                 'tx_level_endc_lte': tx_level_endc_lte,
                 'tx_level_endc_fr1': tx_leve_endc_fr1,
             },
@@ -2667,6 +2668,9 @@ class MainApp(MainV2241App):
     def select_tx_level(self, option):
         logger.info(f'select TX Level {self.tx_level.get()}')
 
+    def select_tx_level_spin(self):
+        logger.info(f'select TX Level_spin {self.tx_level_spin.get()}')
+
     def select_tx_level_endc(self, option):
         logger.info(f'select TX Level ENDC LTE: {self.tx_level_endc_lte.get()}, FR1: {self.tx_level_endc_fr1.get()}')
 
@@ -2881,6 +2885,7 @@ class MainApp(MainV2241App):
         ext_pmt.tx_pcl_lb = self.pcl_lb.get()
         ext_pmt.tx_pcl_mb = self.pcl_mb.get()
         ext_pmt.tx_level = self.tx_level.get()
+        ext_pmt.tx_level_spin = self.tx_level_spin.get()
         ext_pmt.tx_level_endc_lte = self.tx_level_endc_lte.get()
         ext_pmt.tx_level_endc_fr1 = self.tx_level_endc_fr1.get()
         # ext_pmt.wait_time = self.wait_time.get()  # obsolete

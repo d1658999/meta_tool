@@ -1,12 +1,11 @@
-#!/usr/bin/python3
 import pathlib
 import pygubu
 
 PROJECT_PATH = pathlib.Path(__file__).parent
-PROJECT_UI = PROJECT_PATH / pathlib.Path('gui') / "main_v2_24_1.ui"
+PROJECT_UI = PROJECT_PATH / pathlib.Path('gui') / "main_v2_24_2.ui"
 
 
-class MainV2241App:
+class MainV2242App:
     def __init__(self, master=None):
         self.builder = builder = pygubu.Builder()
         builder.add_resource_path(PROJECT_PATH)
@@ -29,7 +28,7 @@ class MainV2241App:
         self.asw_path = None
         self.srs_path_enable = None
         self.srs_path = None
-        self.tx_level = None
+        self.tx_level_spin = None
         self.tx1 = None
         self.tx2 = None
         self.ulmimo = None
@@ -195,6 +194,7 @@ class MainV2241App:
         self.tx_level_start = None
         self.tx_level_stop = None
         self.fcc = None
+        self.tx_level = None
         self.ce = None
         self.endc = None
         self.port_tx_lte = None
@@ -392,7 +392,7 @@ class MainV2241App:
                 "asw_path",
                 "srs_path_enable",
                 "srs_path",
-                "tx_level",
+                "tx_level_spin",
                 "tx1",
                 "tx2",
                 "ulmimo",
@@ -558,6 +558,7 @@ class MainV2241App:
                 "tx_level_start",
                 "tx_level_stop",
                 "fcc",
+                "tx_level",
                 "ce",
                 "endc",
                 "port_tx_lte",
@@ -796,7 +797,7 @@ class MainV2241App:
     def srs_enable(self):
         pass
 
-    def select_tx_level(self, option):
+    def select_tx_level_spin(self):
         pass
 
     def wanted_tx_path(self):
@@ -905,6 +906,9 @@ class MainV2241App:
         pass
 
     def UHB_all_state_fr1(self):
+        pass
+
+    def select_tx_level(self, option):
         pass
 
     def select_tx_port_lte(self, option):
@@ -1017,6 +1021,6 @@ class MainV2241App:
 
 
 if __name__ == "__main__":
-    app = MainV2241App()
+    app = MainV2242App()
     app.run()
 
