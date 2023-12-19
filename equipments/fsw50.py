@@ -16,10 +16,10 @@ class FSW50(FSW):
         super().__init__(equipment)
         self.system_preset()
 
-    def get_level_harmonics(self, band, harmonic_freq, loss):
+    def get_level_harmonics(self, tech, band, harmonic_freq, loss):
         # basic environment setting
         # self.set_reference_level(-30 - MARGIN)
-        self.set_reference_level_offset(self.tech, band, loss)
+        self.set_reference_level_offset(tech, band, loss)
         self.set_input_attenuation(0)
         self.set_freq_center(harmonic_freq)
         self.set_freq_span(500)  # span 500MHz
@@ -44,11 +44,11 @@ class FSW50(FSW):
         logger.info(f'Peak level: {mark_y} and response to the Freq: {mark_x}')
         return mark_x, mark_y
 
-    def get_harmonics_order(self, band, order, tx_freq):
+    def get_harmonics_order(self, tech, band, order, tx_freq):
         tx_freq_order = int(tx_freq * order)
         loss = get_loss_spectrum(tx_freq_order)
         logger.info(f'This is {order} Harmonic')
-        return self.get_level_harmonics(band, tx_freq_order, loss)
+        return self.get_level_harmonics(tech, band, tx_freq_order, loss)
 
     def set_spur_initial(self):
         logger.info('----------select spurious emissions measurement----------')
