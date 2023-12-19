@@ -1981,7 +1981,7 @@ class FSW50(FSW):
             self.set_sweep_type('SWE')
             if chan == 'L':
                 # range
-                self.set_spur_list_range_freq_start(1, 3.5 * ghz)
+                self.set_spur_list_range_freq_start(1, 3.43 * ghz)
                 self.set_spur_list_range_freq_stop(1, 3.53 * ghz)
                 self.set_spur_list_range_freq_stop(2, 3.54 * ghz)
                 self.set_spur_list_range_freq_stop(3, 3.549 * ghz)
