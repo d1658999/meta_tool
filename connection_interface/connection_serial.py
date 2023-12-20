@@ -39,7 +39,7 @@ class ModemComport:
     def begin_serial(self):
         self.ser = serial.Serial()
         self.ser.baudrate = 230400
-        self.ser.timeout = 0.2
+        self.ser.timeout = 1
         self.ser.port = self.get_comport_wanted()
         self.com_open()
 
