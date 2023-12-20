@@ -24,7 +24,7 @@ class TxCBE(TxTestGenre, FSW50):
         """
         this pipline is same as tx_lmh
         """
-        self.file_folder = Path(excel_folder_path())
+        self.file_folder = excel_folder_path()
         self.tx_level = ext_pmt.tx_level
         self.port_tx = ext_pmt.port_tx
         self.chan = ext_pmt.channel
@@ -185,6 +185,7 @@ class TxCBE(TxTestGenre, FSW50):
         """
         this pipline is same as tx_lmh
         """
+        self.file_folder = excel_folder_path()
         self.tx_level = ext_pmt.tx_level
         self.port_tx = ext_pmt.port_tx
         self.chan = ext_pmt.channel
