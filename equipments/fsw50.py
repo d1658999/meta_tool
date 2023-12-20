@@ -2088,7 +2088,7 @@ class FSW50(FSW):
                 self.set_spur_list_range_freq_stop(5, 3.701 * ghz)
                 self.set_spur_list_range_freq_stop(6, 3.71 * ghz)
                 self.set_spur_list_range_freq_stop(7, 3.72 * ghz)
-                self.set_spur_list_range_freq_stop(8, 3.75 * ghz)
+                self.set_spur_list_range_freq_stop(8, 3.85 * ghz)
 
                 # filter type
                 self.set_spur_list_range_filter_type(1, 'NORMal')
