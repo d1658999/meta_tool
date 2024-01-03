@@ -6,6 +6,7 @@ from connection_interface.connection_serial import ModemComport
 from utils.parameters.common_parameters_ftm import TDD_BANDS, NTN_BANDS
 import utils.parameters.rssi_parameters as rssi
 from utils.regy_handler import regy_parser, regy_parser_v2
+from exception.custom_exception import DictionaryException
 
 logger = log_set('AtCmd')
 
@@ -389,6 +390,8 @@ class AtCmd:
 
     def sync_fr1(self):
         logger.info('---------Sync----------')
+        if self.bw_fr1 not in self.bw_fr1_dict.keys():
+            raise DictionaryException(f'There is not {self.bw_fr1} in self.bw_fr1_dict')
         scs = 1 if self.band_fr1 in TDD_BANDS and self.band_fr1 not in NTN_BANDS else 0
         response = self.command(
             f'AT+NRFSYNC={self.sync_path_dict[self.sync_path]},{self.sync_mode},{scs},'
@@ -483,7 +486,7 @@ class AtCmd:
             self.dl_symbol = self.duty_cycle_dict[ext_pmt.duty_cycle][2]
             self.ul_slot = self.duty_cycle_dict[ext_pmt.duty_cycle][3]
             self.ul_symbol = self.duty_cycle_dict[ext_pmt.duty_cycle][4]
-            logger.info('---TDD, so need to set the duty cycle')
+            logger.info('---TDD, so need to set the duty cycle---')
             logger.debug(f'Duty Cycle setting: {self.uldl_period}, {self.dl_slot}, {self.dl_symbol}, {self.ul_slot}, '
                          f'{self.ul_symbol}')
         else:
@@ -492,7 +495,7 @@ class AtCmd:
             self.dl_symbol = 0
             self.ul_slot = 0
             self.ul_symbol = 0
-            logger.info("---FDD, so don't need to set the duty cycle")
+            logger.info("---FDD, so don't need to set the duty cycle---")
             logger.debug(f'Duty Cycle setting: {self.uldl_period}, {self.dl_slot}, {self.dl_symbol}, '
                          f'{self.ul_slot}, {self.ul_symbol}')
 
