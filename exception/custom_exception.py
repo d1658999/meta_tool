@@ -4,8 +4,8 @@ class DictionaryException(Exception):
 class DataException(Exception):
     pass
 
-class ComportException(Exception):
-    pass
+# class ComportException(Exception):
+#     pass
 
 class GbipException(Exception):
     pass
