@@ -1550,7 +1550,7 @@ class AtCmd:
                     return vol_hex
 
         elif tech == "WCDMA":
-            res = self.command(f'AT+HMIPIREAD={mmipi_usid_addr}', delay=0.2)
+            res = self.command(f'AT+HMIPIREAD={mipi_usid_addr}', delay=0.2)
             for line in res:
                 if '+HMIPIREAD:' in line.decode():
                     vol_hex = line.decode().split(':')[1].strip()
