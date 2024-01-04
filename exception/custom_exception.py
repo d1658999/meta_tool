@@ -15,3 +15,6 @@ class PortTableException(Exception):
 
 class FilePlotBwException(Exception):
     pass
+
+class FileNotFoundException(Exception):
+    pass
