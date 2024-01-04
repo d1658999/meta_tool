@@ -10,6 +10,7 @@ from utils.excel_handler import txp_aclr_evm_current_plot_ftm, tx_power_relative
 from utils.excel_handler import select_file_name_genre_tx_ftm, excel_folder_path
 from utils.channel_handler import channel_freq_select
 import utils.parameters.rb_parameters as rb_pmt
+from exception.custom_exception import FileNotFoundException
 
 logger = log_set('1rb_sweep')
 
@@ -96,7 +97,8 @@ class TxTest1RbSweep(AtCmd, CMW100):
                 txp_aclr_evm_current_plot_ftm(file_path, {'script': 'GENERAL', 'tech': 'FR1'})
             except TypeError:
                 logger.info(f'there is no data to plot because the band does not have this BW ')
-            except FileNotFoundError:
+            except FileNotFoundException as err:
+                logger.info(err)
                 logger.info(f'there is not file to plot BW{bw} ')
         self.tx_1rb_filename_judge = False
 

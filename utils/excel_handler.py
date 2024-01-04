@@ -7,6 +7,7 @@ import utils.parameters.common_parameters_ftm as cm_pmt_ftm
 import utils.parameters.common_parameters_anritsu as cm_pmt_anritsu
 import utils.parameters.external_paramters as ext_pmt
 from utils.channel_handler import chan_judge_fr1, chan_judge_lte, chan_judge_wcdma, chan_judge_gsm
+from exception.custom_exception import FileNotFoundException
 
 logger = log_set('excel_hdl')
 
@@ -1018,7 +1019,11 @@ def txp_aclr_evm_current_plot_ftm(file_path, parameters_dict):
     # scs = parameters_dict['scs']
     # type_ = parameters_dict['type']
     logger.info('----------Plot Chart---------')
-    wb = openpyxl.load_workbook(file_path)
+    try:
+        wb = openpyxl.load_workbook(file_path)
+    except Exception:
+        raise FileNotFoundException(f'Cannot find {file_path}')
+
     if script in ['GENERAL', 'CSE', 'APT']:
         if tech == 'LTE':
             for ws_name in wb.sheetnames:
