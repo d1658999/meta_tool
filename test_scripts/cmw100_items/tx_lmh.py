@@ -518,11 +518,13 @@ class TxTestGenre(AtCmd, CMW100):
                 file_name = select_file_name_genre_tx_ftm(bw, 'FR1', 'lmh')
                 file_path = Path(excel_folder_path()) / Path(file_name)
                 txp_aclr_evm_current_plot_ftm(file_path, {'script': 'GENERAL', 'tech': 'FR1'})
-            except TypeError:
-                logger.info(f'there is no data to plot because the band does not have this BW ')
+
             except FileNotFoundException as err:
                 logger.info(err)
                 logger.info(f'there is not file to plot BW{bw} ')
+
+            except Exception as err:
+                logger.info(err)
 
     def tx_power_aclr_evm_lmh_pipeline_lte(self):
         self.tx_level = ext_pmt.tx_level_spin
@@ -561,11 +563,12 @@ class TxTestGenre(AtCmd, CMW100):
                 file_name = select_file_name_genre_tx_ftm(bw, 'LTE', 'lmh')
                 file_path = Path(excel_folder_path()) / Path(file_name)
                 txp_aclr_evm_current_plot_ftm(file_path, {'script': 'GENERAL', 'tech': 'LTE'})
-            except TypeError:
-                logger.info(f'there is no data to plot because the band does not have this BW ')
             except FileNotFoundException as err:
                 logger.info(err)
                 logger.info(f'there is not file to plot BW{bw} ')
+
+            except Exception as err:
+                logger.info(err)
 
     def tx_power_aclr_evm_lmh_pipeline_wcdma(self):
         self.tx_level = ext_pmt.tx_level_spin

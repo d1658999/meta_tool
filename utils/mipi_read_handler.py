@@ -1,6 +1,9 @@
 import csv
 from pathlib import Path
 import utils.parameters.external_paramters as ext_pmt
+from utils.log_init import log_set
+
+logger = log_set('Mipi Read')
 
 
 def read_mipi_setting():
