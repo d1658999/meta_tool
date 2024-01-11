@@ -12,6 +12,7 @@ from utils.excel_handler import rxs_relative_plot_ftm, rxs_endc_plot_ftm, rx_pow
 from utils.excel_handler import rx_power_relative_test_export_excel_ftm, rx_desense_process_ftm
 from utils.excel_handler import rx_desense_endc_process_ftm, select_file_name_rx_ftm, excel_folder_path
 from utils.channel_handler import channel_freq_select
+from exception.custom_exception import FileNotFoundException, PortTableException
 
 logger = log_set('rx_lmh')
 SDL_BANDS = [29, 32, 46, 75, 76]
@@ -47,22 +48,26 @@ class RxTestGenre(AtCmd, CMW100):
         """
         This is used for multi-ports connection on Tx
         """
-        if self.port_table is None:  # to initial port table at first time
-            if ext_pmt.asw_path_enable is False:
-                txas_select = 0
-                self.port_table = self.port_tx_table(txas_select)
+        try:
+            if self.port_table is None:  # to initial port table at first time
+                if ext_pmt.asw_path_enable is False:
+                    txas_select = 0
+                    self.port_table = self.port_tx_table(txas_select)
+                else:
+                    self.port_table = self.port_tx_table(self.asw_path)
+
+            if ext_pmt.port_table_en and tx_path in ['TX1', 'TX2']:
+                self.port_tx = int(self.port_table[tx_path][str(band)])
+
+            elif ext_pmt.port_table_en and tx_path in ['MIMO']:
+                self.port_mimo_tx1 = int(self.port_table['MIMO_TX1'][str(band)])
+                self.port_mimo_tx2 = int(self.port_table['MIMO_TX2'][str(band)])
+
             else:
-                self.port_table = self.port_tx_table(self.asw_path)
+                pass
 
-        if ext_pmt.port_table_en and tx_path in ['TX1', 'TX2']:
-            self.port_tx = int(self.port_table[tx_path][str(band)])
-
-        elif ext_pmt.port_table_en and tx_path in ['MIMO']:
-            self.port_mimo_tx1 = int(self.port_table['MIMO_TX1'][str(band)])
-            self.port_mimo_tx2 = int(self.port_table['MIMO_TX2'][str(band)])
-
-        else:
-            pass
+        except Exception as err:
+            raise PortTableException(f'Tx path {tx_path} and Band {band} not in port table') from err
 
     def get_temperature(self, state=False):
         """
@@ -272,15 +277,12 @@ class RxTestGenre(AtCmd, CMW100):
                 self.ue_power_bool = item[3]
                 self.tx_level = ext_pmt.tx_level_spin if self.ue_power_bool == 1 else -10
                 self.band_fr1 = item[4]
-                try:
-                    self.port_table_selector(self.band_fr1, self.tx_path)
-                    if self.bw_fr1 in cm_pmt_ftm.bandwidths_selected_fr1(self.band_fr1):
-                        self.search_sensitivity_lmh_process_fr1()
-                    else:
-                        logger.info(f'B{self.band_fr1} does not have BW {self.bw_fr1}MHZ')
+                self.port_table_selector(self.band_fr1, self.tx_path)
 
-                except KeyError:
-                    logger.info(f'Band {self.band_fr1} does not have this tx path {self.tx_path}')
+                if self.bw_fr1 in cm_pmt_ftm.bandwidths_selected_fr1(self.band_fr1):
+                    self.search_sensitivity_lmh_process_fr1()
+                else:
+                    logger.info(f'B{self.band_fr1} does not have BW {self.bw_fr1}MHZ')
 
         for bw in ext_pmt.fr1_bandwidths:
             try:
@@ -327,15 +329,13 @@ class RxTestGenre(AtCmd, CMW100):
                 self.ue_power_bool = item[3]
                 self.tx_level = ext_pmt.tx_level_spin if self.ue_power_bool == 1 else -10
                 self.band_lte = item[4]
-                try:
-                    self.port_table_selector(self.band_lte, self.tx_path)
-                    if self.bw_lte in cm_pmt_ftm.bandwidths_selected_lte(self.band_lte):
-                        self.search_sensitivity_lmh_process_lte()
-                    else:
-                        logger.info(f'B{self.band_lte} does not have BW {self.bw_lte}MHZ')
+                self.port_table_selector(self.band_lte, self.tx_path)
 
-                except KeyError:
-                    logger.info(f'Band {self.band_lte} does not have this tx path {self.tx_path}')
+                if self.bw_lte in cm_pmt_ftm.bandwidths_selected_lte(self.band_lte):
+                    self.search_sensitivity_lmh_process_lte()
+                else:
+                    logger.info(f'B{self.band_lte} does not have BW {self.bw_lte}MHZ')
+
 
         for bw in ext_pmt.lte_bandwidths:
             try:
