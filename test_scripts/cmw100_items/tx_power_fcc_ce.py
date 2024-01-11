@@ -8,6 +8,7 @@ from utils.excel_handler import tx_power_fcc_ce_export_excel_ftm
 import utils.parameters.rb_parameters as rb_pmt
 import utils.parameters.fcc as fcc
 import utils.parameters.ce as ce
+from exception.custom_exception import PortTableException
 
 logger = log_set('tx_fcc_ce')
 
@@ -29,22 +30,26 @@ class TxTestFccCe(AtCmd, CMW100):
         """
         This is used for multi-ports connection on Tx
         """
-        if self.port_table is None:  # to initial port table at first time
-            if ext_pmt.asw_path_enable is False:
-                txas_select = 0
-                self.port_table = self.port_tx_table(txas_select)
+        try:
+            if self.port_table is None:  # to initial port table at first time
+                if ext_pmt.asw_path_enable is False:
+                    txas_select = 0
+                    self.port_table = self.port_tx_table(txas_select)
+                else:
+                    self.port_table = self.port_tx_table(self.asw_path)
+
+            if ext_pmt.port_table_en and tx_path in ['TX1', 'TX2']:
+                self.port_tx = int(self.port_table[tx_path][str(band)])
+
+            elif ext_pmt.port_table_en and tx_path in ['MIMO']:
+                self.port_mimo_tx1 = int(self.port_table['MIMO_TX1'][str(band)])
+                self.port_mimo_tx2 = int(self.port_table['MIMO_TX2'][str(band)])
+
             else:
-                self.port_table = self.port_tx_table(self.asw_path)
+                pass
 
-        if ext_pmt.port_table_en and tx_path in ['TX1', 'TX2']:
-            self.port_tx = int(self.port_table[tx_path][str(band)])
-
-        elif ext_pmt.port_table_en and tx_path in ['MIMO']:
-            self.port_mimo_tx1 = int(self.port_table['MIMO_TX1'][str(band)])
-            self.port_mimo_tx2 = int(self.port_table['MIMO_TX2'][str(band)])
-
-        else:
-            pass
+        except Exception as err:
+            raise PortTableException(f'Tx path {tx_path} and Band {band} not in port table') from err
 
     def select_asw_srs_path(self):
         if self.srs_path_enable:

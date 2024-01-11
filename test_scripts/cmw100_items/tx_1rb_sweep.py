@@ -10,7 +10,7 @@ from utils.excel_handler import txp_aclr_evm_current_plot_ftm, tx_power_relative
 from utils.excel_handler import select_file_name_genre_tx_ftm, excel_folder_path
 from utils.channel_handler import channel_freq_select
 import utils.parameters.rb_parameters as rb_pmt
-from exception.custom_exception import FileNotFoundException
+from exception.custom_exception import FileNotFoundException, PortTableException
 
 logger = log_set('1rb_sweep')
 
@@ -34,22 +34,25 @@ class TxTest1RbSweep(AtCmd, CMW100):
         """
         This is used for multi-ports connection on Tx
         """
-        if self.port_table is None:  # to initial port table at first time
-            if ext_pmt.asw_path_enable is False:
-                txas_select = 0
-                self.port_table = self.port_tx_table(txas_select)
+        try:
+            if self.port_table is None:  # to initial port table at first time
+                if ext_pmt.asw_path_enable is False:
+                    txas_select = 0
+                    self.port_table = self.port_tx_table(txas_select)
+                else:
+                    self.port_table = self.port_tx_table(self.asw_path)
+
+            if ext_pmt.port_table_en and tx_path in ['TX1', 'TX2']:
+                self.port_tx = int(self.port_table[tx_path][str(band)])
+
+            elif ext_pmt.port_table_en and tx_path in ['MIMO']:
+                self.port_mimo_tx1 = int(self.port_table['MIMO_TX1'][str(band)])
+                self.port_mimo_tx2 = int(self.port_table['MIMO_TX2'][str(band)])
+
             else:
-                self.port_table = self.port_tx_table(self.asw_path)
-
-        if ext_pmt.port_table_en and tx_path in ['TX1', 'TX2']:
-            self.port_tx = int(self.port_table[tx_path][str(band)])
-
-        elif ext_pmt.port_table_en and tx_path in ['MIMO']:
-            self.port_mimo_tx1 = int(self.port_table['MIMO_TX1'][str(band)])
-            self.port_mimo_tx2 = int(self.port_table['MIMO_TX2'][str(band)])
-
-        else:
-            pass
+                pass
+        except Exception as err:
+            raise PortTableException(f'Tx path {tx_path} and Band {band} not in port table') from err
 
     def select_asw_srs_path(self):
         if self.srs_path_enable:
@@ -80,15 +83,13 @@ class TxTest1RbSweep(AtCmd, CMW100):
                 self.bw_fr1 = item[2]
                 self.band_fr1 = item[3]
                 self.type_fr1 = item[4]
-                try:
-                    self.port_table_selector(self.band_fr1, self.tx_path)
-                    if self.bw_fr1 in cm_pmt_ftm.bandwidths_selected_fr1(self.band_fr1):
-                        self.tx_1rb_sweep_process_fr1()
-                    else:
-                        logger.info(f'B{self.band_fr1} does not have BW {self.bw_fr1}MHZ')
+                self.port_table_selector(self.band_fr1, self.tx_path)
 
-                except KeyError:
-                    logger.info(f'Band {self.band_fr1} does not have this tx path {self.tx_path}')
+                if self.bw_fr1 in cm_pmt_ftm.bandwidths_selected_fr1(self.band_fr1):
+                    self.tx_1rb_sweep_process_fr1()
+                else:
+                    logger.info(f'B{self.band_fr1} does not have BW {self.bw_fr1}MHZ')
+
 
         for bw in ext_pmt.fr1_bandwidths:
             try:
