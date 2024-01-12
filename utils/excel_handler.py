@@ -11,6 +11,7 @@ from exception.custom_exception import FileNotFoundException
 from openpyxl.styles import PatternFill, Font, Color
 from openpyxl.formatting.rule import CellIsRule, FormulaRule, ColorScaleRule
 from openpyxl.formatting.formatting import ConditionalFormattingList
+from spec_limits.spec_limit_handler import import_aclr_limits
 
 
 logger = log_set('excel_hdl')
@@ -3669,6 +3670,12 @@ def color_format_fr1_aclr_ftm(file_path):
         fgColor: (string or Color object) An alias for end_color in older openpyxl versions.
 
     """
+    # import yaml file
+    color_codes = import_aclr_limits()
+    aclr_red_usl = color_codes['FR1']['e_utra_color_red_usl']
+    aclr_yellow_usl = color_codes['FR1']['e_utra_color_yellow_usl']
+    aclr_yellow_lsl = color_codes['FR1']['e_utra_color_yellow_lsl']
+
     # define the color of fill and font
     fill_red = PatternFill(start_color='FFC7CE', end_color='FFC7CE')
     fill_yellow = PatternFill(start_color='FFEB9C', end_color='FFEB9C')
@@ -3676,8 +3683,8 @@ def color_format_fr1_aclr_ftm(file_path):
     font_yellow = Font(color='9C6500')
 
     # define the rule
-    rule_red = CellIsRule(operator='greaterThan', formula=['-37'], stopIfTrue=True, fill=fill_red, font=font_red)
-    rule_yellow = CellIsRule(operator='between', formula=['-40','-37'], stopIfTrue=True, fill=fill_yellow, font=font_yellow)
+    rule_red = CellIsRule(operator='greaterThan', formula=[aclr_red_usl], stopIfTrue=True, fill=fill_red, font=font_red)
+    rule_yellow = CellIsRule(operator='between', formula=[aclr_yellow_lsl,aclr_yellow_usl], stopIfTrue=True, fill=fill_yellow, font=font_yellow)
     ## rule = FormulaRule(formula=['AND($B2>0, $B2<=0.4)'], stopIfTrue=True)
 
     # load workbook and sheets for ACLR EUTRA
@@ -3687,7 +3694,7 @@ def color_format_fr1_aclr_ftm(file_path):
         if 'Dashboard' in sheetname:
             continue
         ws = wb[sheetname]
-        if ws.max_row > 1:
+        if ws.max_row > 1:  # if not only the header, this step can continue to be activated
             ws.conditional_formatting = ConditionalFormattingList()  # clear pattern from entire format
             ws.conditional_formatting.add(f'G2:H{ws.max_row}', rule_red)  # Apply to range G:H
             ws.conditional_formatting.add(f'G2:H{ws.max_row}', rule_yellow)  # Apply to range G:H

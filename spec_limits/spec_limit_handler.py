@@ -11,7 +11,7 @@ CSV_PWR_FILE_LTE = 'power_limits_lte.csv'
 CSV_PWR_FILE_WCDMA = 'power_limits_wcdma.csv'
 CSV_PWR_FILE_GSM = 'power_limits_gsm.csv'
 PWR_LIMITS_YAML_NAME = 'power_limits.yaml'
-ACLR_LIMITS_YAML_NAME = 'aclr_limits.yaml'
+ACLR_LIMITS_YAML_NAME = 'aclr_color_code.yaml'
 EVM_LIMITS_YAML_NAME = 'evm_limits.yaml'
 
 CSV_PWR_PATH_FR1 = Path('spec_limits') / Path(CSV_PWR_FILE_FR1)
@@ -19,7 +19,7 @@ CSV_PWR_PATH_LTE = Path('spec_limits') / Path(CSV_PWR_FILE_LTE)
 CSV_PWR_PATH_WCDMA = Path('spec_limits') / Path(CSV_PWR_FILE_WCDMA)
 CSV_PWR_PATH_GSM = Path('spec_limits') / Path(CSV_PWR_FILE_GSM)
 PWR_LIMITS_YAML_PATH = Path('spec_limits') / PWR_LIMITS_YAML_NAME
-ACLR_LIMITS_YAML_PATH = Path('spec_limits') / PWR_LIMITS_YAML_NAME
+ACLR_LIMITS_YAML_PATH = Path('spec_limits') / ACLR_LIMITS_YAML_NAME
 EVM_LIMITS_YAML_PATH = Path('spec_limits') / PWR_LIMITS_YAML_NAME
 
 TECHs = ['FR1', 'LTE', 'WCDMA', 'GSM']
@@ -99,7 +99,7 @@ def import_power_limits():
 
 def import_aclr_limits():
     logger.info('import aclr yaml file ')
-    with open(EVM_LIMITS_YAML_PATH, 'r') as s:
+    with open(ACLR_LIMITS_YAML_PATH, 'r') as s:
         spec_aclr_limits = yaml.safe_load(s)
         return spec_aclr_limits
 
