@@ -1,17 +1,17 @@
 FR1:
-  e_utra_color_red_usl: -38
-  e_utra_color_yellow_usl: -38
+  e_utra_color_red_usl: -37
+  e_utra_color_yellow_usl: -37
   e_utra_color_yellow_lsl: -40
 
 LTE:
   e_utra_color_red_usl: -37
   e_utra_color_yellow_usl: -37
-  e_utra_color_yellow_lsl: -39
+  e_utra_color_yellow_lsl: -40
 
 WCDMA:
   utra_color_red_usl: -37
   utra_color_yellow_usl: -37
-  utra_color_yellow_lsl: -39
+  utra_color_yellow_lsl: -40
 
 GSM:
   md_orfs_color_red_usl: -62

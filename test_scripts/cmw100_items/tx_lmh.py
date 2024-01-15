@@ -13,6 +13,12 @@ from utils.channel_handler import channel_freq_select
 import utils.parameters.rb_parameters as rb_pmt
 from utils.mipi_read_handler import mipi_settings_dict
 from exception.custom_exception import FileNotFoundException, PortTableException
+from utils.excel_handler import color_format_fr1_aclr_ftm, color_format_lte_aclr_ftm, color_format_clear
+from utils.excel_handler import color_format_wcdma_aclr_ftm, color_format_gsm_orfs_ftm
+from utils.excel_handler import color_format_fr1_evm_ftm, color_format_lte_evm_ftm
+from utils.excel_handler import color_format_wcdma_evm_ftm, color_format_gsm_evm_ftm
+
+
 
 logger = log_set('tx_lmh')
 
@@ -519,6 +525,10 @@ class TxTestGenre(AtCmd, CMW100):
                 file_name = select_file_name_genre_tx_ftm(bw, 'FR1', 'lmh')
                 file_path = Path(excel_folder_path()) / Path(file_name)
                 txp_aclr_evm_current_plot_ftm(file_path, {'script': 'GENERAL', 'tech': 'FR1'})
+                color_format_clear(file_path)
+                color_format_fr1_aclr_ftm(file_path)
+                color_format_fr1_evm_ftm(file_path)
+
 
             except FileNotFoundException as err:
                 logger.info(err)
@@ -561,6 +571,10 @@ class TxTestGenre(AtCmd, CMW100):
                 file_name = select_file_name_genre_tx_ftm(bw, 'LTE', 'lmh')
                 file_path = Path(excel_folder_path()) / Path(file_name)
                 txp_aclr_evm_current_plot_ftm(file_path, {'script': 'GENERAL', 'tech': 'LTE'})
+                color_format_clear(file_path)
+                color_format_lte_aclr_ftm(file_path)
+                color_format_lte_evm_ftm(file_path)
+
             except FileNotFoundException as err:
                 logger.info(err)
                 logger.info(f'there is not file to plot BW{bw} ')
@@ -582,6 +596,9 @@ class TxTestGenre(AtCmd, CMW100):
                     self.port_table_selector(self.band_wcdma)  # this is determined if using port table
                     self.tx_power_aclr_evm_lmh_process_wcdma()
                 txp_aclr_evm_current_plot_ftm(self.file_path, self.parameters)
+                color_format_clear(self.file_path)
+                color_format_wcdma_aclr_ftm(self.file_path)
+                color_format_wcdma_evm_ftm(self.file_path)
 
     def tx_power_aclr_evm_lmh_pipeline_gsm(self):
         self.tx_level = ext_pmt.tx_level_spin
@@ -598,6 +615,9 @@ class TxTestGenre(AtCmd, CMW100):
                     self.port_table_selector(self.band_gsm)  # this is determined if using port table
                     self.tx_power_aclr_evm_lmh_process_gsm()
                 txp_aclr_evm_current_plot_ftm(self.file_path, self.parameters)
+                color_format_clear(self.file_path)
+                color_format_gsm_orfs_ftm(self.file_path)
+                color_format_gsm_evm_ftm(self.file_path)
 
     def run(self):
         for tech in ext_pmt.tech:
