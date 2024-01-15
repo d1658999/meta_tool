@@ -11,8 +11,7 @@ from exception.custom_exception import FileNotFoundException
 from openpyxl.styles import PatternFill, Font, Color
 from openpyxl.formatting.rule import CellIsRule, FormulaRule, ColorScaleRule
 from openpyxl.formatting.formatting import ConditionalFormattingList
-from spec_limits.spec_limit_handler import import_aclr_limits
-
+from spec_limits.spec_limit_handler import import_aclr_limits, import_evm_limits
 
 logger = log_set('excel_hdl')
 
@@ -3627,6 +3626,7 @@ def rxs_freq_relative_plot_sig(file_path, parameters_dict):
         wb.save(file_path)
         wb.close()
 
+
 def color_format_fr1_aclr_ftm(file_path):
     """
     CellIsRule:
@@ -3684,7 +3684,8 @@ def color_format_fr1_aclr_ftm(file_path):
 
     # define the rule
     rule_red = CellIsRule(operator='greaterThan', formula=[aclr_red_usl], stopIfTrue=True, fill=fill_red, font=font_red)
-    rule_yellow = CellIsRule(operator='between', formula=[aclr_yellow_lsl,aclr_yellow_usl], stopIfTrue=True, fill=fill_yellow, font=font_yellow)
+    rule_yellow = CellIsRule(operator='between', formula=[aclr_yellow_lsl, aclr_yellow_usl], stopIfTrue=True,
+                             fill=fill_yellow, font=font_yellow)
     ## rule = FormulaRule(formula=['AND($B2>0, $B2<=0.4)'], stopIfTrue=True)
 
     # load workbook and sheets for ACLR EUTRA
@@ -3703,5 +3704,521 @@ def color_format_fr1_aclr_ftm(file_path):
 
     wb.save(file_path)
 
-file_path = r'C:\Users\pricewu\Documents\meta_tool\output\1FDG65013956000B3CM0001N\sample.xlsx'
-color_format_fr1_aclr_ftm(file_path)
+
+def color_format_lte_aclr_ftm(file_path):
+    """
+    CellIsRule:
+        operator: (string) Specifies the comparison operator to use. Options include:
+            'between'
+            'equal'
+            'greaterThan'
+            'greaterThanOrEqual'
+            'lessThan'
+            'lessThanOrEqual'
+            'notBetween'
+            'notEqual'
+        formula: (list) Contains the value or formula to compare against.
+        stopIfTrue: (bool) Determines whether to stop evaluating other conditional formatting rules if this rule is True.
+        fill: (PatternFill object) Specifies the fill formatting to apply if the condition is met.
+        font: (Font object) Specifies the font formatting to apply if the condition is met.
+
+    PatternFill:
+        patternType: (string) Specifies the fill pattern. Common options:
+
+            'solid': Solid fill with a single color.
+            'lightGray': Light gray pattern.
+            'mediumGray': Medium gray pattern.
+            'darkGray': Dark gray pattern.
+            'darkHorizontal': Dark horizontal lines.
+            'darkVertical': Dark vertical lines.
+            'darkDown': Dark diagonal lines sloping down.
+            'darkUp': Dark diagonal lines sloping up.
+            'darkGrid': Dark grid pattern.
+            'lightGrid': Light grid pattern.
+            'lightHorizontal': Light horizontal lines.
+            'lightVertical': Light vertical lines.
+            'lightDown': Light diagonal lines sloping down.
+            'lightUp': Light diagonal lines sloping up.
+            start_color: (string or Color object) The starting color for gradient fills.
+
+        end_color: (string or Color object) The ending color for gradient fills.
+
+        bgColor: (string or Color object) An alias for start_color in older openpyxl versions.
+
+        fgColor: (string or Color object) An alias for end_color in older openpyxl versions.
+
+    """
+    # import yaml file
+    color_codes = import_aclr_limits()
+    aclr_red_usl = color_codes['LTE']['e_utra_color_red_usl']
+    aclr_yellow_usl = color_codes['LTE']['e_utra_color_yellow_usl']
+    aclr_yellow_lsl = color_codes['LTE']['e_utra_color_yellow_lsl']
+
+    # define the color of fill and font
+    fill_red = PatternFill(start_color='FFC7CE', end_color='FFC7CE')
+    fill_yellow = PatternFill(start_color='FFEB9C', end_color='FFEB9C')
+    font_red = Font(color='9C0006')
+    font_yellow = Font(color='9C6500')
+
+    # define the rule
+    rule_red = CellIsRule(operator='greaterThan', formula=[aclr_red_usl], stopIfTrue=True, fill=fill_red, font=font_red)
+    rule_yellow = CellIsRule(operator='between', formula=[aclr_yellow_lsl, aclr_yellow_usl], stopIfTrue=True,
+                             fill=fill_yellow, font=font_yellow)
+    ## rule = FormulaRule(formula=['AND($B2>0, $B2<=0.4)'], stopIfTrue=True)
+
+    # load workbook and sheets for ACLR EUTRA
+    logger.info('========== Color code judge for ACLR EUTRA ==========')
+    wb = openpyxl.load_workbook(file_path)
+    for sheetname in wb.sheetnames:
+        if 'Dashboard' in sheetname:
+            continue
+        ws = wb[sheetname]
+        if ws.max_row > 1:  # if not only the header, this step can continue to be activated
+            ws.conditional_formatting = ConditionalFormattingList()  # clear pattern from entire format
+            ws.conditional_formatting.add(f'G2:H{ws.max_row}', rule_red)  # Apply to range G:H
+            ws.conditional_formatting.add(f'G2:H{ws.max_row}', rule_yellow)  # Apply to range G:H
+        else:
+            pass
+
+    wb.save(file_path)
+
+
+def color_format_wcdma_aclr_ftm(file_path):
+    """
+    CellIsRule:
+        operator: (string) Specifies the comparison operator to use. Options include:
+            'between'
+            'equal'
+            'greaterThan'
+            'greaterThanOrEqual'
+            'lessThan'
+            'lessThanOrEqual'
+            'notBetween'
+            'notEqual'
+        formula: (list) Contains the value or formula to compare against.
+        stopIfTrue: (bool) Determines whether to stop evaluating other conditional formatting rules if this rule is True.
+        fill: (PatternFill object) Specifies the fill formatting to apply if the condition is met.
+        font: (Font object) Specifies the font formatting to apply if the condition is met.
+
+    PatternFill:
+        patternType: (string) Specifies the fill pattern. Common options:
+
+            'solid': Solid fill with a single color.
+            'lightGray': Light gray pattern.
+            'mediumGray': Medium gray pattern.
+            'darkGray': Dark gray pattern.
+            'darkHorizontal': Dark horizontal lines.
+            'darkVertical': Dark vertical lines.
+            'darkDown': Dark diagonal lines sloping down.
+            'darkUp': Dark diagonal lines sloping up.
+            'darkGrid': Dark grid pattern.
+            'lightGrid': Light grid pattern.
+            'lightHorizontal': Light horizontal lines.
+            'lightVertical': Light vertical lines.
+            'lightDown': Light diagonal lines sloping down.
+            'lightUp': Light diagonal lines sloping up.
+            start_color: (string or Color object) The starting color for gradient fills.
+
+        end_color: (string or Color object) The ending color for gradient fills.
+
+        bgColor: (string or Color object) An alias for start_color in older openpyxl versions.
+
+        fgColor: (string or Color object) An alias for end_color in older openpyxl versions.
+
+    """
+    # import yaml file
+    color_codes = import_aclr_limits()
+    aclr_red_usl = color_codes['WCDMA']['utra_color_red_usl']
+    aclr_yellow_usl = color_codes['WCDMA']['utra_color_yellow_usl']
+    aclr_yellow_lsl = color_codes['WCDMA']['utra_color_yellow_lsl']
+
+    # define the color of fill and font
+    fill_red = PatternFill(start_color='FFC7CE', end_color='FFC7CE')
+    fill_yellow = PatternFill(start_color='FFEB9C', end_color='FFEB9C')
+    font_red = Font(color='9C0006')
+    font_yellow = Font(color='9C6500')
+
+    # define the rule
+    rule_red = CellIsRule(operator='greaterThan', formula=[aclr_red_usl], stopIfTrue=True, fill=fill_red, font=font_red)
+    rule_yellow = CellIsRule(operator='between', formula=[aclr_yellow_lsl, aclr_yellow_usl], stopIfTrue=True,
+                             fill=fill_yellow, font=font_yellow)
+    ## rule = FormulaRule(formula=['AND($B2>0, $B2<=0.4)'], stopIfTrue=True)
+
+    # load workbook and sheets for ACLR EUTRA
+    logger.info('========== Color code judge for ACLR UTRA ==========')
+    wb = openpyxl.load_workbook(file_path)
+    for sheetname in wb.sheetnames:
+        if 'Dashboard' in sheetname:
+            continue
+        ws = wb[sheetname]
+        if ws.max_row > 1:  # if not only the header, this step can continue to be activated
+            ws.conditional_formatting = ConditionalFormattingList()  # clear pattern from entire format
+            ws.conditional_formatting.add(f'G2:H{ws.max_row}', rule_red)  # Apply to range G:H
+            ws.conditional_formatting.add(f'G2:H{ws.max_row}', rule_yellow)  # Apply to range G:H
+        else:
+            pass
+
+    wb.save(file_path)
+
+
+def color_format_gsm_orfs_ftm(file_path):
+    """
+    CellIsRule:
+        operator: (string) Specifies the comparison operator to use. Options include:
+            'between'
+            'equal'
+            'greaterThan'
+            'greaterThanOrEqual'
+            'lessThan'
+            'lessThanOrEqual'
+            'notBetween'
+            'notEqual'
+        formula: (list) Contains the value or formula to compare against.
+        stopIfTrue: (bool) Determines whether to stop evaluating other conditional formatting rules if this rule is True.
+        fill: (PatternFill object) Specifies the fill formatting to apply if the condition is met.
+        font: (Font object) Specifies the font formatting to apply if the condition is met.
+
+    PatternFill:
+        patternType: (string) Specifies the fill pattern. Common options:
+
+            'solid': Solid fill with a single color.
+            'lightGray': Light gray pattern.
+            'mediumGray': Medium gray pattern.
+            'darkGray': Dark gray pattern.
+            'darkHorizontal': Dark horizontal lines.
+            'darkVertical': Dark vertical lines.
+            'darkDown': Dark diagonal lines sloping down.
+            'darkUp': Dark diagonal lines sloping up.
+            'darkGrid': Dark grid pattern.
+            'lightGrid': Light grid pattern.
+            'lightHorizontal': Light horizontal lines.
+            'lightVertical': Light vertical lines.
+            'lightDown': Light diagonal lines sloping down.
+            'lightUp': Light diagonal lines sloping up.
+            start_color: (string or Color object) The starting color for gradient fills.
+
+        end_color: (string or Color object) The ending color for gradient fills.
+
+        bgColor: (string or Color object) An alias for start_color in older openpyxl versions.
+
+        fgColor: (string or Color object) An alias for end_color in older openpyxl versions.
+
+    """
+    # import yaml file
+    color_codes = import_aclr_limits()
+    md_orfs_red_usl = color_codes['GSM']['md_orfs_color_red_usl']
+    md_orfs_yellow_usl = color_codes['GSM']['md_orfs_color_yellow_usl']
+    md_orfs_yellow_lsl = color_codes['GSM']['md_orfs_color_yellow_lsl']
+    sw_orfs_red_usl = color_codes['GSM']['sw_orfs_color_red_usl']
+    sw_orfs_yellow_usl = color_codes['GSM']['sw_orfs_color_yellow_usl']
+    sw_orfs_yellow_lsl = color_codes['GSM']['sw_orfs_color_yellow_lsl']
+
+    # define the color of fill and font
+    fill_red = PatternFill(start_color='FFC7CE', end_color='FFC7CE')
+    fill_yellow = PatternFill(start_color='FFEB9C', end_color='FFEB9C')
+    font_red = Font(color='9C0006')
+    font_yellow = Font(color='9C6500')
+
+    # define the rule
+    md_rule_red = CellIsRule(operator='greaterThan', formula=[md_orfs_red_usl], stopIfTrue=True, fill=fill_red,
+                             font=font_red)
+    md_rule_yellow = CellIsRule(operator='between', formula=[md_orfs_yellow_lsl, md_orfs_yellow_usl], stopIfTrue=True,
+                                fill=fill_yellow, font=font_yellow)
+    sw_rule_red = CellIsRule(operator='greaterThan', formula=[sw_orfs_red_usl], stopIfTrue=True, fill=fill_red,
+                             font=font_red)
+    sw_rule_yellow = CellIsRule(operator='between', formula=[sw_orfs_yellow_lsl, sw_orfs_yellow_usl], stopIfTrue=True,
+                                fill=fill_yellow, font=font_yellow)
+    ## rule = FormulaRule(formula=['AND($B2>0, $B2<=0.4)'], stopIfTrue=True)
+
+    # load workbook and sheets for ORFS
+    logger.info('========== Color code judge for ORFS ==========')
+    wb = openpyxl.load_workbook(file_path)
+    for sheetname in wb.sheetnames:
+        if 'Dashboard' in sheetname:
+            continue
+        ws = wb[sheetname]
+        if ws.max_row > 1:  # if not only the header, this step can continue to be activated
+            ws.conditional_formatting = ConditionalFormattingList()  # clear pattern from entire format
+            ws.conditional_formatting.add(f'L2:M{ws.max_row}', md_rule_red)  # Apply to range L:M for md
+            ws.conditional_formatting.add(f'L2:M{ws.max_row}', md_rule_yellow)  # Apply to range L:M for md
+            ws.conditional_formatting.add(f'P2:Q{ws.max_row}', sw_rule_red)  # Apply to range P:Q for sw
+            ws.conditional_formatting.add(f'P2:Q{ws.max_row}', sw_rule_yellow)  # Apply to range P:Q for sw
+        else:
+            pass
+
+    wb.save(file_path)
+
+
+def color_rule_evm(tech, mod):
+    # import yaml file
+    color_codes = import_evm_limits()
+    evm_red_usl = color_codes[tech][mod]['evm_color_red_usl']
+    evm_yellow_usl = color_codes[tech][mod]['evm_color_yellow_usl']
+    evm_yellow_lsl = color_codes[tech][mod]['evm_color_yellow_lsl']
+
+    # define the color of fill and font
+    fill_red = PatternFill(start_color='FFC7CE', end_color='FFC7CE')
+    fill_yellow = PatternFill(start_color='FFEB9C', end_color='FFEB9C')
+    font_red = Font(color='9C0006')
+    font_yellow = Font(color='9C6500')
+
+    # define the rule
+    rule_red = CellIsRule(operator='greaterThan', formula=[evm_red_usl], stopIfTrue=True, fill=fill_red, font=font_red)
+    rule_yellow = CellIsRule(operator='between', formula=[evm_yellow_lsl, evm_yellow_usl], stopIfTrue=True,
+                             fill=fill_yellow, font=font_yellow)
+    ## rule = FormulaRule(formula=['AND($B2>0, $B2<=0.4)'], stopIfTrue=True)
+    return rule_red, rule_yellow
+
+
+def color_format_fr1_evm_ftm(file_path):
+    """
+    CellIsRule:
+        operator: (string) Specifies the comparison operator to use. Options include:
+            'between'
+            'equal'
+            'greaterThan'
+            'greaterThanOrEqual'
+            'lessThan'
+            'lessThanOrEqual'
+            'notBetween'
+            'notEqual'
+        formula: (list) Contains the value or formula to compare against.
+        stopIfTrue: (bool) Determines whether to stop evaluating other conditional formatting rules if this rule is True.
+        fill: (PatternFill object) Specifies the fill formatting to apply if the condition is met.
+        font: (Font object) Specifies the font formatting to apply if the condition is met.
+
+    PatternFill:
+        patternType: (string) Specifies the fill pattern. Common options:
+
+            'solid': Solid fill with a single color.
+            'lightGray': Light gray pattern.
+            'mediumGray': Medium gray pattern.
+            'darkGray': Dark gray pattern.
+            'darkHorizontal': Dark horizontal lines.
+            'darkVertical': Dark vertical lines.
+            'darkDown': Dark diagonal lines sloping down.
+            'darkUp': Dark diagonal lines sloping up.
+            'darkGrid': Dark grid pattern.
+            'lightGrid': Light grid pattern.
+            'lightHorizontal': Light horizontal lines.
+            'lightVertical': Light vertical lines.
+            'lightDown': Light diagonal lines sloping down.
+            'lightUp': Light diagonal lines sloping up.
+            start_color: (string or Color object) The starting color for gradient fills.
+
+        end_color: (string or Color object) The ending color for gradient fills.
+
+        bgColor: (string or Color object) An alias for start_color in older openpyxl versions.
+
+        fgColor: (string or Color object) An alias for end_color in older openpyxl versions.
+
+    """
+    # load workbook and sheets for ACLR EUTRA
+    logger.info('========== Color code judge for EVM ==========')
+    wb = openpyxl.load_workbook(file_path)
+    for sheetname in wb.sheetnames:
+        if 'Dashboard' in sheetname:
+            continue
+        ws = wb[sheetname]
+        if ws.max_row > 1:  # if not only the header, this step can continue to be activated
+            mod = sheetname.split('_')[-1]  # split to get modulation
+            rule_red, rule_yellow = color_rule_evm('FR1', mod)
+            ws.conditional_formatting = ConditionalFormattingList()  # clear pattern from entire format
+            ws.conditional_formatting.add(f'M2:M{ws.max_row}', rule_red)  # Apply to range M:M
+            ws.conditional_formatting.add(f'M2:M{ws.max_row}', rule_yellow)  # Apply to range M:M
+        else:
+            pass
+
+    wb.save(file_path)
+
+
+def color_format_lte_evm_ftm(file_path):
+    """
+    CellIsRule:
+        operator: (string) Specifies the comparison operator to use. Options include:
+            'between'
+            'equal'
+            'greaterThan'
+            'greaterThanOrEqual'
+            'lessThan'
+            'lessThanOrEqual'
+            'notBetween'
+            'notEqual'
+        formula: (list) Contains the value or formula to compare against.
+        stopIfTrue: (bool) Determines whether to stop evaluating other conditional formatting rules if this rule is True.
+        fill: (PatternFill object) Specifies the fill formatting to apply if the condition is met.
+        font: (Font object) Specifies the font formatting to apply if the condition is met.
+
+    PatternFill:
+        patternType: (string) Specifies the fill pattern. Common options:
+
+            'solid': Solid fill with a single color.
+            'lightGray': Light gray pattern.
+            'mediumGray': Medium gray pattern.
+            'darkGray': Dark gray pattern.
+            'darkHorizontal': Dark horizontal lines.
+            'darkVertical': Dark vertical lines.
+            'darkDown': Dark diagonal lines sloping down.
+            'darkUp': Dark diagonal lines sloping up.
+            'darkGrid': Dark grid pattern.
+            'lightGrid': Light grid pattern.
+            'lightHorizontal': Light horizontal lines.
+            'lightVertical': Light vertical lines.
+            'lightDown': Light diagonal lines sloping down.
+            'lightUp': Light diagonal lines sloping up.
+            start_color: (string or Color object) The starting color for gradient fills.
+
+        end_color: (string or Color object) The ending color for gradient fills.
+
+        bgColor: (string or Color object) An alias for start_color in older openpyxl versions.
+
+        fgColor: (string or Color object) An alias for end_color in older openpyxl versions.
+
+    """
+    # load workbook and sheets for ACLR EUTRA
+    logger.info('========== Color code judge for EVM ==========')
+    wb = openpyxl.load_workbook(file_path)
+    for sheetname in wb.sheetnames:
+        if 'Dashboard' in sheetname:
+            continue
+        ws = wb[sheetname]
+        if ws.max_row > 1:  # if not only the header, this step can continue to be activated
+            mod = sheetname.split('_')[-1]  # split to get modulation
+            rule_red, rule_yellow = color_rule_evm('LTE', mod)
+            ws.conditional_formatting = ConditionalFormattingList()  # clear pattern from entire format
+            ws.conditional_formatting.add(f'M2:M{ws.max_row}', rule_red)  # Apply to range M:M
+            ws.conditional_formatting.add(f'M2:M{ws.max_row}', rule_yellow)  # Apply to range M:M
+        else:
+            pass
+
+    wb.save(file_path)
+
+
+def color_format_wcdma_evm_ftm(file_path):
+    """
+    CellIsRule:
+        operator: (string) Specifies the comparison operator to use. Options include:
+            'between'
+            'equal'
+            'greaterThan'
+            'greaterThanOrEqual'
+            'lessThan'
+            'lessThanOrEqual'
+            'notBetween'
+            'notEqual'
+        formula: (list) Contains the value or formula to compare against.
+        stopIfTrue: (bool) Determines whether to stop evaluating other conditional formatting rules if this rule is True.
+        fill: (PatternFill object) Specifies the fill formatting to apply if the condition is met.
+        font: (Font object) Specifies the font formatting to apply if the condition is met.
+
+    PatternFill:
+        patternType: (string) Specifies the fill pattern. Common options:
+
+            'solid': Solid fill with a single color.
+            'lightGray': Light gray pattern.
+            'mediumGray': Medium gray pattern.
+            'darkGray': Dark gray pattern.
+            'darkHorizontal': Dark horizontal lines.
+            'darkVertical': Dark vertical lines.
+            'darkDown': Dark diagonal lines sloping down.
+            'darkUp': Dark diagonal lines sloping up.
+            'darkGrid': Dark grid pattern.
+            'lightGrid': Light grid pattern.
+            'lightHorizontal': Light horizontal lines.
+            'lightVertical': Light vertical lines.
+            'lightDown': Light diagonal lines sloping down.
+            'lightUp': Light diagonal lines sloping up.
+            start_color: (string or Color object) The starting color for gradient fills.
+
+        end_color: (string or Color object) The ending color for gradient fills.
+
+        bgColor: (string or Color object) An alias for start_color in older openpyxl versions.
+
+        fgColor: (string or Color object) An alias for end_color in older openpyxl versions.
+
+    """
+    # load workbook and sheets for ACLR EUTRA
+    logger.info('========== Color code judge for EVM ==========')
+    wb = openpyxl.load_workbook(file_path)
+    for sheetname in wb.sheetnames:
+        if 'Dashboard' in sheetname:
+            continue
+        ws = wb[sheetname]
+        if ws.max_row > 1:  # if not only the header, this step can continue to be activated
+            mod = 'QPSK'
+            rule_red, rule_yellow = color_rule_evm('WCDMA', mod)
+            ws.conditional_formatting = ConditionalFormattingList()  # clear pattern from entire format
+            ws.conditional_formatting.add(f'L2:L{ws.max_row}', rule_red)  # Apply to range L:L
+            ws.conditional_formatting.add(f'L2:L{ws.max_row}', rule_yellow)  # Apply to range L:L
+        else:
+            pass
+
+    wb.save(file_path)
+
+
+def color_format_gsm_evm_ftm(file_path):
+    """
+    CellIsRule:
+        operator: (string) Specifies the comparison operator to use. Options include:
+            'between'
+            'equal'
+            'greaterThan'
+            'greaterThanOrEqual'
+            'lessThan'
+            'lessThanOrEqual'
+            'notBetween'
+            'notEqual'
+        formula: (list) Contains the value or formula to compare against.
+        stopIfTrue: (bool) Determines whether to stop evaluating other conditional formatting rules if this rule is True.
+        fill: (PatternFill object) Specifies the fill formatting to apply if the condition is met.
+        font: (Font object) Specifies the font formatting to apply if the condition is met.
+
+    PatternFill:
+        patternType: (string) Specifies the fill pattern. Common options:
+
+            'solid': Solid fill with a single color.
+            'lightGray': Light gray pattern.
+            'mediumGray': Medium gray pattern.
+            'darkGray': Dark gray pattern.
+            'darkHorizontal': Dark horizontal lines.
+            'darkVertical': Dark vertical lines.
+            'darkDown': Dark diagonal lines sloping down.
+            'darkUp': Dark diagonal lines sloping up.
+            'darkGrid': Dark grid pattern.
+            'lightGrid': Light grid pattern.
+            'lightHorizontal': Light horizontal lines.
+            'lightVertical': Light vertical lines.
+            'lightDown': Light diagonal lines sloping down.
+            'lightUp': Light diagonal lines sloping up.
+            start_color: (string or Color object) The starting color for gradient fills.
+
+        end_color: (string or Color object) The ending color for gradient fills.
+
+        bgColor: (string or Color object) An alias for start_color in older openpyxl versions.
+
+        fgColor: (string or Color object) An alias for end_color in older openpyxl versions.
+
+    """
+    # load workbook and sheets for ACLR EUTRA
+    logger.info('========== Color code judge for EVM ==========')
+    wb = openpyxl.load_workbook(file_path)
+    for sheetname in wb.sheetnames:
+        if 'Dashboard' in sheetname:
+            continue
+        ws = wb[sheetname]
+        if ws.max_row > 1:  # if not only the header, this step can continue to be activated
+            mod = sheetname.split('_')[-1]
+            rule_red, rule_yellow = color_rule_evm('GSM', mod)
+            ws.conditional_formatting = ConditionalFormattingList()  # clear pattern from entire format
+            ws.conditional_formatting.add(f'H2:H{ws.max_row}', rule_red)  # Apply to range H:H
+            ws.conditional_formatting.add(f'H2:H{ws.max_row}', rule_yellow)  # Apply to range H:H
+        else:
+            pass
+
+    wb.save(file_path)
+
+
+
+if __name__ == '__main__':
+    file_path = r'C:\Users\pricewu\Documents\meta_tool\output\1FDG65013956000B3CM0001N\Tx_Pwr_ACLR_EVM_0MHZ_GSM_LMH.xlsx'
+    color_format_gsm_evm_ftm(file_path)

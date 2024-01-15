@@ -29,7 +29,7 @@ def bandwidths_selected_fr1(band):
             'N34': [5, 10, 15, ],
             'N38': [10, 15, 20, 40, ],
             'N39': [10, 15, 20, 25, 40, ],
-            'N40': [10, 15, 20, 25, 40, 50, 60, 80, 100, 70, ],
+            'N40': [10, 15, 20, 25, 30, 40, 50, 60, 80, 100, 70, ],
             'N41': [10, 15, 20, 30, 40, 50, 60, 80, 90, 100, 70, ],
             'N48': [10, 15, 20, 40, 50, 60, 80, 90, 100, ],
             'N66': [5, 10, 15, 20, 25, 30, 40, 50, 35, ],
@@ -326,21 +326,22 @@ def dl_chan_select_gsm(band):
 
 
 def dl_chan_select_wcdma(band):
-    band_dl_ch_wcdma = {
-        'B1': [10562, 10700, 10838],
-        'B2': [9662, 9800, 9938],
-        'B4': [1537, 1638, 1738],
-        'B5': [4357, 4400, 4458],
-        'B8': [2937, 3013, 3088],
-        'B6': [4387, 4400, 4413],
-        'B9': [9237, 9312, 9387],
-        'B19': [712, 738, 763],
-    }
+    try:
+        band_dl_ch_wcdma = {
+            'B1': [10562, 10700, 10838],
+            'B2': [9662, 9800, 9938],
+            'B4': [1537, 1638, 1738],
+            'B5': [4357, 4400, 4458],
+            'B8': [2937, 3013, 3088],
+            'B6': [4387, 4400, 4413],
+            'B9': [9237, 9312, 9387],
+            'B19': [712, 738, 763],
+        }
 
-    if band not in band_dl_ch_wcdma.keys():
+        return [int(ch) for ch in band_dl_ch_wcdma[f'B{band}']]
+
+    except Exception:
         raise DictionaryException(f'Band {band} is not in dl_chan_select_wcdma')
-
-    return [int(ch) for ch in band_dl_ch_wcdma[f'B{band}']]
 
 
 def transfer_chan_tx2rx_wcdma(band_wcdma, chan):

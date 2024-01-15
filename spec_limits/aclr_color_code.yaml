@@ -14,9 +14,9 @@ WCDMA:
   utra_color_yellow_lsl: -39
 
 GSM:
-  sw_orfs_color_red_usl: -65
-  sw_orfs_color_yellow_usl: -66
-  sw_orfs_color_yellow_lsl: -67
-  md_orfs_color_red_usl: -22
-  md_orfs_color_yellow_usl: -22
-  md_orfs_color_yellow_lsl: -24
+  md_orfs_color_red_usl: -62
+  md_orfs_color_yellow_usl: -62
+  md_orfs_color_yellow_lsl: -64
+  sw_orfs_color_red_usl: -22
+  sw_orfs_color_yellow_usl: -22
+  sw_orfs_color_yellow_lsl: -25
