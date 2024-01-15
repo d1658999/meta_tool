@@ -1,3 +1,4 @@
+import logging
 import openpyxl
 from openpyxl.chart import LineChart, Reference, BarChart, Series
 from pathlib import Path
@@ -3627,6 +3628,19 @@ def rxs_freq_relative_plot_sig(file_path, parameters_dict):
         wb.close()
 
 
+def color_format_clear(file_path):  # clear all condition pattern
+    logger.info('========== Clear Condition Pattern ==========')
+    wb = openpyxl.load_workbook(file_path)
+    for sheetname in wb.sheetnames:
+        if 'Dashboard' in sheetname:
+            continue
+
+        ws = wb[sheetname]
+        if ws.max_row > 1:  # if not only the header, this step can continue to be activated
+            ws.conditional_formatting = ConditionalFormattingList()  # clear pattern from entire format
+
+    wb.save(file_path)
+
 def color_format_fr1_aclr_ftm(file_path):
     """
     CellIsRule:
@@ -3696,7 +3710,7 @@ def color_format_fr1_aclr_ftm(file_path):
             continue
         ws = wb[sheetname]
         if ws.max_row > 1:  # if not only the header, this step can continue to be activated
-            ws.conditional_formatting = ConditionalFormattingList()  # clear pattern from entire format
+            # ws.conditional_formatting = ConditionalFormattingList()  # clear pattern from entire format
             ws.conditional_formatting.add(f'G2:H{ws.max_row}', rule_red)  # Apply to range G:H
             ws.conditional_formatting.add(f'G2:H{ws.max_row}', rule_yellow)  # Apply to range G:H
         else:
@@ -3774,7 +3788,7 @@ def color_format_lte_aclr_ftm(file_path):
             continue
         ws = wb[sheetname]
         if ws.max_row > 1:  # if not only the header, this step can continue to be activated
-            ws.conditional_formatting = ConditionalFormattingList()  # clear pattern from entire format
+            # ws.conditional_formatting = ConditionalFormattingList()  # clear pattern from entire format
             ws.conditional_formatting.add(f'G2:H{ws.max_row}', rule_red)  # Apply to range G:H
             ws.conditional_formatting.add(f'G2:H{ws.max_row}', rule_yellow)  # Apply to range G:H
         else:
@@ -3852,7 +3866,7 @@ def color_format_wcdma_aclr_ftm(file_path):
             continue
         ws = wb[sheetname]
         if ws.max_row > 1:  # if not only the header, this step can continue to be activated
-            ws.conditional_formatting = ConditionalFormattingList()  # clear pattern from entire format
+            # ws.conditional_formatting = ConditionalFormattingList()  # clear pattern from entire format
             ws.conditional_formatting.add(f'G2:H{ws.max_row}', rule_red)  # Apply to range G:H
             ws.conditional_formatting.add(f'G2:H{ws.max_row}', rule_yellow)  # Apply to range G:H
         else:
@@ -3938,7 +3952,7 @@ def color_format_gsm_orfs_ftm(file_path):
             continue
         ws = wb[sheetname]
         if ws.max_row > 1:  # if not only the header, this step can continue to be activated
-            ws.conditional_formatting = ConditionalFormattingList()  # clear pattern from entire format
+            # ws.conditional_formatting = ConditionalFormattingList()  # clear pattern from entire format
             ws.conditional_formatting.add(f'L2:M{ws.max_row}', md_rule_red)  # Apply to range L:M for md
             ws.conditional_formatting.add(f'L2:M{ws.max_row}', md_rule_yellow)  # Apply to range L:M for md
             ws.conditional_formatting.add(f'P2:Q{ws.max_row}', sw_rule_red)  # Apply to range P:Q for sw
@@ -4023,7 +4037,7 @@ def color_format_fr1_evm_ftm(file_path):
         if ws.max_row > 1:  # if not only the header, this step can continue to be activated
             mod = sheetname.split('_')[-1]  # split to get modulation
             rule_red, rule_yellow = color_rule_evm('FR1', mod)
-            ws.conditional_formatting = ConditionalFormattingList()  # clear pattern from entire format
+            # ws.conditional_formatting = ConditionalFormattingList()  # clear pattern from entire format
             ws.conditional_formatting.add(f'M2:M{ws.max_row}', rule_red)  # Apply to range M:M
             ws.conditional_formatting.add(f'M2:M{ws.max_row}', rule_yellow)  # Apply to range M:M
         else:
@@ -4085,7 +4099,7 @@ def color_format_lte_evm_ftm(file_path):
         if ws.max_row > 1:  # if not only the header, this step can continue to be activated
             mod = sheetname.split('_')[-1]  # split to get modulation
             rule_red, rule_yellow = color_rule_evm('LTE', mod)
-            ws.conditional_formatting = ConditionalFormattingList()  # clear pattern from entire format
+            # ws.conditional_formatting = ConditionalFormattingList()  # clear pattern from entire format
             ws.conditional_formatting.add(f'M2:M{ws.max_row}', rule_red)  # Apply to range M:M
             ws.conditional_formatting.add(f'M2:M{ws.max_row}', rule_yellow)  # Apply to range M:M
         else:
@@ -4147,7 +4161,7 @@ def color_format_wcdma_evm_ftm(file_path):
         if ws.max_row > 1:  # if not only the header, this step can continue to be activated
             mod = 'QPSK'
             rule_red, rule_yellow = color_rule_evm('WCDMA', mod)
-            ws.conditional_formatting = ConditionalFormattingList()  # clear pattern from entire format
+            # ws.conditional_formatting = ConditionalFormattingList()  # clear pattern from entire format
             ws.conditional_formatting.add(f'L2:L{ws.max_row}', rule_red)  # Apply to range L:L
             ws.conditional_formatting.add(f'L2:L{ws.max_row}', rule_yellow)  # Apply to range L:L
         else:
@@ -4209,7 +4223,7 @@ def color_format_gsm_evm_ftm(file_path):
         if ws.max_row > 1:  # if not only the header, this step can continue to be activated
             mod = sheetname.split('_')[-1]
             rule_red, rule_yellow = color_rule_evm('GSM', mod)
-            ws.conditional_formatting = ConditionalFormattingList()  # clear pattern from entire format
+            # ws.conditional_formatting = ConditionalFormattingList()  # clear pattern from entire format
             ws.conditional_formatting.add(f'H2:H{ws.max_row}', rule_red)  # Apply to range H:H
             ws.conditional_formatting.add(f'H2:H{ws.max_row}', rule_yellow)  # Apply to range H:H
         else:
@@ -4220,5 +4234,5 @@ def color_format_gsm_evm_ftm(file_path):
 
 
 if __name__ == '__main__':
-    file_path = r'C:\Users\pricewu\Documents\meta_tool\output\1FDG65013956000B3CM0001N\Tx_Pwr_ACLR_EVM_0MHZ_GSM_LMH.xlsx'
-    color_format_gsm_evm_ftm(file_path)
+    file_path = r'C:\Users\pricewu\Documents\meta_tool\output\1FDG65013956000B3CM0001N\Tx_Pwr_ACLR_EVM_10MHZ_FR1_LMH_color.xlsx'
+    color_format_fr1_aclr_ftm(file_path)
