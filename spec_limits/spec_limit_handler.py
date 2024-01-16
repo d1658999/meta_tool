@@ -23,8 +23,10 @@ PWR_LIMITS_YAML_PATH = Path('spec_limits') / PWR_LIMITS_YAML_NAME
 ACLR_LIMITS_YAML_PATH = Path('spec_limits') / ACLR_LIMITS_YAML_NAME
 EVM_LIMITS_YAML_PATH = Path('spec_limits') / EVM_LIMITS_YAML_NAME
 SENS_FDD_FR1_PATH = Path('spec_limits') / 'Sens_fdd_fr1.csv'
+SENS_LTE_PATH = Path('spec_limits') / 'Sens_lte.csv'
 SENS_FDD_FR1_YAML = Path('spec_limits') / 'Sens_fdd_fr1.yaml'
 SENS_TDD_FR1_YAML = Path('spec_limits') / 'Sens_tdd_fr1.yaml'
+SENS_LTE_YAML = Path('spec_limits') / 'Sens_lte.yaml'
 
 TECHs = ['FR1', 'LTE', 'WCDMA', 'GSM']
 
@@ -166,7 +168,7 @@ def import_evm_limits():
         return spec_evm_limits
 
 
-def csv_to_yaml(csv_file_path, yaml_file_path, has_header=True):  # generate fdd sensitivity criteria
+def csv_to_yaml_fr1(csv_file_path, yaml_file_path, has_header=True):  # generate fdd sensitivity criteria
     """
     Converts a CSV file to a YAML file:
     - First column becomes the first tier.
@@ -198,8 +200,38 @@ def csv_to_yaml(csv_file_path, yaml_file_path, has_header=True):  # generate fdd
         yaml.dump(yaml_dict, yaml_file, default_flow_style=False)
 
 
-def sensitivity_criteria_fr1_ftm(band, scs, bw):
+def csv_to_yaml_lte(csv_file_path, yaml_file_path, has_header=True):  # generate fdd sensitivity criteria
+    """
+    Converts a CSV file to a YAML file:
+    - First column becomes the first tier.
+    - Second column becomes the second tier.
+    - Remaining columns are handled using zip().
+    """
 
+    with open(csv_file_path, 'r') as csv_file:
+        csv_reader = csv.reader(csv_file)
+        data = list(csv_reader)
+
+        if has_header:
+            header = data[0]
+            data = data[1:]
+            yaml_dict = {}
+            for row in data:
+                if row[0] not in yaml_dict:  # new create
+                    new_dict = {
+                        row[0]: dict(zip(header[2:], row[2:]))  # Second tier, zip remaining columns
+                    }
+                    yaml_dict.update(new_dict)
+
+                else:
+                    yaml_dict[row[0]] = dict(zip(header[2:], row[2:]))
+
+    with open(yaml_file_path, 'w') as yaml_file:
+        yaml.dump(yaml_dict, yaml_file, default_flow_style=False)
+
+
+
+def sensitivity_criteria_fr1(band, scs, bw):
     if band in TDD_BAND:
         with open(SENS_TDD_FR1_YAML, 'r') as s:
             sens = yaml.safe_load(s)
@@ -214,6 +246,14 @@ def sensitivity_criteria_fr1_ftm(band, scs, bw):
 
         return float(sens[str(band)][str(scs)][f'BW{bw}'])
 
+
+def sensitivity_criteria_lte(band, bw):
+    with open(SENS_LTE_YAML, 'r') as s:
+        sens = yaml.safe_load(s)
+
+    return float(sens[str(band)][f'BW{bw}'])
+
+
 def main():  # test use
     power_limits_csv2yaml()
     # power_limits_csv2yaml('LTE')
@@ -222,4 +262,6 @@ def main():  # test use
 if __name__ == '__main__':
     # main()
     # print(sensitivity_criteria_ftm(77, 30, 100))
-    csv_to_yaml(SENS_FDD_FR1_PATH, SENS_FDD_FR1_YAML)  # tranfer csv to yaml for fdd sens
+    # csv_to_yaml(SENS_FDD_FR1_PATH, SENS_FDD_FR1_YAML)  # tranfer csv to yaml for fdd sens
+    # csv_to_yaml_lte(SENS_LTE_PATH, SENS_LTE_YAML)
+    pass
