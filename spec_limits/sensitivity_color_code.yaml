@@ -1,0 +1,11 @@
+FR1:
+  criteria_min: __sensitivity__
+
+LTE:
+  criteria_min: __sensitivity__
+
+WCDMA:
+  criteria_min: __sensitivity__
+
+GSM:
+  criteria_min: __sensitivity__
