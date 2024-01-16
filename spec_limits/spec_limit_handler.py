@@ -30,7 +30,7 @@ SENS_LTE_YAML = Path('spec_limits') / 'Sens_lte.yaml'
 
 TECHs = ['FR1', 'LTE', 'WCDMA', 'GSM']
 
-TDD_NRB = {
+TDD_NRB_FR1 = {
     15:
         {
             5: 25,
@@ -236,7 +236,7 @@ def sensitivity_criteria_fr1(band, scs, bw):
         with open(SENS_TDD_FR1_YAML, 'r') as s:
             sens = yaml.safe_load(s)
 
-        formula = sens[str(band)][str(scs)].replace('N', str(TDD_NRB[scs][bw]))
+        formula = sens[str(band)][str(scs)].replace('N', str(TDD_NRB_FR1[scs][bw]))
 
         return eval(formula)
 
