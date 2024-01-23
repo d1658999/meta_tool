@@ -3688,7 +3688,6 @@ def color_format_fr1_aclr_ftm(file_path):
     color_codes = import_aclr_limits()
     aclr_red_usl = color_codes['FR1']['e_utra_color_red_usl']
     aclr_yellow_usl = color_codes['FR1']['e_utra_color_yellow_usl']
-    aclr_yellow_lsl = color_codes['FR1']['e_utra_color_yellow_lsl']
 
     # define the color of fill and font
     fill_red = PatternFill(start_color='FFC7CE', end_color='FFC7CE')
@@ -3698,7 +3697,7 @@ def color_format_fr1_aclr_ftm(file_path):
 
     # define the rule
     rule_red = CellIsRule(operator='greaterThan', formula=[aclr_red_usl], stopIfTrue=True, fill=fill_red, font=font_red)
-    rule_yellow = CellIsRule(operator='between', formula=[aclr_yellow_lsl, aclr_yellow_usl], stopIfTrue=True,
+    rule_yellow = CellIsRule(operator='between', formula=[aclr_yellow_usl, aclr_red_usl], stopIfTrue=True,
                              fill=fill_yellow, font=font_yellow)
     ## rule = FormulaRule(formula=['AND($B2>0, $B2<=0.4)'], stopIfTrue=True)
 
@@ -3766,7 +3765,6 @@ def color_format_lte_aclr_ftm(file_path):
     color_codes = import_aclr_limits()
     aclr_red_usl = color_codes['LTE']['e_utra_color_red_usl']
     aclr_yellow_usl = color_codes['LTE']['e_utra_color_yellow_usl']
-    aclr_yellow_lsl = color_codes['LTE']['e_utra_color_yellow_lsl']
 
     # define the color of fill and font
     fill_red = PatternFill(start_color='FFC7CE', end_color='FFC7CE')
@@ -3776,7 +3774,7 @@ def color_format_lte_aclr_ftm(file_path):
 
     # define the rule
     rule_red = CellIsRule(operator='greaterThan', formula=[aclr_red_usl], stopIfTrue=True, fill=fill_red, font=font_red)
-    rule_yellow = CellIsRule(operator='between', formula=[aclr_yellow_lsl, aclr_yellow_usl], stopIfTrue=True,
+    rule_yellow = CellIsRule(operator='between', formula=[aclr_yellow_usl, aclr_red_usl], stopIfTrue=True,
                              fill=fill_yellow, font=font_yellow)
     ## rule = FormulaRule(formula=['AND($B2>0, $B2<=0.4)'], stopIfTrue=True)
 
@@ -3844,7 +3842,6 @@ def color_format_wcdma_aclr_ftm(file_path):
     color_codes = import_aclr_limits()
     aclr_red_usl = color_codes['WCDMA']['utra_color_red_usl']
     aclr_yellow_usl = color_codes['WCDMA']['utra_color_yellow_usl']
-    aclr_yellow_lsl = color_codes['WCDMA']['utra_color_yellow_lsl']
 
     # define the color of fill and font
     fill_red = PatternFill(start_color='FFC7CE', end_color='FFC7CE')
@@ -3854,7 +3851,7 @@ def color_format_wcdma_aclr_ftm(file_path):
 
     # define the rule
     rule_red = CellIsRule(operator='greaterThan', formula=[aclr_red_usl], stopIfTrue=True, fill=fill_red, font=font_red)
-    rule_yellow = CellIsRule(operator='between', formula=[aclr_yellow_lsl, aclr_yellow_usl], stopIfTrue=True,
+    rule_yellow = CellIsRule(operator='between', formula=[aclr_yellow_usl, aclr_red_usl], stopIfTrue=True,
                              fill=fill_yellow, font=font_yellow)
     ## rule = FormulaRule(formula=['AND($B2>0, $B2<=0.4)'], stopIfTrue=True)
 
@@ -3922,10 +3919,8 @@ def color_format_gsm_orfs_ftm(file_path):
     color_codes = import_aclr_limits()
     md_orfs_red_usl = color_codes['GSM']['md_orfs_color_red_usl']
     md_orfs_yellow_usl = color_codes['GSM']['md_orfs_color_yellow_usl']
-    md_orfs_yellow_lsl = color_codes['GSM']['md_orfs_color_yellow_lsl']
     sw_orfs_red_usl = color_codes['GSM']['sw_orfs_color_red_usl']
     sw_orfs_yellow_usl = color_codes['GSM']['sw_orfs_color_yellow_usl']
-    sw_orfs_yellow_lsl = color_codes['GSM']['sw_orfs_color_yellow_lsl']
 
     # define the color of fill and font
     fill_red = PatternFill(start_color='FFC7CE', end_color='FFC7CE')
@@ -3936,11 +3931,11 @@ def color_format_gsm_orfs_ftm(file_path):
     # define the rule
     md_rule_red = CellIsRule(operator='greaterThan', formula=[md_orfs_red_usl], stopIfTrue=True, fill=fill_red,
                              font=font_red)
-    md_rule_yellow = CellIsRule(operator='between', formula=[md_orfs_yellow_lsl, md_orfs_yellow_usl], stopIfTrue=True,
+    md_rule_yellow = CellIsRule(operator='between', formula=[md_orfs_yellow_usl, md_orfs_red_usl], stopIfTrue=True,
                                 fill=fill_yellow, font=font_yellow)
     sw_rule_red = CellIsRule(operator='greaterThan', formula=[sw_orfs_red_usl], stopIfTrue=True, fill=fill_red,
                              font=font_red)
-    sw_rule_yellow = CellIsRule(operator='between', formula=[sw_orfs_yellow_lsl, sw_orfs_yellow_usl], stopIfTrue=True,
+    sw_rule_yellow = CellIsRule(operator='between', formula=[sw_orfs_yellow_usl, sw_orfs_red_usl], stopIfTrue=True,
                                 fill=fill_yellow, font=font_yellow)
     ## rule = FormulaRule(formula=['AND($B2>0, $B2<=0.4)'], stopIfTrue=True)
 
@@ -3968,7 +3963,6 @@ def color_rule_evm(tech, mod):
     color_codes = import_evm_limits()
     evm_red_usl = color_codes[tech][mod]['evm_color_red_usl']
     evm_yellow_usl = color_codes[tech][mod]['evm_color_yellow_usl']
-    evm_yellow_lsl = color_codes[tech][mod]['evm_color_yellow_lsl']
 
     # define the color of fill and font
     fill_red = PatternFill(start_color='FFC7CE', end_color='FFC7CE')
@@ -3978,7 +3972,7 @@ def color_rule_evm(tech, mod):
 
     # define the rule
     rule_red = CellIsRule(operator='greaterThan', formula=[evm_red_usl], stopIfTrue=True, fill=fill_red, font=font_red)
-    rule_yellow = CellIsRule(operator='between', formula=[evm_yellow_lsl, evm_yellow_usl], stopIfTrue=True,
+    rule_yellow = CellIsRule(operator='between', formula=[evm_yellow_usl, evm_red_usl], stopIfTrue=True,
                              fill=fill_yellow, font=font_yellow)
     ## rule = FormulaRule(formula=['AND($B2>0, $B2<=0.4)'], stopIfTrue=True)
     return rule_red, rule_yellow

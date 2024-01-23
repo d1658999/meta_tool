@@ -254,6 +254,12 @@ def sensitivity_criteria_lte(band, bw):
     return float(sens[str(band)][f'BW{bw}'])
 
 
+def sensitivity_criteria_wcdma(band):
+    with open(SENS_LTE_YAML, 'r') as s:
+        sens = yaml.safe_load(s)
+
+    return float(sens[str(band)])
+
 def main():  # test use
     power_limits_csv2yaml()
     # power_limits_csv2yaml('LTE')
