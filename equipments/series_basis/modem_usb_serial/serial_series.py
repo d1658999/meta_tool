@@ -223,10 +223,11 @@ class AtCmd:
             'Q256': 8,
         }
         self.rb_select_lte_dict = {
-            'PRB': 0,
-            'FRB': 1,
-            '1RB_0': 2,
-            '1RB_MAX': 3,
+            'PRB_0': 0,
+            'PRB_MAX': 1,
+            'FRB': 2,
+            '1RB_0': 3,
+            '1RB_MAX': 4,
         }
         self.type_dict = {
             'DFTS': 0,

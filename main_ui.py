@@ -1,11 +1,12 @@
+#!/usr/bin/python3
 import pathlib
 import pygubu
 
 PROJECT_PATH = pathlib.Path(__file__).parent
-PROJECT_UI = PROJECT_PATH / pathlib.Path('gui') / "main_v2_24_2.ui"
+PROJECT_UI = PROJECT_PATH / pathlib.Path('gui') / "main_v2_25_1.ui"
 
 
-class MainV2242App:
+class MainV2251App:
     def __init__(self, master=None):
         self.builder = builder = pygubu.Builder()
         builder.add_resource_path(PROJECT_PATH)
@@ -64,10 +65,11 @@ class MainV2242App:
         self.chan_L = None
         self.chan_M = None
         self.chan_H = None
-        self.prb_lte = None
+        self.prb0_lte = None
         self.frb_lte = None
         self.one_rb0_lte = None
         self.one_rbmax_lte = None
+        self.prbmax_lte = None
         self.bw5_fr1 = None
         self.bw10_fr1 = None
         self.bw15_fr1 = None
@@ -195,6 +197,7 @@ class MainV2242App:
         self.tx_level_stop = None
         self.fcc = None
         self.tx_level = None
+        self.prb_lte = None
         self.ce = None
         self.endc = None
         self.port_tx_lte = None
@@ -428,10 +431,11 @@ class MainV2242App:
                 "chan_L",
                 "chan_M",
                 "chan_H",
-                "prb_lte",
+                "prb0_lte",
                 "frb_lte",
                 "one_rb0_lte",
                 "one_rbmax_lte",
+                "prbmax_lte",
                 "bw5_fr1",
                 "bw10_fr1",
                 "bw15_fr1",
@@ -559,6 +563,7 @@ class MainV2242App:
                 "tx_level_stop",
                 "fcc",
                 "tx_level",
+                "prb_lte",
                 "ce",
                 "endc",
                 "port_tx_lte",
@@ -1021,6 +1026,6 @@ class MainV2242App:
 
 
 if __name__ == "__main__":
-    app = MainV2242App()
+    app = MainV2251App()
     app.run()
 

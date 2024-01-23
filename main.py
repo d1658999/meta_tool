@@ -8,7 +8,7 @@ import signal
 import os
 import yaml
 
-from main_ui import MainV2242App
+from main_ui import MainV2251App
 from utils.log_init import log_set, log_clear
 from utils.adb_handler import get_serial_devices
 from utils.excel_handler import excel_folder_create
@@ -24,7 +24,7 @@ PROJECT_PATH = pathlib.Path(__file__).parent
 logger = log_set('GUI')
 
 
-class MainApp(MainV2242App):
+class MainApp(MainV2251App):
     def __init__(self, master=None):
         super().__init__()
         self.notebook = self.builder.get_object("notebook1")
@@ -742,8 +742,10 @@ class MainApp(MainV2242App):
                 self.cp.set(True)
 
         for rb_ftm in ui_init['rb_set']['rb_ftm_lte']:
-            if rb_ftm == 'PRB':
-                self.prb_lte.set(True)
+            if rb_ftm == 'PRB_0':
+                self.prb0_lte.set(True)
+            elif rb_ftm == 'PRB_MAX':
+                self.prbmax_lte.set(True)
             elif rb_ftm == 'FRB':
                 self.frb_lte.set(True)
             elif rb_ftm == '1RB_0':
@@ -2706,9 +2708,13 @@ class MainApp(MainV2242App):
 
     def wanted_ftm_rb_lte(self):
         self.ftm_rb_lte = []
-        if self.prb_lte.get():
-            logger.debug('PRB')
-            self.ftm_rb_lte.append('PRB')
+        if self.prb0_lte.get():
+            logger.debug('PRB_0')
+            self.ftm_rb_lte.append('PRB_0')
+
+        if self.prbmax_lte.get():
+            logger.debug('PRB_MAX')
+            self.ftm_rb_lte.append('PRB_MAX')
 
         if self.frb_lte.get():
             logger.debug('FRB')
