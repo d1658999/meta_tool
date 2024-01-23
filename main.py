@@ -295,6 +295,7 @@ class MainApp(MainV2242App):
         self.pcl_mb.set(ui_init['power']['mb_gsm_pcl'])
         self.mod_gsm.set(ui_init['mcs']['modulaiton_gsm'])
         self.tx_level.set(ui_init['power']['tx_level'])
+        self.tx_level_spin.set(ui_init['power']['tx_level_spin'])
         self.tx_level_endc_lte.set(ui_init['power']['tx_level_endc_lte'])
         self.tx_level_endc_fr1.set(ui_init['power']['tx_level_endc_fr1'])
         self.wait_time.set(ui_init['external_inst']['wait_time'])
