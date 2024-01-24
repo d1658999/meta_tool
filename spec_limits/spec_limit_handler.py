@@ -27,6 +27,8 @@ SENS_LTE_PATH = Path('spec_limits') / 'Sens_lte.csv'
 SENS_FDD_FR1_YAML = Path('spec_limits') / 'Sens_fdd_fr1.yaml'
 SENS_TDD_FR1_YAML = Path('spec_limits') / 'Sens_tdd_fr1.yaml'
 SENS_LTE_YAML = Path('spec_limits') / 'Sens_lte.yaml'
+SENS_WCDMA_YAML = Path('spec_limits') / 'Sens_wcdma.yaml'
+SENS_GSM_YAML = Path('spec_limits') / 'Sens_gsm.yaml'
 
 TECHs = ['FR1', 'LTE', 'WCDMA', 'GSM']
 
@@ -255,10 +257,18 @@ def sensitivity_criteria_lte(band, bw):
 
 
 def sensitivity_criteria_wcdma(band):
-    with open(SENS_LTE_YAML, 'r') as s:
+    with open(SENS_WCDMA_YAML, 'r') as s:
         sens = yaml.safe_load(s)
 
     return float(sens[str(band)])
+
+
+def sensitivity_criteria_gsm(band):
+    with open(SENS_GSM_YAML, 'r') as s:
+        sens = yaml.safe_load(s)
+
+    return float(sens[str(band)])
+
 
 def main():  # test use
     power_limits_csv2yaml()
