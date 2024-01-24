@@ -1,11 +1,15 @@
 FR1:
-  criteria_min: __sensitivity__
+  sens_color_red_margin: 1
+  sens_color_yellow_margin: 3
 
 LTE:
-  criteria_min: __sensitivity__
+  sens_color_red_margin: 1
+  sens_color_yellow_margin: 3
 
 WCDMA:
-  criteria_min: __sensitivity__
+  sens_color_red_margin: 1
+  sens_color_yellow_margin: 3
 
 GSM:
-  criteria_min: __sensitivity__
+  sens_color_red_margin: 1
+  sens_color_yellow_margin: 3
