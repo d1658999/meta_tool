@@ -13,6 +13,8 @@ from utils.excel_handler import rx_power_relative_test_export_excel_ftm, rx_dese
 from utils.excel_handler import rx_desense_endc_process_ftm, select_file_name_rx_ftm, excel_folder_path
 from utils.channel_handler import channel_freq_select
 from exception.custom_exception import FileNotFoundException, PortTableException
+from utils.excel_handler import color_format_fr1_sens_ftm, color_format_lte_sens_ftm
+
 
 logger = log_set('rx_lmh')
 SDL_BANDS = [29, 32, 46, 75, 76]
@@ -296,6 +298,8 @@ class RxTestGenre(AtCmd, CMW100):
                 file_path = Path(excel_folder_path()) / Path(file_name)
                 rx_desense_process_ftm(file_path, self.mcs_fr1)
                 rxs_relative_plot_ftm(file_path, parameters)
+                color_format_fr1_sens_ftm(file_path)
+
             except TypeError as err:
                 logger.debug(err)
                 logger.info(
@@ -349,6 +353,8 @@ class RxTestGenre(AtCmd, CMW100):
                 file_path = Path(excel_folder_path()) / Path(file_name)
                 rx_desense_process_ftm(file_path, self.mcs_lte)
                 rxs_relative_plot_ftm(file_path, parameters)
+                color_format_lte_sens_ftm(file_path)
+
             except TypeError as err:
                 logger.debug(err)
                 logger.info(

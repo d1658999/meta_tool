@@ -12,7 +12,9 @@ from exception.custom_exception import FileNotFoundException
 from openpyxl.styles import PatternFill, Font, Color
 from openpyxl.formatting.rule import CellIsRule, FormulaRule, ColorScaleRule
 from openpyxl.formatting.formatting import ConditionalFormattingList
-from spec_limits.spec_limit_handler import import_aclr_limits, import_evm_limits
+from spec_limits.spec_limit_handler import import_aclr_limits, import_evm_limits, import_sens_limits
+from spec_limits.spec_limit_handler import sensitivity_criteria_fr1, sensitivity_criteria_lte
+
 
 logger = log_set('excel_hdl')
 
@@ -4226,7 +4228,164 @@ def color_format_gsm_evm_ftm(file_path):
     wb.save(file_path)
 
 
+def color_rule_sens_fr1_ftm(band, bw) -> dict:
+    # import yaml file
+    sens_crit = sensitivity_criteria_fr1(band, 30, bw)
+    margin = import_sens_limits()
+    sens_red_usl = sens_crit - margin['FR1']['sens_color_red_margin']
+    sens_yellow_usl = sens_crit - margin['FR1']['sens_color_yellow_margin']
+
+    # define the color of fill and font
+    fill_red = PatternFill(start_color='FFC7CE', end_color='FFC7CE', fill_type='solid')
+    fill_yellow = PatternFill(start_color='FFEB9C', end_color='FFEB9C', fill_type='solid')
+    fill_none = PatternFill(patternType='none')
+    font_red = Font(color='9C0006')
+    font_yellow = Font(color='9C6500')
+    font_none = Font(color=None)
+
+    red_pattern = {
+        'sens_red_usl': sens_red_usl,
+        'fill_red': fill_red,
+        'font_red': font_red,
+
+    }
+
+    yellow_pattern = {
+        'sens_yellow_usl': sens_yellow_usl,
+        'fill_yellow': fill_yellow,
+        'font_yellow': font_yellow,
+
+    }
+
+    none_pattern = {
+        'fill_none': fill_none,
+        'font_none': font_none,
+    }
+
+    return red_pattern, yellow_pattern, none_pattern
+
+
+def color_rule_sens_lte_ftm(band, bw) -> dict:
+    # import yaml file
+    sens_crit = sensitivity_criteria_lte(band, bw)
+    margin = import_sens_limits()
+    sens_red_usl = sens_crit - margin['LTE']['sens_color_red_margin']
+    sens_yellow_usl = sens_crit - margin['LTE']['sens_color_yellow_margin']
+
+    # define the color of fill and font
+    fill_red = PatternFill(start_color='FFC7CE', end_color='FFC7CE', fill_type='solid')
+    fill_yellow = PatternFill(start_color='FFEB9C', end_color='FFEB9C', fill_type='solid')
+    fill_none = PatternFill(patternType='none')
+    font_red = Font(color='9C0006')
+    font_yellow = Font(color='9C6500')
+    font_none = Font(color=None)
+
+    red_pattern = {
+        'sens_red_usl': sens_red_usl,
+        'fill_red': fill_red,
+        'font_red': font_red,
+
+    }
+
+    yellow_pattern = {
+        'sens_yellow_usl': sens_yellow_usl,
+        'fill_yellow': fill_yellow,
+        'font_yellow': font_yellow,
+
+    }
+
+    none_pattern = {
+        'fill_none': fill_none,
+        'font_none': font_none,
+    }
+
+    return red_pattern, yellow_pattern, none_pattern
+
+
+
+def color_format_fr1_sens_ftm(file_path):
+    logger.info('========== Color code judge for Sensitivity ==========')
+    wb = openpyxl.load_workbook(file_path)
+    for sheetname in wb.sheetnames:
+        if 'Dashboard' in sheetname:
+            continue
+
+        if 'Raw_Data' in sheetname:
+            ws = wb[sheetname]
+            if ws.max_row > 1:  # if not only the header, this step can continue to be activated
+                for row in range(2, ws.max_row+1):
+                    # get band and bw
+                    band = ws.cell(row, 1).value
+                    bw = ws.cell(row, 21).value
+
+                    # get the red and yellow pattern
+                    pattern_red, pattern_yellow, pattern_none = color_rule_sens_fr1_ftm(band, bw)
+
+                    # start to judge and give pattern
+                    if  pattern_red['sens_red_usl'] >= ws.cell(row, 7).value > pattern_yellow['sens_yellow_usl']:
+                        ws.cell(row, 7).fill = pattern_yellow['fill_yellow']
+                        ws.cell(row, 7).font = pattern_yellow['font_yellow']
+
+                    elif ws.cell(row, 7).value > pattern_red['sens_red_usl']:
+                        ws.cell(row, 7).fill = pattern_red['fill_red']
+                        ws.cell(row, 7).font = pattern_red['font_red']
+
+                    else:
+                        ws.cell(row, 7).fill = pattern_none['fill_none']
+                        ws.cell(row, 7).font = pattern_none['font_none']
+
+            else:
+                pass
+
+    wb.save(file_path)
+
+
+def color_format_lte_sens_ftm(file_path):
+    logger.info('========== Color code judge for Sensitivity ==========')
+    wb = openpyxl.load_workbook(file_path)
+    for sheetname in wb.sheetnames:
+        if 'Dashboard' in sheetname:
+            continue
+
+        if 'Raw_Data' in sheetname:
+            ws = wb[sheetname]
+            if ws.max_row > 1:  # if not only the header, this step can continue to be activated
+                for row in range(2, ws.max_row+1):
+                    # get band and bw
+                    band = ws.cell(row, 1).value
+                    bw = ws.cell(row, 21).value
+
+                    # get the red and yellow pattern
+                    pattern_red, pattern_yellow, pattern_none = color_rule_sens_lte_ftm(band, bw)
+
+                    # start to judge and give pattern
+                    if  pattern_red['sens_red_usl'] >= ws.cell(row, 7).value > pattern_yellow['sens_yellow_usl']:
+                        ws.cell(row, 7).fill = pattern_yellow['fill_yellow']
+                        ws.cell(row, 7).font = pattern_yellow['font_yellow']
+
+                    elif ws.cell(row, 7).value > pattern_red['sens_red_usl']:
+                        ws.cell(row, 7).fill = pattern_red['fill_red']
+                        ws.cell(row, 7).font = pattern_red['font_red']
+
+                    else:
+                        ws.cell(row, 7).fill = pattern_none['fill_none']
+                        ws.cell(row, 7).font = pattern_none['font_none']
+
+            else:
+                pass
+
+    wb.save(file_path)
+
 
 if __name__ == '__main__':
-    file_path = r'C:\Users\pricewu\Documents\meta_tool\output\1FDG65013956000B3CM0001N\Tx_Pwr_ACLR_EVM_10MHZ_FR1_LMH_color.xlsx'
-    color_format_fr1_aclr_ftm(file_path)
+    pass
+    # file_path = r'C:\Users\pricewu\Documents\meta_tool\output\1FDG65013941000B3BP0000L\sens_sample_lte.xlsx'
+    # color_format_lte_sens_ftm(file_path)
+    # wb = openpyxl.load_workbook(file_path)
+    # ws = wb['Raw_Data_QPSK_TxMax']
+    #
+    # pattern_red, pattern_yellow, pattern_none = color_rule_sens_fr1_ftm(48, 5)
+    # ws.cell(2, 7).fill = pattern_red['fill_red']
+    # ws.cell(2, 7).font = pattern_red['font_red']
+    #
+    # wb.save(file_path)

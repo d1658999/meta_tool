@@ -14,6 +14,7 @@ CSV_PWR_FILE_GSM = 'power_limits_gsm.csv'
 PWR_LIMITS_YAML_NAME = 'power_limits.yaml'
 ACLR_LIMITS_YAML_NAME = 'aclr_color_code.yaml'
 EVM_LIMITS_YAML_NAME = 'evm_color_code.yaml'
+SENS_LIMITS_YAML_NAME = 'sensitivity_color_code.yaml'
 
 CSV_PWR_PATH_FR1 = Path('spec_limits') / Path(CSV_PWR_FILE_FR1)
 CSV_PWR_PATH_LTE = Path('spec_limits') / Path(CSV_PWR_FILE_LTE)
@@ -22,6 +23,7 @@ CSV_PWR_PATH_GSM = Path('spec_limits') / Path(CSV_PWR_FILE_GSM)
 PWR_LIMITS_YAML_PATH = Path('spec_limits') / PWR_LIMITS_YAML_NAME
 ACLR_LIMITS_YAML_PATH = Path('spec_limits') / ACLR_LIMITS_YAML_NAME
 EVM_LIMITS_YAML_PATH = Path('spec_limits') / EVM_LIMITS_YAML_NAME
+SENS_LIMITS_YAML = Path('spec_limits') / SENS_LIMITS_YAML_NAME
 SENS_FDD_FR1_PATH = Path('spec_limits') / 'Sens_fdd_fr1.csv'
 SENS_LTE_PATH = Path('spec_limits') / 'Sens_lte.csv'
 SENS_FDD_FR1_YAML = Path('spec_limits') / 'Sens_fdd_fr1.yaml'
@@ -29,6 +31,7 @@ SENS_TDD_FR1_YAML = Path('spec_limits') / 'Sens_tdd_fr1.yaml'
 SENS_LTE_YAML = Path('spec_limits') / 'Sens_lte.yaml'
 SENS_WCDMA_YAML = Path('spec_limits') / 'Sens_wcdma.yaml'
 SENS_GSM_YAML = Path('spec_limits') / 'Sens_gsm.yaml'
+
 
 TECHs = ['FR1', 'LTE', 'WCDMA', 'GSM']
 
@@ -157,17 +160,24 @@ def import_power_limits():
 
 
 def import_aclr_limits():
-    logger.info('import aclr yaml file ')
+    logger.debug('import aclr yaml file ')
     with open(ACLR_LIMITS_YAML_PATH, 'r') as s:
         spec_aclr_limits = yaml.safe_load(s)
         return spec_aclr_limits
 
 
 def import_evm_limits():
-    logger.info('import evm yaml file ')
+    logger.debug('import evm yaml file ')
     with open(EVM_LIMITS_YAML_PATH, 'r') as s:
         spec_evm_limits = yaml.safe_load(s)
         return spec_evm_limits
+
+
+def import_sens_limits():
+    logger.debug('import sens yaml file ')
+    with open(SENS_LIMITS_YAML, 'r') as s:
+        spec_sens_limits = yaml.safe_load(s)
+        return spec_sens_limits
 
 
 def csv_to_yaml_fr1(csv_file_path, yaml_file_path, has_header=True):  # generate fdd sensitivity criteria
