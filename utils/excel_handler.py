@@ -4377,6 +4377,40 @@ def color_format_lte_sens_ftm(file_path):
     wb.save(file_path)
 
 
+def merge_same_cells(filepath, sheet_name):
+    """
+    Merges cells with identical values in a specified Excel worksheet.
+
+    Args:
+        filename (str): The name of the Excel file.
+        sheet_name (str): The name of the worksheet.
+    """
+
+    workbook = openpyxl.load_workbook(filepath)
+    worksheet = workbook[sheet_name]
+
+    for col_num in range(1, 3):
+        current_value = None
+        start_row = None
+
+        for row_num in range(2, worksheet.max_row + 2):
+            cell = worksheet.cell(row=row_num, column=col_num)
+            if cell.value == current_value:
+                continue  # Same value, keep extending the merge range
+            else:
+                if start_row is not None and row_num - start_row > 1:  # Merge if multiple cells
+                    worksheet.merge_cells(
+                        start_row=start_row,
+                        end_row=row_num - 1,
+                        start_column=col_num,
+                        end_column=col_num
+                    )
+                current_value = cell.value
+                start_row = row_num
+
+    workbook.save(filepath)
+
+
 if __name__ == '__main__':
     pass
     # file_path = r'C:\Users\pricewu\Documents\meta_tool\output\1FDG65013941000B3BP0000L\sens_sample_lte.xlsx'
@@ -4389,3 +4423,6 @@ if __name__ == '__main__':
     # ws.cell(2, 7).font = pattern_red['font_red']
     #
     # wb.save(file_path)
+    # filepath = "Tx_Pwr_ACLR_EVM_10MHZ_LTE_LMH_CS_UHB.xlsx"
+    # sheetname ="Raw_Data_QPSK"
+    # merge_same_cells(filepath, sheetname)
