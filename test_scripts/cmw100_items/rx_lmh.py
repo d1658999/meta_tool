@@ -551,7 +551,7 @@ class RxTestGenre(AtCmd, CMW100):
             self.rx_path_setting_lte()
 
             # LTE RxS
-            rxs_lte = self.sensitivity_solution_select_fr1()
+            rxs_lte = self.sensitivity_solution_select_lte()
 
             # save data to excel
             data = [

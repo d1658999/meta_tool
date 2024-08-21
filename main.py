@@ -2829,7 +2829,7 @@ class MainApp(MainV2251App):
         logger.info('Separate Successfully')
 
     def separate_nv_2(self):
-        OUTPUT_PATH = pathlib.Path('regy_separate')
+        OUTPUT_PATH = pathlib.Path('regy_file_parse')
         regy_extract_2(self.base_regy_parse.get(), self.parse_cfg.get(), OUTPUT_PATH)
         logger.info('Separate Successfully')
 
