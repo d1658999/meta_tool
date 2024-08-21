@@ -719,9 +719,9 @@ class RxTestGenre(AtCmd, CMW100):
                     self.set_test_end_wcdma()
                     self.set_test_mode_wcdma()
                     self.cmw_query('*OPC?')
-                    self.rx_path_setting_wcdma()
                     self.sig_gen_wcdma()
                     self.sync_wcdma()
+                    self.rx_path_setting_wcdma()
                     self.antenna_switch_v2()
                     # self.tx_chan_wcdma = tx_rx_chan_wcdma[0]
                     # self.tx_set_wcdma()

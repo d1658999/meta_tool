@@ -1732,13 +1732,15 @@ def rx_power_relative_test_export_excel_ftm(data, parameters_dict):
         elif tech == 'WCDMA':
             max_row = ws.max_row
             row = max_row + 1  # skip title
-            for tx_chan, rx_level in data.items():
-                chan = chan_judge_wcdma(band, cm_pmt_ftm.transfer_chan2freq_wcdma(band, tx_chan))
+            for rx_chan, rx_level in data.items():
+                tx_freq = cm_pmt_ftm.transfer_freq_rx2tx_wcdma(band,
+                                                               cm_pmt_ftm.transfer_chan2freq_wcdma(band, rx_chan, 'rx'))
+                chan = chan_judge_wcdma(band, tx_freq)
                 ws.cell(row, 1).value = band
                 ws.cell(row, 2).value = rx_path_wcdma_dict[rx_path]
                 ws.cell(row, 3).value = chan  # LMH
-                ws.cell(row, 4).value = tx_chan  # channel
-                ws.cell(row, 5).value = cm_pmt_ftm.transfer_chan2freq_wcdma(band, tx_chan, 'tx')  # freq_tx
+                ws.cell(row, 4).value = rx_chan  # channel
+                ws.cell(row, 5).value = tx_freq  # freq_tx
                 ws.cell(row, 6).value = rx_level
                 row += 1
 

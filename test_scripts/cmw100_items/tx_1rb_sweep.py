@@ -90,7 +90,6 @@ class TxTest1RbSweep(AtCmd, CMW100):
                 else:
                     logger.info(f'B{self.band_fr1} does not have BW {self.bw_fr1}MHZ')
 
-
         for bw in ext_pmt.fr1_bandwidths:
             try:
                 file_name = select_file_name_genre_tx_ftm(bw, 'FR1', '1rb_sweep')
